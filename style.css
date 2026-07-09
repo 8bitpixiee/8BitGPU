@@ -1,7 +1,7 @@
 body {
     margin: 0;
     background-image: url('starrysky.gif');
-background-size: 1200px;
+background-size: 2000px;
 background-position: center;
 background-repeat: no-repeat;
 background-attachment: fixed;
@@ -11,7 +11,7 @@ background-attachment: fixed;
 
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 
     min-height: 100vh;
     text-align: center;
@@ -25,6 +25,11 @@ h1 {
     font-size: 6rem;
     margin-bottom: 10px;
     color: #d896ff;
+    text-shadow:
+    0 0 10px #d896ff,
+    0 0 20px #d896ff,
+    0 0 40px #d896ff;
+
 }
 
 p {
@@ -39,7 +44,7 @@ button {
     border: 2px solid #d896ff;
     border-radius: 14px;
     display: inline-block;
-    padding: 15px 30px;
+    padding-top: 80px;
     margin: 10px;
 
     font-size: 18px;
