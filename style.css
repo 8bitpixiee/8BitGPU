@@ -74,3 +74,8 @@ button:hover {
     color: black;
     transform: translateY(-3px);
 }
+.pixie {
+    width: 120px;
+    image-rendering: pixelated;
+    margin-bottom:15px;
+}
