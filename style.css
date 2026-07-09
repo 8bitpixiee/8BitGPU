@@ -28,8 +28,8 @@ background-attachment: fixed;
     border-radius: 25px;
     padding: 25px 35px;
     width: fit-content;
-    margin-top: 20px:
-margin-left: 20px;
+    margin-top: 50px:
+margin-left: 50px;
 }
 .nav-buttons {
     display: flex;
@@ -38,7 +38,7 @@ margin-top: 20px:
 flex-wrap: wrap;
 
 h1 {
-    font-size: 6rem;
+    font-size: 5rem;
     margin-bottom: 10px;
     color: #d896ff;
     text-shadow:
@@ -51,6 +51,7 @@ h1 {
 p {
     font-size: 1.5rem;
     margin-bottom: 40px;
+    line-height: 1.8;
 }
 
 button {
