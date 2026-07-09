@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    background-image: url('2e69671ac787cdb6640ae8463f693aa.gif');
+    background: linear-gradient(180deg, #050505, #170026);
 background-size: cover;
 background-position: center;
 background-repeat: no-repeat;
