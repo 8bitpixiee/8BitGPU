@@ -83,7 +83,7 @@ button:hover {
     width: 100vw;
     min-height: 100vh;
 
-background-image: url("crackedwindows.jfif");
+background: red;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
