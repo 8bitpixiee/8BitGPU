@@ -1,13 +1,14 @@
-body {
+body, h1, p, button {
     margin: 0;
     background: black;
 background-size: 2000px;
 background-position: center;
 background-repeat: no-repeat;
 background-attachment: fixed;
+color: white;
+    font-family: 'Pixelify Sans', sans-serif !important;
 }
-    color: white;
-    font-family: 'Pixelify Sans', sans-serif;
+    
 .container {
     position: absolute;
     top: 20px;
@@ -75,7 +76,7 @@ button:hover {
     width: 100vw;
     min-height: 100vh;
 
-background-image: url("crackedwindows.jfif");
+background-image: url("errorwindows.jfif");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
