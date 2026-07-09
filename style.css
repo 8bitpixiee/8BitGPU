@@ -79,3 +79,11 @@ button:hover {
     image-rendering: pixelated;
     margin-bottom:15px;
 }
+.desktop {
+    width: 100vw;
+    height: 100vh;
+
+background-image: url("wallpaper.gif");
+    background-size: cover;
+    background-position: relative;
+}
