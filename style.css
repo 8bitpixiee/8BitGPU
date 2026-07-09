@@ -1,25 +1,17 @@
 body {
     margin: 0;
-    background: black
+    background: black;
 background-size: 2000px;
 background-position: center;
 background-repeat: no-repeat;
 background-attachment: fixed;
-
+}
     color: white;
     font-family: 'Pixelify Sans', sans-serif;
-
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    padding: 15px 25px;
-
-    min-height: 100vh;
-    text-align: left;
-}
-
 .container {
-    width: 100%;
+    position: absolute;
+    top: 20px;
+    left: 20px;
 }
 .hero {
     background: rgba(20, 20, 30, 0.55);
@@ -83,12 +75,10 @@ button:hover {
     width: 100vw;
     min-height: 100vh;
 
-background: red;
+background-image: url("crackedwindows.jfif");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
 
     position: relative;
-
-    border: 5px solid red;
 }
