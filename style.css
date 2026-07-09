@@ -10,15 +10,16 @@ background-attachment: fixed;
     font-family: 'Pixelify Sans', sans-serif;
 
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 40px;
 
     min-height: 100vh;
     text-align: center;
 }
 
 .container {
-    max-width: 900px;
+    max-width: 100%;
 }
 
 h1 {
