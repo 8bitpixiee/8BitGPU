@@ -11,16 +11,31 @@ background-attachment: fixed;
 
     display: flex;
     justify-content: flex-start;
-    align-items: center;
-    padding-top: 40px;
+    align-items: flex-start;
+    padding: 15px 25px;
 
     min-height: 100vh;
-    text-align: center;
+    text-align: left;
 }
 
 .container {
-    max-width: 100%;
+    width: 100%;
 }
+.hero {
+    background: rgba(20, 20, 30, 0.55);
+    backdrop-filter: blur(12px);
+    border: 2px solid #d896ff;
+    border-radius: 25px 35px;
+    padding: 25px 35px;
+    width: fit-content;
+    margin-top: 20px:
+margin-left: 20px;
+}
+.nav-buttons {
+    display: flex;
+    gap: 12px:
+margin-top: 20px:
+flex-wrap: wrap;
 
 h1 {
     font-size: 6rem;
