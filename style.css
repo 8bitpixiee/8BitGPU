@@ -1,6 +1,11 @@
 body {
     margin: 0;
-    background: linear-gradient(180deg, #080010, #170026);
+    background-image: url('2e69671ac787cdb6640ae8463f693aa.gif');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+background-attachment: fixed;
+
     color: white;
     font-family: Arial, sans-serif;
 
