@@ -15,20 +15,22 @@ color: white;
     left: 20px;
 }
 .hero {
-    background: rgba(20, 20, 30, 0.55);
-    backdrop-filter: blur(12px);
-    border: 2px solid #d896ff;
-    border-radius: 25px;
-    padding: 25px 35px;
-    width: fit-content;
-    margin-top: 50px:
-margin-left: 50px;
+    position: fixed;
+
+    right: 40px;
+    bottom: 40px;
+
+    background: none;
+    border: none;
+    backdrop-filter: none;
+    padding: 0;
 }
 .nav-buttons {
     display: flex;
-    gap: 12px;
-margin-top: 20px;
-flex-wrap: wrap;
+    flex-direction: column;
+    gap: 6px;
+    margintop: 10px;
+    align-items: flext-start;
 }
 
 h1 {
@@ -48,24 +50,23 @@ p {
 }
 
 button {
-    background: transparent;
-    color: white;
-
-    border: 2px solid #d896ff;
-    border-radius: 14px;
-    display: inline-block;
-    padding-top: 80px;
-    margin: 10px;
-
-    font-size: 18px;
-
-    transition: all .3s ease;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: #d896ff;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all .2 ease;
 }
 
 button:hover {
-    background: #d896ff;
-    color: black;
-    transform: translateY(-3px);
+    color: white;
+    text-shadow:
+        0 0 10px white,
+        0 0 20px #d896ff;
+    transform: translateX(4px);
 }
 .pixie {
     width: 120px;
