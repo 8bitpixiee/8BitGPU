@@ -80,9 +80,9 @@ button:hover {
     width: 100vw;
     min-height: 100vh;
 
-background-image: url("errorwindows.jfif");
+background-image: url("comets.gif");
     background-size: cover;
-    background-repeat: no-repeat;
+    background-repeat: repeat;
     background-position: center center;
 
     position: relative;
