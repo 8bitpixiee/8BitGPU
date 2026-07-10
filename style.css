@@ -105,21 +105,23 @@ background-image: url("comets.gif");
 .store-page {
     background: url("starrysky.gif");
     background-size: cover;
+    background-attatchment: fixed;
     color: white;
     font-family: sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .store-window {
     width: 700px;
     margin: 80px auto;
-
     background: rgba(15,15,25,.75);
-
     border: 2px solid #d896ff;
     border-radius: 20px;
-
     backdrop-filter: blur(12px);
-
     padding: 40px;
 }
 
@@ -150,33 +152,26 @@ background-image: url("comets.gif");
 }
 .window {
     width: 900px;
-    margin: 60px auto;
-
+    margin-top: 80px;
     background: rgba(15,15,25,.85);
     border: 2px solid #d896ff;
     border-radius: 12px;
-
     overflow: hidden;
-
     backdrop-filter: blur(15px);
 }
 
 .window-bar {
     height: 40px;
-
     background: linear-gradient(
         90deg,
         #c8a2ff,
         #ff69b4,
         #d946ef
     );
-
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     padding: 0 15px;
-
     color: white;
     font-weight: bold;
 }
@@ -194,11 +189,8 @@ background-image: url("comets.gif");
 
 .product {
     margin-bottom: 25px;
-
     padding: 20px;
-
     border: 1px solid #d896ff;
     border-radius: 10px;
-
     background: rgba(255,255,255,.05);
 }
