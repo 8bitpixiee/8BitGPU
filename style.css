@@ -148,3 +148,57 @@ background-image: url("comets.gif");
 
     cursor: pointer;
 }
+.window {
+    width: 900px;
+    margin: 60px auto;
+
+    background: rgba(15,15,25,.85);
+    border: 2px solid #d896ff;
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    backdrop-filter: blur(15px);
+}
+
+.window-bar {
+    height: 40px;
+
+    background: linear-gradient(
+        90deg,
+        #c8a2ff,
+        #ff69b4,
+        #d946ef
+    );
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 15px;
+
+    color: white;
+    font-weight: bold;
+}
+
+.window-buttons {
+    display: flex;
+    gap: 12px;
+    font-size: 20px;
+}
+
+.window-content {
+    padding: 30px;
+    color: white;
+}
+
+.product {
+    margin-bottom: 25px;
+
+    padding: 20px;
+
+    border: 1px solid #d896ff;
+    border-radius: 10px;
+
+    background: rgba(255,255,255,.05);
+}
