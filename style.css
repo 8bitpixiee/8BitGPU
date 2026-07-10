@@ -194,3 +194,6 @@ background-image: url("comets.gif");
     border-radius: 10px;
     background: rgba(255,255,255,.05);
 }
+h1, h2, .window-bar, .desktop-icon span {
+    font-family: 'Press Start 2P', cursive;
+}
