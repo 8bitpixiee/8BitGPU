@@ -102,3 +102,49 @@ background-image: url("comets.gif");
     image-rendering: pixelated;
 }
 
+.store-page {
+    background: url("starrysky.gif");
+    background-size: cover;
+    color: white;
+    font-family: sans-serif;
+}
+
+.store-window {
+    width: 700px;
+    margin: 80px auto;
+
+    background: rgba(15,15,25,.75);
+
+    border: 2px solid #d896ff;
+    border-radius: 20px;
+
+    backdrop-filter: blur(12px);
+
+    padding: 40px;
+}
+
+.products {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.product {
+    background: rgba(255,255,255,.08);
+    border: 1px solid #d896ff;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.product button {
+    margin-top: 15px;
+    padding: 10px 20px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #ff69b4;
+    color: white;
+
+    cursor: pointer;
+}
