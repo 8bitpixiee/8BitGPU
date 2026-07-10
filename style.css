@@ -124,7 +124,18 @@ background-image: url("comets.gif");
     backdrop-filter: blur(12px);
     padding: 40px;
 }
-
+.store-window h1 {
+    fontsize: 72px;
+    line-height: 0.9;
+    letter-spacing: -6px;
+    color: #f0d6ff;
+    text-shadow:
+        0 0 10px #d896ff,
+        0 0 20px #d896ff,
+        0 0 40px #ff69b4,
+        0 0 80px #ff69b4;
+}
+    
 .products {
     display: flex;
     flex-direction: column;
