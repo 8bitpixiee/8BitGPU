@@ -17,7 +17,7 @@ color: white;
     position: fixed;
 
     right: 40px;
-    bottom: 40px;
+    bottom: 28px;
 
     background: none;
     border: none;
@@ -35,8 +35,8 @@ color: white;
 
 h1 {
     background: none;
-    font-size: 8rem;
-    margin-bottom: 10px;
+    font-size: 56px;
+    margin-bottom: 5px;
     color: #d896ff;
     text-shadow:
     0 0 10px #d896ff,
@@ -48,6 +48,7 @@ p {
     background: none;
     font-size: 1.5rem;
     margin-bottom: 40px;
+    margin-top: 0;
     line-height: 1.8;
 }
 
@@ -75,7 +76,8 @@ button:hover {
    position: fixed;
     top: 25px;
     right: 25px;
-    width: 200px;
+    width: 90px;
+    margin-bottom: -10px;
     image-rendering: pixelated;
     z-index: 1000;
     filter: 
