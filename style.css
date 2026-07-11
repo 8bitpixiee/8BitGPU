@@ -239,7 +239,7 @@ h1, h2, .window-bar, .desktop-icon span {
     z-index: 1000;
 }
 #taskbar {
-    position: fixed;
+    position: absolute;
     bottom: 0;
     left: 0;
     width: 100vw;
