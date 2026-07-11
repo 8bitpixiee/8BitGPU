@@ -9,7 +9,7 @@ if (choice === "none") {
   }
 }
 function toggleMenu() {
-  const menu = document.getElementById("avatarMenu");
+  const menu = document.getElementById("avatarMenu").style.display ="none";
   if (menu.style.display === "flex") {
     menu.style.display = "none";
   } else {
