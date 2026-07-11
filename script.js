@@ -11,3 +11,4 @@ function setHair(choice) {
 function toggleMenu {
   display: none;
 }
+alert ("script workin");
