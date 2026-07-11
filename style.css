@@ -239,16 +239,17 @@ h1, h2, .window-bar, .desktop-icon span {
     z-index: 1000;
 }
 #taskbar {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
     width: 100vw;
-    height: auto;
-    max-height: 40px;
-    z-index: 9999;
-    image-rendering: pixelated;
-    cursor: pointer;
+    height: 32px;
+
+    z-index: 999999999;
+
+    transform: translateZ(0);
 }
+
 #gamesButton {
     position: fixed;
     bottom: 4px;
