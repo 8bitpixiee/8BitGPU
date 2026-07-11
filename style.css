@@ -17,7 +17,7 @@ color: white;
     position: fixed;
 
     right: 40px;
-    bottom: 120px;
+    bottom: 260px;
 
     background: none;
     border: none;
@@ -87,12 +87,7 @@ button:hover {
     margin-bottom: -10px;
     image-rendering: pixelated;
     z-index: 1000;
-    filter: 
-        drop-shadow(0 40 10px #c8a2ff)
-        drop-shadow(0 40 25px #e0b0ff)
-        drop-shadow(0 40 45px #ff69b4)
-        drop-shadow(0 40 70px #ff4fa3)
-        drop-shadow(0 40 100px #d946ef);
+
 }
 .desktop {
     width: 100vw;
@@ -218,16 +213,19 @@ h1, h2, .window-bar, .desktop-icon span {
     font-family: 'Press Start 2P', cursive;
 }
 
-#companion {
-    position: fixed;
-    bottom: 36px;
-    right: 20px;
-    width: 256px;
-    height: 256px;
-    z-index: 9999;
-    border: none;
-    outline: none;
-    background: transparent;
+#companion::before {
+    content: "";
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle,
+        rgba(217,70,239,0.7),
+        rgba(217,70,239,0));
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    filter: blur(20px);
+    z-index: -1;
 }
 .avatar-layer {
     position: absolute;
