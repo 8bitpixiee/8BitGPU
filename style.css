@@ -263,3 +263,12 @@ h1, h2, .window-bar, .desktop-icon span {
 #gamesButton:hover {
     transform: scale(1.1);
 }
+#startMenu {
+    display: none;
+    position: fixed;
+    bottom: 32px;
+    left: 0;
+    background: black;
+    padding: 10px;
+    z-index: 9999;
+}
