@@ -242,12 +242,13 @@ h1, h2, .window-bar, .desktop-icon span {
     position: fixed;
     bottom: 0;
     left: 0;
+
     width: 100vw;
-    height: 32px;
+    height: auto;
 
-    z-index: 999999999;
+    z-index: 999999999999999;
 
-    transform: translateZ(0);
+    border: 3px solid red;
 }
 
 #gamesButton {
