@@ -17,7 +17,7 @@ color: white;
     position: fixed;
 
     right: 40px;
-    bottom: 260px;
+    bottom: 28px;
 
     background: none;
     border: none;
@@ -35,20 +35,13 @@ color: white;
 
 h1 {
     background: none;
-    font-size: 160px;
+    font-size: 56px;
     margin-bottom: 5px;
-    position: relative;
-    bottom: 80px;
-    right: 0px;
-    font-size: 72px;
-
     color: #d896ff;
-   text-shadow:
-    0 0 15px #d896ff,
-    0 0 30px #d896ff,
-    0 0 60px #d896ff,
-    0 0 100px #d896ff;
-
+    text-shadow:
+    0 0 10px #d896ff,
+    0 0 20px #d896ff,
+    0 0 40px #d896ff;
 }
 
 p {
@@ -81,13 +74,18 @@ button:hover {
 }
 .pixie {
    position: fixed;
-    top: 330px;
-    right: 180px;
+    top: 25px;
+    right: 25px;
     width: 90px;
     margin-bottom: -10px;
     image-rendering: pixelated;
     z-index: 1000;
-
+    filter: 
+        drop-shadow(0 0 10px #c8a2ff)
+        drop-shadow(0 0 25px #e0b0ff)
+        drop-shadow(0 0 45px #ff69b4)
+        drop-shadow(0 0 70px #ff4fa3)
+        drop-shadow(0 0 100px #d946ef)
 }
 .desktop {
     width: 100vw;
@@ -213,19 +211,16 @@ h1, h2, .window-bar, .desktop-icon span {
     font-family: 'Press Start 2P', cursive;
 }
 
-#companion::before {
-    content: "";
-    position: absolute;
-    width: 140px;
-    height: 140px;
-    background: radial-gradient(circle,
-        rgba(217,70,239,0.7),
-        rgba(217,70,239,0));
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    filter: blur(20px);
-    z-index: -1;
+#companion {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 256px;
+    height: 256px;
+    z-index: 9999;
+    border: none;
+    outline: none;
+    background: transparent;
 }
 .avatar-layer {
     position: absolute;
