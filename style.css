@@ -249,6 +249,7 @@ h1, h2, .window-bar, .desktop-icon span {
     z-index: 999999999999999;
 
     border: 3px solid red;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
 #gamesButton {
