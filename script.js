@@ -1,3 +1,4 @@
+let species="pixie"
 function sayHi() {
-  alert ("PIXIE CODE WORKS!!")
+  alert(species)
 }
