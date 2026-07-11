@@ -8,11 +8,6 @@ function setHair(choice) {
     hairLayer.src=choice;
   }
 }
-function toggleMenu() {
-  const menu=document.getElementById("avatarMenu")
-  if (menu.style.display==="flex") {
-      menu.style.display="none";
-} else {
-  menu.style.display="flex";
-}
+function toggleMenu {
+  display: none;
 }
