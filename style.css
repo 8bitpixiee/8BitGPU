@@ -237,3 +237,13 @@ h1, h2, .window-bar, .desktop-icon span {
     flex-direction: column;
     gap: 8px;
     z-index: 1000;
+}
+#taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%
+    height: auto;
+    z-index:10000;
+    pointer-events: none;
+}
