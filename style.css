@@ -208,3 +208,27 @@ background-image: url("comets.gif");
 h1, h2, .window-bar, .desktop-icon span {
     font-family: 'Press Start 2P', cursive;
 }
+
+#companion {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 128px;
+    height: 128px;
+    z-index: 9999;
+}
+.avatar-layer {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 128px;
+    image-rendering: pixelated;
+}
+#avatarMenu {
+    position: fixed;
+    bottom: 170px
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1000;
