@@ -61,7 +61,7 @@
 </header>   <!-- hero -->
 </div>      <!-- container -->
 </div> <!-- desktop -->
-<div id="companion" onclick="alert('PIXIE CLICKED')">
+<div id="companion" onclick="toggleMenu()">
     <img
         src="body_base_fem_idle_front_v1.png"
         id="bodyLayer"
@@ -78,11 +78,12 @@
         class="avatar-layer"
         >
 </div>
-<div id="avatarMenu">
+<div id="avatarMenu" style="display:none;">
     <button onclick="setHair('none')">
         Bald
     </button>
-    <button onclick="setHair('volume_hair_fem_idle_front_v1.png)">
+
+    <button onclick="setHair('volume_hair_fem_idle_front_v1.png')">
         Bombshell
     </button>
 </div>
