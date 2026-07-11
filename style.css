@@ -35,13 +35,20 @@ color: white;
 
 h1 {
     background: none;
-    font-size: 56px;
+    font-size: 160px;
     margin-bottom: 5px;
+    position: relative;
+    bottom: 80px;
+    right: 0px;
+    font-size: 72px;
+
     color: #d896ff;
-    text-shadow:
-    0 0 10px #d896ff,
-    0 0 20px #d896ff,
-    0 0 40px #d896ff;
+   text-shadow:
+    0 0 15px #d896ff,
+    0 0 30px #d896ff,
+    0 0 60px #d896ff,
+    0 0 100px #d896ff;
+
 }
 
 p {
@@ -85,7 +92,7 @@ button:hover {
         drop-shadow(0 40 25px #e0b0ff)
         drop-shadow(0 40 45px #ff69b4)
         drop-shadow(0 40 70px #ff4fa3)
-        drop-shadow(0 40 100px #d946ef)
+        drop-shadow(0 40 100px #d946ef);
 }
 .desktop {
     width: 100vw;
