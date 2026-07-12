@@ -246,14 +246,12 @@ h1, h2, .window-bar, .desktop-icon span {
     left: 0;
 
     width: 100vw;
-    height: auto;
-
+    height: 48px;
+    overflow: hidden;
     z-index: 100;
 
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
-#taskbar * {
-    pointer-events: auto;
 
 #gamesButton {
     position: fixed;
