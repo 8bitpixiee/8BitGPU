@@ -248,7 +248,7 @@ h1, h2, .window-bar, .desktop-icon span {
     width: 100vw;
     height: auto;
 
-    z-index: 999999999999999;
+    z-index: 100;
 
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
