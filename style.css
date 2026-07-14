@@ -213,7 +213,7 @@ h1, h2, .window-bar, .desktop-icon span {
 
 #companion {
     position: fixed;
-    bottom: 20px;
+    bottom: 32px;
     right: 20px;
     width: 256px;
     height: 256px;
