@@ -233,17 +233,6 @@ h1, h2, .window-bar, .desktop-icon span {
     image-rendering: pixelated;
     pointer-events: none;
 }
-#avatarMenu {
-    position: fixed;
-    bottom: 170;
-    left: 20px;
-    display: none;
-    flex-direction: column;
-    gap: 8px;
-    background: black;
-    padding: 10px;
-    z-index: 1000;
-}
 #taskbar {
     position: fixed;
     bottom: 0;
