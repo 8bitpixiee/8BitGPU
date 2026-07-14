@@ -15,14 +15,16 @@ color: white;
 }
 .hero {
     position: fixed;
-
     right: 40px;
     bottom: 28px;
-
     background: none;
     border: none;
     backdrop-filter: none;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-item: flex-end;
+    margin-top: -8px
 }
 .nav-buttons {
     display: flex;
@@ -36,7 +38,7 @@ color: white;
 h1 {
     background: none;
     font-size: 120px;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
     color: #d896ff;
     text-shadow:
     0 0 10px #d896ff,
