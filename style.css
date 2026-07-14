@@ -224,6 +224,31 @@ h1, h2, .window-bar, .desktop-icon span {
     outline: none;
     background: transparent;
 }
+
+#avatarLabButton {
+    position: fixed;
+    left: 48px;
+    bottom: 295px;
+    z-index: 9998;
+    display: block;
+    padding: 10px 15px;
+    border: 2px solid #f3c9ff;
+    border-radius: 6px;
+    color: white;
+    background: linear-gradient(135deg, #6e3d95, #d44d9e);
+    box-shadow: 0 0 8px #d896ff, 0 0 18px #ff69b4, inset 0 0 8px #ffffff66;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: .5px;
+    image-rendering: pixelated;
+}
+
+#avatarLabButton:hover {
+    transform: translateY(-3px) scale(1.03);
+    color: white;
+    text-shadow: 0 0 8px white;
+    box-shadow: 0 0 12px #f3c9ff, 0 0 28px #ff69b4, inset 0 0 10px #ffffff99;
+}
 #avatarMenu {
     bottom: 170px
     position: fixed;

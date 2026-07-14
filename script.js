@@ -18,6 +18,25 @@ function setHair(choice) {
     }
 }
 
+function loadSavedOutfit() {
+    const savedOutfit = JSON.parse(localStorage.getItem("8bitgpu-avatar-outfit"));
+
+    if (!savedOutfit) {
+        return;
+    }
+
+    const hairLayer = document.getElementById("hairLayer");
+    const bottomLayer = document.getElementById("drawlsLayer");
+
+    if (savedOutfit.hair === 0) {
+        hairLayer.style.display = "none";
+    }
+
+    if (savedOutfit.bottom === 0) {
+        bottomLayer.style.display = "none";
+    }
+}
+
 document.addEventListener("click", function(event) {
     const menu = document.getElementById("avatarMenu");
     const companion = document.getElementById("companion");
@@ -29,3 +48,5 @@ document.addEventListener("click", function(event) {
         menu.style.display = "none";
     }
 });
+
+loadSavedOutfit();

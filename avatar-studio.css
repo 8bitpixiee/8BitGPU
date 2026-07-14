@@ -1,0 +1,124 @@
+:root {
+    color-scheme: dark;
+    --purple: #d896ff;
+    --pink: #ff69b4;
+    --deep-space: #10071b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-family: "Pixelify Sans", sans-serif;
+    background: #090411 url("starrysky.gif") center / cover fixed;
+}
+
+button { font: inherit; }
+
+.studio-window {
+    width: min(940px, calc(100vw - 32px));
+    min-height: min(670px, calc(100vh - 32px));
+    overflow: hidden;
+    border: 2px solid var(--purple);
+    border-radius: 15px;
+    background: rgba(12, 5, 24, .91);
+    box-shadow: 0 0 24px #d896ff88, 0 0 70px #ff69b455;
+    backdrop-filter: blur(12px);
+}
+
+.title-bar {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 11px 0 16px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #9c6bdf, var(--pink), #9c6bdf);
+    text-shadow: 1px 1px #3a1044;
+}
+
+.close-button {
+    width: 26px;
+    height: 26px;
+    border: 1px solid white;
+    color: white;
+    background: #51235d;
+    cursor: pointer;
+    line-height: 19px;
+}
+
+.studio-content { display: grid; grid-template-columns: 1.05fr .95fr; min-height: 625px; }
+
+.preview-panel {
+    position: relative;
+    display: grid;
+    place-items: end center;
+    overflow: hidden;
+    padding: 28px 20px 22px;
+    background: radial-gradient(circle at 50% 30%, #6b378a77, transparent 50%), linear-gradient(#1c0d30dd, #090411);
+}
+
+.avatar-preview {
+    position: relative;
+    width: min(390px, 80vw);
+    aspect-ratio: 1;
+    filter: drop-shadow(0 0 15px #d896ffaa) drop-shadow(0 0 32px #ff69b477);
+}
+
+.avatar-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.sparkle { position: absolute; color: #f6d4ff; text-shadow: 0 0 12px white; animation: pulse 1.8s infinite alternate; }
+.sparkle-one { top: 14%; left: 16%; font-size: 35px; }
+.sparkle-two { top: 30%; right: 17%; font-size: 25px; animation-delay: .7s; }
+.status-text { position: absolute; bottom: 7px; margin: 0; color: #f6d4ff; }
+
+.controls-panel { padding: 56px 43px; background: rgba(6, 2, 14, .55); }
+h1 { margin: 0; font-size: clamp(38px, 5vw, 58px); color: #f0d6ff; text-shadow: 0 0 10px var(--purple), 0 0 28px var(--pink); }
+.subtitle { margin: 0 0 37px; font-size: 19px; color: #e8c5ff; }
+
+.option-row {
+    display: grid;
+    grid-template-columns: 74px 34px minmax(92px, 1fr) 34px;
+    align-items: center;
+    gap: 8px;
+    min-height: 56px;
+    padding: 8px 10px;
+    margin-bottom: 13px;
+    border: 1px solid #d896ff88;
+    border-radius: 8px;
+    background: #ffffff0b;
+}
+.option-label { color: #f3c9ff; font-weight: 700; }
+.option-name { text-align: center; color: white; }
+.arrow-button, .studio-button { border: 1px solid #f3c9ff; color: white; background: #7e3e9366; cursor: pointer; transition: transform .15s, background .15s; }
+.arrow-button { height: 30px; padding: 0; }
+.arrow-button:hover, .studio-button:hover { transform: translateY(-2px); background: #d65ca9; }
+
+.future-slots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; margin: 24px 0; }
+.future-slots span { padding: 9px; border: 1px dashed #d896ff77; color: #c7a3d3; text-align: center; font-size: 14px; }
+.action-buttons { display: flex; gap: 12px; }
+.studio-button { flex: 1; padding: 11px 8px; border-radius: 6px; }
+.studio-button.primary { background: linear-gradient(90deg, #a950b9, #e64c9f); font-weight: 700; }
+.asset-note { margin-top: 19px; color: #bb9ac6; font-size: 14px; line-height: 1.25; }
+
+@keyframes pulse { from { opacity: .45; transform: scale(.8); } to { opacity: 1; transform: scale(1.1); } }
+
+@media (max-width: 700px) {
+    body { display: block; }
+    .studio-window { width: 100%; min-height: 100vh; border-radius: 0; }
+    .studio-content { grid-template-columns: 1fr; }
+    .preview-panel { min-height: 430px; }
+    .controls-panel { padding: 34px 24px; }
+}

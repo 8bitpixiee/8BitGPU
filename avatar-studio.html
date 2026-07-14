@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Studio | 8BitGPU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="avatar-studio.css">
+</head>
+<body>
+    <main class="studio-window">
+        <header class="title-bar">
+            <span>Avatar Studio.exe</span>
+            <button class="close-button" type="button" aria-label="Close Avatar Studio" onclick="window.close()">×</button>
+        </header>
+
+        <section class="studio-content">
+            <section class="preview-panel" aria-label="Avatar preview">
+                <div class="sparkle sparkle-one">✦</div>
+                <div class="sparkle sparkle-two">✧</div>
+                <div class="avatar-preview">
+                    <img id="bodyLayer" class="avatar-layer" src="body_base_fem_idle_front_v1.png" alt="">
+                    <img id="bottomLayer" class="avatar-layer" src="drawls_fem_idle_front_v1.png" alt="">
+                    <img id="hairLayer" class="avatar-layer" src="volume_hair_fem_idle_front_v1.png" alt="">
+                </div>
+                <p class="status-text" id="saveStatus" aria-live="polite">Ready to create ✦</p>
+            </section>
+
+            <section class="controls-panel" aria-label="Avatar controls">
+                <h1>Pixie Creator</h1>
+                <p class="subtitle">Build your stream-side bestie.</p>
+
+                <div class="option-row">
+                    <span class="option-label">Hair</span>
+                    <button class="arrow-button" type="button" data-control="hair" data-direction="-1" aria-label="Previous hair">◀</button>
+                    <span class="option-name" id="hairName">Bombshell</span>
+                    <button class="arrow-button" type="button" data-control="hair" data-direction="1" aria-label="Next hair">▶</button>
+                </div>
+
+                <div class="option-row">
+                    <span class="option-label">Bottom</span>
+                    <button class="arrow-button" type="button" data-control="bottom" data-direction="-1" aria-label="Previous bottom">◀</button>
+                    <span class="option-name" id="bottomName">Drawls</span>
+                    <button class="arrow-button" type="button" data-control="bottom" data-direction="1" aria-label="Next bottom">▶</button>
+                </div>
+
+                <div class="future-slots" aria-label="Coming soon avatar layers">
+                    <span>Eyes</span><span>Tops</span><span>Accessories</span><span>Wings</span>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="studio-button" id="randomizeButton" type="button">Randomize</button>
+                    <button class="studio-button primary" id="saveButton" type="button">Save Outfit</button>
+                </div>
+                <p class="asset-note">More layers unlock when new sprite assets are added.</p>
+            </section>
+        </section>
+    </main>
+    <script src="avatar-studio.js"></script>
+</body>
+</html>
