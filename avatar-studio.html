@@ -22,8 +22,12 @@
                 <div class="sparkle sparkle-two">✧</div>
                 <div class="avatar-preview">
                     <img id="bodyLayer" class="avatar-layer" src="body_base_fem_idle_front_v1.png" alt="">
-                    <img id="bottomLayer" class="avatar-layer" src="drawls_fem_idle_front_v1.png" alt="">
+                    <img id="earsLayer" class="avatar-layer" alt="">
+                    <img id="headLayer" class="avatar-layer" alt="">
+                    <img id="eyesLayer" class="avatar-layer" alt="">
                     <img id="hairLayer" class="avatar-layer" src="volume_hair_fem_idle_front_v1.png" alt="">
+                    <img id="fitLayer" class="avatar-layer" alt="">
+                    <img id="extraLayer" class="avatar-layer" alt="">
                 </div>
                 <p class="status-text" id="saveStatus" aria-live="polite">Ready to create ✦</p>
             </section>
@@ -31,6 +35,48 @@
             <section class="controls-panel" aria-label="Avatar controls">
                 <h1>Pixie Creator</h1>
                 <p class="subtitle">Build your stream-side bestie.</p>
+
+                <div class="select-row">
+                    <label for="speciesSelect">Species</label>
+                    <select id="speciesSelect" data-setting="species">
+                        <option>Pixies</option><option>Elves</option><option>Kitties</option><option>Duckies</option>
+                        <option>Mushlings</option><option>Flower Folk</option><option>Synths</option><option>Clankers</option>
+                        <option>Lizards</option><option>Snakes</option>
+                        <option>Deerbras</option><option>Bovadill</option>
+                    </select>
+                </div>
+
+                <div class="select-row">
+                    <label for="skinToneSelect">Skin Tone</label>
+                    <select id="skinToneSelect" data-setting="skinTone">
+                        <option>Soft Pink</option><option>Lavender Purple</option><option>Sky Blue</option><option>Brown</option>
+                        <option>Tan</option><option>Pink / White</option><option>Black</option><option>Duckie Yellow</option>
+                    </select>
+                </div>
+
+                <div class="select-row">
+                    <label for="affinitySelect">Affinity</label>
+                    <select id="affinitySelect" data-setting="affinity">
+                        <option>Natura — nature</option><option>Glitch — tech / electricity</option>
+                        <option>Emberling — fire elements</option><option>Voidling — space / physics</option>
+                    </select>
+                </div>
+
+                <div class="select-row">
+                    <label for="hairstyleSelect">Hairstyle</label>
+                    <select id="hairstyleSelect" data-setting="hairstyle">
+                        <option>Bombshell Blowout</option><option>Locs</option><option>High Pony</option>
+                        <option>Big Curls</option><option>Straight</option><option>Bangs</option>
+                    </select>
+                </div>
+
+                <div class="select-row">
+                    <label for="fitSelect">Fit</label>
+                    <select id="fitSelect" data-setting="fitTheme">
+                        <option>Mage</option><option>Brawler</option><option>Witch</option><option>School Boy / Girl</option>
+                        <option>Island Attire</option><option>Casual</option>
+                    </select>
+                </div>
 
                 <div class="option-row">
                     <span class="option-label">Hair</span>
@@ -40,21 +86,35 @@
                 </div>
 
                 <div class="option-row">
-                    <span class="option-label">Bottom</span>
-                    <button class="arrow-button" type="button" data-control="bottom" data-direction="-1" aria-label="Previous bottom">◀</button>
-                    <span class="option-name" id="bottomName">Drawls</span>
-                    <button class="arrow-button" type="button" data-control="bottom" data-direction="1" aria-label="Next bottom">▶</button>
+                    <span class="option-label">Eyes</span>
+                    <button class="arrow-button" type="button" data-control="eyes" data-direction="-1" aria-label="Previous eyes">◀</button>
+                    <span class="option-name" id="eyesName">Pixie Eyes 1</span>
+                    <button class="arrow-button" type="button" data-control="eyes" data-direction="1" aria-label="Next eyes">▶</button>
+                </div>
+
+                <div class="option-row">
+                    <span class="option-label">Fit</span>
+                    <button class="arrow-button" type="button" data-control="fit" data-direction="-1" aria-label="Previous fit">◀</button>
+                    <span class="option-name" id="fitName">Fit 1</span>
+                    <button class="arrow-button" type="button" data-control="fit" data-direction="1" aria-label="Next fit">▶</button>
+                </div>
+
+                <div class="option-row">
+                    <span class="option-label">Extra</span>
+                    <button class="arrow-button" type="button" data-control="extra" data-direction="-1" aria-label="Previous extra">◀</button>
+                    <span class="option-name" id="extraName">None</span>
+                    <button class="arrow-button" type="button" data-control="extra" data-direction="1" aria-label="Next extra">▶</button>
                 </div>
 
                 <div class="future-slots" aria-label="Coming soon avatar layers">
-                    <span>Eyes</span><span>Tops</span><span>Accessories</span><span>Wings</span>
+                    <span>4 shirts</span><span>4 pants</span><span>4 shoes</span><span>4 accessories</span>
                 </div>
 
                 <div class="action-buttons">
                     <button class="studio-button" id="randomizeButton" type="button">Randomize</button>
                     <button class="studio-button primary" id="saveButton" type="button">Save Outfit</button>
                 </div>
-                <p class="asset-note">More layers unlock when new sprite assets are added.</p>
+                <p class="asset-note">Your selections save now. Sprite changes unlock as each art layer is added.</p>
             </section>
         </section>
     </main>
