@@ -240,6 +240,7 @@ h1, h2, .window-bar, .desktop-icon span {
     display: none;
     flex-direction: column;
     gap: 8px;
+    background: black;
     padding: 10px;
     z-index: 1000;
 }
