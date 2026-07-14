@@ -235,7 +235,7 @@ h1, h2, .window-bar, .desktop-icon span {
 }
 #avatarMenu {
     bottom: 170px
-    left: 40px;
+    left: 20px;
     display: none;
     flex-direction: column;
     gap: 8px;
