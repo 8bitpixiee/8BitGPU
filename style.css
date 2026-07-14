@@ -211,9 +211,9 @@ h1, h2, .window-bar, .desktop-icon span {
     font-family: 'Press Start 2P', cursive;
 }
 
-#companion {
+.companion {
     position: fixed;
-    bottom: 20px;
+    bottom: 32px;
     right: 20px;
     width: 256px;
     height: 256px;
@@ -231,7 +231,7 @@ h1, h2, .window-bar, .desktop-icon span {
     image-rendering: pixelated;
     pointer-events: none;
 }
-#avatarMenu {
+.avatarMenu {
     position: fixed;
     bottom: 170px
     right: 20px;
@@ -240,7 +240,7 @@ h1, h2, .window-bar, .desktop-icon span {
     gap: 8px;
     z-index: 1000;
 }
-#taskbar {
+.taskbar {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -253,7 +253,7 @@ h1, h2, .window-bar, .desktop-icon span {
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
-#gamesButton {
+.gamesButton {
     position: fixed;
     bottom: 4px;
     left: 180px;
@@ -265,10 +265,10 @@ h1, h2, .window-bar, .desktop-icon span {
     z-index: 10000;
 }
 
-#gamesButton:hover {
+.gamesButton:hover {
     transform: scale(1.1);
 }
-#startMenu {
+.startMenu {
     display: none;
     position: fixed;
     bottom: 32px;
