@@ -3,6 +3,8 @@ function toggleMenu() {
 
     const menu = document.getElementById("avatarMenu");
 
+    alert(menu);
+
     if (menu.style.display === "none") {
         menu.style.display = "flex";
     } else {
