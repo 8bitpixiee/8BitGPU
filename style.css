@@ -240,7 +240,7 @@ $avatarMenu {
     gap: 8px;
     z-index: 1000;
 }
-.taskbar {
+#taskbar {
     position: fixed;
     bottom: 0;
     left: 0;
