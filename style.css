@@ -35,8 +35,10 @@ color: white;
 
 h1 {
     background: none;
-    font-size: 56px;
+    font-size: 120px;
     margin-bottom: 5px;
+    position: relative;
+    top: -20px;
     color: #d896ff;
     text-shadow:
     0 0 10px #d896ff,
