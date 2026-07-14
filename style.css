@@ -23,8 +23,8 @@ color: white;
     padding: 0;
     display: flex;
     flex-direction: column;
-    align-item: flex-end;
-    margin-top: -8px
+    align-items: flex-end;
+    margin-top: -8px;
 }
 .nav-buttons {
     display: flex;
@@ -129,7 +129,7 @@ background-image: url("comets.gif");
     padding: 40px;
 }
 .store-window h1 {
-    fontsize: 72px;
+    font-size: 72px;
     line-height: 0.9;
     letter-spacing: -6px;
     color: #f0d6ff;
@@ -233,7 +233,7 @@ h1, h2, .window-bar, .desktop-icon span {
     image-rendering: pixelated;
     pointer-events: none;
 }
-$avatarMenu {
+#avatarMenu {
     position: fixed;
     bottom: 170px
     right: 20px;
@@ -255,7 +255,7 @@ $avatarMenu {
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
-$gamesButton {
+#gamesButton {
     position: fixed;
     bottom: 4px;
     left: 180px;
