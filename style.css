@@ -224,6 +224,17 @@ h1, h2, .window-bar, .desktop-icon span {
     outline: none;
     background: transparent;
 }
+#avatarMenu {
+    bottom: 170px
+    position: fixed;
+    bottom: 170;
+    left: 20px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    z-index: 1000;
+}
 .avatar-layer {
     position: absolute;
     bottom: 0;
