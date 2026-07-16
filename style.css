@@ -100,10 +100,14 @@ background-image: url("comets.gif");
 
     position: relative;
 }
+/* VINE PLACEMENT GUIDE: change these px values to move each desktop vine. */
 .desktop-vine { position: fixed; z-index: 2; pointer-events: none; image-rendering: pixelated; filter: drop-shadow(0 0 7px #86d65c88); }
-.vine-left { top: 100px; left: -4px; height: min(82vh, 760px); }
-.vine-right { top: -8px; right: -4px; height: min(76vh, 700px); }
-.vine-top { top: -6px; left: 0%; width: min(80vw, 1040px); }
+/* Left frame vine: top = up/down, left = side-to-side, height = size. */
+.vine-left { top: -20px; left: -58px; height: min(74vh, 660px); }
+/* Right frame vine: top = up/down, right = side-to-side, height = size. */
+.vine-right { top: -16px; right: -28px; height: min(70vh, 650px); }
+/* Ceiling vine: top = up/down, left = horizontal position, width = size. */
+.vine-top { top: -30px; left: 31%; width: min(32vw, 460px); }
 .container { z-index: 3; }
 .desktop-icon {
     width: 48px;
@@ -133,7 +137,7 @@ background-image: url("comets.gif");
     backdrop-filter: blur(12px);
     padding: 40px;
 }
-.store-page::before, .store-page::after { content: ""; position: fixed; z-index: 10; pointer-events: none; background: url("assets/deco/1longleft.png") top left / contain no-repeat; width: min(24vw, 280px); height: 88vh; }
+.store-page::before, .store-page::after { content: ""; position: fixed; z-index: 10; pointer-events: none; background: url("1longleft.png") top left / contain no-repeat; width: min(24vw, 280px); height: 88vh; }
 .store-page::before { top: 0; left: 0; }
 .store-page::after { top: 0; right: 0; transform: scaleX(-1); }
 .store-window h1 {
@@ -245,10 +249,18 @@ h1, h2, .window-bar, .desktop-icon span {
     color: white;
     background: linear-gradient(135deg, #6e3d95, #d44d9e);
     box-shadow: 0 0 8px #d896ff, 0 0 18px #ff69b4, inset 0 0 8px #ffffff66;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: bold;
     letter-spacing: .5px;
     image-rendering: pixelated;
+}
+#avatarLabButton::before {
+    content: "* ";
+    color: #f8d7ff;
+}
+#avatarLabButton::after {
+    content: " *";
+    color: #f8d7ff;
 }
 
 #avatarLabButton:hover {
@@ -256,6 +268,31 @@ h1, h2, .window-bar, .desktop-icon span {
     color: white;
     text-shadow: 0 0 8px white;
     box-shadow: 0 0 12px #f3c9ff, 0 0 28px #ff69b4, inset 0 0 10px #ffffff99;
+}
+
+#loginButton {
+    position: fixed;
+    left: 48px;
+    bottom: 238px;
+    z-index: 9998;
+    display: block;
+    padding: 8px 13px;
+    border: 2px solid #a9ef8a;
+    border-radius: 6px;
+    color: #efffe9;
+    background: linear-gradient(135deg, #345e43, #6b9c55);
+    box-shadow: 0 0 8px #78df71, 0 0 15px #7e4ca6, inset 0 0 7px #efffe966;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: .5px;
+    image-rendering: pixelated;
+}
+
+#loginButton:hover {
+    transform: translateY(-3px) scale(1.03);
+    color: white;
+    text-shadow: 0 0 8px white;
+    box-shadow: 0 0 13px #a9ef8a, 0 0 23px #d896ff, inset 0 0 9px #efffe999;
 }
 #avatarMenu {
     bottom: 170px
