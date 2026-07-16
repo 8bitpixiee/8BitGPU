@@ -1,4 +1,4 @@
-const assetPath = "assets/avatar/";
+const assetPath = "avatar";
 const options = {
     ears: [
         { name: "Pixie Ears", src: `${assetPath}ears_fem_v1.png` },
