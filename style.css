@@ -103,11 +103,11 @@ background-image: url("comets.gif");
 /* VINE PLACEMENT GUIDE: change these px values to move each desktop vine. */
 .desktop-vine { position: fixed; z-index: 2; pointer-events: none; image-rendering: pixelated; filter: drop-shadow(0 0 7px #86d65c88); }
 /* Left frame vine: top = up/down, left = side-to-side, height = size. */
-.vine-left { top: -20px; left: -58px; height: min(74vh, 660px); }
+.vine-left { top: 115px; left: -42px; height: min (76vh, 700px):}
 /* Right frame vine: top = up/down, right = side-to-side, height = size. */
-.vine-right { top: -16px; right: -28px; height: min(70vh, 650px); }
+.vine-right { top: 135px; right: -35px; height: min(61vh, 575px); }
 /* Ceiling vine: top = up/down, left = horizontal position, width = size. */
-.vine-top { top: -30px; left: 31%; width: min(32vw, 460px); }
+.vine-top { top: -35px; left: 35%; width: min(43vw, 620px); }
 .container { z-index: 3; }
 .desktop-icon {
     width: 48px;
