@@ -11,9 +11,9 @@
 </head>
 <body>
     <main class="lab-window">
-        <img class="lab-vine lab-vine-left" src="assets/deco/1longleft.png" alt="">
-        <img class="lab-vine lab-vine-right" src="assets/deco/1longright.png" alt="">
-        <img class="lab-vine lab-vine-top" src="assets/deco/ropevines.png" alt="">
+        <img class="lab-vine lab-vine-left" src="1longleft.png" alt="">
+        <img class="lab-vine lab-vine-right" src="1longright.png" alt="">
+        <img class="lab-vine lab-vine-top" src="ropevines.png" alt="">
         <header class="title-bar">
             <span>8Bit Lab.exe — Avatar Creator</span>
             <button class="close-button" type="button" aria-label="Close Avatar Lab" onclick="window.close()">×</button>
@@ -23,13 +23,13 @@
             <section class="preview-panel" aria-label="Avatar preview">
                 <p class="preview-label">YOUR CREATURE</p>
                 <div class="avatar-preview">
+                    <img id="extraLayer" class="avatar-layer" alt="">
                     <img id="bodyLayer" class="avatar-layer" alt="">
                     <img id="earsLayer" class="avatar-layer" alt="">
                     <img id="headLayer" class="avatar-layer" alt="">
                     <img id="eyesLayer" class="avatar-layer" alt="">
                     <img id="hairLayer" class="avatar-layer" alt="">
                     <img id="fitLayer" class="avatar-layer" alt="">
-                    <img id="extraLayer" class="avatar-layer" alt="">
                 </div>
                 <p class="status-text" id="saveStatus" aria-live="polite">Choose your creature!</p>
             </section>
@@ -61,6 +61,7 @@
 
                 <section class="step-panel" data-step-panel="style">
                     <h1>Make It Yours</h1>
+                    <button class="desktop-preset" id="desktopPresetButton" type="button">Load Thick Pixie Preset</button>
                     <div class="layer-controls">
                         <div class="option-row"><span>Ears</span><button type="button" data-control="ears" data-direction="-1">◀</button><strong id="earsName"></strong><button type="button" data-control="ears" data-direction="1">▶</button></div>
                         <div class="option-row"><span>Hair</span><button type="button" data-control="hair" data-direction="-1">◀</button><strong id="hairName"></strong><button type="button" data-control="hair" data-direction="1">▶</button></div>

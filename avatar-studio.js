@@ -23,7 +23,8 @@ const options = {
     fit: [
         { name: "None", src: "" },
         { name: "Violet Two-Piece", src: `${assetPath}fit_fem_v1.png` },
-        { name: "Kitties Chill-Outs", src: `${assetPath}fit_fem_v2.png` }
+        { name: "Kitties Chill-Outs", src: `${assetPath}fit_fem_v2.png` },
+        { name: "Drawls (Desktop Classic)", src: "drawls_fem_idle_front_v1.png" }
     ],
     extra: [
         { name: "None", src: "" },
@@ -33,7 +34,7 @@ const options = {
 };
 
 const selection = { ears: 0, hair: 1, eyes: 1, fit: 1, extra: 0 };
-const settings = { species: "Pixies", skinTone: "Nutmeg" };
+const settings = { species: "Pixies", skinTone: "Nutmeg", bodyPreset: "custom" };
 const steps = ["species", "skinTone", "style"];
 let currentStep = 0;
 
@@ -45,6 +46,7 @@ try {
         });
         if (["Pixies", "Deerbras"].includes(saved.species)) settings.species = saved.species;
         if (["Nutmeg", "Peachy"].includes(saved.skinTone)) settings.skinTone = saved.skinTone;
+        if (saved.bodyPreset === "thickPixie") settings.bodyPreset = "thickPixie";
     }
 } catch { /* Start with the default Pixie if saved data is unavailable. */ }
 
@@ -55,6 +57,12 @@ function setLayer(layerName, src) {
 }
 
 function renderBase() {
+    if (settings.bodyPreset === "thickPixie") {
+        setLayer("body", "body_base_fem_idle_front_v1.png");
+        setLayer("head", "");
+        return;
+    }
+
     if (settings.species === "Deerbras") {
         setLayer("body", `${assetPath}body_fem_deerbra_v1.png`);
         setLayer("head", `${assetPath}head_fem_deerbra_v1.png`);
@@ -74,6 +82,10 @@ function renderCategory(category) {
 function renderAvatar() {
     renderBase();
     Object.keys(options).forEach(renderCategory);
+    if (settings.bodyPreset === "thickPixie") {
+        setLayer("ears", "");
+        setLayer("eyes", "");
+    }
 }
 
 function renderSettingChoices() {
@@ -92,6 +104,7 @@ function setStep(step) {
 
 document.querySelectorAll("[data-control]").forEach((button) => button.addEventListener("click", () => {
     const category = button.dataset.control;
+    settings.bodyPreset = "custom";
     selection[category] = (selection[category] + Number(button.dataset.direction) + options[category].length) % options[category].length;
     renderCategory(category);
     document.getElementById("saveStatus").textContent = "Looking cute!";
@@ -100,6 +113,7 @@ document.querySelectorAll("[data-control]").forEach((button) => button.addEventL
 document.querySelectorAll("[data-setting-choice]").forEach((button) => button.addEventListener("click", () => {
     const setting = button.dataset.settingChoice;
     settings[setting] = button.dataset.value;
+    settings.bodyPreset = "custom";
     if (setting === "species" && settings.species === "Deerbras") settings.skinTone = "Peachy";
     renderAvatar();
     renderSettingChoices();
@@ -111,7 +125,18 @@ document.querySelectorAll("[data-step-target]").forEach((tab) => tab.addEventLis
 document.getElementById("previousButton").addEventListener("click", () => setStep(steps[Math.max(0, currentStep - 1)]));
 document.getElementById("nextButton").addEventListener("click", () => setStep(steps[Math.min(steps.length - 1, currentStep + 1)]));
 
+document.getElementById("desktopPresetButton").addEventListener("click", () => {
+    settings.species = "Pixies";
+    settings.skinTone = "Nutmeg";
+    settings.bodyPreset = "thickPixie";
+    Object.assign(selection, { ears: 0, hair: 1, eyes: 0, fit: 3, extra: 0 });
+    renderAvatar();
+    renderSettingChoices();
+    document.getElementById("saveStatus").textContent = "Thick Pixie loaded!";
+});
+
 document.getElementById("randomizeButton").addEventListener("click", () => {
+    settings.bodyPreset = "custom";
     Object.keys(options).forEach((category) => selection[category] = Math.floor(Math.random() * options[category].length));
     settings.species = ["Pixies", "Deerbras"][Math.floor(Math.random() * 2)];
     settings.skinTone = settings.species === "Deerbras" ? "Peachy" : ["Nutmeg", "Peachy"][Math.floor(Math.random() * 2)];
