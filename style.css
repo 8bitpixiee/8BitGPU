@@ -100,14 +100,10 @@ background-image: url("comets.gif");
 
     position: relative;
 }
-/* VINE PLACEMENT GUIDE: change these px values to move each desktop vine. */
 .desktop-vine { position: fixed; z-index: 2; pointer-events: none; image-rendering: pixelated; filter: drop-shadow(0 0 7px #86d65c88); }
-/* Left frame vine: top = up/down, left = side-to-side, height = size. */
-.vine-left { top: 115px; left: -4px; height: min (82vh, 760px):}
-/* Right frame vine: top = up/down, right = side-to-side, height = size. */
-.vine-right { top: 135px; right: -35px; height: min(61vh, 575px); }
-/* Ceiling vine: top = up/down, left = horizontal position, width = size. */
-.vine-top { top: -35px; left: 35px; width: min(43vw, 620px); }
+.vine-left { top: -8px; left: -4px; height: min(82vh, 760px); }
+.vine-right { top: 125px; right: -35px; height: min(62vh, 590px); }
+.vine-top { top: -22px; left: 0; width: min(50vw, 760px); }
 .container { z-index: 3; }
 .desktop-icon {
     width: 48px;
@@ -235,6 +231,7 @@ h1, h2, .window-bar, .desktop-icon span {
     border: none;
     outline: none;
     background: transparent;
+    pointer-events: none;
 }
 
 #avatarLabButton {
