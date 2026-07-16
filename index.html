@@ -11,9 +11,9 @@
 
 <body>
     <div class="desktop">
-    <img class="desktop-vine vine-left" src="assets/deco/1longleft.png" alt="">
-    <img class="desktop-vine vine-right" src="assets/deco/1longright.png" alt="">
-    <img class="desktop-vine vine-top" src="assets/deco/clustervines.png" alt="">
+    <img class="desktop-vine vine-left" src="1longleft.png" alt="">
+    <img class="desktop-vine vine-right" src="1longright.png" alt="">
+    <img class="desktop-vine vine-top" src="clustervines.png" alt="">
     <div class="container">
     <header class="hero">
         <img src="pixilart pixie.png" class="pixie">
@@ -64,45 +64,28 @@
 </div> <!-- desktop -->
 
     <button id="avatarLabButton" onclick="window.open('avatar-studio.html','avatarstudio','width=1000,height=760,left=160,top=80')">
-        🍄🧬8BitLab.exe🧪🧚🏻‍♀️
+        8BitLab.exe
     </button>
 
-    <div id="companion" onclick="toggleMenu()">
+    <div id="companion">
+    <img id="extraLayer" class="avatar-layer">
     <img
         src="body_base_fem_idle_front_v1.png"
         id="bodyLayer"
         class="avatar-layer"
         >
     <img
-        src="drawls_fem_idle_front_v1.png"
-        id="drawlsLayer"
+        id="earsLayer"
         class="avatar-layer"
         >
+    <img id="headLayer" class="avatar-layer">
+    <img id="eyesLayer" class="avatar-layer">
     <img
         src="volume_hair_fem_idle_front_v1.png"
         id="hairLayer"
         class="avatar-layer"
         >
-<div id="avatarMenu" 
-    style="
-    display: none;
-    flex-direction: column;
-    gap: 8px;
-    position: fixed;
-    left: 40px;
-    bottom: 150px;
-    background: black;
-    padding: 10px;
-    z-index: 9999;
-    ">
-    <button onclick="setHair('none')">
-        Bald
-    </button>
-
-    <button onclick="setHair('volume_hair_fem_idle_front_v1.png')">
-        Bombshell
-    </button>
-</div>
+    <img id="fitLayer" class="avatar-layer">
     <div id="startMenu">
     <a href="games.html">Games</a>
     <a href="about.html">About Me</a>
