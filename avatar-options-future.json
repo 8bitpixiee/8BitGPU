@@ -1,0 +1,8 @@
+{
+  "species": ["Elves", "Kitties", "Duckies", "Mushlings", "Flower Folk", "Synths", "Clankers", "Bovadill", "Lizards", "Snakes"],
+  "genderTypes": ["Faes", "Drakes", "Mythics"],
+  "skinTones": ["Lavender Purple", "Sky Blue", "Brown", "Tan", "Pink / White", "Black", "Duckie Yellow"],
+  "affinities": ["Natura - nature", "Glitch - tech / electricity", "Emberling - fire elements", "Voidling - space / physics"],
+  "hairstylesToCreate": ["Locs - 4 lengths", "High Pony - 2 lengths", "Big Curls - 2 lengths", "Straight - 2 lengths", "Bangs - 4 types"],
+  "clothingToCreate": ["Mage", "Brawler", "Witch", "School Boy / Girl", "Island Attire", "Casual", "4 shirts", "4 pants", "4 shoes", "4 accessories"]
+}
