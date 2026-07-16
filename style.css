@@ -101,9 +101,9 @@ background-image: url("comets.gif");
     position: relative;
 }
 .desktop-vine { position: fixed; z-index: 2; pointer-events: none; image-rendering: pixelated; filter: drop-shadow(0 0 7px #86d65c88); }
-.vine-left { top: -8px; left: -4px; height: min(82vh, 760px); }
+.vine-left { top: 100px; left: -4px; height: min(82vh, 760px); }
 .vine-right { top: -8px; right: -4px; height: min(76vh, 700px); }
-.vine-top { top: -6px; left: 20%; width: min(47vw, 720px); }
+.vine-top { top: -6px; left: 0%; width: min(80vw, 1040px); }
 .container { z-index: 3; }
 .desktop-icon {
     width: 48px;
