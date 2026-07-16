@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Lab | 8BitGPU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="avatar-studio.css">
+</head>
+<body>
+    <main class="lab-window">
+        <img class="lab-vine lab-vine-left" src="assets/deco/1longleft.png" alt="">
+        <img class="lab-vine lab-vine-right" src="assets/deco/1longright.png" alt="">
+        <img class="lab-vine lab-vine-top" src="assets/deco/ropevines.png" alt="">
+        <header class="title-bar">
+            <span>8Bit Lab.exe — Avatar Creator</span>
+            <button class="close-button" type="button" aria-label="Close Avatar Lab" onclick="window.close()">×</button>
+        </header>
+
+        <div class="lab-content">
+            <section class="preview-panel" aria-label="Avatar preview">
+                <p class="preview-label">YOUR CREATURE</p>
+                <div class="avatar-preview">
+                    <img id="bodyLayer" class="avatar-layer" alt="">
+                    <img id="earsLayer" class="avatar-layer" alt="">
+                    <img id="headLayer" class="avatar-layer" alt="">
+                    <img id="eyesLayer" class="avatar-layer" alt="">
+                    <img id="hairLayer" class="avatar-layer" alt="">
+                    <img id="fitLayer" class="avatar-layer" alt="">
+                    <img id="extraLayer" class="avatar-layer" alt="">
+                </div>
+                <p class="status-text" id="saveStatus" aria-live="polite">Choose your creature!</p>
+            </section>
+
+            <section class="creator-panel" aria-label="Avatar creator controls">
+                <div class="step-tabs" aria-label="Creator steps">
+                    <button type="button" class="step-tab active" data-step-target="species">1. Species</button>
+                    <button type="button" class="step-tab" data-step-target="skinTone">2. Colors</button>
+                    <button type="button" class="step-tab" data-step-target="style">3. Style</button>
+                </div>
+
+                <section class="step-panel active" data-step-panel="species">
+                    <h1>Select Species</h1>
+                    <p class="helper-text">Pick the kind of magical creature you want to be.</p>
+                    <div class="choice-grid species-grid">
+                        <button type="button" data-setting-choice="species" data-value="Pixies">Pixies</button>
+                        <button type="button" data-setting-choice="species" data-value="Deerbras">Deerbras</button>
+                    </div>
+                </section>
+
+                <section class="step-panel" data-step-panel="skinTone">
+                    <h1>Choose Colors</h1>
+                    <p class="helper-text">Start with a base tone. More color layers can be added later.</p>
+                    <div class="swatch-grid">
+                        <button type="button" class="swatch nutmeg" data-setting-choice="skinTone" data-value="Nutmeg"><span>Nutmeg</span></button>
+                        <button type="button" class="swatch peachy" data-setting-choice="skinTone" data-value="Peachy"><span>Peachy</span></button>
+                    </div>
+                </section>
+
+                <section class="step-panel" data-step-panel="style">
+                    <h1>Make It Yours</h1>
+                    <div class="layer-controls">
+                        <div class="option-row"><span>Ears</span><button type="button" data-control="ears" data-direction="-1">◀</button><strong id="earsName"></strong><button type="button" data-control="ears" data-direction="1">▶</button></div>
+                        <div class="option-row"><span>Hair</span><button type="button" data-control="hair" data-direction="-1">◀</button><strong id="hairName"></strong><button type="button" data-control="hair" data-direction="1">▶</button></div>
+                        <div class="option-row"><span>Eyes</span><button type="button" data-control="eyes" data-direction="-1">◀</button><strong id="eyesName"></strong><button type="button" data-control="eyes" data-direction="1">▶</button></div>
+                        <div class="option-row"><span>Fit</span><button type="button" data-control="fit" data-direction="-1">◀</button><strong id="fitName"></strong><button type="button" data-control="fit" data-direction="1">▶</button></div>
+                        <div class="option-row"><span>Extra</span><button type="button" data-control="extra" data-direction="-1">◀</button><strong id="extraName"></strong><button type="button" data-control="extra" data-direction="1">▶</button></div>
+                    </div>
+                </section>
+
+                <footer class="creator-actions">
+                    <button class="round-button" id="previousButton" type="button">← Back</button>
+                    <button class="round-button" id="randomizeButton" type="button">Randomize</button>
+                    <button class="round-button primary" id="nextButton" type="button">Next →</button>
+                    <button class="round-button save-button" id="saveButton" type="button">Save</button>
+                </footer>
+            </section>
+        </div>
+    </main>
+    <script src="avatar-studio.js"></script>
+</body>
+</html>
