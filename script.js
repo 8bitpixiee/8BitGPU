@@ -70,6 +70,12 @@ const desktopApps = {
     avatarLab: { title: "Avatar Lab.exe", src: "avatar-studio.html", width: 1000, height: 720, left: 160, top: 70 },
     storefront: { title: "STORE.exe", src: "storefront.html", width: 920, height: 680, left: 235, top: 92 },
     login: { title: "Login.exe", src: "login.html", width: 700, height: 620, left: 290, top: 110 },
+    coaching: { title: "1:1 Coaching.exe", external: "https://forms.gle/18ea3aWxwWu9c1rj9", description: "Book a one-on-one coaching session with 8Bit Pixiee.", width: 520, height: 350, left: 210, top: 145 },
+    mealPlanning: { title: "Meal Planning.exe", external: "https://forms.gle/uD31jM6uUzGe3tUa7", description: "Open the meal-planning sign-up portal.", width: 520, height: 350, left: 245, top: 170 },
+    twitch: { title: "Watch Us Live.exe", external: "https://www.twitch.tv/8bit_pixiee", description: "The stream lives on Twitch. Launch it in a new tab when you are ready to pull up.", width: 540, height: 360, left: 280, top: 120 },
+    discord: { title: "Community.exe", external: "https://discord.gg/RbqP4BAmH", description: "Join the 8BitGPU Discord community and show us your creature build.", width: 540, height: 360, left: 315, top: 150 },
+    important: { title: "IMPORTANT.exe", src: "nick.html", width: 700, height: 620, left: 330, top: 105 },
+    sonic: { title: "Sonic.exe", src: "sonic.html", width: 700, height: 620, left: 365, top: 130 },
     profile: { title: "PROFILE.exe", width: 470, height: 365, left: 510, top: 155, content: () => `<section class="os-welcome os-profile"><p class="os-profile-label">CURRENT CREATURE</p><h2>${escapePlayerName()}</h2><p>Your saved avatar is waiting on the desktop. Online outfits, inventory, and friends will live here once the game account system wakes up.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>` }
 };
 
@@ -161,6 +167,11 @@ function openApp(appName) {
         frame.src = app.src;
         frame.title = app.title;
         windowElement.appendChild(frame);
+    } else if (app.external) {
+        const content = document.createElement("div");
+        content.innerHTML = `<section class="os-welcome os-link-window"><p class="os-profile-label">DESKTOP SHORTCUT</p><h2>${app.title.replace(".exe", "")}</h2><p>${app.description}</p><button type="button" data-external-link>Launch</button></section>`;
+        content.querySelector("[data-external-link]").addEventListener("click", () => window.open(app.external, "_blank", "noopener"));
+        windowElement.appendChild(content);
     } else {
         const content = document.createElement("div");
         content.innerHTML = typeof app.content === "function" ? app.content() : app.content;
