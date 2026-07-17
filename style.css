@@ -374,6 +374,12 @@ h1, h2, .window-bar, .desktop-icon span {
 .os-task-tab.is-active { border-style: inset; color: #ffffff; background: linear-gradient(#7651a0, #4e326b); box-shadow: inset 1px 1px #2f1f40; text-shadow: 2px 2px #281a38; }
 .os-task-tab:hover { transform: none; }
 #osSystemTray { display: flex; flex: 0 0 auto; align-items: center; gap: 7px; padding: 6px 8px; border: 3px inset #eeeeee; background: #acacac; box-shadow: inset 1px 1px #696969, 2px 2px 0 #777777; }
+.taskbar-socials { display: flex; align-items: center; gap: 4px; padding-right: 6px; border-right: 2px solid #777777; }
+.taskbar-social { width: 28px; height: 28px; display: grid; place-items: center; padding: 2px; border: 2px outset #ffffff; border-radius: 0; color: #ffffff; background: linear-gradient(#dedede, #acacac); box-shadow: 1px 1px 0 #717171; font-family: "Pixelify Sans", monospace; font-size: 12px; font-weight: 700; line-height: 1; }
+.taskbar-social:hover { transform: none; filter: brightness(1.12); }
+.taskbar-social:active { border-style: inset; box-shadow: none; }
+.taskbar-social img { width: 21px; height: 21px; object-fit: contain; image-rendering: pixelated; }
+.taskbar-instagram-slot { color: #55326f; background: linear-gradient(#e4caff, #ad77cd); text-shadow: 1px 1px #f9eaff; }
 .tray-sparkle { display: grid; width: 23px; height: 23px; place-items: center; border: 2px solid #7650a1; color: #ffffff; background: #5d3c7e; font-family: "Pixelify Sans", monospace; font-size: 16px; line-height: 1; text-shadow: 1px 1px #261533; }
 #osClock { flex: 0 0 auto; min-width: 72px; padding: 4px 7px; border-left: 2px solid #777777; color: #24152f; font-family: "Pixelify Sans", monospace; font-size: 16px; font-weight: 700; text-align: center; text-shadow: 1px 1px #ffffff; }
 #osTray { flex: 0 0 auto; display: block; max-width: 245px; overflow: hidden; padding: 4px 5px; border: 0; border-radius: 0; color: #321c45; background: transparent; font-family: "Pixelify Sans", monospace; font-size: 14px; font-weight: 700; text-align: right; text-overflow: ellipsis; white-space: nowrap; text-shadow: 1px 1px #fff; }
