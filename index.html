@@ -103,6 +103,11 @@
         <button id="osStartButton" type="button" onclick="openApp('welcome')"><span class="start-pixel" aria-hidden="true">8</span> START</button>
         <div id="osTaskTabs"></div>
         <div id="osSystemTray">
+            <div class="taskbar-socials" aria-label="Social links">
+                <button class="taskbar-social" type="button" onclick="openApp('twitch')" aria-label="Open Twitch"><img src="twitch.png" alt=""></button>
+                <button class="taskbar-social" type="button" onclick="openApp('discord')" aria-label="Open Discord"><img src="discord.png" alt=""></button>
+                <span class="taskbar-social taskbar-instagram-slot" title="Instagram icon coming soon">IG</span>
+            </div>
             <span class="tray-sparkle" aria-hidden="true">8</span>
             <span id="osClock" aria-label="Current local time"></span>
             <button id="osTray" type="button" onclick="cycleAngelTime()" aria-label="Change angel time message"></button>
