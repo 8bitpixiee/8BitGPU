@@ -44,7 +44,7 @@
         <span>Join the Community</span>
 </button>
     
-<button onclick="window.open('storefront.html','storewindow','width=1100,height=900,left=200,top=100')">
+<button onclick="openApp('storefront')">
     <img src="moneystack.png" class="desktop-icon">
     <span>Storefront</span>
 </button>
@@ -63,13 +63,18 @@
 </div>      <!-- container -->
 </div> <!-- desktop -->
 
-    <button id="avatarLabButton" onclick="window.open('avatar-studio.html','avatarstudio','width=1000,height=760,left=160,top=80')">
+    <button id="avatarLabButton" onclick="openApp('avatarLab')">
         8BitLab.exe
     </button>
 
-    <button id="loginButton" onclick="window.open('login.html','8bitlogin','width=720,height=650,left=220,top=110')">
+    <button id="loginButton" onclick="openApp('login')">
         Login.exe
     </button>
+
+    <div id="playerBadge" aria-label="Current player">
+        <span>PLAYER</span>
+        <strong id="playerName">Guest Pixie</strong>
+    </div>
 
     <div id="companion">
     <img id="extraLayer" class="avatar-layer">
@@ -90,12 +95,15 @@
         class="avatar-layer"
         >
     <img id="fitLayer" class="avatar-layer">
-    <div id="startMenu">
-    <a href="games.html">Games</a>
-    <a href="about.html">About Me</a>
-    <a href="stream.html">Stream</a>
-</div>
-<img id="taskbar" src="windowstask.png">
+    </div>
+
+    <div id="osWindowLayer" aria-live="polite"></div>
+
+    <nav id="osTaskbar" aria-label="8BitGPU taskbar">
+        <button id="osStartButton" type="button" onclick="openApp('welcome')">START</button>
+        <div id="osTaskTabs"></div>
+        <div id="osTray">* ONLINE&nbsp;&nbsp; 8:08 PM</div>
+    </nav>
 <script src="script.js"></script>
 
 </body>
