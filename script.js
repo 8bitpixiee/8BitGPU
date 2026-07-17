@@ -61,22 +61,22 @@ renderPlayerBadge();
 const desktopApps = {
     welcome: {
         title: "WELCOME.exe",
-        width: 580,
-        height: 420,
-        left: 260,
-        top: 115,
+        width: 470,
+        height: 335,
+        left: 210,
+        top: 105,
         content: `<section class="os-welcome"><h2>Welcome to 8BitGPU</h2><p>A little enchanted computer world for games, glow-ups, streams, store drops, and pixie behavior.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>`
     },
-    avatarLab: { title: "Avatar Lab.exe", src: "avatar-studio.html", width: 1000, height: 720, left: 160, top: 70 },
-    storefront: { title: "STORE.exe", src: "storefront.html", width: 920, height: 680, left: 235, top: 92 },
-    login: { title: "Login.exe", src: "login.html", width: 700, height: 620, left: 290, top: 110 },
-    coaching: { title: "1:1 Coaching.exe", external: "https://forms.gle/18ea3aWxwWu9c1rj9", description: "Book a one-on-one coaching session with 8Bit Pixiee.", width: 520, height: 350, left: 210, top: 145 },
-    mealPlanning: { title: "Meal Planning.exe", external: "https://forms.gle/uD31jM6uUzGe3tUa7", description: "Open the meal-planning sign-up portal.", width: 520, height: 350, left: 245, top: 170 },
-    twitch: { title: "Watch Us Live.exe", external: "https://www.twitch.tv/8bit_pixiee", description: "The stream lives on Twitch. Launch it in a new tab when you are ready to pull up.", width: 540, height: 360, left: 280, top: 120 },
-    discord: { title: "Community.exe", external: "https://discord.gg/RbqP4BAmH", description: "Join the 8BitGPU Discord community and show us your creature build.", width: 540, height: 360, left: 315, top: 150 },
-    important: { title: "IMPORTANT.exe", src: "nick.html", width: 700, height: 620, left: 330, top: 105 },
-    sonic: { title: "Sonic.exe", src: "sonic.html", width: 700, height: 620, left: 365, top: 130 },
-    profile: { title: "PROFILE.exe", width: 470, height: 365, left: 510, top: 155, content: () => `<section class="os-welcome os-profile"><p class="os-profile-label">CURRENT CREATURE</p><h2>${escapePlayerName()}</h2><p>Your saved avatar is waiting on the desktop. Online outfits, inventory, and friends will live here once the game account system wakes up.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>` }
+    avatarLab: { title: "Avatar Lab.exe", src: "avatar-studio.html", width: 780, height: 590, left: 145, top: 65 },
+    storefront: { title: "STORE.exe", src: "storefront.html", width: 690, height: 520, left: 215, top: 88 },
+    login: { title: "Login.exe", src: "login.html", width: 470, height: 520, left: 280, top: 105 },
+    coaching: { title: "1:1 Coaching.exe", external: "https://forms.gle/18ea3aWxwWu9c1rj9", description: "Book a one-on-one coaching session with 8Bit Pixiee.", width: 430, height: 290, left: 210, top: 145 },
+    mealPlanning: { title: "Meal Planning.exe", external: "https://forms.gle/uD31jM6uUzGe3tUa7", description: "Open the meal-planning sign-up portal.", width: 430, height: 290, left: 245, top: 170 },
+    twitch: { title: "Watch Us Live.exe", external: "https://www.twitch.tv/8bit_pixiee", description: "The stream lives on Twitch. Launch it in a new tab when you are ready to pull up.", width: 440, height: 305, left: 280, top: 120 },
+    discord: { title: "Community.exe", external: "https://discord.gg/RbqP4BAmH", description: "Join the 8BitGPU Discord community and show us your creature build.", width: 440, height: 305, left: 315, top: 150 },
+    important: { title: "IMPORTANT.exe", src: "nick.html", width: 550, height: 450, left: 330, top: 105 },
+    sonic: { title: "Sonic.exe", src: "sonic.html", width: 550, height: 450, left: 365, top: 130 },
+    profile: { title: "PROFILE.exe", width: 410, height: 310, left: 510, top: 155, content: () => `<section class="os-welcome os-profile"><p class="os-profile-label">CURRENT CREATURE</p><h2>${escapePlayerName()}</h2><p>Your saved avatar is waiting on the desktop. Online outfits, inventory, and friends will live here once the game account system wakes up.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>` }
 };
 
 const openWindows = new Map();
