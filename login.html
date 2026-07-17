@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login.exe | 8BitGPU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <main class="login-window">
+        <header class="window-bar">
+            <span>8BitGPU Login.exe</span>
+            <button class="close-button" type="button" aria-label="Close login window" onclick="window.close()">×</button>
+        </header>
+
+        <section class="login-content">
+            <p class="eyebrow">PLAYER ACCESS TERMINAL</p>
+            <h1>Welcome, creature.</h1>
+            <p class="intro">The 8BitGPU world is waking up. Tell the system what to call you.</p>
+
+            <form id="loginForm">
+                <label for="displayName">Creature name</label>
+                <input id="displayName" name="displayName" maxlength="18" autocomplete="nickname" placeholder="ex. mossy.exe" required>
+                <p class="input-note">This is only saved in this browser for now.</p>
+
+                <button class="primary-button" type="submit">Enter 8BitGPU</button>
+                <button class="secondary-button" type="button" id="guestButton">Continue as Guest</button>
+            </form>
+
+            <div class="status-card" id="statusCard" aria-live="polite">
+                <span class="status-dot"></span>
+                <span>System ready. No online account connected.</span>
+            </div>
+
+            <p class="future-note">Real accounts, saved outfits, inventory, and game progress are coming soon.</p>
+        </section>
+    </main>
+    <script src="login.js"></script>
+</body>
+</html>
