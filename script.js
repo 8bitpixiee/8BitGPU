@@ -11,6 +11,9 @@ function loadSavedOutfit() {
         return;
     }
 
+    const companion = document.getElementById("companion");
+    if (companion) companion.style.display = "block";
+
     const avatarPath = "avatar/";
     const setLayer = (id, source) => {
         const layer = document.getElementById(id);
@@ -48,6 +51,15 @@ function loadSavedOutfit() {
 }
 
 loadSavedOutfit();
+window.refreshDesktopAvatar = loadSavedOutfit;
+window.addEventListener("storage", (event) => {
+    if (event.key === "8bitgpu-avatar-outfit") loadSavedOutfit();
+});
+window.addEventListener("message", (event) => {
+    if (event.origin === window.location.origin && event.data?.type === "8bitgpu-avatar-saved") {
+        loadSavedOutfit();
+    }
+});
 
 function renderPlayerBadge() {
     const playerName = document.getElementById("playerName");

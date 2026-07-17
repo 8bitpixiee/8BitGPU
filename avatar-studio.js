@@ -140,6 +140,12 @@ document.getElementById("saveButton").addEventListener("click", () => {
     if (window.parent && window.parent !== window && typeof window.parent.refreshDesktopAvatar === "function") {
         window.parent.refreshDesktopAvatar();
     }
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: "8bitgpu-avatar-saved" }, window.location.origin);
+    }
+    if (window.opener) {
+        window.opener.postMessage({ type: "8bitgpu-avatar-saved" }, window.location.origin);
+    }
     document.getElementById("saveStatus").textContent = "Outfit saved to this browser!";
 });
 
