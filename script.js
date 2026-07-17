@@ -197,9 +197,11 @@ let angelTimeIndex = 0;
 
 function updateAngelTime() {
     const tray = document.getElementById("osTray");
-    if (!tray) return;
+    const clock = document.getElementById("osClock");
+    if (!tray || !clock) return;
     const time = new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit" }).format(new Date());
-    tray.textContent = `${time} | ${angelTimeMessages[angelTimeIndex]}`;
+    clock.textContent = time;
+    tray.textContent = angelTimeMessages[angelTimeIndex];
 }
 
 function cycleAngelTime() {
