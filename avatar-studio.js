@@ -125,16 +125,6 @@ document.querySelectorAll("[data-step-target]").forEach((tab) => tab.addEventLis
 document.getElementById("previousButton").addEventListener("click", () => setStep(steps[Math.max(0, currentStep - 1)]));
 document.getElementById("nextButton").addEventListener("click", () => setStep(steps[Math.min(steps.length - 1, currentStep + 1)]));
 
-document.getElementById("desktopPresetButton").addEventListener("click", () => {
-    settings.species = "Pixies";
-    settings.skinTone = "Nutmeg";
-    settings.bodyPreset = "thickPixie";
-    Object.assign(selection, { ears: 0, hair: 1, eyes: 0, fit: 3, extra: 0 });
-    renderAvatar();
-    renderSettingChoices();
-    document.getElementById("saveStatus").textContent = "Thick Pixie loaded!";
-});
-
 document.getElementById("randomizeButton").addEventListener("click", () => {
     settings.bodyPreset = "custom";
     Object.keys(options).forEach((category) => selection[category] = Math.floor(Math.random() * options[category].length));
@@ -147,6 +137,9 @@ document.getElementById("randomizeButton").addEventListener("click", () => {
 
 document.getElementById("saveButton").addEventListener("click", () => {
     localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify({ ...selection, ...settings }));
+    if (window.parent && window.parent !== window && typeof window.parent.refreshDesktopAvatar === "function") {
+        window.parent.refreshDesktopAvatar();
+    }
     document.getElementById("saveStatus").textContent = "Outfit saved to this browser!";
 });
 
