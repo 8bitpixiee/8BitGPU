@@ -18,7 +18,10 @@ function escapeHtml(value) {
 function enterWorld(name) {
     localStorage.setItem("8bitgpu-player-name", name);
     statusCard.innerHTML = `<span class="status-dot"></span><span>Player profile ready: ${escapeHtml(name)}</span>`;
-    setTimeout(() => window.close(), 750);
+    setTimeout(() => {
+        if (window.opener && !window.opener.closed) window.opener.location.reload();
+        window.close();
+    }, 750);
 }
 
 loginForm.addEventListener("submit", (event) => {
