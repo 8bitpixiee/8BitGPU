@@ -307,7 +307,8 @@ h1, h2, .window-bar, .desktop-icon span {
     background: #28183dcc;
     box-shadow: 0 0 10px #9c65d899, inset 0 0 8px #bfa6e633;
     font-family: "Pixelify Sans", monospace;
-    pointer-events: none;
+    text-align: left;
+    cursor: pointer;
 }
 
 #playerBadge span {
@@ -322,6 +323,12 @@ h1, h2, .window-bar, .desktop-icon span {
     font-size: 17px;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+#playerBadge:hover {
+    transform: translateY(-2px);
+    background: #392151ee;
+    box-shadow: 0 0 14px #d896ff, inset 0 0 8px #c8f3a444;
 }
 #avatarMenu {
     bottom: 170px
@@ -344,14 +351,14 @@ h1, h2, .window-bar, .desktop-icon span {
     pointer-events: none;
 }
 #osWindowLayer { position: fixed; inset: 0; z-index: 11000; pointer-events: none; }
-.os-window { position: fixed; display: flex; flex-direction: column; overflow: hidden; min-width: 330px; min-height: 250px; border: 3px solid #f0d6ff; border-radius: 12px; background: #251534; box-shadow: 0 0 0 3px #714c91, 0 0 24px #d896ff99, 0 0 55px #7edb6a44; pointer-events: auto; }
+.os-window { position: fixed; display: flex; flex-direction: column; overflow: hidden; min-width: 330px; min-height: 250px; border: 3px outset #eeeeee; border-radius: 4px; background: #c0c0c0; box-shadow: 0 0 0 2px #6e6e6e, 0 0 22px #d896ff88, 0 0 52px #7edb6a33; pointer-events: auto; }
 .os-window.is-minimized { display: none; }
-.os-window-bar { height: 39px; flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 9px 0 14px; color: white; background: linear-gradient(90deg, #7653a8, #cd679e, #7653a8); cursor: grab; touch-action: none; text-shadow: 1px 2px #422956; }
+.os-window-bar { height: 39px; flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 9px 0 14px; color: white; background: linear-gradient(90deg, #25123e, #5c337a, #25123e); cursor: grab; touch-action: none; text-shadow: 1px 2px #12091d; }
 .os-window-bar:active { cursor: grabbing; }
 .os-window-title { overflow: hidden; font-size: 16px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .os-window-actions { display: flex; gap: 6px; }
-.os-window-actions button { width: 25px; height: 25px; display: grid; place-items: center; padding: 0; border: 2px solid #fff4ff; border-radius: 6px; color: white; background: #73436f; font-size: 17px; line-height: 1; }
-.os-window-actions button:hover { transform: none; background: #a55787; }
+.os-window-actions button { width: 25px; height: 25px; display: grid; place-items: center; padding: 0; border: 2px outset #f6f6f6; border-radius: 0; color: #2a1740; background: #c0c0c0; font-size: 17px; line-height: 1; }
+.os-window-actions button:hover { transform: none; background: #dedede; }
 .os-window iframe { width: 100%; min-height: 0; flex: 1; border: 0; background: #130d1d; }
 .os-welcome { height: 100%; padding: 35px; color: #fff4ff; background: radial-gradient(circle at 15% 25%, #a9e57d55 0 3px, transparent 4px), radial-gradient(circle at 82% 18%, #e0a5ff77 0 2px, transparent 3px), linear-gradient(135deg, #3e7353, #21142e 55%, #6d3f82); }
 .os-welcome h2 { margin: 0 0 12px; color: #f0b8ff; font-size: 43px; text-shadow: 0 0 14px #e77dff; }
@@ -365,7 +372,8 @@ h1, h2, .window-bar, .desktop-icon span {
 .os-task-tab { max-width: 180px; min-width: 116px; height: 36px; display: block; overflow: hidden; padding: 6px 10px; border: 2px outset #eeeeee; border-radius: 3px; color: #2a1740; background: #d8c2e5; font-size: 14px; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
 .os-task-tab.is-active { border-style: inset; color: white; background: #7750a2; text-shadow: 1px 1px #422956; }
 .os-task-tab:hover { transform: none; }
-#osTray { flex: 0 0 auto; color: #321c45; font-size: 13px; font-weight: 700; white-space: nowrap; text-shadow: 1px 1px #fff; }
+#osTray { flex: 0 0 auto; display: block; max-width: 290px; overflow: hidden; padding: 5px 8px; border: 2px inset #eeeeee; border-radius: 0; color: #321c45; background: #d1d1d1cc; font-size: 12px; font-weight: 700; text-align: right; text-overflow: ellipsis; white-space: nowrap; text-shadow: 1px 1px #fff; }
+#osTray:hover { transform: none; color: #4c2771; background: #eeeeee; }
 
 @media (max-width: 700px) { .os-window { min-width: 280px; } .os-window-title { font-size: 14px; } #osStartButton { width: 96px; font-size: 15px; } #osTray { display: none; } }
 
