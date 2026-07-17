@@ -100,9 +100,13 @@
     <div id="osWindowLayer" aria-live="polite"></div>
 
     <nav id="osTaskbar" aria-label="8BitGPU taskbar">
-        <button id="osStartButton" type="button" onclick="openApp('welcome')">START</button>
+        <button id="osStartButton" type="button" onclick="openApp('welcome')"><span class="start-pixel" aria-hidden="true">✦</span> START</button>
         <div id="osTaskTabs"></div>
-        <button id="osTray" type="button" onclick="cycleAngelTime()" aria-label="Change angel time message"></button>
+        <div id="osSystemTray">
+            <span class="tray-sparkle" aria-hidden="true">✦</span>
+            <span id="osClock" aria-label="Current local time"></span>
+            <button id="osTray" type="button" onclick="cycleAngelTime()" aria-label="Change angel time message"></button>
+        </div>
     </nav>
 <script src="script.js"></script>
 
