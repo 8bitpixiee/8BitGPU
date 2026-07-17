@@ -69,7 +69,8 @@ const desktopApps = {
     },
     avatarLab: { title: "Avatar Lab.exe", src: "avatar-studio.html", width: 1000, height: 720, left: 160, top: 70 },
     storefront: { title: "STORE.exe", src: "storefront.html", width: 920, height: 680, left: 235, top: 92 },
-    login: { title: "Login.exe", src: "login.html", width: 700, height: 620, left: 290, top: 110 }
+    login: { title: "Login.exe", src: "login.html", width: 700, height: 620, left: 290, top: 110 },
+    profile: { title: "PROFILE.exe", width: 470, height: 365, left: 510, top: 155, content: () => `<section class="os-welcome os-profile"><p class="os-profile-label">CURRENT CREATURE</p><h2>${escapePlayerName()}</h2><p>Your saved avatar is waiting on the desktop. Online outfits, inventory, and friends will live here once the game account system wakes up.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>` }
 };
 
 const openWindows = new Map();
@@ -162,7 +163,7 @@ function openApp(appName) {
         windowElement.appendChild(frame);
     } else {
         const content = document.createElement("div");
-        content.innerHTML = app.content;
+        content.innerHTML = typeof app.content === "function" ? app.content() : app.content;
         windowElement.appendChild(content);
     }
 
@@ -175,3 +176,37 @@ function openApp(appName) {
 }
 
 window.openApp = openApp;
+
+function escapePlayerName() {
+    const value = localStorage.getItem("8bitgpu-player-name") || "Guest Pixie";
+    const element = document.createElement("div");
+    element.textContent = value;
+    return element.innerHTML;
+}
+
+const angelTimeMessages = [
+    "111 - New beginnings | Isaiah 43:19",
+    "222 - You are held | Romans 8:28",
+    "333 - Grace surrounds you | Psalm 34:7",
+    "444 - Protected and planted | Psalm 91:11",
+    "555 - Beautiful change is coming | Ecclesiastes 3:1",
+    "777 - Walk by faith | 2 Corinthians 5:7",
+    "888 - Overflow and renewal | John 10:10"
+];
+let angelTimeIndex = 0;
+
+function updateAngelTime() {
+    const tray = document.getElementById("osTray");
+    if (!tray) return;
+    const time = new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit" }).format(new Date());
+    tray.textContent = `${time} | ${angelTimeMessages[angelTimeIndex]}`;
+}
+
+function cycleAngelTime() {
+    angelTimeIndex = (angelTimeIndex + 1) % angelTimeMessages.length;
+    updateAngelTime();
+}
+
+window.cycleAngelTime = cycleAngelTime;
+updateAngelTime();
+setInterval(updateAngelTime, 30000);

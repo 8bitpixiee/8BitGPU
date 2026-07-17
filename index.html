@@ -71,10 +71,10 @@
         Login.exe
     </button>
 
-    <div id="playerBadge" aria-label="Current player">
+    <button id="playerBadge" type="button" onclick="openApp('profile')" aria-label="Open player profile">
         <span>PLAYER</span>
         <strong id="playerName">Guest Pixie</strong>
-    </div>
+    </button>
 
     <div id="companion">
     <img id="extraLayer" class="avatar-layer">
@@ -102,7 +102,7 @@
     <nav id="osTaskbar" aria-label="8BitGPU taskbar">
         <button id="osStartButton" type="button" onclick="openApp('welcome')">START</button>
         <div id="osTaskTabs"></div>
-        <div id="osTray">* ONLINE&nbsp;&nbsp; 8:08 PM</div>
+        <button id="osTray" type="button" onclick="cycleAngelTime()" aria-label="Change angel time message"></button>
     </nav>
 <script src="script.js"></script>
 
