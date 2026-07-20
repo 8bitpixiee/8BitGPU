@@ -112,6 +112,9 @@ function publicUser(user) {
 }
 
 async function handleApi(request, env, url) {
+  if (!env.DB || typeof env.DB.prepare !== "function") {
+    return json({ error: "The D1 binding named DB is not available to this deployment." }, 500);
+  }
   await ensureSchema(env.DB);
   const path = url.pathname;
 
@@ -180,7 +183,7 @@ export default {
       try { return await handleApi(request, env, url); }
       catch (error) {
         console.error(error);
-        return json({ error: "The player database is temporarily unavailable." }, 500);
+        return json({ error: "The player database is temporarily unavailable.", detail: error instanceof Error ? error.message : String(error) }, 500);
       }
     }
     return env.ASSETS.fetch(request);
