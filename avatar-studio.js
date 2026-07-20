@@ -135,8 +135,9 @@ document.getElementById("randomizeButton").addEventListener("click", () => {
     document.getElementById("saveStatus").textContent = "New look generated!";
 });
 
-document.getElementById("saveButton").addEventListener("click", () => {
-    localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify({ ...selection, ...settings }));
+document.getElementById("saveButton").addEventListener("click", async () => {
+    const outfit = { ...selection, ...settings };
+    localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(outfit));
     if (window.parent && window.parent !== window && typeof window.parent.refreshDesktopAvatar === "function") {
         window.parent.refreshDesktopAvatar();
     }
@@ -146,7 +147,22 @@ document.getElementById("saveButton").addEventListener("click", () => {
     if (window.opener) {
         window.opener.postMessage({ type: "8bitgpu-avatar-saved" }, window.location.origin);
     }
-    document.getElementById("saveStatus").textContent = "Outfit saved to this browser!";
+    try {
+        const response = await fetch("/api/avatar", {
+            method: "PUT",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(outfit)
+        });
+        if (response.ok) {
+            document.getElementById("saveStatus").textContent = "Outfit saved to your player account!";
+        } else if (response.status === 401) {
+            document.getElementById("saveStatus").textContent = "Saved here—log in to save it online too.";
+        } else {
+            document.getElementById("saveStatus").textContent = "Saved here. Online save will retry later.";
+        }
+    } catch {
+        document.getElementById("saveStatus").textContent = "Saved here. Online save is unavailable right now.";
+    }
 });
 
 renderAvatar();

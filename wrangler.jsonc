@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "8bitgpu",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-07-20",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "8bit-players",
+      "database_id": "c0825d53-8914-4749-bdc2-c421deca9654"
+    }
+  ]
+}
