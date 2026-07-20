@@ -41,7 +41,7 @@ async function sendAccountRequest(path) {
             body: JSON.stringify({ username, password: password.value })
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "The account terminal blinked out.");
+        if (!response.ok) throw new Error(data.detail || data.error || "The account terminal blinked out.");
         if (data.user.avatar) localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(data.user.avatar));
         enterWorld(data.user.username, true);
     } catch (error) {
