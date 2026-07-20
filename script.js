@@ -101,7 +101,7 @@ const desktopApps = {
     },
     avatarLab: { title: "Avatar Lab.exe", src: "avatar-studio.html", width: 780, height: 590, left: 145, top: 65 },
     storefront: { title: "STORE.exe", src: "storefront.html", width: 690, height: 520, left: 215, top: 88 },
-    login: { title: "Login.exe", src: "login.html", width: 470, height: 520, left: 280, top: 105 },
+    login: { title: "Login.exe", src: "login.html", width: 510, height: 650, left: 280, top: 80 },
     coaching: { title: "1:1 Coaching.exe", external: "https://forms.gle/18ea3aWxwWu9c1rj9", description: "Book a one-on-one coaching session with 8Bit Pixiee.", width: 430, height: 290, left: 210, top: 145 },
     mealPlanning: { title: "Meal Planning.exe", external: "https://forms.gle/uD31jM6uUzGe3tUa7", description: "Open the meal-planning sign-up portal.", width: 430, height: 290, left: 245, top: 170 },
     twitch: { title: "Watch Us Live.exe", external: "https://www.twitch.tv/8bit_pixiee", description: "The stream lives on Twitch. Launch it in a new tab when you are ready to pull up.", width: 440, height: 305, left: 280, top: 120 },
@@ -198,6 +198,7 @@ function openApp(appName) {
         const frame = document.createElement("iframe");
         frame.src = app.src;
         frame.title = app.title;
+        frame.scrolling = "auto";
         windowElement.appendChild(frame);
     } else if (app.external) {
         const content = document.createElement("div");
