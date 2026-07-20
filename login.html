@@ -19,23 +19,28 @@
         <section class="login-content">
             <p class="eyebrow">PLAYER ACCESS TERMINAL</p>
             <h1>Welcome, creature.</h1>
-            <p class="intro">The 8BitGPU world is waking up. Tell the system what to call you.</p>
+            <p class="intro">Make your player account once, then your creature and saved fits can follow you into the world.</p>
 
             <form id="loginForm">
                 <label for="displayName">Creature name</label>
-                <input id="displayName" name="displayName" maxlength="18" autocomplete="nickname" placeholder="ex. mossy.exe" required>
-                <p class="input-note">This is only saved in this browser for now.</p>
+                <input id="displayName" name="displayName" minlength="3" maxlength="18" autocomplete="username" placeholder="ex. mossy.exe" required>
+                <p class="input-note">3–18 letters, numbers, dots, dashes, or underscores.</p>
 
-                <button class="primary-button" type="submit">Enter 8BitGPU</button>
+                <label for="password">Passcode</label>
+                <input id="password" name="password" type="password" minlength="8" autocomplete="current-password" placeholder="at least 8 characters" required>
+                <p class="input-note">Your passcode is protected by the player database—never stored in this browser.</p>
+
+                <button class="primary-button" type="submit">Log In</button>
+                <button class="secondary-button" type="button" id="registerButton">Create Account</button>
                 <button class="secondary-button" type="button" id="guestButton">Continue as Guest</button>
             </form>
 
             <div class="status-card" id="statusCard" aria-live="polite">
                 <span class="status-dot"></span>
-                <span>System ready. No online account connected.</span>
+                <span>Checking the player database...</span>
             </div>
 
-            <p class="future-note">Real accounts, saved outfits, inventory, and game progress are coming soon.</p>
+            <p class="future-note">Logged-in creatures keep their Avatar Lab outfit online. Inventory and game progress are next.</p>
         </section>
     </main>
     <script src="login.js"></script>

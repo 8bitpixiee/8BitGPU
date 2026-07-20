@@ -70,6 +70,26 @@ function renderPlayerBadge() {
 
 renderPlayerBadge();
 
+async function restoreOnlinePlayer() {
+    try {
+        const response = await fetch("/api/auth/me", { cache: "no-store" });
+        const data = await response.json();
+        if (!data.user) return;
+
+        localStorage.setItem("8bitgpu-player-name", data.user.username);
+        localStorage.setItem("8bitgpu-account-active", "true");
+        if (data.user.avatar) {
+            localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(data.user.avatar));
+            loadSavedOutfit();
+        }
+        renderPlayerBadge();
+    } catch {
+        // The desktop still works as a guest if the player server is unavailable.
+    }
+}
+
+restoreOnlinePlayer();
+
 const desktopApps = {
     welcome: {
         title: "WELCOME.exe",
