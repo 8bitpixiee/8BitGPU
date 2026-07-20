@@ -32,7 +32,7 @@ async function hashPassword(password, salt) {
   const bits = await crypto.subtle.deriveBits({
     name: "PBKDF2",
     salt: base64ToBytes(salt),
-    iterations: 120000,
+    iterations: 100000,
     hash: "SHA-256"
   }, key, 256);
   return btoa(String.fromCharCode(...new Uint8Array(bits)));
@@ -165,7 +165,7 @@ export default {
       try { return await handleApi(request, env, url); }
       catch (error) {
         console.error(error);
-        return json({ error: "The player database is temporarily unavailable.", detail: error instanceof Error ? error.message : String(error) }, 500);
+        return json({ error: "The player database is temporarily unavailable." }, 500);
       }
     }
     return env.ASSETS.fetch(request);
