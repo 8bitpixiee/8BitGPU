@@ -18,6 +18,8 @@ function setStatus(message) {
 function enterWorld(name, account = false) {
     localStorage.setItem("8bitgpu-player-name", name);
     localStorage.setItem("8bitgpu-account-active", account ? "true" : "false");
+    if (account) localStorage.removeItem("8bitgpu-guest-session");
+    else localStorage.setItem("8bitgpu-guest-session", "true");
     setStatus(account ? `Welcome in, ${name}. Your account is connected.` : `Playing locally as ${name}.`);
     setTimeout(() => {
         if (window.parent && window.parent !== window) window.parent.location.reload();
