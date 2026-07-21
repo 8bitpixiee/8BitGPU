@@ -168,3 +168,20 @@ document.getElementById("saveButton").addEventListener("click", async () => {
 renderAvatar();
 renderSettingChoices();
 setStep("species");
+
+async function restoreOnlineOutfit() {
+    try {
+        const response = await fetch("/api/auth/me", { cache: "no-store" });
+        const data = await response.json();
+        if (!data.user?.avatar) return;
+        const onlineOutfit = JSON.stringify(data.user.avatar);
+        if (localStorage.getItem("8bitgpu-avatar-outfit") !== onlineOutfit) {
+            localStorage.setItem("8bitgpu-avatar-outfit", onlineOutfit);
+            window.location.reload();
+        }
+    } catch {
+        // Avatar Lab still works locally if the account server is offline.
+    }
+}
+
+restoreOnlineOutfit();
