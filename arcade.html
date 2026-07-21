@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arcade 01</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="arcade.css">
+</head>
+<body>
+    <main id="arcadeGame" tabindex="0" aria-label="Arcade 01 game. Use arrow keys or WASD to move.">
+        <header class="arcade-header"><span>✦ ARCADE 01: PIXIE LAUNCHPAD</span><small>WASD / ARROWS TO MOVE · CLICK SPARKLES</small></header>
+        <div id="arcadeMap">
+            <button class="hotspot cabinets" data-reward="Arcade Token" data-xp="10" data-mana="0"><span>ARCADE MACHINES</span></button>
+            <button class="hotspot portal" data-reward="Galaxy Postcard" data-xp="25" data-mana="0"><span>PORTAL WINDOW</span></button>
+            <button class="hotspot cafe" data-reward="Pixie Soda" data-xp="5" data-mana="8"><span>PIXIE CAFÉ</span></button>
+            <button class="hotspot terminal" data-reward="Chatroom Sticker" data-xp="12" data-mana="0"><span>CHAT TERMINAL</span></button>
+            <button class="hotspot stump" data-reward="Mushroom Charm" data-xp="8" data-mana="4"><span>STUMP TABLE</span></button>
+
+            <div id="gamePlayer" aria-label="Your Being">
+                <img id="extraLayer" class="avatar-layer" alt="">
+                <img id="bodyLayer" class="avatar-layer" alt="">
+                <img id="earsLayer" class="avatar-layer" alt="">
+                <img id="headLayer" class="avatar-layer" alt="">
+                <img id="eyesLayer" class="avatar-layer" alt="">
+                <img id="hairLayer" class="avatar-layer" alt="">
+                <img id="fitLayer" class="avatar-layer" alt="">
+            </div>
+            <div id="rewardToast" role="status" aria-live="polite"></div>
+        </div>
+        <footer><span id="arcadeStats">LVL 01 · XP 120 / 300 · MANA 80 / 100</span><button id="focusButton" type="button">FOCUS GAME</button></footer>
+    </main>
+    <script src="arcade.js"></script>
+</body>
+</html>

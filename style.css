@@ -331,6 +331,10 @@ h1, h2, .window-bar, .desktop-icon span {
 .xp-track { height: 9px; overflow: hidden; border: 2px inset #d5c5e6; background: #2a2036; box-shadow: inset 1px 1px #160e1e; }
 #xpFill { display: block; width: 40%; height: 100%; background: linear-gradient(90deg, #b8ff8c, #6eecbf); box-shadow: 0 0 5px #a8ff9e; }
 .mana-label { margin-top: 5px; margin-bottom: 0; }
+#inventoryButton { width: 100%; margin-top: 5px; padding: 3px 2px; border: 2px outset #f0e7ff; color: #fff; background: linear-gradient(#7b52a0, #4b3169); font: inherit; font-size: 9px; font-weight: 700; text-shadow: 1px 1px #2d1b3e; }
+#inventoryButton:hover { transform: none; filter: brightness(1.15); }
+.os-inventory ul { display: grid; gap: 8px; margin: 18px 0; padding: 0; list-style: none; }
+.os-inventory li { padding: 8px; border: 2px inset #d7c6e2; color: #3b2553; background: #d9f4e3; font-weight: 700; }
 .being-actions {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

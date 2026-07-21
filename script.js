@@ -75,7 +75,38 @@ function renderPlayerBadge() {
     if (startMenuName) startMenuName.textContent = name;
 }
 
+function getGameState() {
+    try {
+        return JSON.parse(localStorage.getItem("8bitgpu-game-state")) || { xp: 120, mana: 80, inventory: [] };
+    } catch {
+        return { xp: 120, mana: 80, inventory: [] };
+    }
+}
+
+function renderGameHud() {
+    const state = getGameState();
+    const xp = Math.max(0, state.xp || 0);
+    const mana = Math.max(0, Math.min(100, state.mana ?? 80));
+    const level = Math.floor(xp / 300) + 1;
+    const currentXp = xp % 300;
+    const levelElement = document.getElementById("beingLevel");
+    const xpElement = document.getElementById("beingXp");
+    const manaElement = document.getElementById("manaValue");
+    const fill = document.getElementById("xpFill");
+    if (levelElement) levelElement.textContent = String(level).padStart(2, "0");
+    if (xpElement) xpElement.textContent = `${currentXp} / 300`;
+    if (manaElement) manaElement.textContent = `${mana} / 100`;
+    if (fill) fill.style.width = `${(currentXp / 300) * 100}%`;
+}
+
 renderPlayerBadge();
+renderGameHud();
+window.addEventListener("storage", (event) => {
+    if (event.key === "8bitgpu-game-state") renderGameHud();
+});
+window.addEventListener("message", (event) => {
+    if (event.origin === window.location.origin && event.data?.type === "8bitgpu-game-updated") renderGameHud();
+});
 
 async function restoreOnlinePlayer() {
     try {
@@ -116,6 +147,12 @@ const desktopApps = {
     coaching: { title: "1:1 Coaching.exe", external: "https://forms.gle/18ea3aWxwWu9c1rj9", description: "Book a one-on-one coaching session with 8Bit Pixiee.", width: 430, height: 290, left: 210, top: 145 },
     mealPlanning: { title: "Meal Planning.exe", external: "https://forms.gle/uD31jM6uUzGe3tUa7", description: "Open the meal-planning sign-up portal.", width: 430, height: 290, left: 245, top: 170 },
     twitch: { title: "8Bit Media Player.exe", src: "media-player.html", width: 920, height: 570, left: 185, top: 75 },
+    arcade: { title: "Arcade 01.exe", src: "arcade.html", width: 900, height: 650, left: 125, top: 50 },
+    inventory: { title: "INVENTORY.exe", width: 440, height: 400, left: 435, top: 140, content: () => {
+        const inventory = getGameState().inventory || [];
+        const items = inventory.length ? inventory.map((item) => `<li>✦ ${item}</li>`).join("") : "<li>Nothing collected yet. Visit Arcade 01!</li>";
+        return `<section class="os-welcome os-inventory"><p class="os-profile-label">PIXIE POCKET</p><h2>Inventory</h2><ul>${items}</ul><button type="button" onclick="openApp('arcade')">Go to Arcade 01</button></section>`;
+    } },
     discord: { title: "Community.exe", external: "https://discord.gg/RbqP4BAmH", description: "Join the 8BitGPU Discord community and show us your creature build.", width: 440, height: 305, left: 315, top: 150 },
     important: { title: "IMPORTANT.exe", src: "nick.html", width: 550, height: 450, left: 330, top: 105 },
     sonic: { title: "Sonic.exe", src: "sonic.html", width: 550, height: 450, left: 365, top: 130 },
