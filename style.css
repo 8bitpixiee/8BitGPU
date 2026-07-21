@@ -89,6 +89,7 @@ button:hover {
         drop-shadow(0 0 70px #ff4fa3)
         drop-shadow(0 0 100px #d946ef)
 }
+.hero > .pixie { display: none; }
 .desktop {
     width: 100vw;
     min-height: 100vh;
@@ -101,9 +102,9 @@ background-image: url("comets.gif");
     position: relative;
 }
 .desktop-vine { position: fixed; z-index: 2; pointer-events: none; image-rendering: pixelated; filter: drop-shadow(0 0 7px #86d65c88); }
-.vine-left { bottom: -85px; left: -72px; height: min(55vh, 520px); }
-.vine-right { top: 115px; right: -95px; height: min(61vh, 580px); }
-.vine-top { top: -20px; left: -20px; width: min(46vw, 700px); }
+.vine-left { bottom: -110px; left: -88px; height: min(50vh, 475px); }
+.vine-right { top: -58px; right: -128px; height: min(43vh, 420px); }
+.vine-top { top: -34px; left: -38px; width: min(40vw, 610px); }
 .container { z-index: 3; }
 .desktop-icon {
     width: 48px;
@@ -231,13 +232,13 @@ h1, h2, .window-bar, .desktop-icon span {
 /* Lower-right Being Dock + Start menu */
 .hero {
     right: 46px;
-    bottom: 192px;
+    bottom: 278px;
 }
 
 #beingDock {
     position: fixed;
     right: 30px;
-    bottom: 42px;
+    bottom: 52px;
     z-index: 9999;
     width: 220px;
     color: #fff7ff;
@@ -297,7 +298,7 @@ h1, h2, .window-bar, .desktop-icon span {
 #beingHud {
     position: fixed;
     right: 262px;
-    bottom: 48px;
+    bottom: 58px;
     z-index: 9998;
     display: flex;
     align-items: flex-end;
@@ -362,7 +363,7 @@ h1, h2, .window-bar, .desktop-icon span {
 #osStartMenu {
     position: fixed;
     z-index: 19999;
-    bottom: 31px;
+    bottom: 40px;
     left: 2px;
     width: 240px;
     padding: 5px;
@@ -533,24 +534,25 @@ h1, h2, .window-bar, .desktop-icon span {
 .os-window[data-app="coaching"] .os-welcome, .os-window[data-app="mealPlanning"] .os-welcome { background: linear-gradient(135deg, #c4f0ef, #b7d7f4 54%, #d1c3ef); }
 .os-window[data-app="twitch"] .os-welcome, .os-window[data-app="discord"] .os-welcome { background: linear-gradient(135deg, #e6cbff, #c7dcff 55%, #c5efcb); }
 
-#osTaskbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 20000; box-sizing: border-box; height: 32px; display: flex; align-items: center; gap: 4px; padding: 2px 5px 2px 2px; overflow: hidden; border-top: 2px solid #ffffff; background: linear-gradient(#e9e9e9 0 18%, #c9c9c9 18% 66%, #9d9d9d 100%); box-shadow: 0 -2px 0 #686868, 0 -4px 9px #0009, inset 0 1px #ffffff; }
-#osStartButton { width: 122px; height: 26px; flex: 0 0 auto; display: block; padding: 1px 7px; border: 2px outset #ffffff; border-radius: 0; color: #ffffff; background: linear-gradient(90deg, #3e6f43, #72aa5e 58%, #467b46); font-family: "Pixelify Sans", monospace; font-size: 14px; font-weight: 700; letter-spacing: .2px; text-align: left; text-shadow: 1px 1px #254d2a; box-shadow: inset 1px 1px #c9f3a5, inset -1px -1px #284d30, 1px 1px 0 #747474; }
+#osTaskbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 20000; box-sizing: border-box; height: 40px; display: flex; align-items: center; gap: 5px; padding: 3px 6px 3px 3px; overflow: hidden; border-top: 2px solid #ffffff; background: linear-gradient(#e9e9e9 0 18%, #c9c9c9 18% 66%, #9d9d9d 100%); box-shadow: 0 -2px 0 #686868, 0 -4px 9px #0009, inset 0 1px #ffffff; }
+#osStartButton { width: 142px; height: 33px; flex: 0 0 auto; display: flex; align-items: center; justify-content: flex-start; padding: 1px 7px; border: 2px outset #ffffff; border-radius: 0; color: #ffffff; background: linear-gradient(90deg, #3e6f43, #72aa5e 58%, #467b46); font-family: "Pixelify Sans", monospace; font-size: 16px; font-weight: 700; letter-spacing: .2px; text-align: left; text-shadow: 1px 1px #254d2a; box-shadow: inset 1px 1px #c9f3a5, inset -1px -1px #284d30, 1px 1px 0 #747474; }
 #osStartButton:hover { transform: none; filter: brightness(1.08); }
-.start-pixel { display: inline-grid; width: 16px; height: 16px; place-items: center; margin-right: 3px; border: 1px solid #c7f1a4; color: #f1c6ff; background: #3c653d; font-size: 11px; line-height: 1; text-shadow: 1px 1px #45225f; }
+.start-pixel { display: inline-grid; width: 27px; height: 27px; place-items: center; overflow: hidden; margin-right: 5px; border: 1px solid #c7f1a4; background: #3c653d; box-shadow: inset 1px 1px #213d26; }
+.start-pixel img { width: 33px; height: 33px; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 0 3px #f5c8ff); }
 #osTaskTabs { display: flex; min-width: 0; flex: 1; gap: 3px; overflow-x: auto; }
-.os-task-tab { max-width: 170px; min-width: 96px; height: 25px; display: block; overflow: hidden; padding: 3px 6px; border: 2px outset #ffffff; border-radius: 0; color: #29183a; background: linear-gradient(#e4e4e4, #bdbdbd); box-shadow: 1px 1px 0 #777777; font-family: "Pixelify Sans", monospace; font-size: 11px; font-weight: 700; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.os-task-tab { max-width: 185px; min-width: 106px; height: 32px; display: block; overflow: hidden; padding: 5px 7px; border: 2px outset #ffffff; border-radius: 0; color: #29183a; background: linear-gradient(#e4e4e4, #bdbdbd); box-shadow: 1px 1px 0 #777777; font-family: "Pixelify Sans", monospace; font-size: 12px; font-weight: 700; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
 .os-task-tab.is-active { border-style: inset; color: #ffffff; background: linear-gradient(#7651a0, #4e326b); box-shadow: inset 1px 1px #2f1f40; text-shadow: 1px 1px #281a38; }
 .os-task-tab:hover { transform: none; }
 #osSystemTray { display: flex; flex: 0 0 auto; align-items: center; gap: 3px; padding: 2px 3px; border: 2px inset #eeeeee; background: #acacac; box-shadow: inset 1px 1px #696969, 1px 1px 0 #777777; }
 .taskbar-socials { display: flex; align-items: center; gap: 2px; padding-right: 3px; border-right: 1px solid #777777; }
-.taskbar-social { width: 20px; height: 20px; display: grid; place-items: center; padding: 1px; border: 1px outset #ffffff; border-radius: 0; color: #ffffff; background: linear-gradient(#dedede, #acacac); box-shadow: 1px 1px 0 #717171; font-family: "Pixelify Sans", monospace; font-size: 9px; font-weight: 700; line-height: 1; }
+.taskbar-social { width: 26px; height: 26px; display: grid; place-items: center; padding: 1px; border: 1px outset #ffffff; border-radius: 0; color: #ffffff; background: linear-gradient(#dedede, #acacac); box-shadow: 1px 1px 0 #717171; font-family: "Pixelify Sans", monospace; font-size: 10px; font-weight: 700; line-height: 1; }
 .taskbar-social:hover { transform: none; filter: brightness(1.12); }
 .taskbar-social:active { border-style: inset; box-shadow: none; }
-.taskbar-social img { width: 15px; height: 15px; object-fit: contain; image-rendering: pixelated; }
+.taskbar-social img { width: 19px; height: 19px; object-fit: contain; image-rendering: pixelated; }
 .taskbar-instagram-slot { color: #55326f; background: linear-gradient(#e4caff, #ad77cd); text-shadow: 1px 1px #f9eaff; }
 .tray-sparkle { display: grid; width: 18px; height: 18px; place-items: center; border: 1px solid #7650a1; color: #ffffff; background: #5d3c7e; font-family: "Pixelify Sans", monospace; font-size: 11px; line-height: 1; text-shadow: 1px 1px #261533; }
-#osClock { flex: 0 0 auto; min-width: 53px; padding: 2px 3px; border-left: 1px solid #777777; color: #24152f; font-family: "Pixelify Sans", monospace; font-size: 11px; font-weight: 700; text-align: center; text-shadow: 1px 1px #ffffff; }
-#osTray { flex: 0 0 auto; display: block; max-width: 220px; overflow: hidden; padding: 2px 3px; border: 0; border-radius: 0; color: #321c45; background: transparent; font-family: "Pixelify Sans", monospace; font-size: 10px; font-weight: 700; text-align: right; text-overflow: ellipsis; white-space: nowrap; text-shadow: 1px 1px #fff; }
+#osClock { flex: 0 0 auto; min-width: 61px; padding: 3px 4px; border-left: 1px solid #777777; color: #24152f; font-family: "Pixelify Sans", monospace; font-size: 12px; font-weight: 700; text-align: center; text-shadow: 1px 1px #ffffff; }
+#osTray { flex: 0 0 auto; display: block; max-width: 240px; overflow: hidden; padding: 3px 4px; border: 0; border-radius: 0; color: #321c45; background: transparent; font-family: "Pixelify Sans", monospace; font-size: 11px; font-weight: 700; text-align: right; text-overflow: ellipsis; white-space: nowrap; text-shadow: 1px 1px #fff; }
 #osTray:hover { transform: none; color: #4c2771; background: #eeeeee; }
 
 @media (max-width: 700px) { .os-window { min-width: 280px; } .os-window-title { font-size: 14px; } #osTaskbar { height: 55px; } #osStartButton { width: 105px; height: 43px; font-size: 17px; } .start-pixel { width: 19px; height: 19px; font-size: 14px; } .os-task-tab { min-width: 112px; height: 38px; font-size: 14px; } #osSystemTray { display: none; } }
