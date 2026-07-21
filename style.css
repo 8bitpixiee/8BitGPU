@@ -228,6 +228,131 @@ h1, h2, .window-bar, .desktop-icon span {
     display: none;
 }
 
+/* Lower-right Being Dock + Start menu */
+.hero {
+    right: 46px;
+    bottom: 192px;
+}
+
+#beingDock {
+    position: fixed;
+    right: 30px;
+    bottom: 42px;
+    z-index: 9999;
+    width: 220px;
+    color: #fff7ff;
+    text-align: center;
+    pointer-events: none;
+}
+.being-dock-label {
+    margin: 0 0 4px;
+    color: #eac7ff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px #392151;
+}
+.being-frame {
+    position: relative;
+    height: 178px;
+    overflow: hidden;
+    border: 3px outset #e8d2ff;
+    background: linear-gradient(145deg, #60406f, #3b5745 58%, #2e3a4c);
+    box-shadow: 0 0 0 2px #624275, 0 0 13px #d896ff88, inset 0 0 0 2px #a8e97e77;
+}
+.being-frame::before,
+.being-frame::after {
+    position: absolute;
+    z-index: 1;
+    color: #dfffc4;
+    font-size: 25px;
+    line-height: 1;
+    text-shadow: 0 0 6px #b8ff8c;
+    content: "✦";
+}
+.being-frame::before { top: 9px; left: 10px; }
+.being-frame::after { right: 9px; bottom: 7px; color: #f0c7ff; }
+#beingDock #companion {
+    position: absolute;
+    bottom: -33px;
+    left: -18px;
+    width: 254px;
+    height: 254px;
+    z-index: 2;
+}
+#beingEmptyState {
+    position: absolute;
+    z-index: 3;
+    top: 66px;
+    left: 0;
+    right: 0;
+    margin: 0;
+    color: #eddbff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.45;
+    text-shadow: 1px 1px #352045;
+}
+.being-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    margin-top: 4px;
+    pointer-events: auto;
+}
+.being-actions button,
+#osStartMenu button {
+    display: block;
+    border: 2px outset #f3edff;
+    border-radius: 0;
+    color: #2d1b3e;
+    background: linear-gradient(#d8c7e6, #a88ab9);
+    box-shadow: inset 1px 1px #fff, 1px 1px #352440;
+    font-size: 11px;
+    font-weight: 700;
+    text-shadow: none;
+}
+.being-actions button { padding: 5px 2px; }
+.being-actions button:hover,
+#osStartMenu button:hover { transform: none; color: #fff; background: #7651a0; text-shadow: 1px 1px #352045; }
+#companion.is-wave { animation: beingWave 700ms ease-in-out; }
+#companion.is-dance { animation: beingDance 800ms ease-in-out; }
+#companion.is-spin { animation: beingSpin 800ms ease-in-out; }
+@keyframes beingWave { 0%,100%{transform:translateX(0)} 35%{transform:translateX(12px) rotate(4deg)} 70%{transform:translateX(-5px) rotate(-2deg)} }
+@keyframes beingDance { 0%,100%{transform:translateY(0)} 25%{transform:translate(-10px,-10px) rotate(-4deg)} 70%{transform:translate(10px,-4px) rotate(4deg)} }
+@keyframes beingSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+#osStartMenu {
+    position: fixed;
+    z-index: 19999;
+    bottom: 31px;
+    left: 2px;
+    width: 240px;
+    padding: 5px;
+    border: 3px outset #fff;
+    color: #261735;
+    background: linear-gradient(90deg, #5b3d7b 0 27px, #c9c9c9 27px);
+    box-shadow: 4px 4px 0 #2c2c2c, 0 0 16px #d896ff88;
+    transform: translateY(12px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
+}
+#osStartMenu.is-open { transform: translateY(0); opacity: 1; visibility: visible; }
+#osStartMenu button { width: calc(100% - 27px); margin-left: 27px; padding: 9px 8px; text-align: left; }
+#osStartMenu .start-user-card { display: flex; align-items: center; gap: 8px; min-height: 56px; color: #fff; background: linear-gradient(#8050a3, #4c2d6b); text-shadow: 1px 1px #29183a; }
+.start-user-icon { display: grid; width: 34px; height: 34px; place-items: center; border: 2px inset #d8c7e6; color: #b8ff8c; background: #4a6849; font-size: 20px; }
+.start-user-card small { display: block; color: #baff96; font-size: 9px; }
+.start-user-card strong { display: block; margin-top: 4px; font-size: 14px; }
+.start-menu-divider { width: calc(100% - 27px); height: 2px; margin: 5px 0 5px 27px; background: #8a8a8a; border-bottom: 1px solid #fff; }
+
+@media (max-width: 700px) {
+    .hero { right: 18px; bottom: 248px; }
+    h1 { font-size: 68px; }
+    #beingDock { right: 12px; bottom: 62px; transform: scale(.8); transform-origin: right bottom; }
+    #osStartMenu { bottom: 54px; }
+}
+
 #avatarLabButton {
     position: fixed;
     left: 48px;
