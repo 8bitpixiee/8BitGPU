@@ -1,0 +1,24 @@
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+body { color: #fff4ff; background: #2c1d45; font-family: "Pixelify Sans", monospace; }
+.media-player { width: 100%; height: 100%; display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(255px, .7fr); gap: 7px; padding: 7px; background: linear-gradient(135deg, #6b4780, #b2679b 52%, #5c9b82); }
+.player-side, .aol-chat { min-width: 0; border: 3px outset #ead8ff; box-shadow: inset 0 0 0 2px #3d2855, 2px 2px #33203d; background: #211a35; }
+.player-heading { height: 34px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border-bottom: 2px solid #b98ad1; background: linear-gradient(90deg, #51316e, #8c599d); font-size: 13px; }
+.player-heading strong { letter-spacing: 1px; }
+.player-heading span:last-child { margin-left: auto; color: #baff96; font-size: 10px; }
+.live-dot { width: 9px; height: 9px; border: 1px solid white; border-radius: 50%; background: #ff5b91; box-shadow: 0 0 8px #ff77ab; }
+.twitch-screen { height: calc(100% - 71px); min-height: 240px; border: 4px inset #b7a5c4; background: #080710; }
+iframe { width: 100%; height: 100%; border: 0; }
+.player-controls { height: 37px; display: flex; align-items: center; gap: 14px; padding: 0 10px; border-top: 2px solid #cba4d6; background: linear-gradient(#d5c5d8, #997e9b); color: #35203e; font-weight: 700; }
+.signal-meter { display: flex; align-items: end; gap: 2px; margin-right: auto; height: 15px; }
+.signal-meter i { display: block; width: 4px; background: #75ad58; border: 1px solid #345b3d; }
+.signal-meter i:nth-child(1) { height: 4px; }.signal-meter i:nth-child(2) { height: 7px; }.signal-meter i:nth-child(3) { height: 10px; }.signal-meter i:nth-child(4) { height: 13px; }.signal-meter i:nth-child(5) { height: 15px; }
+.player-controls a { padding: 4px 7px; border: 2px outset white; color: white; background: #69417d; font-size: 10px; text-decoration: none; text-shadow: 1px 1px #321f43; }
+.aol-chat { display: grid; grid-template-rows: 35px 30px minmax(0, 1fr) 29px; background: #ccebf6; color: #281a38; }
+.aol-chat header { display: flex; align-items: center; gap: 7px; padding: 0 8px; border-bottom: 2px solid #43275c; color: white; background: linear-gradient(90deg, #3c6990, #704690); font-size: 12px; text-shadow: 1px 1px #281a38; }
+.chat-flower { color: #baff96; font-size: 18px; }.chat-status { margin-left: auto; color: #baff96; font-size: 9px; }
+.buddy-bar { display: flex; align-items: center; gap: 4px; padding: 0 6px; border-bottom: 2px solid #8b6e9d; background: #e8c9e4; font-size: 10px; font-weight: 700; }.buddy-bar span { color: #704690; }.buddy-bar button { margin-left: auto; border: 1px outset white; color: #2c1d45; background: #b7d1e6; font: inherit; font-size: 9px; }
+.chat-wrap { position: relative; overflow: hidden; border: 3px inset #a8bfd0; background: #251b33; }.buddy-list { position: absolute; z-index: 3; top: 8px; right: 8px; width: 170px; padding: 9px; border: 2px outset white; color: #241530; background: #bfe5f1; box-shadow: 3px 3px #2a1936; font-size: 11px; }.buddy-list strong, .buddy-list span { display: block; margin: 4px 0; }.buddy-list span { color: #3e884d; }
+.aol-chat footer { display: flex; align-items: center; justify-content: space-between; padding: 0 7px; border-top: 2px solid #a27eb2; color: #563469; background: #f3cde2; font-size: 9px; font-weight: 700; }.aol-chat footer b { font-size: 16px; color: #9d64bb; }
+@media (max-width: 650px) { .media-player { grid-template-columns: 1fr; grid-template-rows: 1fr .8fr; }.player-heading span:last-child { display:none; } }

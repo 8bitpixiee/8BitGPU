@@ -115,7 +115,7 @@ const desktopApps = {
     login: { title: "Login.exe", src: "login.html", width: 510, height: 650, left: 280, top: 80 },
     coaching: { title: "1:1 Coaching.exe", external: "https://forms.gle/18ea3aWxwWu9c1rj9", description: "Book a one-on-one coaching session with 8Bit Pixiee.", width: 430, height: 290, left: 210, top: 145 },
     mealPlanning: { title: "Meal Planning.exe", external: "https://forms.gle/uD31jM6uUzGe3tUa7", description: "Open the meal-planning sign-up portal.", width: 430, height: 290, left: 245, top: 170 },
-    twitch: { title: "Watch Us Live.exe", external: "https://www.twitch.tv/8bit_pixiee", description: "The stream lives on Twitch. Launch it in a new tab when you are ready to pull up.", width: 440, height: 305, left: 280, top: 120 },
+    twitch: { title: "8Bit Media Player.exe", src: "media-player.html", width: 920, height: 570, left: 185, top: 75 },
     discord: { title: "Community.exe", external: "https://discord.gg/RbqP4BAmH", description: "Join the 8BitGPU Discord community and show us your creature build.", width: 440, height: 305, left: 315, top: 150 },
     important: { title: "IMPORTANT.exe", src: "nick.html", width: 550, height: 450, left: 330, top: 105 },
     sonic: { title: "Sonic.exe", src: "sonic.html", width: 550, height: 450, left: 365, top: 130 },

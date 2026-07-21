@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>8Bit Media Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="media-player.css">
+</head>
+<body>
+    <main class="media-player">
+        <section class="player-side">
+            <div class="player-heading"><span class="live-dot"></span><strong>8BIT PIXIEE TV</strong><span>LIVE TRANSMISSION</span></div>
+            <div class="twitch-screen">
+                <iframe
+                    src="https://player.twitch.tv/?channel=8bit_pixiee&parent=8bitgpu.villainerafit.workers.dev&muted=false"
+                    allowfullscreen="true"
+                    allow="autoplay; fullscreen"
+                    title="8Bit Pixiee Twitch stream"></iframe>
+            </div>
+            <div class="player-controls">
+                <span>◀◀</span><span>▶</span><span>▶▶</span>
+                <div class="signal-meter"><i></i><i></i><i></i><i></i><i></i></div>
+                <a href="https://www.twitch.tv/8bit_pixiee" target="_blank" rel="noreferrer">OPEN TWITCH ↗</a>
+            </div>
+        </section>
+
+        <aside class="aol-chat">
+            <header><span class="chat-flower">✿</span> PIXIE AOL CHAT <span class="chat-status">ONLINE</span></header>
+            <div class="buddy-bar"><span>ROOM:</span> 8BITGPU STREAMSIDE ✦ <button type="button" onclick="toggleBuddyList()">BUDDIES</button></div>
+            <div class="chat-wrap">
+                <iframe
+                    src="https://www.twitch.tv/embed/8bit_pixiee/chat?parent=8bitgpu.villainerafit.workers.dev&darkpopout"
+                    title="8Bit Pixiee Twitch chat"></iframe>
+                <div id="buddyList" class="buddy-list" hidden>
+                    <strong>✦ PIXIE BUDDIES</strong>
+                    <span>● 8BitPixiee</span>
+                    <span>● Stream Spirits</span>
+                    <span>● Garden Ghouls</span>
+                </div>
+            </div>
+            <footer><span>TYPE A MESSAGE IN TWITCH CHAT</span><b>✦</b></footer>
+        </aside>
+    </main>
+    <script>
+        function toggleBuddyList() {
+            const list = document.getElementById('buddyList');
+            list.hidden = !list.hidden;
+        }
+    </script>
+</body>
+</html>
