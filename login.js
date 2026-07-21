@@ -26,6 +26,23 @@ function enterWorld(name, account = false) {
     }, 750);
 }
 
+async function moveMatchingBrowserAvatarToAccount(username) {
+    const browserName = localStorage.getItem("8bitgpu-player-name") || "";
+    if (browserName.toLowerCase() !== username.toLowerCase()) return;
+
+    try {
+        const avatar = JSON.parse(localStorage.getItem("8bitgpu-avatar-outfit"));
+        if (!avatar) return;
+        await fetch("/api/avatar", {
+            method: "PUT",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(avatar)
+        });
+    } catch {
+        // The browser-only outfit remains intact if migration cannot run yet.
+    }
+}
+
 async function sendAccountRequest(path) {
     const username = displayName.value.trim();
     if (!username || password.value.length < 8) {
@@ -42,7 +59,11 @@ async function sendAccountRequest(path) {
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.detail || data.error || "The account terminal blinked out.");
-        if (data.user.avatar) localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(data.user.avatar));
+        if (data.user.avatar) {
+            localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(data.user.avatar));
+        } else {
+            await moveMatchingBrowserAvatarToAccount(data.user.username);
+        }
         enterWorld(data.user.username, true);
     } catch (error) {
         setStatus(error.message || "Could not reach the player database.");
@@ -66,7 +87,11 @@ async function loadExistingAccount() {
             return;
         }
         displayName.value = data.user.username;
-        if (data.user.avatar) localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(data.user.avatar));
+        if (data.user.avatar) {
+            localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(data.user.avatar));
+        } else {
+            await moveMatchingBrowserAvatarToAccount(data.user.username);
+        }
         setStatus(`Already connected as ${data.user.username}.`);
     } catch {
         setStatus("Player database is waking up. You can still continue as a guest.");
