@@ -11,17 +11,15 @@
 </head>
 <body>
     <main class="lab-window">
-        <img class="lab-vine lab-vine-left" src="1longleft.png" alt="">
-        <img class="lab-vine lab-vine-right" src="1longright.png" alt="">
-        <img class="lab-vine lab-vine-top" src="ropevines.png" alt="">
-        <header class="title-bar" hidden>
-            <span>8Bit Lab.exe — Avatar Creator</span>
-            <button class="close-button" type="button" aria-label="Close Avatar Lab" onclick="window.close()">×</button>
-        </header>
+        <div class="studio-toolbar" aria-hidden="true">
+            <span class="toolbar-icon">✦</span>
+            <span>BEING STUDIO</span>
+            <span class="toolbar-dots">● ● ●</span>
+        </div>
 
         <div class="lab-content">
             <section class="preview-panel" aria-label="Avatar preview">
-                <p class="preview-label" id="previewLabel">YOUR CREATURE</p>
+                <p class="preview-label" id="previewLabel">YOUR BEING</p>
                 <div class="avatar-preview">
                     <img id="extraLayer" class="avatar-layer" alt="">
                     <img id="bodyLayer" class="avatar-layer" alt="">
@@ -31,44 +29,45 @@
                     <img id="hairLayer" class="avatar-layer" alt="">
                     <img id="fitLayer" class="avatar-layer" alt="">
                 </div>
-                <p class="status-text" id="saveStatus" aria-live="polite">Choose your creature!</p>
+                <p class="status-text" id="saveStatus" aria-live="polite">Ohh... whos this?? A new Being has appeared in the 8BitGPU...</p>
             </section>
 
             <section class="creator-panel" aria-label="Avatar creator controls">
                 <div class="step-tabs" aria-label="Creator steps">
-                    <button type="button" class="step-tab active" data-step-target="species">1. Species</button>
-                    <button type="button" class="step-tab" data-step-target="skinTone">2. Colors</button>
-                    <button type="button" class="step-tab" data-step-target="style">3. Style</button>
+                    <button type="button" class="step-tab active" data-step-target="species">Species</button>
+                    <button type="button" class="step-tab" data-step-target="skinTone">Being Palette</button>
+                    <button type="button" class="step-tab" data-step-target="style">Style</button>
                 </div>
 
                 <section class="step-panel active" data-step-panel="species">
                     <h1>Select Species</h1>
-                    <p class="helper-text">Pick the kind of magical creature you want to be.</p>
+                    <p class="helper-text">Pick the kind of magical Being you want to be...</p>
                     <div class="choice-grid species-grid">
-                        <button type="button" data-setting-choice="species" data-value="Pixies">Pixies</button>
-                        <button type="button" data-setting-choice="species" data-value="Deerbras">Deerbras</button>
-                        <button type="button" data-setting-choice="species" data-value="Thixies">Thixies</button>
+                        <button type="button" data-setting-choice="species" data-value="Pixies">Pixie</button>
+                        <button type="button" data-setting-choice="species" data-value="Deerbras">Deerbra</button>
+                        <button type="button" data-setting-choice="species" data-value="Thixies">Thixie</button>
                     </div>
                 </section>
 
                 <section class="step-panel" data-step-panel="skinTone">
                     <h1>Choose Colors</h1>
-                    <p class="helper-text">Start with a base tone. More color layers can be added later.</p>
+                    <p class="helper-text">Pick a Being palette</p>
                     <div class="swatch-grid">
                         <button type="button" class="swatch nutmeg" data-setting-choice="skinTone" data-value="Nutmeg"><span>Nutmeg</span></button>
                         <button type="button" class="swatch peachy" data-setting-choice="skinTone" data-value="Peachy"><span>Peachy</span></button>
-                        <button type="button" class="swatch creme" data-setting-choice="skinTone" data-value="Creme"><span>Creme</span></button>
+                        <button type="button" class="swatch creme" data-setting-choice="skinTone" data-value="Creme"><span>Crème</span></button>
                     </div>
                 </section>
 
                 <section class="step-panel" data-step-panel="style">
                     <h1>Make It Yours</h1>
+                    <p class="helper-text">Use the arrows to browse your saved art assets.</p>
                     <div class="layer-controls">
-                        <div class="option-row"><span>Ears</span><button type="button" data-control="ears" data-direction="-1">◀</button><strong id="earsName"></strong><button type="button" data-control="ears" data-direction="1">▶</button></div>
-                        <div class="option-row"><span>Hair</span><button type="button" data-control="hair" data-direction="-1">◀</button><strong id="hairName"></strong><button type="button" data-control="hair" data-direction="1">▶</button></div>
-                        <div class="option-row"><span>Eyes</span><button type="button" data-control="eyes" data-direction="-1">◀</button><strong id="eyesName"></strong><button type="button" data-control="eyes" data-direction="1">▶</button></div>
-                        <div class="option-row"><span>Fit</span><button type="button" data-control="fit" data-direction="-1">◀</button><strong id="fitName"></strong><button type="button" data-control="fit" data-direction="1">▶</button></div>
-                        <div class="option-row"><span>Extra</span><button type="button" data-control="extra" data-direction="-1">◀</button><strong id="extraName"></strong><button type="button" data-control="extra" data-direction="1">▶</button></div>
+                        <div class="option-row"><span>Ears</span><button type="button" data-control="ears" data-direction="-1" aria-label="Previous ears">◀</button><strong id="earsName"></strong><button type="button" data-control="ears" data-direction="1" aria-label="Next ears">▶</button></div>
+                        <div class="option-row"><span>Hair</span><button type="button" data-control="hair" data-direction="-1" aria-label="Previous hair">◀</button><strong id="hairName"></strong><button type="button" data-control="hair" data-direction="1" aria-label="Next hair">▶</button></div>
+                        <div class="option-row"><span>Eyes</span><button type="button" data-control="eyes" data-direction="-1" aria-label="Previous eyes">◀</button><strong id="eyesName"></strong><button type="button" data-control="eyes" data-direction="1" aria-label="Next eyes">▶</button></div>
+                        <div class="option-row"><span>Fit</span><button type="button" data-control="fit" data-direction="-1" aria-label="Previous fit">◀</button><strong id="fitName"></strong><button type="button" data-control="fit" data-direction="1" aria-label="Next fit">▶</button></div>
+                        <div class="option-row"><span>Extra</span><button type="button" data-control="extra" data-direction="-1" aria-label="Previous extra">◀</button><strong id="extraName"></strong><button type="button" data-control="extra" data-direction="1" aria-label="Next extra">▶</button></div>
                     </div>
                 </section>
 
