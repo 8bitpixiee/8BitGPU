@@ -61,13 +61,21 @@
 
                 <section class="step-panel" data-step-panel="style">
                     <h1>Make It Yours</h1>
-                    <p class="helper-text">Use the arrows to browse your saved art assets.</p>
-                    <div class="layer-controls">
-                        <div class="option-row"><span>Ears</span><button type="button" data-control="ears" data-direction="-1" aria-label="Previous ears">◀</button><strong id="earsName"></strong><button type="button" data-control="ears" data-direction="1" aria-label="Next ears">▶</button></div>
-                        <div class="option-row"><span>Hair</span><button type="button" data-control="hair" data-direction="-1" aria-label="Previous hair">◀</button><strong id="hairName"></strong><button type="button" data-control="hair" data-direction="1" aria-label="Next hair">▶</button></div>
-                        <div class="option-row"><span>Eyes</span><button type="button" data-control="eyes" data-direction="-1" aria-label="Previous eyes">◀</button><strong id="eyesName"></strong><button type="button" data-control="eyes" data-direction="1" aria-label="Next eyes">▶</button></div>
-                        <div class="option-row"><span>Fit</span><button type="button" data-control="fit" data-direction="-1" aria-label="Previous fit">◀</button><strong id="fitName"></strong><button type="button" data-control="fit" data-direction="1" aria-label="Next fit">▶</button></div>
-                        <div class="option-row"><span>Extra</span><button type="button" data-control="extra" data-direction="-1" aria-label="Previous extra">◀</button><strong id="extraName"></strong><button type="button" data-control="extra" data-direction="1" aria-label="Next extra">▶</button></div>
+                    <p class="helper-text">Pick a style, then choose its colorway.</p>
+                    <div class="customizer-shell">
+                        <nav class="picker-categories" aria-label="Style categories">
+                            <button type="button" class="picker-category active" data-picker-category="hair">Hair</button>
+                            <button type="button" class="picker-category" data-picker-category="eyes">Eyes</button>
+                            <button type="button" class="picker-category" data-picker-category="ears">Ears</button>
+                            <button type="button" class="picker-category" data-picker-category="fit">Fit</button>
+                            <button type="button" class="picker-category" data-picker-category="extra">Extra</button>
+                        </nav>
+                        <div class="picker-panel">
+                            <p class="picker-label" id="pickerLabel">HAIR STYLE</p>
+                            <div class="asset-grid" id="assetGrid"></div>
+                            <p class="picker-label color-label" id="colorLabel">COLORWAY</p>
+                            <div class="color-grid" id="colorGrid"></div>
+                        </div>
                     </div>
                 </section>
 
