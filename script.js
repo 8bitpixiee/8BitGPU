@@ -17,11 +17,12 @@ function loadSavedOutfit() {
     const avatarPath = "avatar/";
     const setLayer = (id, source) => {
         const layer = document.getElementById(id);
+        layer.onerror = () => { layer.style.display = "none"; };
         layer.src = source;
         layer.style.display = source ? "block" : "none";
     };
 
-    const hairOptions = ["", `${avatarPath}volume_hair_fem_idle_front_v1.png`, `${avatarPath}hair_fem_v1.png`, `${avatarPath}hair_fem_deerbra_v1.png`, `${avatarPath}hair_fem_deerbra_v2.png`, `${avatarPath}hair_fem_deerbra_v3.png`, `${avatarPath}hair_fem_deerbra_v4.png`, `${avatarPath}hair_lemon_v1.png`, `${avatarPath}hair_lemon_v2.png`, `${avatarPath}hair_lemon_v3.png`, `${avatarPath}hair_locs_v1.png`, `${avatarPath}hair_locs_v2.png`, `${avatarPath}hair_locs_v3.png`, `${avatarPath}hair_longwaves_v1.png`, `${avatarPath}hair_longwaves_v2.png`, `${avatarPath}hair_longwaves_v3.png`, `${avatarPath}sideswept_hair_v1.png`, `${avatarPath}sideswept_hair_v2.png`, `${avatarPath}sideswept_hair_v3.png`];
+    const hairOptions = ["", "volume_hair_fem_idle_front_v1.png", `${avatarPath}hair_fem_v1.png`, `${avatarPath}hair_fem_deerbra_v1.png`, `${avatarPath}hair_fem_deerbra_v2.png`, `${avatarPath}hair_fem_deerbra_v3.png`, `${avatarPath}hair_fem_deerbra_v4.png`, `${avatarPath}hair_lemon_v1.png`, `${avatarPath}hair_lemon_v2.png`, `${avatarPath}hair_lemon_v3.png`, `${avatarPath}hair_locs_v1.png`, `${avatarPath}hair_locs_v2.png`, `${avatarPath}hair_locs_v3.png`, `${avatarPath}hair_longwaves_v1.png`, `${avatarPath}hair_longwaves_v2.png`, `${avatarPath}hair_longwaves_v3.png`, `${avatarPath}sideswept_hair_v1.png`, `${avatarPath}sideswept_hair_v2.png`, `${avatarPath}sideswept_hair_v3.png`];
     const earsOptions = [`${avatarPath}ears_fem_v1.png`, `${avatarPath}ears_fem_v2.png`, `${avatarPath}ears_fem_v3.png`, `${avatarPath}kittie_ears_v1.png`, `${avatarPath}kittie_ears_v2.png`, `${avatarPath}kittie_ears_v3.png`, `${avatarPath}ears_fem_deerbra_v1.png`, `${avatarPath}ears_fem_deerbra_v3.png`, `${avatarPath}ears_fem_bovidil_v1.png`, `${avatarPath}ears_fem_bovidil_v2.png`, `${avatarPath}ears_fem_bovidil_v3.png`];
     const eyesOptions = ["", `${avatarPath}eyes_fem_v1.png`, `${avatarPath}eyes_fem_v2.png`, `${avatarPath}eyes_mac_v1.png`, `${avatarPath}eyes_mac_v2.png`, `${avatarPath}eyes_mac_v3.png`, `${avatarPath}eyes_lemon.png`];
     const fitOptions = ["", `${avatarPath}fit_fem_v1.png`, `${avatarPath}fit_fem_v2.png`, `${avatarPath}fit_fem_v3.png`, `${avatarPath}fit_kittie_v1.png`, `${avatarPath}fit_kittie_v2.png`, `${avatarPath}fit_kittie_v3.png`, `${avatarPath}drawls_fem_idle_front_v1.png`, `${avatarPath}drawls_fem_idle_front_v2.png`, `${avatarPath}drawls_fem_idle_front_v3.png`];

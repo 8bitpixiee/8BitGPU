@@ -16,7 +16,7 @@ const options = {
     ],
     hair: [
         { name: "None", src: "" },
-        { name: "Bombshell Blowout", src: `${assetPath}volume_hair_fem_idle_front_v1.png` },
+        { name: "Bombshell Blowout", src: "volume_hair_fem_idle_front_v1.png" },
         { name: "Straight (Violet)", src: `${assetPath}hair_fem_v1.png` },
         { name: "Beachy Waves (Cocoa)", src: `${assetPath}hair_fem_deerbra_v1.png` },
         { name: "Beachy Waves (Pumpkin)", src: `${assetPath}hair_fem_deerbra_v2.png` },
@@ -101,13 +101,14 @@ try {
 
 function setLayer(layerName, src) {
     const layer = document.getElementById(`${layerName}Layer`);
+    layer.onerror = () => { layer.hidden = true; };
     layer.src = src;
     layer.hidden = !src;
 }
 
 function renderPreviewLabel() {
     const username = localStorage.getItem("8bitgpu-player-name");
-    document.getElementById("previewLabel").textContent = username ? `${username.toUpperCase()}'S CREATURE` : "YOUR CREATURE";
+    document.getElementById("previewLabel").textContent = username ? `${username.toUpperCase()}'S BEING` : "YOUR BEING";
 }
 
 function renderBase() {
