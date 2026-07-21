@@ -21,7 +21,7 @@
 
         <div class="lab-content">
             <section class="preview-panel" aria-label="Avatar preview">
-                <p class="preview-label">YOUR CREATURE</p>
+                <p class="preview-label" id="preveiwLabel">Your Being</p>
                 <div class="avatar-preview">
                     <img id="extraLayer" class="avatar-layer" alt="">
                     <img id="bodyLayer" class="avatar-layer" alt="">
@@ -31,22 +31,23 @@
                     <img id="hairLayer" class="avatar-layer" alt="">
                     <img id="fitLayer" class="avatar-layer" alt="">
                 </div>
-                <p class="status-text" id="saveStatus" aria-live="polite">Choose your creature!</p>
+                <p class="status-text" id="saveStatus" aria-live="polite">Oh... whos this???</p>
             </section>
 
             <section class="creator-panel" aria-label="Avatar creator controls">
                 <div class="step-tabs" aria-label="Creator steps">
-                    <button type="button" class="step-tab active" data-step-target="species">1. Species</button>
-                    <button type="button" class="step-tab" data-step-target="skinTone">2. Colors</button>
-                    <button type="button" class="step-tab" data-step-target="style">3. Style</button>
+                    <button type="button" class="step-tab active" data-step-target="species">Species</button>
+                    <button type="button" class="step-tab" data-step-target="skinTone">Skin Tones</button>
+                    <button type="button" class="step-tab" data-step-target="style">Style</button>
                 </div>
 
                 <section class="step-panel active" data-step-panel="species">
-                    <h1>Select Species</h1>
-                    <p class="helper-text">Pick the kind of magical creature you want to be.</p>
+                    <h1>Select Your Body</h1>
+                    <p class="helper-text">Choose your species...</p>
                     <div class="choice-grid species-grid">
-                        <button type="button" data-setting-choice="species" data-value="Pixies">Pixies</button>
-                        <button type="button" data-setting-choice="species" data-value="Deerbras">Deerbras</button>
+                        <button type="button" data-setting-choice="species" data-value="Pixie">Pixie</button>
+                        <button type="button" data-setting-choice="species" data-value="Deerbra">Deerbra</button>
+                        <button type="button" data-setting-choice="species" data-value="Thixie">Thixie</button>
                     </div>
                 </section>
 
@@ -56,6 +57,8 @@
                     <div class="swatch-grid">
                         <button type="button" class="swatch nutmeg" data-setting-choice="skinTone" data-value="Nutmeg"><span>Nutmeg</span></button>
                         <button type="button" class="swatch peachy" data-setting-choice="skinTone" data-value="Peachy"><span>Peachy</span></button>
+                        <button type="button" class="swatch creme" data-setting-choice="skinTone" data-value="Crème"><span>Crème</span></button>
+                        
                     </div>
                 </section>
 
@@ -71,10 +74,10 @@
                 </section>
 
                 <footer class="creator-actions">
-                    <button class="round-button" id="previousButton" type="button">← Back</button>
+                    <button class="round-button" id="previousButton" type="button">←Back</button>
                     <button class="round-button" id="randomizeButton" type="button">Randomize</button>
-                    <button class="round-button primary" id="nextButton" type="button">Next →</button>
-                    <button class="round-button save-button" id="saveButton" type="button">Save</button>
+                    <button class="round-button primary" id="nextButton" type="button">Next→</button>
+                    <button class="round-button save-button" id="saveButton" type="button">Save✓</button>
                 </footer>
             </section>
         </div>
