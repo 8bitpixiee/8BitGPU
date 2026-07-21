@@ -293,6 +293,43 @@ h1, h2, .window-bar, .desktop-icon span {
     line-height: 1.45;
     text-shadow: 1px 1px #352045;
 }
+
+#beingHud {
+    position: fixed;
+    right: 262px;
+    bottom: 48px;
+    z-index: 9998;
+    display: flex;
+    align-items: flex-end;
+    gap: 7px;
+    padding: 7px 9px;
+    border: 2px outset #efe6ff;
+    color: #fff;
+    background: linear-gradient(145deg, #51326c, #273a4b);
+    box-shadow: 2px 2px 0 #26192e, 0 0 12px #d896ff77, inset 1px 1px #a8e97e55;
+    font-size: 10px;
+    text-shadow: 1px 1px #29183a;
+}
+.mana-jar {
+    position: relative;
+    width: 32px;
+    height: 43px;
+    overflow: hidden;
+    border: 3px solid #f0d6ff;
+    border-radius: 4px 4px 8px 8px;
+    background: linear-gradient(90deg, #8050a3, #e0b8ff 45%, #70428e);
+    box-shadow: inset 2px 0 #ffffff88, 0 0 8px #f1a9ff;
+}
+.jar-lid { position: absolute; top: -4px; left: 5px; width: 18px; height: 5px; border: 2px solid #f5deae; background: #8b6e41; }
+.jar-glow { position: absolute; right: 2px; bottom: 2px; left: 2px; height: 76%; background: linear-gradient(#ffbdff, #c759df); box-shadow: 0 -2px 7px #ffd4ff; }
+.jar-sparkle { position: absolute; z-index: 2; top: 12px; left: 9px; color: white; font-size: 13px; text-shadow: 0 0 5px white; }
+.hud-stats { width: 128px; }
+.hud-stats p, .xp-label, .mana-label { display: flex; justify-content: space-between; margin: 0 0 4px; font-size: 10px; line-height: 1.1; }
+.hud-stats p span, .xp-label span, .mana-label span { color: #baff96; }
+.hud-stats strong { color: #fff9df; font-size: 10px; }
+.xp-track { height: 9px; overflow: hidden; border: 2px inset #d5c5e6; background: #2a2036; box-shadow: inset 1px 1px #160e1e; }
+#xpFill { display: block; width: 40%; height: 100%; background: linear-gradient(90deg, #b8ff8c, #6eecbf); box-shadow: 0 0 5px #a8ff9e; }
+.mana-label { margin-top: 5px; margin-bottom: 0; }
 .being-actions {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -351,6 +388,7 @@ h1, h2, .window-bar, .desktop-icon span {
     h1 { font-size: 68px; }
     #beingDock { right: 12px; bottom: 62px; transform: scale(.8); transform-origin: right bottom; }
     #osStartMenu { bottom: 54px; }
+    #beingHud { right: 182px; bottom: 63px; transform: scale(.75); transform-origin: right bottom; }
 }
 
 #avatarLabButton {
