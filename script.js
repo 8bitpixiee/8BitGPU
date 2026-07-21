@@ -13,6 +13,8 @@ function loadSavedOutfit() {
 
     const companion = document.getElementById("companion");
     if (companion) companion.style.display = "block";
+    const emptyState = document.getElementById("beingEmptyState");
+    if (emptyState) emptyState.hidden = true;
 
     const avatarPath = "avatar/";
     const setLayer = (id, source) => {
@@ -66,9 +68,11 @@ window.addEventListener("message", (event) => {
 
 function renderPlayerBadge() {
     const playerName = document.getElementById("playerName");
-    if (!playerName) return;
+    const startMenuName = document.getElementById("startMenuName");
+    const name = localStorage.getItem("8bitgpu-player-name") || "Guest Pixie";
 
-    playerName.textContent = localStorage.getItem("8bitgpu-player-name") || "Guest Pixie";
+    if (playerName) playerName.textContent = name;
+    if (startMenuName) startMenuName.textContent = name;
 }
 
 renderPlayerBadge();
@@ -117,6 +121,31 @@ const desktopApps = {
     sonic: { title: "Sonic.exe", src: "sonic.html", width: 550, height: 450, left: 365, top: 130 },
     profile: { title: "PROFILE.exe", width: 410, height: 310, left: 510, top: 155, content: () => `<section class="os-welcome os-profile"><p class="os-profile-label">CURRENT CREATURE</p><h2>${escapePlayerName()}</h2><p>Your saved avatar is waiting on the desktop. Online outfits, inventory, and friends will live here once the game account system wakes up.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>` }
 };
+
+function toggleStartMenu() {
+    const menu = document.getElementById("osStartMenu");
+    if (!menu) return;
+    const isOpen = menu.classList.toggle("is-open");
+    menu.setAttribute("aria-hidden", String(!isOpen));
+}
+
+function closeStartMenu() {
+    const menu = document.getElementById("osStartMenu");
+    if (!menu) return;
+    menu.classList.remove("is-open");
+    menu.setAttribute("aria-hidden", "true");
+}
+
+function playBeingAction(action) {
+    const companion = document.getElementById("companion");
+    if (!companion || companion.style.display === "none") return;
+    companion.classList.remove("is-wave", "is-dance", "is-spin");
+    void companion.offsetWidth;
+    companion.classList.add(`is-${action}`);
+}
+
+window.toggleStartMenu = toggleStartMenu;
+window.playBeingAction = playBeingAction;
 
 const openWindows = new Map();
 let highestWindowZ = 11000;
@@ -173,6 +202,7 @@ function addDrag(windowElement, handle) {
 }
 
 function openApp(appName) {
+    closeStartMenu();
     const app = desktopApps[appName];
     if (!app) return;
 

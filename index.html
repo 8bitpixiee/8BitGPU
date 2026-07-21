@@ -63,44 +63,48 @@
 </div>      <!-- container -->
 </div> <!-- desktop -->
 
-    <button id="avatarLabButton" onclick="openApp('avatarLab')">
-        8BitLab.exe
-    </button>
-
-    <button id="loginButton" onclick="openApp('login')">
-        Login.exe
-    </button>
-
     <button id="playerBadge" type="button" onclick="openApp('profile')" aria-label="Open player profile">
         <span>PLAYER</span>
         <strong id="playerName">Guest Pixie</strong>
     </button>
 
-    <div id="companion">
-    <img id="extraLayer" class="avatar-layer">
-    <img
-        src="body_base_fem_idle_front_v1.png"
-        id="bodyLayer"
-        class="avatar-layer"
-        >
-    <img
-        id="earsLayer"
-        class="avatar-layer"
-        >
-    <img id="headLayer" class="avatar-layer">
-    <img id="eyesLayer" class="avatar-layer">
-    <img
-        src="volume_hair_fem_idle_front_v1.png"
-        id="hairLayer"
-        class="avatar-layer"
-        >
-    <img id="fitLayer" class="avatar-layer">
-    </div>
+    <section id="beingDock" aria-label="Your Being">
+        <p class="being-dock-label">YOUR BEING</p>
+        <div class="being-frame">
+            <div id="companion">
+                <img id="extraLayer" class="avatar-layer">
+                <img src="body_base_fem_idle_front_v1.png" id="bodyLayer" class="avatar-layer">
+                <img id="earsLayer" class="avatar-layer">
+                <img id="headLayer" class="avatar-layer">
+                <img id="eyesLayer" class="avatar-layer">
+                <img src="volume_hair_fem_idle_front_v1.png" id="hairLayer" class="avatar-layer">
+                <img id="fitLayer" class="avatar-layer">
+            </div>
+            <p id="beingEmptyState">MAKE A BEING<br>IN AVATAR LAB</p>
+        </div>
+        <div class="being-actions" aria-label="Being actions">
+            <button type="button" onclick="playBeingAction('wave')">WAVE</button>
+            <button type="button" onclick="playBeingAction('dance')">DANCE</button>
+            <button type="button" onclick="playBeingAction('spin')">SPIN</button>
+        </div>
+    </section>
+
+    <section id="osStartMenu" aria-label="Start menu" aria-hidden="true">
+        <button class="start-user-card" type="button" onclick="openApp('profile')">
+            <span class="start-user-icon">✦</span>
+            <span><small>PLAYER</small><strong id="startMenuName">Guest Pixie</strong></span>
+        </button>
+        <div class="start-menu-divider"></div>
+        <button type="button" onclick="openApp('avatarLab')">✦ Avatar Lab.exe</button>
+        <button type="button" onclick="openApp('login')">✦ Login.exe</button>
+        <button type="button" onclick="openApp('storefront')">✦ Storefront.exe</button>
+        <button type="button" onclick="openApp('twitch')">✦ Watch Us Live</button>
+    </section>
 
     <div id="osWindowLayer" aria-live="polite"></div>
 
     <nav id="osTaskbar" aria-label="8BitGPU taskbar">
-        <button id="osStartButton" type="button" onclick="openApp('welcome')"><span class="start-pixel" aria-hidden="true">8</span> START</button>
+        <button id="osStartButton" type="button" onclick="toggleStartMenu()"><span class="start-pixel" aria-hidden="true">8</span> START</button>
         <div id="osTaskTabs"></div>
         <div id="osSystemTray">
             <div class="taskbar-socials" aria-label="Social links">
