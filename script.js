@@ -257,12 +257,30 @@ function openApp(appName) {
     windowElement.style.height = `${Math.min(app.height, window.innerHeight - 75)}px`;
     windowElement.style.left = `${Math.max(12, Math.min(app.left, window.innerWidth - 220))}px`;
     windowElement.style.top = `${Math.max(12, Math.min(app.top, window.innerHeight - 160))}px`;
-    windowElement.innerHTML = `<header class="os-window-bar"><span class="os-window-title">${app.title}</span><span class="os-window-actions"><button type="button" aria-label="Minimize">-</button><button type="button" aria-label="Close">x</button></span></header>`;
+    windowElement.innerHTML = `<header class="os-window-bar"><span class="os-window-title">${app.title}</span><span class="os-window-actions"><button type="button" aria-label="Minimize">-</button><button type="button" aria-label="Maximize">□</button><button type="button" aria-label="Close">x</button></span></header>`;
 
     const header = windowElement.querySelector(".os-window-bar");
     const actions = windowElement.querySelectorAll(".os-window-actions button");
     actions[0].addEventListener("click", () => windowElement.classList.add("is-minimized"));
     actions[1].addEventListener("click", () => {
+        const maximized = windowElement.classList.toggle("is-maximized");
+        if (maximized) {
+            windowElement.dataset.restoreLeft = windowElement.style.left;
+            windowElement.dataset.restoreTop = windowElement.style.top;
+            windowElement.dataset.restoreWidth = windowElement.style.width;
+            windowElement.dataset.restoreHeight = windowElement.style.height;
+            windowElement.style.left = "8px";
+            windowElement.style.top = "8px";
+            windowElement.style.width = `${window.innerWidth - 16}px`;
+            windowElement.style.height = `${window.innerHeight - 48}px`;
+        } else {
+            windowElement.style.left = windowElement.dataset.restoreLeft;
+            windowElement.style.top = windowElement.dataset.restoreTop;
+            windowElement.style.width = windowElement.dataset.restoreWidth;
+            windowElement.style.height = windowElement.dataset.restoreHeight;
+        }
+    });
+    actions[2].addEventListener("click", () => {
         document.querySelector(`#osTaskTabs [data-app="${appName}"]`)?.remove();
         windowElement.remove();
         openWindows.delete(appName);

@@ -21,53 +21,45 @@ function loadBeing() {
 }
 
 function state() { try { return JSON.parse(localStorage.getItem("8bitgpu-game-state")) || { xp:120, mana:80, inventory:[] }; } catch { return { xp:120, mana:80, inventory:[] }; } }
-function saveState(next) { localStorage.setItem("8bitgpu-game-state", JSON.stringify(next)); parent.postMessage({ type:"8bitgpu-game-updated" }, location.origin); updateStats(); }
-const tuturialItems= [
-    "Arcade Token",
-    "Bag of Pixie Dust"
-    "Magic Mushroom"
-    "Yak"
-    "Bits & Bobs"
-];
-function updateTutorial(){
+const tutorialItems = ["Arcade Token", "Bag of Pixie Dust", "Magic Mushroom", "Yak", "Bits & Bobs"];
+function updateTutorial() {
     const game = state();
-    const progress = tuturialItems.filter((item) =>
-        game.inventory.includes(item)
-        ).length;
-    document.getElemtById("tutorialProgress").textContent = 
-        `${progress} / ${tutorialItems.length} machines awakened`;
+    const progress = tutorialItems.filter((item) => game.inventory.includes(item)).length;
+    const progressElement = document.getElementById("tutorialProgress");
+    if (progressElement) progressElement.textContent = `${progress} / ${tutorialItems.length} machines awakened`;
+    if (progress === tutorialItems.length) {
+        document.getElementById("tutorialTitle").textContent = "ARCADE AWAKENED!";
+        document.getElementById("tutorialCopy").textContent = "The portal is glowing… Map 02 signal detected.";
+    }
 }
+function saveState(next) { localStorage.setItem("8bitgpu-game-state", JSON.stringify(next)); parent.postMessage({ type:"8bitgpu-game-updated" }, location.origin); updateStats(); }
 function updateStats() { const s = state(); const level = Math.floor(s.xp / 300) + 1; document.getElementById("arcadeStats").textContent = `LVL ${String(level).padStart(2,"0")} · XP ${s.xp % 300} / 300 · MANA ${s.mana} / 100`; }
 function reward(button) {
     const s = state();
     const item = button.dataset.reward;
     const xp = Number(button.dataset.xp);
     const mana = Number(button.dataset.mana);
-
+    const toast = document.getElementById("rewardToast");
     if (s.inventory.includes(item)) {
-        const toast = document.getElementById("rewardToast");
         toast.textContent = `${item} already collected!`;
         toast.classList.add("show");
         setTimeout(() => toast.classList.remove("show"), 1800);
         return;
     }
-
     s.xp += xp;
     s.mana = Math.min(100, s.mana + mana);
     s.inventory.push(item);
-
     saveState(s);
     updateTutorial();
-
-    const toast = document.getElementById("rewardToast");
     toast.textContent = `+${xp} XP${mana ? ` · +${mana} MANA` : ""} · ${item}`;
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 2600);
 }
+
 const player = document.getElementById("gamePlayer"); let x = 48, y = 75;
 function move(dx, dy) { x = Math.max(10, Math.min(89, x + dx)); y = Math.max(38, Math.min(86, y + dy)); player.style.left = `${x}%`; player.style.top = `${y}%`; }
 document.addEventListener("keydown", (event) => { const key = event.key.toLowerCase(); const moves = { arrowleft:[-2,0], a:[-2,0], arrowright:[2,0], d:[2,0], arrowup:[0,-2], w:[0,-2], arrowdown:[0,2], s:[0,2] }; if (moves[key]) { event.preventDefault(); move(...moves[key]); } });
 document.querySelectorAll(".hotspot").forEach((button) => button.addEventListener("click", () => reward(button)));
 document.getElementById("focusButton").addEventListener("click", () => document.getElementById("arcadeGame").focus());
-loadBeing(); updateStats(); document.getElementById("arcadeGame").focus();
-updateTutorial();
+document.getElementById("tutorialHide").addEventListener("click", () => document.getElementById("tutorialPanel").classList.toggle("is-hidden"));
+loadBeing(); updateStats(); updateTutorial(); document.getElementById("arcadeGame").focus();

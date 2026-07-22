@@ -10,20 +10,21 @@
     <link rel="stylesheet" href="arcade.css">
 </head>
 <body>
-    <main id="arcadeGame" tabindex="0" aria-label="8BitArcade. Use arrow keys or WASD to move.">
-        <header class="arcade-header"><span>✦ ARCADE: 8BITLAUNCHPAD</span><small> use WASD or arrow keys to move · click the sparkles</small></header>
+    <main id="arcadeGame" tabindex="0" aria-label="Arcade 01 game. Use arrow keys or WASD to move.">
+        <header class="arcade-header"><span>✦ ARCADE 01: PIXIE LAUNCHPAD</span><small>WASD / ARROWS TO MOVE · CLICK SPARKLES</small></header>
         <div id="arcadeMap">
             <aside id="tutorialPanel">
-                <strong>QUEST LOG.exe</strong>
-                <h2>WAKE THE ARCADE</h2>
-                <p>Follow the sparkles to wake the old machines... </p>
-                <p id="tutorialProgress">0/5 machines awakened</p>
+                <header><strong>QUEST LOG.exe</strong><button id="tutorialHide" type="button" aria-label="Hide quest log">_</button></header>
+                <h2 id="tutorialTitle">WAKE THE ARCADE</h2>
+                <p id="tutorialCopy">Follow the sparkles and power up the old machines.</p>
+                <p id="tutorialProgress">0 / 5 machines awakened</p>
+                <span>REWARD: +50 XP · ARCADE AWAKENED BADGE</span>
             </aside>
             <button class="hotspot cabinets" data-reward="Arcade Token" data-xp="10" data-mana="0"><span>ARCADE MACHINES</span></button>
             <button class="hotspot portal" data-reward="Bag of Pixie Dust" data-xp="25" data-mana="0"><span>PORTAL WINDOW</span></button>
             <button class="hotspot cafe" data-reward="Magic Mushroom" data-xp="5" data-mana="8"><span>PIXIE CAFÉ</span></button>
             <button class="hotspot terminal" data-reward="Yak" data-xp="12" data-mana="0"><span>CHAT TERMINAL</span></button>
-            <button class="hotspot stump" data-reward="Bits & Bobs" data-xp="8" data-mana="4"><span>STUMP TABLE</span></button>
+            <button class="hotspot stump" data-reward="Bits &amp; Bobs" data-xp="8" data-mana="4"><span>STUMP TABLE</span></button>
 
             <div id="gamePlayer" aria-label="Your Being">
                 <img id="extraLayer" class="avatar-layer" alt="">
