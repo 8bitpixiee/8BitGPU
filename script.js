@@ -173,6 +173,17 @@ function closeStartMenu() {
     menu.setAttribute("aria-hidden", "true");
 }
 
+function isPocketMode() {
+    return window.matchMedia("(max-width: 700px)").matches;
+}
+
+function closePocketApps() {
+    if (!isPocketMode()) return;
+    openWindows.forEach((windowElement) => windowElement.remove());
+    openWindows.clear();
+    document.getElementById("osTaskTabs").replaceChildren();
+}
+
 function playBeingAction(action) {
     const companion = document.getElementById("companion");
     if (!companion || companion.style.display === "none") return;
@@ -183,6 +194,7 @@ function playBeingAction(action) {
 
 window.toggleStartMenu = toggleStartMenu;
 window.playBeingAction = playBeingAction;
+window.closePocketApps = closePocketApps;
 
 const openWindows = new Map();
 let highestWindowZ = 11000;
@@ -253,10 +265,18 @@ function openApp(appName) {
     windowElement = document.createElement("section");
     windowElement.className = "os-window";
     windowElement.dataset.app = appName;
-    windowElement.style.width = `${Math.min(app.width, window.innerWidth - 24)}px`;
-    windowElement.style.height = `${Math.min(app.height, window.innerHeight - 75)}px`;
-    windowElement.style.left = `${Math.max(12, Math.min(app.left, window.innerWidth - 220))}px`;
-    windowElement.style.top = `${Math.max(12, Math.min(app.top, window.innerHeight - 160))}px`;
+    if (isPocketMode()) {
+        windowElement.classList.add("is-pocket-window");
+        windowElement.style.width = "100vw";
+        windowElement.style.height = "calc(100vh - 58px)";
+        windowElement.style.left = "0";
+        windowElement.style.top = "0";
+    } else {
+        windowElement.style.width = `${Math.min(app.width, window.innerWidth - 24)}px`;
+        windowElement.style.height = `${Math.min(app.height, window.innerHeight - 75)}px`;
+        windowElement.style.left = `${Math.max(12, Math.min(app.left, window.innerWidth - 220))}px`;
+        windowElement.style.top = `${Math.max(12, Math.min(app.top, window.innerHeight - 160))}px`;
+    }
     windowElement.innerHTML = `<header class="os-window-bar"><span class="os-window-title">${app.title}</span><span class="os-window-actions"><button type="button" aria-label="Minimize">-</button><button type="button" aria-label="Maximize">□</button><button type="button" aria-label="Close">x</button></span></header>`;
 
     const header = windowElement.querySelector(".os-window-bar");
@@ -285,6 +305,11 @@ function openApp(appName) {
         windowElement.remove();
         openWindows.delete(appName);
     });
+
+    if (isPocketMode()) {
+        actions[0].style.display = "none";
+        actions[1].style.display = "none";
+    }
 
     if (app.src) {
         const frame = document.createElement("iframe");

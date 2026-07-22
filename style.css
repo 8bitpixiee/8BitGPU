@@ -585,3 +585,46 @@ h1, h2, .window-bar, .desktop-icon span {
     padding: 10px;
     z-index: 9999;
 }
+
+/* 8BitGPU Pocket: a deliberately phone-shaped OS, not a squished desktop. */
+#mobilePocketHome, #mobileDock { display: none; }
+
+@media (max-width: 700px) {
+    html, body { min-width: 0; overflow: hidden; background: #10091c; }
+    .desktop { min-height: 100dvh; background-position: center; }
+    .desktop-vine { opacity: .45; pointer-events: none; }
+    .vine-left { left: -56px; top: auto; bottom: 42px; height: 46vh; }
+    .vine-right { right: -74px; top: 10px; height: 36vh; }
+    .vine-top { top: -34px; left: -18px; width: 74vw; }
+    .container, .hero, .nav-buttons { display: none; }
+    #avatarLabButton, #loginButton { display: none !important; }
+    #osTaskbar, #osStartMenu { display: none !important; }
+    #playerBadge { top: 16px; right: 14px; min-width: 122px; padding: 7px 9px; }
+    #playerBadge span { font-size: 9px; }
+    #playerBadge strong { font-size: 13px; }
+    #beingHud { right: 12px; bottom: 83px; transform: scale(.74); transform-origin: right bottom; z-index: 12; }
+    #beingDock { right: 12px; bottom: 137px; transform: scale(.72); transform-origin: right bottom; z-index: 11; }
+    #beingDock .being-actions { display: none; }
+    #mobilePocketHome { position: fixed; z-index: 9; top: 88px; left: 16px; right: 16px; display: block; padding: 18px; border: 3px outset #f3ecff; color: #fff; background: linear-gradient(145deg, #533276e8, #253b5dd9 58%, #5a3c76dd); box-shadow: 4px 4px 0 #1b1128, 0 0 22px #d394ff88; }
+    .pocket-kicker { margin: 0 0 7px; color: #baff96; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+    #mobilePocketHome h2 { margin: 0; color: #f0b6ff; font-size: clamp(29px, 10vw, 40px); line-height: .96; text-shadow: 2px 2px #39214e, 0 0 12px #e18dff; }
+    #mobilePocketHome > p:not(.pocket-kicker) { max-width: 190px; margin: 12px 0 16px; color: #e8f7ff; font-size: 14px; line-height: 1.25; }
+    .pocket-launch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .pocket-launch-grid button { min-height: 49px; padding: 7px; border: 2px outset #fff; color: #2c1840; background: linear-gradient(#f8e7ff, #cdb5ed); box-shadow: 2px 2px #24172f; font: 700 13px "Pixelify Sans", monospace; text-align: left; }
+    .pocket-launch-grid button:nth-child(2) { background: linear-gradient(#c9f7ff, #93c8e5); }
+    .pocket-launch-grid button:nth-child(3) { background: linear-gradient(#ffd0e7, #e69abf); }
+    .pocket-launch-grid button:nth-child(4) { background: linear-gradient(#d8f4bd, #9fc888); }
+    .pocket-launch-grid button span { display: block; color: #7743a3; font-size: 18px; line-height: 1; }
+    #mobileDock { position: fixed; right: 0; bottom: 0; left: 0; z-index: 20001; display: grid; grid-template-columns: repeat(5, 1fr); height: 62px; padding: 4px; border-top: 3px outset #fff; background: linear-gradient(#dedede, #a4a4a4); box-shadow: 0 -3px 12px #000b; }
+    #mobileDock button { display: grid; place-items: center; gap: 1px; border: 1px outset #fff; color: #2c173e; background: transparent; font: 700 10px "Pixelify Sans", monospace; text-shadow: 1px 1px #fff; }
+    #mobileDock button:active { border-style: inset; background: #cdb3e8; }
+    #mobileDock button span { color: #663f91; font-size: 19px; line-height: 1; text-shadow: 1px 1px #e9d8ff; }
+    #osWindowLayer { z-index: 20000; }
+    .os-window.is-pocket-window { min-width: 0; min-height: 0; border-width: 3px 3px 0; box-shadow: none; }
+    .os-window.is-pocket-window .os-window-bar { height: 38px; margin: 3px 3px 0; font-size: 16px; }
+    .os-window.is-pocket-window .os-window-actions button:last-child { width: 27px; height: 27px; }
+    .os-window.is-pocket-window iframe { border-width: 2px 0 0; }
+    .os-window.is-pocket-window .os-welcome { padding: 18px; }
+    .os-window.is-pocket-window .os-welcome h2 { font-size: 32px; }
+    .os-window.is-pocket-window .os-welcome p { font-size: 16px; }
+}
