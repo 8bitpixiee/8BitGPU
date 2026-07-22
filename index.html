@@ -122,6 +122,26 @@
 
     <div id="osWindowLayer" aria-live="polite"></div>
 
+    <section id="mobilePocketHome" aria-label="8BitGPU Pocket home">
+        <p class="pocket-kicker">8BITGPU POCKET</p>
+        <h2>YOUR LITTLE<br>PIXIE OS</h2>
+        <p>Tap a program to enter the world.</p>
+        <div class="pocket-launch-grid">
+            <button type="button" onclick="openApp('avatarLab')"><span>✦</span> Avatar Lab</button>
+            <button type="button" onclick="openApp('arcade')"><span>✦</span> Arcade 01</button>
+            <button type="button" onclick="openApp('twitch')"><span>✦</span> Watch Live</button>
+            <button type="button" onclick="openApp('inventory')"><span>✦</span> Inventory</button>
+        </div>
+    </section>
+
+    <nav id="mobileDock" aria-label="8BitGPU Pocket navigation">
+        <button type="button" onclick="closePocketApps()"><span>⌂</span>Home</button>
+        <button type="button" onclick="openApp('avatarLab')"><span>✦</span>Lab</button>
+        <button type="button" onclick="openApp('arcade')"><span>◉</span>Arcade</button>
+        <button type="button" onclick="openApp('twitch')"><span>▣</span>Live</button>
+        <button type="button" onclick="openApp('inventory')"><span>▤</span>Bag</button>
+    </nav>
+
     <nav id="osTaskbar" aria-label="8BitGPU taskbar">
         <button id="osStartButton" type="button" onclick="toggleStartMenu()"><span class="start-pixel" aria-hidden="true"></span> START</button>
         <div id="osTaskTabs"></div>
