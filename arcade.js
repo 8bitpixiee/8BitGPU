@@ -59,6 +59,8 @@ function reward(button) {
 const player = document.getElementById("gamePlayer"); let x = 48, y = 75;
 function move(dx, dy) { x = Math.max(10, Math.min(89, x + dx)); y = Math.max(38, Math.min(86, y + dy)); player.style.left = `${x}%`; player.style.top = `${y}%`; }
 document.addEventListener("keydown", (event) => { const key = event.key.toLowerCase(); const moves = { arrowleft:[-2,0], a:[-2,0], arrowright:[2,0], d:[2,0], arrowup:[0,-2], w:[0,-2], arrowdown:[0,2], s:[0,2] }; if (moves[key]) { event.preventDefault(); move(...moves[key]); } });
+const touchMoves = { up:[0,-3], left:[-3,0], down:[0,3], right:[3,0] };
+document.querySelectorAll("#touchControls [data-move]").forEach((button) => button.addEventListener("click", () => move(...touchMoves[button.dataset.move])));
 document.querySelectorAll(".hotspot").forEach((button) => button.addEventListener("click", () => reward(button)));
 document.getElementById("focusButton").addEventListener("click", () => document.getElementById("arcadeGame").focus());
 document.getElementById("tutorialHide").addEventListener("click", () => document.getElementById("tutorialPanel").classList.toggle("is-hidden"));

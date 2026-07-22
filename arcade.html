@@ -13,6 +13,7 @@
     <main id="arcadeGame" tabindex="0" aria-label="Arcade 01 game. Use arrow keys or WASD to move.">
         <header class="arcade-header"><span>✦ ARCADE 01: PIXIE LAUNCHPAD</span><small>WASD / ARROWS TO MOVE · CLICK SPARKLES</small></header>
         <div id="arcadeMap">
+            <div id="mapStage">
             <aside id="tutorialPanel">
                 <header><strong>QUEST LOG.exe</strong><button id="tutorialHide" type="button" aria-label="Hide quest log">_</button></header>
                 <h2 id="tutorialTitle">WAKE THE ARCADE</h2>
@@ -36,6 +37,13 @@
                 <img id="fitLayer" class="avatar-layer" alt="">
             </div>
             <div id="rewardToast" role="status" aria-live="polite"></div>
+            <div id="touchControls" aria-label="Move your Being">
+                <button type="button" data-move="up" aria-label="Move up">&uarr;</button>
+                <button type="button" data-move="left" aria-label="Move left">&larr;</button>
+                <button type="button" data-move="down" aria-label="Move down">&darr;</button>
+                <button type="button" data-move="right" aria-label="Move right">&rarr;</button>
+            </div>
+            </div>
         </div>
         <footer><span id="arcadeStats">LVL 01 · XP 120 / 300 · MANA 80 / 100</span><button id="focusButton" type="button">FOCUS GAME</button></footer>
     </main>
