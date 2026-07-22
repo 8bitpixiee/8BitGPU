@@ -621,7 +621,8 @@ h1, h2, .window-bar, .desktop-icon span {
     #mobileDock button { display: grid; place-items: center; gap: 1px; border: 1px outset #fff; color: #2c173e; background: transparent; font: 700 10px "Pixelify Sans", monospace; text-shadow: 1px 1px #fff; }
     #mobileDock button:active { border-style: inset; background: #cdb3e8; }
     #mobileDock button span { color: #663f91; font-size: 19px; line-height: 1; text-shadow: 1px 1px #e9d8ff; }
-    #osWindowLayer { z-index: 20000; }
+    /* Open phone apps must sit above the Pocket dock, so their own bottom controls stay tappable. */
+    #osWindowLayer { z-index: 20002; }
     .os-window.is-pocket-window { min-width: 0; min-height: 0; border-width: 3px 3px 0; box-shadow: none; }
     .os-window.is-pocket-window .os-window-bar { height: 38px; margin: 3px 3px 0; font-size: 16px; }
     .os-window.is-pocket-window .os-window-actions button:last-child { width: 27px; height: 27px; }
