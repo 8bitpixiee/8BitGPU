@@ -53,8 +53,6 @@ h1 { margin: 0; color: #5f427d; font-size: clamp(28px, 3vw, 41px); line-height: 
     .picker-categories { gap: 3px; padding: 4px; }
     .picker-category { min-height: 36px; font-size: 10px; }
     .asset-grid, .color-grid { grid-template-columns: repeat(3, minmax(48px, 1fr)); }
-    .creator-actions { position: sticky; bottom: 0; z-index: 6; grid-template-columns: 1fr 1fr; margin-top: 8px; padding: 7px 2px; border-top: 2px solid #7b7d82; background: #d8d8d8; }
-    .round-button { min-height: 42px; font-size: 13px; }
-    #saveButton { grid-column: 2; grid-row: 2; }
-    #nextButton { grid-column: 1; grid-row: 2; }
+    .creator-actions { position: sticky; bottom: 0; z-index: 6; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; margin-top: 8px; padding: 7px 2px; border-top: 2px solid #7b7d82; background: #d8d8d8; }
+    .round-button { min-height: 42px; padding: 3px 1px; font-size: 11px; }
 }
