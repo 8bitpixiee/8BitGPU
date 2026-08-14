@@ -103,7 +103,7 @@ background-image: url("comets.gif");
 }
 .desktop-vine { position: fixed; z-index: 2; pointer-events: none; image-rendering: pixelated; opacity: .82; filter: drop-shadow(0 0 5px #86d65c77); }
 .vine-left { bottom: 42px; left: 12px; height: min(48vh, 500px); }
-.vine-right { top: 210px; right: 14px; height: min(48vh, 500px); }
+.vine-right { top: auto; right: -54px; height: min(42vh, 440px); }
 .vine-top { top: 6px; left: 12px; width: min(45vw, 720px); }
 .container { z-index: 3; }
 .desktop-icon {
