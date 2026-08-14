@@ -101,7 +101,7 @@ background-image: url("comets.gif");
 
     position: relative;
 }
-.desktop-vine { position: fixed; z-index: 2; pointer-events: none; image-rendering: pixelated; opacity: .82; filter: drop-shadow(0 0 5px #86d65c77); }
+
 /* Full top-left corner vine — keeps the whole artwork visible */
 .vine-top {
     top: 0;
