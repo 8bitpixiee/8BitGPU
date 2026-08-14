@@ -137,7 +137,20 @@ function ensureSelections() {
 }
 function setLayer(name, source) {
     const layer = document.getElementById(name + "Layer");
-    layer.onerror = () => { layer.hidden = true; };
+    layer.onerror = () => {
+        layer.hidden = true;
+
+        // A saved outfit can point at an art file that has not been uploaded
+        // yet. Fall back to the first real option instead of leaving a broken
+        // little strip in the preview.
+        if (Object.prototype.hasOwnProperty.call(selection, name)) {
+            const fallback = visibleOptions(name).find((choice) => choice.id !== selection[name] && choice.src);
+            if (fallback) {
+                selection[name] = fallback.id;
+                setLayer(name, fallback.src);
+            }
+        }
+    };
     layer.src = source;
     layer.hidden = !source;
 }
@@ -210,7 +223,11 @@ function setStep(step) {
     if (step === "style") renderPicker();
 }
 function tileMarkup(choice, className, selected) {
-    return '<button type="button" class="' + className + (selected ? " selected" : "") + (choice.src ? "" : " is-none") + '" data-choice-id="' + choice.id + '" title="' + choice.name + '" aria-label="' + choice.name + '">' + (choice.src ? '<img src="' + choice.src + '" alt="">' : "X") + "</button>";
+    // If a PNG was not uploaded yet, remove its tile rather than showing the
+    // browser's broken-image icon. It automatically comes back when that PNG
+    // exists in /avatar/.
+    const image = '<img src="' + choice.src + '" alt="" onerror="this.closest(\'button\').remove()">';
+    return '<button type="button" class="' + className + (selected ? " selected" : "") + (choice.src ? "" : " is-none") + '" data-choice-id="' + choice.id + '" title="' + choice.name + '" aria-label="' + choice.name + '">' + (choice.src ? image : "X") + "</button>";
 }
 function renderPicker() {
     const category = activePickerCategory;
