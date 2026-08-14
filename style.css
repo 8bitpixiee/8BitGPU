@@ -102,15 +102,39 @@ background-image: url("comets.gif");
     position: relative;
 }
 .desktop-vine { position: fixed; z-index: 2; pointer-events: none; image-rendering: pixelated; opacity: .82; filter: drop-shadow(0 0 5px #86d65c77); }
-.vine-right { top: auto; right: -20px; bottom: -18px; height: min(76vh, 820px); }
-.vine-top { top: 6px; left: 12px; width: min(45vw, 720px); }
-.container { z-index: 3; }
-.desktop-icon {
-    width: 48px;
-    height: 48px;
-    image-rendering: pixelated;
+/* Full top-left corner vine — keeps the whole artwork visible */
+.vine-top {
+    top: 0;
+    left: 0;
+    width: min(55vw, 860px);
+    height: auto;
 }
 
+/* Big right-side climbing vine */
+.vine-right {
+    top: auto;
+    right: -42px;
+    bottom: -30px;
+    height: min(66vh, 720px);
+}
+
+/* New upper-right draping vine */
+.vine-hanging-top {
+    top: -25px;
+    right: 120px;
+    width: min(30vw, 470px);
+    height: auto;
+    opacity: 0.82;
+}
+
+/* New lower-right curling vine */
+.vine-hanging-bottom {
+    right: -25px;
+    bottom: -45px;
+    width: min(29vw, 450px);
+    height: auto;
+    opacity: 0.8;
+}
 .store-page {
     background: radial-gradient(circle at 82% 14%, #ff9bcf88 0 3px, transparent 4px), radial-gradient(circle at 15% 75%, #8cf3d488 0 3px, transparent 4px), linear-gradient(135deg, #b8ebed, #c8dcff 47%, #ffd3e4);
     color: #372147;
