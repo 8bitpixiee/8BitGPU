@@ -101,40 +101,17 @@ background-image: url("comets.gif");
 
     position: relative;
 }
-
-/* Full top-left corner vine — keeps the whole artwork visible */
-.vine-top {
-    top: 0;
-    left: 0;
-    width: min(55vw, 860px);
-    height: auto;
+.desktop-vine { position: fixed; z-index: 2; pointer-events: none; image-rendering: pixelated; opacity: .82; filter: drop-shadow(0 0 5px #86d65c77); }
+.vine-left { bottom: -62px; left: -54px; height: min(34vh, 330px); }
+.vine-right { top: 36px; right: -66px; height: min(32vh, 310px); }
+.vine-top { top: -22px; left: -28px; width: min(31vw, 475px); }
+.container { z-index: 3; }
+.desktop-icon {
+    width: 48px;
+    height: 48px;
+    image-rendering: pixelated;
 }
 
-/* Big right-side climbing vine */
-.vine-right {
-    top: auto;
-    right: -42px;
-    bottom: -30px;
-    height: min(66vh, 720px);
-}
-
-/* New upper-right draping vine */
-.vine-hanging-top {
-    top: -25px;
-    right: 120px;
-    width: min(30vw, 470px);
-    height: auto;
-    opacity: 0.82;
-}
-
-/* New lower-right curling vine */
-.vine-hanging-bottom {
-    right: -25px;
-    bottom: -45px;
-    width: min(29vw, 450px);
-    height: auto;
-    opacity: 0.8;
-}
 .store-page {
     background: radial-gradient(circle at 82% 14%, #ff9bcf88 0 3px, transparent 4px), radial-gradient(circle at 15% 75%, #8cf3d488 0 3px, transparent 4px), linear-gradient(135deg, #b8ebed, #c8dcff 47%, #ffd3e4);
     color: #372147;
@@ -294,7 +271,7 @@ h1, h2, .window-bar, .desktop-icon span {
     font-size: 25px;
     line-height: 1;
     text-shadow: 0 0 6px #b8ff8c;
-    content: "✦";
+    content: "âœ¦";
 }
 .being-frame::before { top: 9px; left: 10px; }
 .being-frame::after { right: 9px; bottom: 7px; color: #f0c7ff; }
@@ -420,6 +397,133 @@ h1, h2, .window-bar, .desktop-icon span {
     #beingDock { right: 12px; bottom: 62px; transform: scale(.8); transform-origin: right bottom; }
     #osStartMenu { bottom: 54px; }
     #beingHud { right: 182px; bottom: 63px; transform: scale(.75); transform-origin: right bottom; }
+}
+
+/* ================================================================
+   DESKTOP RESCUE â€” keep this block LAST in the file.
+   It restores the original roomy desktop layout and prevents the
+   decoration images from behaving like giant app icons.
+   ================================================================ */
+html, body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+.desktop {
+    position: relative;
+    width: 100vw;
+    min-height: 100dvh;
+    overflow: hidden;
+}
+
+/* Every vine must be positioned decor, never normal page content. */
+.desktop-vine {
+    position: fixed !important;
+    display: block !important;
+    z-index: 2 !important;
+    max-width: none !important;
+    pointer-events: none !important;
+    image-rendering: pixelated !important;
+    filter: drop-shadow(0 0 7px rgba(126, 235, 114, .34));
+}
+
+/* The full L-shaped cluster belongs in the upper-left corner. */
+.vine-top {
+    top: -16px !important;
+    left: -16px !important;
+    width: min(42vw, 660px) !important;
+    height: auto !important;
+    opacity: .96 !important;
+    transform: none !important;
+}
+
+/* The long vine belongs on the right edge, large but behind the UI. */
+.vine-right {
+    top: 48px !important;
+    right: -54px !important;
+    bottom: auto !important;
+    width: auto !important;
+    height: min(67vh, 720px) !important;
+    opacity: .9 !important;
+    transform: none !important;
+}
+
+/* These experimental vines are what caused the huge diagonal mess. */
+.vine-left,
+.vine-hanging-top,
+.vine-hanging-bottom {
+    display: none !important;
+}
+
+/* Keep desktop application icons small and consistent. */
+.nav-buttons {
+    position: fixed !important;
+    top: 38px !important;
+    left: 26px !important;
+    z-index: 10 !important;
+    display: flex !important;
+    width: 112px !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.nav-buttons button {
+    width: 112px !important;
+    min-height: 66px !important;
+    padding: 3px !important;
+    gap: 2px !important;
+    font-size: 12px !important;
+    line-height: 1.05 !important;
+    text-align: center !important;
+    transform: none !important;
+}
+
+.nav-buttons button:hover { transform: translateX(2px) !important; }
+
+.desktop-icon,
+.nav-buttons .desktop-icon {
+    display: block !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+    object-fit: contain !important;
+    image-rendering: pixelated !important;
+}
+
+/* Do not squash the saved Being preview. */
+#beingDock .avatar-layer,
+#beingDock .avatar-preview img,
+#companion .avatar-layer {
+    object-fit: contain !important;
+    image-rendering: pixelated !important;
+}
+
+/* Keep the desktop UI above the vines. */
+.container,
+.hero,
+#playerBadge,
+#beingDock,
+#beingHud,
+#osTaskbar,
+#osStartMenu,
+#osWindowLayer {
+    z-index: 10;
+}
+
+#osTaskbar { z-index: 20000 !important; }
+#osStartMenu, #osWindowLayer { z-index: 20001 !important; }
+
+@media (max-width: 700px) {
+    html, body { overflow: hidden; }
+    .vine-top { top: -10px !important; left: -12px !important; width: 78vw !important; }
+    .vine-right { top: 76px !important; right: -80px !important; height: 48vh !important; opacity: .55 !important; }
+    .nav-buttons { display: none !important; }
 }
 
 #avatarLabButton {
@@ -654,3 +758,73 @@ h1, h2, .window-bar, .desktop-icon span {
     .os-window.is-pocket-window .os-welcome h2 { font-size: 32px; }
     .os-window.is-pocket-window .os-welcome p { font-size: 16px; }
 }
+
+/* FINAL DESKTOP RESCUE â€” intentionally last so mobile/old experiments cannot override it. */
+@media (min-width: 701px) {
+    html, body { margin: 0; overflow: hidden; }
+    .desktop { min-height: 100dvh; overflow: hidden; }
+    .desktop-vine {
+        position: fixed !important;
+        display: block !important;
+        z-index: 2 !important;
+        pointer-events: none !important;
+        image-rendering: pixelated !important;
+        filter: drop-shadow(0 0 7px rgba(126, 235, 114, .34));
+    }
+    .vine-top {
+        top: -16px !important;
+        left: -16px !important;
+        width: min(42vw, 660px) !important;
+        height: auto !important;
+        opacity: .96 !important;
+        transform: none !important;
+    }
+    .vine-right {
+        top: 48px !important;
+        right: -54px !important;
+        bottom: auto !important;
+        width: auto !important;
+        height: min(67vh, 720px) !important;
+        opacity: .9 !important;
+        transform: none !important;
+    }
+    .vine-left, .vine-hanging-top, .vine-hanging-bottom { display: none !important; }
+    .nav-buttons {
+        position: fixed !important;
+        top: 38px !important;
+        left: 26px !important;
+        z-index: 10 !important;
+        display: flex !important;
+        width: 112px !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+    .nav-buttons button {
+        width: 112px !important;
+        min-height: 66px !important;
+        padding: 3px !important;
+        gap: 2px !important;
+        font-size: 12px !important;
+        line-height: 1.05 !important;
+        text-align: center !important;
+        transform: none !important;
+    }
+    .nav-buttons button:hover { transform: translateX(2px) !important; }
+    .desktop-icon, .nav-buttons .desktop-icon {
+        display: block !important;
+        width: 48px !important;
+        height: 48px !important;
+        min-width: 48px !important;
+        max-width: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+        object-fit: contain !important;
+        image-rendering: pixelated !important;
+    }
+    #beingDock .avatar-layer, #beingDock .avatar-preview img, #companion .avatar-layer { object-fit: contain !important; image-rendering: pixelated !important; }
+    .container, .hero, #playerBadge, #beingDock, #beingHud, #osTaskbar, #osStartMenu, #osWindowLayer { z-index: 10; }
+    #osTaskbar { z-index: 20000 !important; }
+    #osStartMenu, #osWindowLayer { z-index: 20001 !important; }
+}
+
