@@ -131,7 +131,7 @@ function renderPlayerBadge() {
 
     if (playerName) playerName.textContent = name;
     if (startMenuName) startMenuName.textContent = name;
-    if (startAccountStatus) startAccountStatus.textContent = localStorage.getItem("8bitgpu-account-active") === "true" ? "SIGNED IN" : "GUEST DESKTOP";
+    if (startAccountStatus) startAccountStatus.textContent = "8BIT DESKTOP";
 }
 
 function getGameState() {

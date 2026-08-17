@@ -130,12 +130,12 @@
                         <img data-avatar-layer="fitLayer" alt="">
                     </span>
                 </span>
-                <span><small id="startAccountStatus">GUEST DESKTOP</small><strong id="startMenuName">Guest Pixie</strong><em>My saved Being</em></span>
+                <span><small id="startAccountStatus">8BIT DESKTOP</small><strong id="startMenuName">Guest Pixie</strong><em>Ready to play ✦</em></span>
             </button>
         </header>
         <div class="start-menu-columns">
             <div class="start-program-pane">
-                <p class="start-pane-label">PROGRAMS</p>
+                <p class="start-pane-label">FAVORITE PROGRAMS</p>
                 <button class="start-program" data-start-program type="button" onclick="openApp('avatarLab')"><span class="program-gem gem-pink">✦</span><span><strong>Avatar Lab</strong><small>Create your Being</small></span></button>
                 <button class="start-program" data-start-program type="button" onclick="openApp('arcade')"><span class="program-gem gem-blue">★</span><span><strong>Arcade 01</strong><small>Games and quests</small></span></button>
                 <button class="start-program" data-start-program type="button" onclick="openApp('inventory')"><span class="program-gem gem-green">◆</span><span><strong>Inventory</strong><small>Your collected items</small></span></button>
@@ -145,19 +145,19 @@
                 <div class="all-programs">All Programs <span>▶</span></div>
             </div>
             <aside class="start-system-pane" aria-label="Places and settings">
-                <button type="button" onclick="openApp('profile')"><strong>My Being</strong></button>
-                <button type="button" data-open-wallpapers>Pictures</button>
-                <button type="button" onclick="openApp('inventory')">Inventory</button>
+                <button type="button" onclick="openApp('profile')"><span class="system-glyph">✦</span><strong>My Being</strong></button>
+                <button type="button" data-open-wallpapers><span class="system-glyph">▣</span>Pictures</button>
+                <button type="button" onclick="openApp('inventory')"><span class="system-glyph">◆</span>Inventory</button>
                 <span class="start-system-divider"></span>
-                <button type="button" onclick="openApp('login')">Connect / Sign In</button>
-                <button type="button" onclick="openApp('important')">Help &amp; Important</button>
+                <button type="button" onclick="openApp('login')"><span class="system-glyph">☁</span>Connect</button>
+                <button type="button" onclick="openApp('important')"><span class="system-glyph">?</span>Help &amp; Important</button>
                 <span class="start-system-divider"></span>
-                <button type="button" data-open-wallpapers><strong>Personalize</strong></button>
+                <button type="button" data-open-wallpapers><span class="system-glyph">✿</span><strong>Personalize</strong></button>
             </aside>
         </div>
         <footer class="start-menu-footer">
             <label class="start-search"><span class="sr-only">Search programs</span><input id="startMenuSearch" type="search" placeholder="Search programs and files" autocomplete="off"><span aria-hidden="true">⌕</span></label>
-            <button class="start-power" type="button" data-close-start>Close menu <span>›</span></button>
+            <button class="start-power" type="button" data-close-start>Sleep <span>›</span></button>
         </footer>
     </section>
 
@@ -227,7 +227,7 @@
     </nav>
 
     <nav id="osTaskbar" aria-label="8BitGPU taskbar">
-        <button id="osStartButton" type="button" onclick="toggleStartMenu()"><span class="start-pixel" aria-hidden="true">8</span><span>8BIT</span></button>
+        <button id="osStartButton" type="button" onclick="toggleStartMenu()" aria-label="Open Start menu"><img src="purplestartwindows.png" alt=""></button>
         <div id="osTaskTabs"></div>
         <div id="osSystemTray">
             <div class="taskbar-socials" aria-label="Social links">
