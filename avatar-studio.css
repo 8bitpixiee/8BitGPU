@@ -118,3 +118,11 @@ h1 { color: #694183; text-shadow: 1px 1px #fff,0 0 9px #cbb3df88; }
 .customizer-shell,.option-row { border: 2px solid #fff; background: linear-gradient(145deg,#e4caef,#ad7bc1 45%,#6b4b7d 51%,#b28bc2); box-shadow: inset 0 4px #fff9,inset 0 -4px #4f3b5b88,0 4px 8px #39224666; }
 .asset-tile,.color-tile,.swatch { border: 2px solid #fff; background: linear-gradient(#fff,#ead9f1 38%,#b589c4 48%,#71517f 54%,#b994c5); box-shadow: inset 0 3px #fff,inset 0 -3px #503b5c88,0 3px 6px #3b274866; }
 .asset-tile.selected,.color-tile.selected,.swatch.selected { background: linear-gradient(#fff,#edc8ff 27%,#cc7ee5 45%,#75418f 52%,#a75eb8); box-shadow: inset 0 3px #fff,inset 0 -3px #4a2759,0 0 15px #a5fff0bb; }
+
+/* Lighter translucent Macintosh/Aqua finish */
+.lab-window { background: linear-gradient(145deg,rgba(249,232,255,.88),rgba(185,141,215,.72) 44%,rgba(112,78,143,.78)); }
+.studio-toolbar { background: linear-gradient(180deg,#fff,rgba(242,211,253,.96) 15%,rgba(187,128,221,.9) 47%,rgba(113,70,150,.92) 53%,rgba(205,154,229,.9)); }
+.lab-content { background: linear-gradient(145deg,rgba(198,153,222,.76),rgba(119,85,147,.68) 48%,rgba(220,193,233,.72)); }
+.creator-panel { background: linear-gradient(145deg,rgba(250,237,255,.82),rgba(208,174,229,.66) 44%,rgba(137,99,166,.7)); backdrop-filter: blur(18px) saturate(1.4); }
+.preview-panel { background: radial-gradient(circle at 82% 15%,#fff 0 3px,#d7fff288 4px 12px,transparent 14px),linear-gradient(145deg,rgba(224,255,220,.78),rgba(151,224,203,.66) 40%,rgba(122,184,202,.62) 52%,rgba(147,116,184,.7)); }
+.step-panel { background: radial-gradient(circle at 88% 8%,#fff 0 2px,#d8fff288 3px 8px,transparent 10px),linear-gradient(145deg,rgba(255,254,248,.88),rgba(224,247,240,.82) 48%,rgba(239,221,248,.84)); }

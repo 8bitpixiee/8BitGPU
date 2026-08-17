@@ -31,6 +31,16 @@
     <img class="desktop-vine vine-top" src="clustervines.png" alt="">
     <img class="desktop-vine vine-hanging-top" src="hangingvine.png" alt="">
     <img class="desktop-vine vine-hanging-bottom" src="hangingvine2.png" alt="">
+    <img class="desktop-vine vine-new-top-right" src="hangingvine.png" alt="">
+    <img class="desktop-vine vine-new-bottom-left" src="clustervines.png" alt="">
+    <img class="desktop-vine vine-new-lower-right" src="hangingvine2.png" alt="">
+    <div class="twinkle-field" aria-hidden="true">
+        <i style="--x:12%;--y:18%;--d:0s;--s:1"></i><i style="--x:28%;--y:67%;--d:1.4s;--s:.7"></i>
+        <i style="--x:41%;--y:29%;--d:2.8s;--s:1.2"></i><i style="--x:54%;--y:76%;--d:.7s;--s:.8"></i>
+        <i style="--x:67%;--y:22%;--d:3.4s;--s:1.1"></i><i style="--x:79%;--y:58%;--d:1.9s;--s:.65"></i>
+        <i style="--x:90%;--y:34%;--d:4.1s;--s:1"></i><i style="--x:20%;--y:48%;--d:5s;--s:.85"></i>
+        <i style="--x:48%;--y:11%;--d:2.2s;--s:.6"></i><i style="--x:73%;--y:84%;--d:3.8s;--s:1.2"></i>
+    </div>
     <div class="container">
     <header class="hero">
         <img src="pixilart pixie.png" class="pixie">
@@ -119,7 +129,18 @@
     <section id="osStartMenu" aria-label="Start menu" aria-hidden="true">
         <header class="start-menu-header">
             <button class="start-user-card" type="button" data-toggle-user-avatar aria-expanded="false">
-                <span class="start-user-icon"><img id="startUserAvatar" src="user-avatar-2.png" alt="Selected user picture"></span>
+                <span class="start-user-icon">
+                    <img id="startUserAvatar" src="user-avatar-2.png" alt="Selected user picture">
+                    <span id="startUserBeing" class="start-being-preview" aria-label="Saved Being">
+                        <img data-avatar-layer="extraLayer" alt="">
+                        <img data-avatar-layer="bodyLayer" alt="">
+                        <img data-avatar-layer="earsLayer" alt="">
+                        <img data-avatar-layer="headLayer" alt="">
+                        <img data-avatar-layer="eyesLayer" alt="">
+                        <img data-avatar-layer="hairLayer" alt="">
+                        <img data-avatar-layer="fitLayer" alt="">
+                    </span>
+                </span>
                 <span><small id="startAccountStatus">8BIT DESKTOP</small><strong id="startMenuName">Guest Pixie</strong><em>Ready to play ✦</em></span>
             </button>
             <div id="userAvatarPicker" aria-label="Choose a user picture" hidden>
@@ -131,6 +152,18 @@
                     <button type="button" data-user-avatar="user-avatar-4.png"><img src="user-avatar-4.png" alt="Blue cartoon eyes"></button>
                     <button type="button" data-user-avatar="user-avatar-5.png"><img src="user-avatar-5.png" alt="Lavender hibiscus"></button>
                     <button type="button" data-user-avatar="user-avatar-6.png"><img src="user-avatar-6.png" alt="Sunset gel person"></button>
+                    <button class="saved-being-choice" type="button" data-user-avatar="saved-being" aria-label="Use my saved Being">
+                        <span class="start-being-preview">
+                            <img data-avatar-layer="extraLayer" alt="">
+                            <img data-avatar-layer="bodyLayer" alt="">
+                            <img data-avatar-layer="earsLayer" alt="">
+                            <img data-avatar-layer="headLayer" alt="">
+                            <img data-avatar-layer="eyesLayer" alt="">
+                            <img data-avatar-layer="hairLayer" alt="">
+                            <img data-avatar-layer="fitLayer" alt="">
+                        </span>
+                        <span class="avatar-choice-tag">BEING</span>
+                    </button>
                 </div>
             </div>
         </header>

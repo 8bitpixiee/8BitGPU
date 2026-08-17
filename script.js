@@ -137,10 +137,16 @@ function renderPlayerBadge() {
 const userAvatarPicker = document.getElementById("userAvatarPicker");
 const userAvatarButton = document.querySelector("[data-toggle-user-avatar]");
 const startUserAvatar = document.getElementById("startUserAvatar");
+const startUserBeing = document.getElementById("startUserBeing");
 const savedUserAvatar = localStorage.getItem("8bitgpu-user-avatar") || "user-avatar-2.png";
 
 function renderUserAvatar(source) {
-    if (startUserAvatar) startUserAvatar.src = source;
+    const usesSavedBeing = source === "saved-being";
+    if (startUserAvatar) {
+        startUserAvatar.src = usesSavedBeing ? "" : source;
+        startUserAvatar.hidden = usesSavedBeing;
+    }
+    if (startUserBeing) startUserBeing.hidden = !usesSavedBeing;
     document.querySelectorAll("[data-user-avatar]").forEach((button) => button.classList.toggle("is-selected", button.dataset.userAvatar === source));
 }
 
