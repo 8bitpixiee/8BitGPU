@@ -134,6 +134,43 @@ function renderPlayerBadge() {
     if (startAccountStatus) startAccountStatus.textContent = "8BIT DESKTOP";
 }
 
+const userAvatarPicker = document.getElementById("userAvatarPicker");
+const userAvatarButton = document.querySelector("[data-toggle-user-avatar]");
+const startUserAvatar = document.getElementById("startUserAvatar");
+const savedUserAvatar = localStorage.getItem("8bitgpu-user-avatar") || "user-avatar-2.png";
+
+function renderUserAvatar(source) {
+    if (startUserAvatar) startUserAvatar.src = source;
+    document.querySelectorAll("[data-user-avatar]").forEach((button) => button.classList.toggle("is-selected", button.dataset.userAvatar === source));
+}
+
+function closeUserAvatarPicker() {
+    if (!userAvatarPicker) return;
+    userAvatarPicker.hidden = true;
+    userAvatarButton?.setAttribute("aria-expanded", "false");
+}
+
+userAvatarButton?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const willOpen = userAvatarPicker.hidden;
+    userAvatarPicker.hidden = !willOpen;
+    userAvatarButton.setAttribute("aria-expanded", String(willOpen));
+});
+
+document.querySelectorAll("[data-user-avatar]").forEach((button) => button.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const source = button.dataset.userAvatar;
+    localStorage.setItem("8bitgpu-user-avatar", source);
+    renderUserAvatar(source);
+    closeUserAvatarPicker();
+}));
+
+document.addEventListener("click", (event) => {
+    if (!event.target.closest("#userAvatarPicker, [data-toggle-user-avatar]")) closeUserAvatarPicker();
+});
+
+renderUserAvatar(savedUserAvatar);
+
 function getGameState() {
     try {
         return JSON.parse(localStorage.getItem("8bitgpu-game-state")) || { xp: 120, mana: 80, inventory: [] };

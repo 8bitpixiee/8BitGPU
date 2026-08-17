@@ -118,29 +118,30 @@
 
     <section id="osStartMenu" aria-label="Start menu" aria-hidden="true">
         <header class="start-menu-header">
-            <button class="start-user-card" type="button" onclick="openApp('profile')">
-                <span class="start-user-icon" aria-hidden="true">
-                    <span class="start-being-preview">
-                        <img data-avatar-layer="extraLayer" alt="">
-                        <img data-avatar-layer="bodyLayer" alt="">
-                        <img data-avatar-layer="earsLayer" alt="">
-                        <img data-avatar-layer="headLayer" alt="">
-                        <img data-avatar-layer="eyesLayer" alt="">
-                        <img data-avatar-layer="hairLayer" alt="">
-                        <img data-avatar-layer="fitLayer" alt="">
-                    </span>
-                </span>
+            <button class="start-user-card" type="button" data-toggle-user-avatar aria-expanded="false">
+                <span class="start-user-icon"><img id="startUserAvatar" src="user-avatar-2.png" alt="Selected user picture"></span>
                 <span><small id="startAccountStatus">8BIT DESKTOP</small><strong id="startMenuName">Guest Pixie</strong><em>Ready to play ✦</em></span>
             </button>
+            <div id="userAvatarPicker" aria-label="Choose a user picture" hidden>
+                <p>CHOOSE YOUR ICON</p>
+                <div>
+                    <button type="button" data-user-avatar="user-avatar-1.png"><img src="user-avatar-1.png" alt="Purple leopard kiss"></button>
+                    <button type="button" data-user-avatar="user-avatar-2.png"><img src="user-avatar-2.png" alt="Pink aqua gel person"></button>
+                    <button type="button" data-user-avatar="user-avatar-3.png"><img src="user-avatar-3.png" alt="Deep purple gel person"></button>
+                    <button type="button" data-user-avatar="user-avatar-4.png"><img src="user-avatar-4.png" alt="Blue cartoon eyes"></button>
+                    <button type="button" data-user-avatar="user-avatar-5.png"><img src="user-avatar-5.png" alt="Lavender hibiscus"></button>
+                    <button type="button" data-user-avatar="user-avatar-6.png"><img src="user-avatar-6.png" alt="Sunset gel person"></button>
+                </div>
+            </div>
         </header>
         <div class="start-menu-columns">
             <div class="start-program-pane">
                 <p class="start-pane-label">FAVORITE PROGRAMS</p>
-                <button class="start-program" data-start-program type="button" onclick="openApp('avatarLab')"><span class="program-gem gem-pink">✦</span><span><strong>Avatar Lab</strong><small>Create your Being</small></span></button>
-                <button class="start-program" data-start-program type="button" onclick="openApp('arcade')"><span class="program-gem gem-blue">★</span><span><strong>Arcade 01</strong><small>Games and quests</small></span></button>
+                <button class="start-program" data-start-program type="button" onclick="openApp('avatarLab')"><span class="program-gem"><img src="start-icon-wings.png" alt=""></span><span><strong>Avatar Lab</strong><small>Create your Being</small></span></button>
+                <button class="start-program" data-start-program type="button" onclick="openApp('arcade')"><span class="program-gem"><img src="start-icon-disc.png" alt=""></span><span><strong>Arcade 01</strong><small>Games and quests</small></span></button>
                 <button class="start-program" data-start-program type="button" onclick="openApp('inventory')"><span class="program-gem gem-green">◆</span><span><strong>Inventory</strong><small>Your collected items</small></span></button>
-                <button class="start-program" data-start-program type="button" onclick="openApp('storefront')"><span class="program-gem gem-gold">$</span><span><strong>Storefront</strong><small>Browse the shop</small></span></button>
-                <button class="start-program" data-start-program type="button" onclick="openApp('twitch')"><span class="program-gem gem-purple">▶</span><span><strong>Watch Us Live</strong><small>Open the stream</small></span></button>
+                <button class="start-program" data-start-program type="button" onclick="openApp('storefront')"><span class="program-gem"><img src="start-icon-cash.png" alt=""></span><span><strong>Storefront</strong><small>Browse the shop</small></span></button>
+                <button class="start-program" data-start-program type="button" onclick="openApp('twitch')"><span class="program-gem"><img src="start-icon-music.png" alt=""></span><span><strong>Watch Us Live</strong><small>Open the stream</small></span></button>
                 <p class="start-search-empty" hidden>No programs found.</p>
                 <div class="all-programs">All Programs <span>▶</span></div>
             </div>
