@@ -440,7 +440,7 @@ if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     window.addEventListener("load", () => window.setTimeout(finishDesktopBoot, 1150), { once: true });
 }
 
-const desktopWallpapers = ["wallpaper-1.jpg", "wallpaper-2.jpg", "wallpaper-3.jpg", "wallpaper-4.jpg"];
+const desktopWallpapers = ["wallpaper-1-purple.png", "wallpaper-2-purple.png", "wallpaper-3-purple.png", "wallpaper-4-purple.png"];
 const wallpaperFrames = Array.from(document.querySelectorAll(".wallpaper-frame"));
 let activeWallpaperFrame = 0;
 let currentWallpaperIndex = Number.parseInt(localStorage.getItem("8bitgpu-wallpaper-index") || "1", 10);
@@ -512,7 +512,28 @@ function openWallpaperPicker() {
     wallpaperPicker.hidden = false;
     wallpaperPicker.querySelector("[data-wallpaper-index].is-selected")?.focus();
 }
+window.openWallpaperPicker = openWallpaperPicker;
 function closeWallpaperPicker() { wallpaperPicker.hidden = true; }
+
+document.querySelectorAll("[data-open-wallpapers]").forEach((button) => button.addEventListener("click", () => {
+    closeStartMenu();
+    openWallpaperPicker();
+}));
+document.querySelector("[data-close-start]")?.addEventListener("click", closeStartMenu);
+
+const startMenuSearch = document.getElementById("startMenuSearch");
+startMenuSearch?.addEventListener("input", () => {
+    const query = startMenuSearch.value.trim().toLowerCase();
+    const programs = Array.from(document.querySelectorAll("[data-start-program]"));
+    let visiblePrograms = 0;
+    programs.forEach((program) => {
+        const isVisible = !query || program.textContent.toLowerCase().includes(query);
+        program.hidden = !isVisible;
+        if (isVisible) visiblePrograms += 1;
+    });
+    const emptyMessage = document.querySelector(".start-search-empty");
+    if (emptyMessage) emptyMessage.hidden = visiblePrograms !== 0;
+});
 
 document.querySelector(".desktop").addEventListener("contextmenu", (event) => {
     if (event.target.closest("button, .os-window, #osTaskbar, #osStartMenu, #beingDock, #beingHud, #playerBadge")) return;
