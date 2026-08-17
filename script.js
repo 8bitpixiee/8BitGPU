@@ -439,3 +439,126 @@ if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
 } else {
     window.addEventListener("load", () => window.setTimeout(finishDesktopBoot, 1150), { once: true });
 }
+
+const desktopWallpapers = ["wallpaper-1.jpg", "wallpaper-2.jpg", "wallpaper-3.jpg", "wallpaper-4.jpg"];
+const wallpaperFrames = Array.from(document.querySelectorAll(".wallpaper-frame"));
+let activeWallpaperFrame = 0;
+let currentWallpaperIndex = Number.parseInt(localStorage.getItem("8bitgpu-wallpaper-index") || "1", 10);
+let wallpaperShuffleEnabled = localStorage.getItem("8bitgpu-wallpaper-shuffle") === "true";
+let wallpaperShuffleTimer = 0;
+if (!Number.isInteger(currentWallpaperIndex) || !desktopWallpapers[currentWallpaperIndex]) currentWallpaperIndex = 1;
+let pendingWallpaperIndex = currentWallpaperIndex;
+
+function showWallpaper(index, immediate = false, persist = true) {
+    if (!wallpaperFrames.length || !desktopWallpapers[index]) return;
+    const image = new Image();
+    image.onload = () => {
+        const nextFrameIndex = immediate ? activeWallpaperFrame : 1 - activeWallpaperFrame;
+        const nextFrame = wallpaperFrames[nextFrameIndex];
+        nextFrame.style.backgroundImage = `url("${desktopWallpapers[index]}")`;
+        if (immediate) nextFrame.style.transition = "none";
+        requestAnimationFrame(() => {
+            wallpaperFrames.forEach((frame, frameIndex) => frame.classList.toggle("is-visible", frameIndex === nextFrameIndex));
+            if (immediate) requestAnimationFrame(() => { nextFrame.style.transition = ""; });
+        });
+        activeWallpaperFrame = nextFrameIndex;
+        if (persist) {
+            currentWallpaperIndex = index;
+            localStorage.setItem("8bitgpu-wallpaper-index", String(index));
+        }
+    };
+    image.src = desktopWallpapers[index];
+}
+
+function shuffleDesktopWallpaper() {
+    let nextIndex = currentWallpaperIndex;
+    while (nextIndex === currentWallpaperIndex) nextIndex = Math.floor(Math.random() * desktopWallpapers.length);
+    showWallpaper(nextIndex);
+}
+
+function scheduleWallpaperShuffle() {
+    window.clearTimeout(wallpaperShuffleTimer);
+    if (!wallpaperShuffleEnabled) return;
+    wallpaperShuffleTimer = window.setTimeout(() => {
+        shuffleDesktopWallpaper();
+        scheduleWallpaperShuffle();
+    }, 10 * 60 * 1000);
+}
+
+function updateWallpaperMenuLabels() {
+    const toggleButton = document.querySelector('[data-context-action="toggle-shuffle"]');
+    if (toggleButton) toggleButton.textContent = wallpaperShuffleEnabled ? "Stop 10-minute shuffle" : "Start 10-minute shuffle";
+}
+
+function setWallpaperShuffle(enabled) {
+    wallpaperShuffleEnabled = Boolean(enabled);
+    localStorage.setItem("8bitgpu-wallpaper-shuffle", String(wallpaperShuffleEnabled));
+    document.getElementById("wallpaperShuffleToggle").checked = wallpaperShuffleEnabled;
+    updateWallpaperMenuLabels();
+    scheduleWallpaperShuffle();
+}
+
+const desktopContextMenu = document.getElementById("desktopContextMenu");
+const wallpaperPicker = document.getElementById("wallpaperPicker");
+
+function closeDesktopContextMenu() { desktopContextMenu.hidden = true; }
+function renderWallpaperSelection() {
+    document.querySelectorAll("[data-wallpaper-index]").forEach((button) => button.classList.toggle("is-selected", Number(button.dataset.wallpaperIndex) === pendingWallpaperIndex));
+}
+function openWallpaperPicker() {
+    pendingWallpaperIndex = currentWallpaperIndex;
+    document.getElementById("wallpaperShuffleToggle").checked = wallpaperShuffleEnabled;
+    renderWallpaperSelection();
+    wallpaperPicker.hidden = false;
+    wallpaperPicker.querySelector("[data-wallpaper-index].is-selected")?.focus();
+}
+function closeWallpaperPicker() { wallpaperPicker.hidden = true; }
+
+document.querySelector(".desktop").addEventListener("contextmenu", (event) => {
+    if (event.target.closest("button, .os-window, #osTaskbar, #osStartMenu, #beingDock, #beingHud, #playerBadge")) return;
+    event.preventDefault();
+    updateWallpaperMenuLabels();
+    desktopContextMenu.hidden = false;
+    const menuWidth = 218;
+    const menuHeight = desktopContextMenu.offsetHeight;
+    desktopContextMenu.style.left = Math.min(event.clientX, window.innerWidth - menuWidth - 6) + "px";
+    desktopContextMenu.style.top = Math.min(event.clientY, window.innerHeight - menuHeight - 6) + "px";
+});
+
+desktopContextMenu.addEventListener("click", (event) => {
+    const action = event.target.closest("[data-context-action]")?.dataset.contextAction;
+    if (!action) return;
+    closeDesktopContextMenu();
+    if (action === "change-wallpaper") openWallpaperPicker();
+    if (action === "next-wallpaper") shuffleDesktopWallpaper();
+    if (action === "toggle-shuffle") setWallpaperShuffle(!wallpaperShuffleEnabled);
+    if (action === "refresh") window.location.reload();
+});
+
+document.addEventListener("pointerdown", (event) => {
+    if (!desktopContextMenu.hidden && !event.target.closest("#desktopContextMenu")) closeDesktopContextMenu();
+});
+document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    closeDesktopContextMenu();
+    closeWallpaperPicker();
+});
+
+document.querySelectorAll("[data-wallpaper-index]").forEach((button) => button.addEventListener("click", () => {
+    pendingWallpaperIndex = Number(button.dataset.wallpaperIndex);
+    renderWallpaperSelection();
+    showWallpaper(pendingWallpaperIndex, false, false);
+}));
+document.querySelector("[data-wallpaper-save]").addEventListener("click", () => {
+    showWallpaper(pendingWallpaperIndex);
+    setWallpaperShuffle(document.getElementById("wallpaperShuffleToggle").checked);
+    closeWallpaperPicker();
+});
+document.querySelector("[data-wallpaper-cancel]").addEventListener("click", () => {
+    showWallpaper(currentWallpaperIndex);
+    closeWallpaperPicker();
+});
+document.querySelector("[data-wallpaper-close]").addEventListener("click", closeWallpaperPicker);
+
+showWallpaper(currentWallpaperIndex, true);
+setWallpaperShuffle(wallpaperShuffleEnabled);

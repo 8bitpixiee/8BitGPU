@@ -23,6 +23,10 @@
         </div>
     </div>
     <div class="desktop">
+    <div id="wallpaperRotator" aria-hidden="true">
+        <span class="wallpaper-frame is-visible"></span>
+        <span class="wallpaper-frame"></span>
+    </div>
     <img class="desktop-vine vine-right" src="1longright.png" alt="">
     <img class="desktop-vine vine-top" src="clustervines.png" alt="">
     <img class="desktop-vine vine-hanging-top" src="hangingvine.png" alt="">
@@ -129,6 +133,49 @@
         <button type="button" onclick="openApp('login')">✦ Login.exe</button>
         <button type="button" onclick="openApp('storefront')">✦ Storefront.exe</button>
         <button type="button" onclick="openApp('twitch')">✦ Watch Us Live</button>
+    </section>
+
+    <menu id="desktopContextMenu" aria-label="Desktop menu" hidden>
+        <button type="button" data-context-action="change-wallpaper">Change wallpaper...</button>
+        <button type="button" data-context-action="next-wallpaper">Next image</button>
+        <button type="button" data-context-action="toggle-shuffle">Start 10-minute shuffle</button>
+        <span class="context-divider" aria-hidden="true"></span>
+        <button type="button" data-context-action="refresh">Refresh</button>
+    </menu>
+
+    <section id="wallpaperPicker" role="dialog" aria-modal="true" aria-labelledby="wallpaperPickerTitle" hidden>
+        <header class="wallpaper-picker-bar">
+            <span id="wallpaperPickerTitle">Desktop Backgrounds</span>
+            <button type="button" data-wallpaper-close aria-label="Close">×</button>
+        </header>
+        <div class="wallpaper-explorer-toolbar">
+            <button type="button" aria-label="Back" disabled>←</button>
+            <span>Pictures ▸ 8BitGPU Wallpapers</span>
+        </div>
+        <div class="wallpaper-explorer-body">
+            <aside>
+                <strong>Favorite Links</strong>
+                <span>Desktop</span>
+                <span>Pictures</span>
+                <span>8BitGPU</span>
+            </aside>
+            <div class="wallpaper-browser">
+                <p>Choose your desktop background</p>
+                <div class="wallpaper-grid">
+                    <button type="button" data-wallpaper-index="0"><img src="wallpaper-1.jpg" alt="Blue ocean and clouds"><span>Aqua Horizon</span></button>
+                    <button type="button" data-wallpaper-index="1"><img src="wallpaper-2.jpg" alt="Pool water and palm trees"><span>Palmwater</span></button>
+                    <button type="button" data-wallpaper-index="2"><img src="wallpaper-3.jpg" alt="Purple tropical island"><span>Violet Island</span></button>
+                    <button type="button" data-wallpaper-index="3"><img src="wallpaper-4.jpg" alt="Colorful ocean sunset"><span>Dream Sunset</span></button>
+                </div>
+            </div>
+        </div>
+        <footer class="wallpaper-picker-footer">
+            <label><input id="wallpaperShuffleToggle" type="checkbox"> Shuffle every 10 minutes</label>
+            <span class="wallpaper-picker-actions">
+                <button type="button" data-wallpaper-cancel>Cancel</button>
+                <button type="button" class="wallpaper-save" data-wallpaper-save>Save changes</button>
+            </span>
+        </footer>
     </section>
 
     <div id="osWindowLayer" aria-live="polite"></div>
