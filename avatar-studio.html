@@ -20,14 +20,16 @@
         <div class="lab-content">
             <section class="preview-panel" aria-label="Avatar preview">
                 <p class="preview-label" id="previewLabel">YOUR BEING</p>
-                <div class="avatar-preview">
-                    <img id="extraLayer" class="avatar-layer" alt="">
-                    <img id="bodyLayer" class="avatar-layer" alt="">
-                    <img id="earsLayer" class="avatar-layer" alt="">
-                    <img id="headLayer" class="avatar-layer" alt="">
-                    <img id="eyesLayer" class="avatar-layer" alt="">
-                    <img id="hairLayer" class="avatar-layer" alt="">
-                    <img id="fitLayer" class="avatar-layer" alt="">
+                <div class="avatar-preview" id="avatarPreview" role="button" tabindex="0" aria-label="Make your Being hop">
+                    <div class="avatar-character" id="avatarCharacter">
+                        <img id="extraLayer" class="avatar-layer" alt="">
+                        <img id="bodyLayer" class="avatar-layer" alt="">
+                        <img id="earsLayer" class="avatar-layer" alt="">
+                        <img id="headLayer" class="avatar-layer" alt="">
+                        <img id="eyesLayer" class="avatar-layer" alt="">
+                        <img id="hairLayer" class="avatar-layer" alt="">
+                        <img id="fitLayer" class="avatar-layer" alt="">
+                    </div>
                 </div>
                 <p class="status-text" id="saveStatus" aria-live="polite">A new Being has appeared in 8BitGPU...</p>
             </section>
@@ -39,7 +41,7 @@
                 </div>
                 <section class="step-panel active" data-step-panel="species">
                     <h1>Select Species</h1>
-                    <p class="helper-text">Pick your playable Being. Kitties and Drow are coming soon.</p>
+                    <p class="helper-text">Pick your playable Being, then choose its body type.</p>
                     <div class="choice-grid species-grid" id="speciesGrid"></div>
                     <div id="buildGroup">
                         <h2>Choose Build</h2>
@@ -50,6 +52,10 @@
                     <h1>Choose Colors</h1>
                     <p class="helper-text">Choose a palette available for your selected species and build.</p>
                     <div class="swatch-grid" id="toneGrid"></div>
+                    <div id="breedGroup" hidden>
+                        <h2>Choose Bovadill Coat</h2>
+                        <div class="choice-grid species-grid" id="breedGrid"></div>
+                    </div>
                 </section>
                 <section class="step-panel" data-step-panel="style">
                     <h1>Make It Yours</h1>
@@ -67,6 +73,19 @@
                             <div class="asset-grid" id="assetGrid"></div>
                             <p class="picker-label color-label" id="colorLabel">COLORWAY</p>
                             <div class="color-grid" id="colorGrid"></div>
+                            <div class="sprite-adjuster" aria-label="Adjust selected layer">
+                                <p class="picker-label adjuster-label">POSITION + SCALE</p>
+                                <p class="adjuster-readout" id="adjusterReadout">HAIR · X 0 · Y 0 · 100%</p>
+                                <div class="adjuster-buttons">
+                                    <button type="button" data-adjust="left" aria-label="Move layer left">←</button>
+                                    <button type="button" data-adjust="up" aria-label="Move layer up">↑</button>
+                                    <button type="button" data-adjust="down" aria-label="Move layer down">↓</button>
+                                    <button type="button" data-adjust="right" aria-label="Move layer right">→</button>
+                                    <button type="button" data-adjust="shrink" aria-label="Make layer smaller">−</button>
+                                    <button type="button" data-adjust="grow" aria-label="Make layer larger">＋</button>
+                                    <button type="button" data-adjust="reset">Reset</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>

@@ -130,6 +130,51 @@ const steps = ["species", "skinTone", "style"];
 let currentStep = 0;
 let activePickerCategory = "hair";
 const activeFamily = {};
+const adjustableCategories = ["ears", "hair", "eyes", "fit", "extra"];
+const adjustmentProfiles = {};
+
+function profileKey() { return settings.species + ":" + settings.build; }
+function defaultAdjustments() {
+    const profile = Object.fromEntries(adjustableCategories.map((category) => [category, { x: 0, y: 0, scale: 1 }]));
+    if (settings.build === "Masc") profile.eyes.y = 4;
+    if (settings.build === "Chunky Masc") profile.eyes.y = 6;
+    return profile;
+}
+function activeAdjustments() {
+    if (!adjustmentProfiles[profileKey()]) adjustmentProfiles[profileKey()] = defaultAdjustments();
+    return adjustmentProfiles[profileKey()];
+}
+function normalizeAdjustment(value) {
+    return {
+        x: Math.max(-20, Math.min(20, Number(value?.x) || 0)),
+        y: Math.max(-20, Math.min(20, Number(value?.y) || 0)),
+        scale: Math.max(.7, Math.min(1.3, Number(value?.scale) || 1))
+    };
+}
+function applyLayerAdjustment(category) {
+    const layer = document.getElementById(category + "Layer");
+    if (!layer) return;
+    const adjustment = activeAdjustments()[category];
+    layer.style.transform = "translate(" + adjustment.x + "%, " + adjustment.y + "%) scale(" + adjustment.scale + ")";
+}
+function renderAdjuster() {
+    const adjustment = activeAdjustments()[activePickerCategory];
+    document.getElementById("adjusterReadout").textContent = activePickerCategory.toUpperCase() + " · X " + adjustment.x + " · Y " + adjustment.y + " · " + Math.round(adjustment.scale * 100) + "%";
+}
+function adjustActiveLayer(action) {
+    const profile = activeAdjustments();
+    const adjustment = profile[activePickerCategory];
+    if (action === "left") adjustment.x = Math.max(-20, adjustment.x - 1);
+    if (action === "right") adjustment.x = Math.min(20, adjustment.x + 1);
+    if (action === "up") adjustment.y = Math.max(-20, adjustment.y - 1);
+    if (action === "down") adjustment.y = Math.min(20, adjustment.y + 1);
+    if (action === "shrink") adjustment.scale = Math.max(.7, Math.round((adjustment.scale - .05) * 100) / 100);
+    if (action === "grow") adjustment.scale = Math.min(1.3, Math.round((adjustment.scale + .05) * 100) / 100);
+    if (action === "reset") profile[activePickerCategory] = defaultAdjustments()[activePickerCategory];
+    applyLayerAdjustment(activePickerCategory);
+    renderAdjuster();
+    document.getElementById("saveStatus").textContent = activePickerCategory.toUpperCase() + " alignment adjusted.";
+}
 
 function visibleOptions(category) {
     return options[category].filter((choice) => {
@@ -200,6 +245,7 @@ function renderAvatar() {
     setLayer("body", base.body);
     setLayer("head", base.head);
     ["ears", "hair", "eyes", "fit", "extra"].forEach((category) => setLayer(category, selectedOption(category).src));
+    adjustableCategories.forEach(applyLayerAdjustment);
 }
 function renderPreviewLabel() {
     const username = localStorage.getItem("8bitgpu-player-name");
@@ -213,19 +259,36 @@ function renderSpeciesChoices() {
         settings.species = button.dataset.species;
         settings.build = speciesData[settings.species].builds[0];
         settings.skinTone = speciesData[settings.species].tones[0];
-        ensureSelections(); renderAll(); setStep("skinTone");
+        ensureSelections(); renderAll();
         document.getElementById("saveStatus").textContent = settings.species + " selected!";
     }));
 }
 function renderBuildChoices() {
     const builds = speciesData[settings.species].builds;
     const group = document.getElementById("buildGroup");
-    group.hidden = builds.length < 2;
+    group.hidden = builds.length < 2 || settings.species === "Bovadill";
     document.getElementById("buildGrid").innerHTML = builds.map((name) => '<button type="button" class="' + (settings.build === name ? "selected" : "") + '" data-build="' + name + '">' + name + "</button>").join("");
     document.querySelectorAll("[data-build]").forEach((button) => button.addEventListener("click", () => {
         settings.build = button.dataset.build;
+        if (settings.build === "Masc" || settings.build === "Chunky Masc") selection.fit = "fit-none";
         renderAll();
         document.getElementById("saveStatus").textContent = settings.build + " build selected!";
+    }));
+}
+function renderBreedChoices() {
+    const group = document.getElementById("breedGroup");
+    const isBovadill = settings.species === "Bovadill";
+    group.hidden = !isBovadill;
+    if (!isBovadill) {
+        document.getElementById("breedGrid").innerHTML = "";
+        return;
+    }
+    const breeds = speciesData.Bovadill.builds;
+    document.getElementById("breedGrid").innerHTML = breeds.map((name) => '<button type="button" class="' + (settings.build === name ? "selected" : "") + '" data-breed="' + name + '">' + name + "</button>").join("");
+    document.querySelectorAll("[data-breed]").forEach((button) => button.addEventListener("click", () => {
+        settings.build = button.dataset.breed;
+        renderAll();
+        document.getElementById("saveStatus").textContent = settings.build + " coat selected!";
     }));
 }
 function renderToneChoices() {
@@ -269,9 +332,10 @@ function renderPicker() {
     document.querySelectorAll(".color-tile").forEach((button) => button.addEventListener("click", () => {
         selection[category] = button.dataset.choiceId; renderAvatar(); renderPicker();
     }));
+    renderAdjuster();
 }
 function renderAll() {
-    renderSpeciesChoices(); renderBuildChoices(); renderToneChoices(); renderAvatar(); renderPicker(); renderPreviewLabel();
+    renderSpeciesChoices(); renderBuildChoices(); renderToneChoices(); renderBreedChoices(); renderAvatar(); renderPicker(); renderPreviewLabel();
 }
 function randomChoice(list) { return list[Math.floor(Math.random() * list.length)]; }
 
@@ -285,10 +349,17 @@ try {
         Object.keys(selection).forEach((category) => {
             if (saved.selection && options[category].some((choice) => choice.id === saved.selection[category])) selection[category] = saved.selection[category];
         });
+        if (saved.adjustments) {
+            adjustmentProfiles[profileKey()] = defaultAdjustments();
+            adjustableCategories.forEach((category) => {
+                if (saved.adjustments[category]) adjustmentProfiles[profileKey()][category] = normalizeAdjustment(saved.adjustments[category]);
+            });
+        }
     }
 } catch { /* Start with the default Pixie if saved data is unavailable. */ }
 
 document.querySelectorAll("[data-picker-category]").forEach((button) => button.addEventListener("click", () => { activePickerCategory = button.dataset.pickerCategory; renderPicker(); }));
+document.querySelectorAll("[data-adjust]").forEach((button) => button.addEventListener("click", () => adjustActiveLayer(button.dataset.adjust)));
 document.querySelectorAll("[data-step-target]").forEach((button) => button.addEventListener("click", () => setStep(button.dataset.stepTarget)));
 document.getElementById("previousButton").addEventListener("click", () => setStep(steps[Math.max(0, currentStep - 1)]));
 document.getElementById("nextButton").addEventListener("click", () => setStep(steps[Math.min(steps.length - 1, currentStep + 1)]));
@@ -297,12 +368,14 @@ document.getElementById("randomizeButton").addEventListener("click", () => {
     settings.build = randomChoice(speciesData[settings.species].builds);
     settings.skinTone = randomChoice(speciesData[settings.species].tones);
     Object.keys(selection).forEach((category) => selection[category] = randomChoice(visibleOptions(category)).id);
+    if (settings.build === "Masc" || settings.build === "Chunky Masc") selection.fit = "fit-none";
     renderAll(); document.getElementById("saveStatus").textContent = "New look generated!";
 });
 document.getElementById("saveButton").addEventListener("click", async () => {
     const layers = {};
     Object.keys(selection).forEach((category) => layers[category] = selectedOption(category).src);
-    const outfit = { version: 2, ...settings, bodyPreset: settings.species === "Thixie" ? "thixie" : "custom", selection: { ...selection }, layers };
+    const adjustments = JSON.parse(JSON.stringify(activeAdjustments()));
+    const outfit = { version: 2, ...settings, bodyPreset: settings.species === "Thixie" ? "thixie" : "custom", selection: { ...selection }, layers, adjustments };
     localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(outfit));
     if (window.parent && window.parent !== window) window.parent.postMessage({ type: "8bitgpu-avatar-saved" }, window.location.origin);
     if (window.opener) window.opener.postMessage({ type: "8bitgpu-avatar-saved" }, window.location.origin);
@@ -312,6 +385,17 @@ document.getElementById("saveButton").addEventListener("click", async () => {
     } catch { document.getElementById("saveStatus").textContent = "Saved here. Online save is unavailable right now."; }
 });
 document.getElementById("mobileSaveButton").addEventListener("click", () => document.getElementById("saveButton").click());
+function playPreviewMotion() {
+    const character = document.getElementById("avatarCharacter");
+    character.classList.remove("is-hop");
+    void character.offsetWidth;
+    character.classList.add("is-hop");
+    window.setTimeout(() => character.classList.remove("is-hop"), 540);
+}
+document.getElementById("avatarPreview").addEventListener("click", playPreviewMotion);
+document.getElementById("avatarPreview").addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") { event.preventDefault(); playPreviewMotion(); }
+});
 
 renderAll();
 setStep("species");

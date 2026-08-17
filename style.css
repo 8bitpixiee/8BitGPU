@@ -229,6 +229,8 @@ h1, h2, .window-bar, .desktop-icon span {
     background: transparent;
     pointer-events: none;
     display: none;
+    transform-origin: center bottom;
+    animation: beingIdle 2.4s steps(4, end) infinite;
 }
 
 /* Lower-right Being Dock + Start menu */
@@ -365,6 +367,8 @@ h1, h2, .window-bar, .desktop-icon span {
 @keyframes beingWave { 0%,100%{transform:translateX(0)} 35%{transform:translateX(12px) rotate(4deg)} 70%{transform:translateX(-5px) rotate(-2deg)} }
 @keyframes beingDance { 0%,100%{transform:translateY(0)} 25%{transform:translate(-10px,-10px) rotate(-4deg)} 70%{transform:translate(10px,-4px) rotate(4deg)} }
 @keyframes beingSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes beingIdle { 0%,100%{transform:translateY(0) scaleY(1)} 50%{transform:translateY(-4px) scaleY(1.01)} }
+@media (prefers-reduced-motion: reduce) { #companion { animation: none; } }
 
 #osStartMenu {
     position: fixed;
@@ -827,4 +831,3 @@ html, body {
     #osTaskbar { z-index: 20000 !important; }
     #osStartMenu, #osWindowLayer { z-index: 20001 !important; }
 }
-
