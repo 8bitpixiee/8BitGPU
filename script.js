@@ -252,6 +252,7 @@ let highestWindowZ = 11000;
 function focusWindow(windowElement) {
     highestWindowZ += 1;
     windowElement.style.zIndex = highestWindowZ;
+    document.querySelectorAll(".os-window").forEach((openWindow) => openWindow.classList.toggle("is-active-window", openWindow === windowElement));
     document.querySelectorAll(".os-task-tab").forEach((tab) => tab.classList.toggle("is-active", tab.dataset.app === windowElement.dataset.app));
 }
 
@@ -423,3 +424,18 @@ function cycleAngelTime() {
 window.cycleAngelTime = cycleAngelTime;
 updateAngelTime();
 setInterval(updateAngelTime, 30000);
+
+function finishDesktopBoot() {
+    const bootScreen = document.getElementById("osBootScreen");
+    if (!bootScreen) return;
+    bootScreen.classList.add("is-finished");
+    window.setTimeout(() => bootScreen.remove(), 700);
+}
+
+if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    finishDesktopBoot();
+} else if (document.readyState === "complete") {
+    window.setTimeout(finishDesktopBoot, 1150);
+} else {
+    window.addEventListener("load", () => window.setTimeout(finishDesktopBoot, 1150), { once: true });
+}
