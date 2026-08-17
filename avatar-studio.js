@@ -1,13 +1,17 @@
 const assetPath = "avatar/";
-const PLAYABLE_SPECIES = ["Pixie", "Deerbra", "Bovadill", "Thixie"];
+// Only expose character bases that have a complete body + head pair in /avatar.
+// Keeping incomplete builds out of the live controls prevents a button from
+// selecting a character that can never render.
+const PLAYABLE_SPECIES = ["Pixie", "Deerbra", "Thixie"];
+const COMING_SOON_SPECIES = ["Bovadill"];
 
 const speciesData = {
     Pixie: {
         tones: ["Nutmeg", "Peachy", "Creme"],
-        builds: ["Fae", "Masc", "Chunky Masc"]
+        builds: ["Fae"]
     },
     Deerbra: {
-        tones: ["Wood", "Copper", "Pedal"],
+        tones: ["Wood", "Copper"],
         builds: ["Fae"]
     },
     Bovadill: {
@@ -20,12 +24,28 @@ const speciesData = {
     }
 };
 
+// These filenames are referenced by the catalogue but have not been uploaded
+// to /avatar yet. Hide them from both the buttons and Randomize until the art
+// arrives, instead of allowing a selection that produces a broken image.
+const unavailableAssets = new Set([
+    "ears_fem_deerbra_v2.png",
+    "eyes_fem_v3.png",
+    "eyes_mac_v4.png",
+    "ponytail v1.png", "ponytail v2.png", "ponytail v3.png", "ponytail v4.png",
+    "comfy_hair_m_v1.png", "comfy_hair_m_v2.png", "comfy_hair_m_v3.png", "comfy_hair_m_v4.png",
+    "donnie_hair_v1.png", "donnie_hair_v2.png", "donnie_hair_v3.png",
+    "frolic_fit_v1.png", "frolic_fit_v2.png", "frolic_fit_v3.png",
+    "frolic_skirt_v1.png", "frolic_skirt_v2.png", "frolic_skirt_v3.png",
+    "bovidil_tail_v1.png", "bovidil_tail_v2.png", "bovidil_tail_v3.png"
+]);
+
 const asset = (filename) => filename ? assetPath + filename : "";
 const shared = PLAYABLE_SPECIES;
 const item = (id, name, filename, family, species = shared) => ({ id, name, src: asset(filename), family, species });
 
 const options = {
     ears: [
+        item("ears-none", "No Ears", "", "No Ears"),
         item("pixie-ears-nutmeg", "Pixie Ears - Nutmeg", "ears_fem_v1.png", "Pixie Ears", ["Pixie"]),
         item("pixie-ears-peachy", "Pixie Ears - Peachy", "ears_fem_v2.png", "Pixie Ears", ["Pixie"]),
         item("pixie-ears-creme", "Pixie Ears - Creme", "ears_fem_v3.png", "Pixie Ears", ["Pixie"]),
@@ -116,7 +136,10 @@ let activePickerCategory = "hair";
 const activeFamily = {};
 
 function visibleOptions(category) {
-    return options[category].filter((choice) => choice.species.includes(settings.species));
+    return options[category].filter((choice) => {
+        const filename = choice.src.split("/").pop();
+        return choice.species.includes(settings.species) && (!choice.src || !unavailableAssets.has(filename));
+    });
 }
 function selectedOption(category) {
     return visibleOptions(category).find((choice) => choice.id === selection[category]) || visibleOptions(category)[0];
@@ -171,8 +194,9 @@ function baseFiles() {
         const breedNumber = { Highland: 1, Holstein: 2, Dexter: 3 }[settings.build];
         return { body: asset("bovidil_body_fem_v" + toneNumber + "." + breedNumber + ".png"), head: asset("bovidil_head_fem_v" + toneNumber + ".png") };
     }
-    const number = { Nutmeg: 1, Creme: 2, Peachy: 3 }[tone];
-    return { body: asset("thixie_body_v" + number + ".png"), head: asset("thixie_head_v" + number + ".png") };
+    const bodyNumber = { Nutmeg: 1, Creme: 2, Peachy: 4 }[tone];
+    const headNumber = { Nutmeg: 1, Creme: 2, Peachy: 3 }[tone];
+    return { body: asset("thixie_body_v" + bodyNumber + ".png"), head: asset("thixie_head_v" + headNumber + ".png") };
 }
 function renderAvatar() {
     ensureSelections();
@@ -186,7 +210,9 @@ function renderPreviewLabel() {
     document.getElementById("previewLabel").textContent = username ? username.toUpperCase() + "'S BEING" : "YOUR BEING";
 }
 function renderSpeciesChoices() {
-    document.getElementById("speciesGrid").innerHTML = PLAYABLE_SPECIES.map((name) => '<button type="button" class="' + (settings.species === name ? "selected" : "") + '" data-species="' + name + '">' + name + "</button>").join("");
+    const playable = PLAYABLE_SPECIES.map((name) => '<button type="button" class="' + (settings.species === name ? "selected" : "") + '" data-species="' + name + '">' + name + "</button>").join("");
+    const comingSoon = COMING_SOON_SPECIES.map((name) => '<button type="button" disabled aria-disabled="true" title="Character art coming soon">' + name + " — coming soon</button>").join("");
+    document.getElementById("speciesGrid").innerHTML = playable + comingSoon;
     document.querySelectorAll("[data-species]").forEach((button) => button.addEventListener("click", () => {
         settings.species = button.dataset.species;
         settings.build = speciesData[settings.species].builds[0];

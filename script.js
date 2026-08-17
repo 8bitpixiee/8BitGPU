@@ -20,9 +20,43 @@ function loadSavedOutfit() {
     const setLayer = (id, source) => {
         const layer = document.getElementById(id);
         layer.onerror = () => { layer.style.display = "none"; };
-        layer.src = source;
+        layer.src = source || "";
         layer.style.display = source ? "block" : "none";
     };
+
+    // Avatar Lab v2 saves stable asset paths, not the old numeric option
+    // indexes. Render those paths directly so every studio button maps to the
+    // same PNG on the desktop after Save.
+    if (savedOutfit.version === 2) {
+        const tone = savedOutfit.skinTone;
+        let body = "body_fem_v1.png";
+        let head = "head_fem_v1.png";
+
+        if (savedOutfit.species === "Pixie") {
+            const version = { Nutmeg: 1, Peachy: 2, Creme: 3 }[tone] || 1;
+            body = `body_fem_v${version}.png`;
+            head = `head_fem_v${version}.png`;
+        } else if (savedOutfit.species === "Deerbra") {
+            const version = { Wood: 1, Copper: 2 }[tone] || 1;
+            body = `body_fem_deerbra_v${version}.png`;
+            head = `head_fem_deerbra_v${version}.png`;
+        } else if (savedOutfit.species === "Thixie") {
+            const bodyVersion = { Nutmeg: 1, Creme: 2, Peachy: 4 }[tone] || 1;
+            const headVersion = { Nutmeg: 1, Creme: 2, Peachy: 3 }[tone] || 1;
+            body = `thixie_body_v${bodyVersion}.png`;
+            head = `thixie_head_v${headVersion}.png`;
+        }
+
+        setLayer("bodyLayer", avatarPath + body);
+        setLayer("headLayer", avatarPath + head);
+        const layers = savedOutfit.layers || {};
+        setLayer("earsLayer", layers.ears);
+        setLayer("hairLayer", layers.hair);
+        setLayer("eyesLayer", layers.eyes);
+        setLayer("fitLayer", layers.fit);
+        setLayer("extraLayer", layers.extra);
+        return;
+    }
 
     const hairOptions = ["", "volume_hair_fem_idle_front_v1.png", `${avatarPath}hair_fem_v1.png`, `${avatarPath}hair_fem_deerbra_v1.png`, `${avatarPath}hair_fem_deerbra_v2.png`, `${avatarPath}hair_fem_deerbra_v3.png`, `${avatarPath}hair_fem_deerbra_v4.png`, `${avatarPath}hair_lemon_v1.png`, `${avatarPath}hair_lemon_v2.png`, `${avatarPath}hair_lemon_v3.png`, `${avatarPath}hair_locs_v1.png`, `${avatarPath}hair_locs_v2.png`, `${avatarPath}hair_locs_v3.png`, `${avatarPath}hair_longwaves_v1.png`, `${avatarPath}hair_longwaves_v2.png`, `${avatarPath}hair_longwaves_v3.png`, `${avatarPath}sideswept_hair_v1.png`, `${avatarPath}sideswept_hair_v2.png`, `${avatarPath}sideswept_hair_v3.png`];
     const earsOptions = [`${avatarPath}ears_fem_v1.png`, `${avatarPath}ears_fem_v2.png`, `${avatarPath}ears_fem_v3.png`, `${avatarPath}kittie_ears_v1.png`, `${avatarPath}kittie_ears_v2.png`, `${avatarPath}kittie_ears_v3.png`, `${avatarPath}ears_fem_deerbra_v1.png`, `${avatarPath}ears_fem_deerbra_v3.png`, `${avatarPath}ears_fem_bovidil_v1.png`, `${avatarPath}ears_fem_bovidil_v2.png`, `${avatarPath}ears_fem_bovidil_v3.png`];
