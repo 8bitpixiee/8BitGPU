@@ -13,7 +13,10 @@
 
 html, body {
     background: #6a5296;
+    cursor: url("cursor-purple.png") 2 2, auto;
 }
+
+button, a, [role="button"], input, label { cursor: url("cursor-purple.png") 2 2, pointer !important; }
 
 .desktop {
     isolation: isolate;
@@ -568,6 +571,16 @@ html, body {
 .system-glyph {
     box-shadow: inset 0 2px 5px rgba(255,255,255,.84), inset 0 -3px 4px rgba(49,25,68,.36), 0 2px 5px rgba(28,12,42,.48), 0 0 8px rgba(188,247,234,.2) !important;
 }
+.program-gem img { width: 30px; height: 30px; display: block; object-fit: contain; image-rendering: pixelated; }
+
+#userAvatarPicker { position: absolute; top: 58px; left: 10px; z-index: 6; width: 220px; padding: 8px; border: 2px solid #fff; border-radius: 9px; background: linear-gradient(145deg,rgba(222,170,244,.96),rgba(87,46,122,.97)); box-shadow: inset 0 3px #fff9,inset 0 -3px #402155,0 7px 18px #20102dcc,0 0 14px #bffff088; }
+#userAvatarPicker[hidden] { display: none; }
+#userAvatarPicker p { margin: 0 0 6px; color: #d9ffb7; font: 700 10px "Pixelify Sans",monospace; letter-spacing: .1em; text-shadow: 1px 1px #3d2150; }
+#userAvatarPicker > div { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+#userAvatarPicker button { width: 62px !important; height: 62px; display: grid !important; place-items: center; margin: 0 !important; padding: 4px !important; border: 2px solid #fff !important; border-radius: 9px !important; background: linear-gradient(#fff9,#c994de88 45%,#6d448688 52%,#a971bb88) !important; box-shadow: inset 0 3px #fff8,inset 0 -3px #49305988,0 2px 5px #2a153999 !important; }
+#userAvatarPicker button:hover,#userAvatarPicker button.is-selected { background: linear-gradient(#fff,#caffeb 38%,#75cdbd 48%,#8d55ab) !important; box-shadow: inset 0 3px #fff,0 0 12px #baffef !important; transform: translateY(-1px) !important; }
+#userAvatarPicker img { width: 100%; height: 100%; object-fit: contain; }
+.start-user-icon > img { width: 100%; height: 100%; display: block; object-fit: contain; }
 
 #beingDock,
 #beingHud {
