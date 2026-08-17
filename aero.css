@@ -498,3 +498,119 @@ html, body {
 @keyframes aeroSparkle { from { opacity: .48; } to { opacity: .84; } }
 @keyframes aeroFrameGlow { from { box-shadow: inset 1px 1px rgba(255,255,255,.45), 0 8px 22px rgba(48,24,64,.36); } to { box-shadow: inset 1px 1px rgba(255,255,255,.65), 0 8px 26px rgba(218,171,255,.34); } }
 @keyframes aeroWindowOpen { from { opacity: 0; transform: scale(.975) translateY(5px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+/* High-gloss Aqua pass: crisp Windows chrome with Y2K bubble shine. */
+.os-window,
+#beingDock,
+#beingHud,
+#osStartMenu,
+#wallpaperPicker {
+    border-color: rgba(255,255,255,.96) !important;
+    box-shadow: inset 0 0 0 1px rgba(91,50,121,.74), inset 0 2px rgba(255,255,255,.78), inset 0 -2px rgba(38,19,56,.58), 0 12px 34px rgba(31,13,46,.56), 0 0 20px rgba(202,155,255,.3) !important;
+}
+
+.os-window-bar,
+.wallpaper-picker-bar {
+    background: linear-gradient(180deg, #f6d9ff 0%, #d89df0 13%, #9a5fc2 47%, #5e347f 52%, #8752a7 78%, #c78bdb 100%) !important;
+    box-shadow: inset 0 2px rgba(255,255,255,.92), inset 0 -2px rgba(47,22,66,.65), 0 2px 4px rgba(31,12,45,.45) !important;
+}
+
+.os-window-bar::after,
+.wallpaper-picker-bar::after {
+    position: absolute;
+    top: 2px;
+    right: 17%;
+    left: 11%;
+    height: 8px;
+    border-radius: 50%;
+    content: "";
+    pointer-events: none;
+    background: rgba(255,255,255,.38);
+    filter: blur(1px);
+}
+
+#osStartMenu {
+    background:
+        radial-gradient(circle at 88% 7%, rgba(199,255,236,.22) 0 7%, transparent 18%),
+        linear-gradient(145deg, rgba(170,105,206,.94), rgba(54,28,79,.95)) !important;
+}
+
+#osStartMenu::before {
+    position: absolute;
+    top: 3px;
+    right: 10px;
+    left: 10px;
+    height: 22px;
+    border-radius: 10px 10px 50% 50%;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(rgba(255,255,255,.34), rgba(255,255,255,0));
+}
+
+.start-menu-columns {
+    background: rgba(44,26,64,.55);
+    box-shadow: inset 0 1px rgba(255,255,255,.7), inset 0 -1px rgba(23,13,35,.52), 0 2px 6px rgba(27,13,40,.4) !important;
+}
+
+.start-program-pane {
+    background:
+        radial-gradient(circle at 12% 10%, rgba(201,255,238,.15), transparent 28%),
+        linear-gradient(145deg, rgba(118,73,151,.9), rgba(53,38,84,.88)) !important;
+}
+
+.start-system-pane {
+    background:
+        radial-gradient(circle at 82% 12%, rgba(255,255,255,.16), transparent 22%),
+        linear-gradient(155deg, rgba(104,60,139,.9), rgba(42,27,66,.9)) !important;
+}
+
+.program-gem,
+.system-glyph {
+    box-shadow: inset 0 2px 5px rgba(255,255,255,.84), inset 0 -3px 4px rgba(49,25,68,.36), 0 2px 5px rgba(28,12,42,.48), 0 0 8px rgba(188,247,234,.2) !important;
+}
+
+#beingDock,
+#beingHud {
+    background:
+        radial-gradient(circle at 82% 12%, rgba(255,255,255,.44) 0 2px, transparent 5px),
+        linear-gradient(155deg, rgba(207,185,241,.62), rgba(103,66,139,.68) 48%, rgba(51,36,79,.76)) !important;
+}
+
+#beingDock::before,
+#beingHud::before {
+    position: absolute;
+    top: 3px;
+    right: 9px;
+    left: 9px;
+    height: 21%;
+    border-radius: 12px 12px 50% 50%;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(rgba(255,255,255,.38), transparent);
+}
+
+#osTaskbar {
+    background: linear-gradient(180deg, rgba(246,231,255,.9) 0 5%, rgba(176,128,204,.82) 10% 38%, rgba(91,56,119,.92) 46% 83%, rgba(49,34,69,.96) 100%) !important;
+    box-shadow: inset 0 2px rgba(255,255,255,.76), inset 0 -2px rgba(33,19,48,.7), 0 -4px 18px rgba(44,21,61,.45) !important;
+}
+
+#osStartButton {
+    width: 96px !important;
+    height: 48px !important;
+    flex-basis: 96px !important;
+}
+#osStartButton img { width: 96px !important; height: 48px !important; object-fit: contain !important; }
+
+.os-welcome {
+    background:
+        radial-gradient(circle at 84% 14%, rgba(255,255,255,.82) 0 3px, transparent 7px),
+        radial-gradient(circle at 75% 25%, rgba(191,255,244,.55) 0 7px, transparent 10px),
+        linear-gradient(145deg,#c9f6ef,#b5d7f2 48%,#d5b9ed) !important;
+    box-shadow: inset 0 3px rgba(255,255,255,.72), inset 0 -5px rgba(91,62,123,.18) !important;
+}
+.os-welcome button {
+    border: 1px solid #fff !important;
+    border-radius: 8px !important;
+    background: linear-gradient(#d8ffc9,#8dca86 43%,#4a7c59 50%,#70a779) !important;
+    box-shadow: inset 0 2px #fff9,inset 0 -2px #315b43,0 3px 7px #3b285877,0 0 9px #baffec88 !important;
+}
