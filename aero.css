@@ -121,15 +121,7 @@ html, body {
 }
 
 .nav-buttons::before {
-    position: absolute;
-    inset: -8px -7px;
-    z-index: -1;
-    content: "";
-    border: 1px solid rgba(255,255,255,.55);
-    border-radius: 18px;
-    background: linear-gradient(145deg, rgba(235,219,255,.32), rgba(91,55,126,.18));
-    box-shadow: inset 1px 1px rgba(255,255,255,.62), inset -1px -1px rgba(65,35,91,.38), 0 12px 32px rgba(47,20,72,.26);
-    backdrop-filter: blur(8px) saturate(1.25);
+    display: none !important;
 }
 
 .nav-buttons button {
@@ -182,7 +174,7 @@ html, body {
     text-shadow: 1px 2px #4a2c62;
 }
 
-#playerBadge,
+#beingDock,
 #beingHud,
 .being-frame,
 #osStartMenu {
@@ -192,10 +184,25 @@ html, body {
     backdrop-filter: blur(12px) saturate(1.3);
 }
 
-#playerBadge {
-    top: 139px !important;
-    right: 30px !important;
-    border-radius: 12px !important;
+#playerBadge { display: none !important; }
+
+#beingDock {
+    right: 22px !important;
+    bottom: 56px !important;
+    padding: 8px 8px 7px !important;
+    border-radius: 17px !important;
+    background: linear-gradient(145deg, rgba(224,210,246,.42), rgba(85,54,115,.52)) !important;
+    box-shadow: inset 1px 1px rgba(255,255,255,.62), inset -1px -1px rgba(52,28,72,.5), 0 12px 30px rgba(31,14,45,.46), 0 0 18px rgba(203,161,240,.2) !important;
+    backdrop-filter: blur(13px) saturate(1.35);
+}
+
+#beingHud {
+    right: 266px !important;
+    bottom: 61px !important;
+    padding: 10px !important;
+    border-radius: 14px !important;
+    background: linear-gradient(145deg, rgba(224,210,246,.48), rgba(76,48,105,.62)) !important;
+    backdrop-filter: blur(13px) saturate(1.35);
 }
 
 #beingDock .being-dock-label {
@@ -286,12 +293,33 @@ html, body {
 }
 
 #osStartButton {
-    height: 37px !important;
-    border: 1px solid rgba(255,255,255,.82) !important;
-    border-radius: 7px !important;
-    background: linear-gradient(180deg, #bdf0a9, #67a96c 52%, #3d714b) !important;
-    box-shadow: inset 1px 1px rgba(255,255,255,.7), inset -1px -1px #315b3b, 0 2px 5px rgba(35,21,48,.45) !important;
+    width: 112px !important;
+    height: 38px !important;
+    gap: 7px !important;
+    padding: 2px 12px 2px 5px !important;
+    border: 1px solid rgba(255,255,255,.86) !important;
+    border-radius: 19px 8px 8px 19px !important;
+    color: #fff !important;
+    background: linear-gradient(180deg, #dca9f0 0%, #9862ba 48%, #56346f 52%, #785095 100%) !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.88), inset 0 -1px #3d2551, 0 1px 6px rgba(35,21,48,.55), 0 0 10px rgba(223,177,255,.28) !important;
+    text-shadow: 1px 1px #402351 !important;
 }
+#osStartButton:hover { filter: brightness(1.12); }
+#osStartButton .start-pixel {
+    width: 30px !important;
+    height: 30px !important;
+    display: grid !important;
+    flex: 0 0 30px !important;
+    place-items: center !important;
+    margin: 0 !important;
+    border: 1px solid rgba(255,255,255,.9) !important;
+    border-radius: 50% !important;
+    color: #fff !important;
+    background: radial-gradient(circle at 35% 28%, #fff 0 3%, #e5b8ff 15%, #9661c1 50%, #4d2b69 76%) !important;
+    box-shadow: inset 0 0 7px #fff9, 0 1px 3px #321c42 !important;
+    font: 700 16px "Pixelify Sans",monospace !important;
+}
+#osStartButton > span:last-child { font-size: 14px; letter-spacing: .08em; }
 
 .os-task-tab {
     height: 36px !important;
@@ -329,8 +357,8 @@ html, body {
     overflow: visible !important;
     border: 1px solid rgba(255,255,255,.88) !important;
     border-radius: 12px 12px 5px 5px !important;
-    background: linear-gradient(135deg, rgba(116,73,150,.94), rgba(55,34,76,.91)) !important;
-    box-shadow: inset 0 0 0 1px rgba(91,50,120,.72), inset 0 1px rgba(255,255,255,.55), 0 10px 28px rgba(25,11,35,.58) !important;
+    background: linear-gradient(135deg, rgba(124,65,166,.88), rgba(44,25,66,.92)) !important;
+    box-shadow: inset 0 0 0 1px rgba(77,35,108,.78), inset 0 1px rgba(255,255,255,.62), 0 12px 34px rgba(25,11,35,.66), 0 0 24px rgba(210,150,255,.26) !important;
     backdrop-filter: blur(17px) saturate(1.3) !important;
 }
 
@@ -347,34 +375,37 @@ html, body {
     background: linear-gradient(90deg, rgba(240,198,235,.56), rgba(190,230,229,.3)) !important;
 }
 
-.start-menu-header { height: 53px; position: relative; }
-#osStartMenu .start-user-card { position: absolute; left: 12px; bottom: 4px; display: flex !important; flex-direction: row !important; align-items: center; gap: 10px; padding: 0 !important; color: #fff !important; background: transparent !important; text-align: left; text-shadow: 1px 1px #3f2452 !important; }
+.start-menu-header { min-height: 59px; display: flex; align-items: center; padding: 3px 12px 5px; }
+#osStartMenu .start-user-card { position: static; display: flex !important; flex-direction: row !important; align-items: center; gap: 11px; padding: 0 !important; border: 0 !important; color: #fff !important; background: transparent !important; box-shadow: none !important; transform: none !important; text-align: left; text-shadow: 1px 1px #3f2452 !important; }
 .start-user-card > span:last-child { display: grid; gap: 1px; }
-.start-user-card small { color: #eee3f4; font-size: 9px; letter-spacing: .08em; }
-.start-user-card strong { font-size: 15px; font-weight: 500; }
-.start-user-icon { width: 49px; height: 49px; display: grid; place-items: center; overflow: hidden; border: 2px solid #fff; border-radius: 7px; background: linear-gradient(#dff7ff,#9bd6db 55%,#8fbd85); box-shadow: 0 0 0 2px rgba(58,30,77,.72), inset 0 0 7px #fff; }
-.start-user-icon img { width: 44px; height: 44px; object-fit: contain; }
-.start-menu-columns { min-height: 342px; display: grid; grid-template-columns: 58% 42%; overflow: hidden; border: 1px solid rgba(255,255,255,.92); border-radius: 6px 6px 3px 3px; box-shadow: 0 0 0 1px rgba(73,47,85,.52); }
-.start-program-pane { display: flex; flex-direction: column; gap: 1px; padding: 9px 7px 6px; color: #29232d; background: rgba(255,255,255,.96); }
-.start-pane-label { margin: 0 7px 5px; color: #80628d; font: 600 10px "Segoe UI",Arial,sans-serif; letter-spacing: .12em; }
-#osStartMenu .start-program { min-height: 48px; display: flex !important; flex-direction: row !important; align-items: center; gap: 9px; padding: 4px 7px !important; color: #28222c !important; background: transparent !important; text-align: left; text-shadow: none !important; }
+.start-user-card small { color: #bfffa8; font: 700 9px "Pixelify Sans",monospace; letter-spacing: .12em; }
+.start-user-card strong { font: 600 16px "Pixelify Sans",monospace; }
+.start-user-card em { color: #eadcf1; font: normal 10px "Segoe UI",Arial,sans-serif; }
+.start-user-icon { width: 48px; height: 48px; display: grid; place-items: center; overflow: hidden; border: 1px solid rgba(255,255,255,.72); border-radius: 6px; background: linear-gradient(145deg,rgba(207,247,241,.72),rgba(102,74,131,.58)); box-shadow: inset 0 0 7px rgba(255,255,255,.52); }
+.start-being-preview { position: relative; width: 49px; height: 49px; display: block; overflow: hidden; }
+.start-being-preview img { position: absolute; inset: -5px; width: 59px; height: 59px; display: none; object-fit: contain; image-rendering: pixelated; transform-origin: center; }
+.start-menu-columns { min-height: 342px; display: grid; grid-template-columns: 59% 41%; overflow: hidden; border: 1px solid rgba(255,255,255,.76); border-radius: 7px 7px 3px 3px; box-shadow: 0 0 0 1px rgba(60,28,82,.64), inset 0 1px rgba(255,255,255,.34); }
+.start-program-pane { display: flex; flex-direction: column; gap: 1px; padding: 9px 7px 6px; color: #30243a; background: linear-gradient(145deg,rgba(255,251,255,.88),rgba(232,216,242,.82)); backdrop-filter: blur(13px); }
+.start-pane-label { margin: 0 8px 5px; color: #76498e; font: 700 10px "Pixelify Sans",monospace; letter-spacing: .13em; }
+#osStartMenu .start-program { min-height: 48px; display: flex !important; flex-direction: row !important; align-items: center; gap: 10px; padding: 4px 8px !important; border: 1px solid transparent !important; border-radius: 5px !important; color: #30243a !important; background: transparent !important; box-shadow: none !important; text-align: left; text-shadow: none !important; }
 #osStartMenu .start-program[hidden] { display: none !important; }
-#osStartMenu .start-program:hover { border-color: #b790cc !important; background: linear-gradient(#f4eaff,#dfcff0) !important; box-shadow: inset 0 0 0 1px #fff; }
+#osStartMenu .start-program:hover { border-color: rgba(113,194,217,.8) !important; background: linear-gradient(90deg,rgba(200,249,250,.82),rgba(222,188,243,.7)) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,.8), 0 0 9px rgba(132,225,230,.32) !important; }
 .start-program > span:last-child { display: grid; gap: 1px; }
 .start-program strong { font-size: 13px; font-weight: 600; }
 .start-program small { color: #6c6470; font-size: 10px; }
-.program-gem { width: 32px; height: 32px; display: grid; flex: 0 0 32px; place-items: center; border: 1px solid #ffffffcc; border-radius: 8px; color: #fff; box-shadow: 0 0 0 1px #786b7d, inset 1px 1px 5px #ffffffbb, 0 2px 4px #493c4c55; font-weight: 700; text-shadow: 1px 1px #4e3f55; }
+.program-gem { width: 34px; height: 34px; display: grid; flex: 0 0 34px; place-items: center; border: 1px solid #ffffffdd; border-radius: 7px; color: #fff; box-shadow: 0 0 0 1px #6c5775, inset 1px 1px 7px #ffffffcc, 0 2px 5px #493c4c66; font: 700 15px "Pixelify Sans",monospace; text-shadow: 1px 1px #4e3f55; transform: rotate(-2deg); }
 .gem-pink { background: linear-gradient(135deg,#ffbde3,#9958bb); }.gem-blue { background: linear-gradient(135deg,#94eaff,#4183bd); }.gem-green { background: linear-gradient(135deg,#d6fa9f,#64a986); }.gem-gold { background: linear-gradient(135deg,#fff59d,#d78951); }.gem-purple { background: linear-gradient(135deg,#e0c3ff,#7c4caf); }
 .start-search-empty { margin: 20px 10px; color: #766d79; font: 12px "Segoe UI",Arial,sans-serif; text-align: center; }
-.all-programs { margin-top: auto; padding: 7px 8px 3px; border-top: 1px solid #ddd4e1; font: 600 12px "Segoe UI",Arial,sans-serif; text-align: right; }
+.all-programs { margin: auto -1px -1px; padding: 8px 9px 4px; border-top: 1px solid rgba(117,83,132,.34); font: 700 11px "Pixelify Sans",monospace; text-align: right; }
 .all-programs span { margin-left: 5px; color: #74508c; }
-.start-system-pane { display: flex; flex-direction: column; gap: 2px; padding: 14px 8px 8px; border-left: 1px solid rgba(91,56,111,.62); background: linear-gradient(135deg,rgba(220,198,231,.76),rgba(153,119,174,.68)); }
-#osStartMenu .start-system-pane button { min-height: 31px; display: flex !important; flex-direction: row !important; align-items: center; padding: 5px 9px !important; color: #fff !important; background: transparent !important; text-align: left; text-shadow: 1px 1px #543866 !important; }
-#osStartMenu .start-system-pane button:hover { border-color: rgba(255,255,255,.65) !important; background: linear-gradient(90deg,rgba(255,255,255,.32),rgba(211,175,226,.3)) !important; }
+.start-system-pane { display: flex; flex-direction: column; gap: 1px; padding: 14px 8px 8px; border-left: 1px solid rgba(255,255,255,.28); background: linear-gradient(145deg,rgba(103,57,136,.78),rgba(55,35,80,.68)); backdrop-filter: blur(15px); }
+#osStartMenu .start-system-pane button { min-height: 33px; display: flex !important; flex-direction: row !important; align-items: center; padding: 5px 9px !important; border: 1px solid transparent !important; border-radius: 4px !important; color: #fff !important; background: transparent !important; box-shadow: none !important; text-align: left; text-shadow: 1px 1px #392149 !important; }
+#osStartMenu .start-system-pane button:hover { border-color: rgba(255,255,255,.45) !important; background: linear-gradient(90deg,rgba(190,247,239,.3),rgba(224,166,244,.24)) !important; box-shadow: inset 0 0 7px rgba(255,255,255,.2) !important; }
 .start-system-divider { height: 1px; margin: 4px 6px; background: linear-gradient(90deg,transparent,rgba(77,45,93,.55),rgba(255,255,255,.48),transparent); }
 .start-menu-footer { min-height: 49px; display: flex; align-items: center; gap: 9px; padding: 7px 4px 7px; }
-.start-search { min-width: 0; flex: 1; display: flex; align-items: center; overflow: hidden; border: 1px solid #4e395a; border-radius: 3px; background: #fff; box-shadow: inset 0 1px 3px #928a96; }
-.start-search input { min-width: 0; width: 100%; height: 27px; padding: 4px 7px; border: 0; outline: 0; color: #343037; background: transparent; font: italic 11px "Segoe UI",Arial,sans-serif; }
+.start-search { min-width: 0; flex: 1; display: flex; align-items: center; overflow: hidden; border: 1px solid rgba(255,255,255,.68); border-radius: 5px; background: rgba(42,25,58,.68); box-shadow: inset 0 1px 4px #21142c, 0 0 0 1px rgba(63,34,80,.65); }
+.start-search input { min-width: 0; width: 100%; height: 27px; padding: 4px 7px; border: 0; outline: 0; color: #fff; background: transparent; font: italic 11px "Segoe UI",Arial,sans-serif; }
+.start-search input::placeholder { color: #d7c5df; }
 .start-search > span:last-child { padding: 0 7px; color: #6f4b84; font: 19px Arial,sans-serif; }
 #osStartMenu .start-power { min-height: 28px; display: flex !important; flex-direction: row !important; align-items: center; gap: 8px; padding: 3px 8px !important; border-color: rgba(255,255,255,.5) !important; color: #fff !important; background: linear-gradient(#ad81c3,#684479) !important; text-shadow: 1px 1px #3f2452 !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }

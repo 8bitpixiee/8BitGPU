@@ -80,11 +80,6 @@
 </div>      <!-- container -->
 </div> <!-- desktop -->
 
-    <button id="playerBadge" type="button" onclick="openApp('profile')" aria-label="Open player profile">
-        <span>PLAYER</span>
-        <strong id="playerName">Guest Pixie</strong>
-    </button>
-
     <section id="beingDock" aria-label="Your Being">
         <p class="being-dock-label">YOUR BEING</p>
         <div class="being-frame">
@@ -124,8 +119,18 @@
     <section id="osStartMenu" aria-label="Start menu" aria-hidden="true">
         <header class="start-menu-header">
             <button class="start-user-card" type="button" onclick="openApp('profile')">
-                <span class="start-user-icon"><img src="pixilart pixie.png" alt=""></span>
-                <span><small>PLAYER PROFILE</small><strong id="startMenuName">Guest Pixie</strong></span>
+                <span class="start-user-icon" aria-hidden="true">
+                    <span class="start-being-preview">
+                        <img data-avatar-layer="extraLayer" alt="">
+                        <img data-avatar-layer="bodyLayer" alt="">
+                        <img data-avatar-layer="earsLayer" alt="">
+                        <img data-avatar-layer="headLayer" alt="">
+                        <img data-avatar-layer="eyesLayer" alt="">
+                        <img data-avatar-layer="hairLayer" alt="">
+                        <img data-avatar-layer="fitLayer" alt="">
+                    </span>
+                </span>
+                <span><small id="startAccountStatus">GUEST DESKTOP</small><strong id="startMenuName">Guest Pixie</strong><em>My saved Being</em></span>
             </button>
         </header>
         <div class="start-menu-columns">
@@ -140,7 +145,7 @@
                 <div class="all-programs">All Programs <span>▶</span></div>
             </div>
             <aside class="start-system-pane" aria-label="Places and settings">
-                <button type="button" onclick="openApp('profile')"><strong>Player Profile</strong></button>
+                <button type="button" onclick="openApp('profile')"><strong>My Being</strong></button>
                 <button type="button" data-open-wallpapers>Pictures</button>
                 <button type="button" onclick="openApp('inventory')">Inventory</button>
                 <span class="start-system-divider"></span>
@@ -222,7 +227,7 @@
     </nav>
 
     <nav id="osTaskbar" aria-label="8BitGPU taskbar">
-        <button id="osStartButton" type="button" onclick="toggleStartMenu()"><span class="start-pixel" aria-hidden="true"></span> START</button>
+        <button id="osStartButton" type="button" onclick="toggleStartMenu()"><span class="start-pixel" aria-hidden="true">8</span><span>8BIT</span></button>
         <div id="osTaskTabs"></div>
         <div id="osSystemTray">
             <div class="taskbar-socials" aria-label="Social links">
