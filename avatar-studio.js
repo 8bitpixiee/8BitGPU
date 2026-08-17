@@ -2,16 +2,16 @@ const assetPath = "avatar/";
 // Only expose character bases that have a complete body + head pair in /avatar.
 // Keeping incomplete builds out of the live controls prevents a button from
 // selecting a character that can never render.
-const PLAYABLE_SPECIES = ["Pixie", "Deerbra", "Thixie"];
-const COMING_SOON_SPECIES = ["Bovadill"];
+const PLAYABLE_SPECIES = ["Pixie", "Deerbra", "Bovadill", "Thixie"];
+const COMING_SOON_SPECIES = [];
 
 const speciesData = {
     Pixie: {
         tones: ["Nutmeg", "Peachy", "Creme"],
-        builds: ["Fae"]
+        builds: ["Fae", "Masc", "Chunky Masc"]
     },
     Deerbra: {
-        tones: ["Wood", "Copper"],
+        tones: ["Wood", "Copper", "Pedal"],
         builds: ["Fae"]
     },
     Bovadill: {
@@ -27,17 +27,7 @@ const speciesData = {
 // These filenames are referenced by the catalogue but have not been uploaded
 // to /avatar yet. Hide them from both the buttons and Randomize until the art
 // arrives, instead of allowing a selection that produces a broken image.
-const unavailableAssets = new Set([
-    "ears_fem_deerbra_v2.png",
-    "eyes_fem_v3.png",
-    "eyes_mac_v4.png",
-    "ponytail v1.png", "ponytail v2.png", "ponytail v3.png", "ponytail v4.png",
-    "comfy_hair_m_v1.png", "comfy_hair_m_v2.png", "comfy_hair_m_v3.png", "comfy_hair_m_v4.png",
-    "donnie_hair_v1.png", "donnie_hair_v2.png", "donnie_hair_v3.png",
-    "frolic_fit_v1.png", "frolic_fit_v2.png", "frolic_fit_v3.png",
-    "frolic_skirt_v1.png", "frolic_skirt_v2.png", "frolic_skirt_v3.png",
-    "bovidil_tail_v1.png", "bovidil_tail_v2.png", "bovidil_tail_v3.png"
-]);
+const unavailableAssets = new Set();
 
 const asset = (filename) => filename ? assetPath + filename : "";
 const shared = PLAYABLE_SPECIES;
@@ -101,27 +91,33 @@ const options = {
     ],
     fit: [
         item("fit-none", "No Fit", "", "No Fit"),
-        item("chillouts-magma", "Kitties Chillouts - Cool Magma", "fit_fem_v1.png", "Kitties Chillouts", ["Pixie", "Deerbra"]),
-        item("sunrise", "Sunrise Two-Piece", "fit_fem_v2.png", "Two-Piece", ["Pixie", "Deerbra"]),
-        item("malachite", "Malachite Two-Piece", "fit_fem_v3.png", "Two-Piece", ["Pixie", "Deerbra"]),
-        item("drawls-purple", "Drawls - Purple", "drawls_fem_idle_front_v1.png", "Drawls", ["Pixie", "Deerbra"]),
-        item("drawls-blue", "Drawls - Synth Blue", "drawls_fem_idle_front_v2.png", "Drawls", ["Pixie", "Deerbra"]),
-        item("drawls-gold", "Drawls - Golden Hour", "drawls_fem_idle_front_v3.png", "Drawls", ["Pixie", "Deerbra"]),
-        item("frolic-tree", "Frolic Fit - Tree Squatter", "frolic_fit_v1.png", "Frolic Fit", ["Pixie", "Deerbra"]),
-        item("frolic-smoke", "Frolic Fit - Smoke Spotter", "frolic_fit_v2.png", "Frolic Fit", ["Pixie", "Deerbra"]),
-        item("frolic-merican", "Frolic Fit - Merican Dough Boy", "frolic_fit_v3.png", "Frolic Fit", ["Pixie", "Deerbra"]),
-        item("skirt-blue", "Frolic Skirt - Blue", "frolic_skirt_v1.png", "Frolic Skirt", ["Pixie", "Deerbra"]),
-        item("skirt-red", "Frolic Skirt - Red", "frolic_skirt_v2.png", "Frolic Skirt", ["Pixie", "Deerbra"]),
-        item("skirt-green", "Frolic Skirt - Green", "frolic_skirt_v3.png", "Frolic Skirt", ["Pixie", "Deerbra"]),
-        item("thixie-aura", "Thixie Fit - Aura Blue", "thixie_fit_v1.png", "Thixie Fit", ["Thixie"]),
-        item("thixie-mauve", "Thixie Fit - Mauve Kiss", "thixie_fit_v2.png", "Thixie Fit", ["Thixie"]),
-        item("thixie-watermelon", "Thixie Fit - Watermelon", "thixie_fit_v3.png", "Thixie Fit", ["Thixie"])
+        item("chillouts-magma", "Kitties Chillouts - Cool Magma", "fit_fem_v1.png", "Kitties Chillouts"),
+        item("sunrise", "Sunrise Two-Piece", "fit_fem_v2.png", "Two-Piece"),
+        item("malachite", "Malachite Two-Piece", "fit_fem_v3.png", "Two-Piece"),
+        item("kittie-fit-one", "Kittie Fit - Look 01", "fit_kittie_v1.png", "Kittie Fits"),
+        item("kittie-fit-two", "Kittie Fit - Look 02", "fit_kittie_v2.png", "Kittie Fits"),
+        item("kittie-fit-three", "Kittie Fit - Look 03", "fit_kittie_v3.png", "Kittie Fits"),
+        item("drawls-purple", "Drawls - Purple", "drawls_fem_idle_front_v1.png", "Drawls"),
+        item("drawls-blue", "Drawls - Synth Blue", "drawls_fem_idle_front_v2.png", "Drawls"),
+        item("drawls-gold", "Drawls - Golden Hour", "drawls_fem_idle_front_v3.png", "Drawls"),
+        item("frolic-tree", "Frolic Fit - Tree Squatter", "frolic_fit_v1.png", "Frolic Fit"),
+        item("frolic-smoke", "Frolic Fit - Smoke Spotter", "frolic_fit_v2.png", "Frolic Fit"),
+        item("frolic-merican", "Frolic Fit - Merican Dough Boy", "frolic_fit_v3.png", "Frolic Fit"),
+        item("skirt-blue", "Frolic Skirt - Blue", "frolic_skirt_v1.png", "Frolic Skirt"),
+        item("skirt-red", "Frolic Skirt - Red", "frolic_skirt_v2.png", "Frolic Skirt"),
+        item("skirt-green", "Frolic Skirt - Green", "frolic_skirt_v3.png", "Frolic Skirt"),
+        item("thixie-aura", "Thixie Fit - Aura Blue", "thixie_fit_v1.png", "Thixie Fit"),
+        item("thixie-mauve", "Thixie Fit - Mauve Kiss", "thixie_fit_v2.png", "Thixie Fit"),
+        item("thixie-watermelon", "Thixie Fit - Watermelon", "thixie_fit_v3.png", "Thixie Fit")
     ],
     extra: [
         item("extra-none", "No Extra", "", "No Extra"),
-        item("wings-lavender", "Pixie Wings - Lavender Sparkle", "wings_v1.png", "Pixie Wings", ["Pixie", "Thixie"]),
-        item("wings-evil", "Pixie Wings - Evil Pixie", "wings_v2.png", "Pixie Wings", ["Pixie", "Thixie"]),
-        item("wings-synth", "Pixie Wings - Synth Pixie", "wings_v3.png", "Pixie Wings", ["Pixie", "Thixie"]),
+        item("wings-lavender", "Pixie Wings - Lavender Sparkle", "wings_v1.png", "Pixie Wings"),
+        item("wings-evil", "Pixie Wings - Evil Pixie", "wings_v2.png", "Pixie Wings"),
+        item("wings-synth", "Pixie Wings - Synth Pixie", "wings_v3.png", "Pixie Wings"),
+        item("kittie-tail-one", "Kittie Tail - Look 01", "kittie_tail_v1.png", "Kittie Tails"),
+        item("kittie-tail-two", "Kittie Tail - Look 02", "kittie_tail_v2.png", "Kittie Tails"),
+        item("kittie-tail-three", "Kittie Tail - Look 03", "kittie_tail_v3.png", "Kittie Tails"),
         item("bovadill-tail-highland", "Bovadill Tail - Highland", "bovidil_tail_v1.png", "Bovadill Tail", ["Bovadill"]),
         item("bovadill-tail-holstein", "Bovadill Tail - Holstein", "bovidil_tail_v2.png", "Bovadill Tail", ["Bovadill"]),
         item("bovadill-tail-dexter", "Bovadill Tail - Dexter", "bovidil_tail_v3.png", "Bovadill Tail", ["Bovadill"])
@@ -192,9 +188,9 @@ function baseFiles() {
     if (settings.species === "Bovadill") {
         const toneNumber = { Cocoa: 1, Peachy: 2, Milky: 3 }[tone];
         const breedNumber = { Highland: 1, Holstein: 2, Dexter: 3 }[settings.build];
-        return { body: asset("bovidil_body_fem_v" + toneNumber + "." + breedNumber + ".png"), head: asset("bovidil_head_fem_v" + toneNumber + ".png") };
+        return { body: asset("bovidil_body_fem_v" + toneNumber + "." + breedNumber + ".png"), head: asset("bovidil_head_fem_v1.png") };
     }
-    const bodyNumber = { Nutmeg: 1, Creme: 2, Peachy: 4 }[tone];
+    const bodyNumber = { Nutmeg: 1, Creme: 2, Peachy: 3 }[tone];
     const headNumber = { Nutmeg: 1, Creme: 2, Peachy: 3 }[tone];
     return { body: asset("thixie_body_v" + bodyNumber + ".png"), head: asset("thixie_head_v" + headNumber + ".png") };
 }
