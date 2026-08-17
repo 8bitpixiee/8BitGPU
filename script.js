@@ -61,6 +61,16 @@ function loadSavedOutfit() {
         setLayer("eyesLayer", layers.eyes);
         setLayer("fitLayer", layers.fit);
         setLayer("extraLayer", layers.extra);
+        const adjustments = savedOutfit.adjustments || {};
+        ["ears", "hair", "eyes", "fit", "extra"].forEach((category) => {
+            const layer = document.getElementById(category + "Layer");
+            if (!layer) return;
+            const value = adjustments[category] || { x: 0, y: 0, scale: 1 };
+            const x = Math.max(-20, Math.min(20, Number(value.x) || 0));
+            const y = Math.max(-20, Math.min(20, Number(value.y) || 0));
+            const scale = Math.max(.7, Math.min(1.3, Number(value.scale) || 1));
+            layer.style.transform = `translate(${x}%, ${y}%) scale(${scale})`;
+        });
         return;
     }
 
