@@ -324,23 +324,60 @@ html, body {
 
 #osStartMenu {
     bottom: 50px !important;
-    width: 276px !important;
-    padding: 8px !important;
-    border-radius: 13px 13px 5px 5px !important;
+    width: min(430px, calc(100vw - 14px)) !important;
+    padding: 7px 7px 0 !important;
+    overflow: visible !important;
+    border: 1px solid rgba(255,255,255,.88) !important;
+    border-radius: 12px 12px 5px 5px !important;
+    background: linear-gradient(135deg, rgba(116,73,150,.94), rgba(55,34,76,.91)) !important;
+    box-shadow: inset 0 0 0 1px rgba(91,50,120,.72), inset 0 1px rgba(255,255,255,.55), 0 10px 28px rgba(25,11,35,.58) !important;
+    backdrop-filter: blur(17px) saturate(1.3) !important;
 }
 
 #osStartMenu button {
+    width: auto !important;
+    margin: 0 !important;
     border: 1px solid transparent !important;
     border-radius: 5px !important;
-    color: #fff !important;
-    background: rgba(255,255,255,.12) !important;
-    text-shadow: 1px 1px #3f2452 !important;
+    font-family: "Segoe UI", Arial, sans-serif !important;
 }
 
 #osStartMenu button:hover {
     border-color: rgba(255,255,255,.58) !important;
     background: linear-gradient(90deg, rgba(240,198,235,.56), rgba(190,230,229,.3)) !important;
 }
+
+.start-menu-header { height: 53px; position: relative; }
+#osStartMenu .start-user-card { position: absolute; left: 12px; bottom: 4px; display: flex !important; flex-direction: row !important; align-items: center; gap: 10px; padding: 0 !important; color: #fff !important; background: transparent !important; text-align: left; text-shadow: 1px 1px #3f2452 !important; }
+.start-user-card > span:last-child { display: grid; gap: 1px; }
+.start-user-card small { color: #eee3f4; font-size: 9px; letter-spacing: .08em; }
+.start-user-card strong { font-size: 15px; font-weight: 500; }
+.start-user-icon { width: 49px; height: 49px; display: grid; place-items: center; overflow: hidden; border: 2px solid #fff; border-radius: 7px; background: linear-gradient(#dff7ff,#9bd6db 55%,#8fbd85); box-shadow: 0 0 0 2px rgba(58,30,77,.72), inset 0 0 7px #fff; }
+.start-user-icon img { width: 44px; height: 44px; object-fit: contain; }
+.start-menu-columns { min-height: 342px; display: grid; grid-template-columns: 58% 42%; overflow: hidden; border: 1px solid rgba(255,255,255,.92); border-radius: 6px 6px 3px 3px; box-shadow: 0 0 0 1px rgba(73,47,85,.52); }
+.start-program-pane { display: flex; flex-direction: column; gap: 1px; padding: 9px 7px 6px; color: #29232d; background: rgba(255,255,255,.96); }
+.start-pane-label { margin: 0 7px 5px; color: #80628d; font: 600 10px "Segoe UI",Arial,sans-serif; letter-spacing: .12em; }
+#osStartMenu .start-program { min-height: 48px; display: flex !important; flex-direction: row !important; align-items: center; gap: 9px; padding: 4px 7px !important; color: #28222c !important; background: transparent !important; text-align: left; text-shadow: none !important; }
+#osStartMenu .start-program[hidden] { display: none !important; }
+#osStartMenu .start-program:hover { border-color: #b790cc !important; background: linear-gradient(#f4eaff,#dfcff0) !important; box-shadow: inset 0 0 0 1px #fff; }
+.start-program > span:last-child { display: grid; gap: 1px; }
+.start-program strong { font-size: 13px; font-weight: 600; }
+.start-program small { color: #6c6470; font-size: 10px; }
+.program-gem { width: 32px; height: 32px; display: grid; flex: 0 0 32px; place-items: center; border: 1px solid #ffffffcc; border-radius: 8px; color: #fff; box-shadow: 0 0 0 1px #786b7d, inset 1px 1px 5px #ffffffbb, 0 2px 4px #493c4c55; font-weight: 700; text-shadow: 1px 1px #4e3f55; }
+.gem-pink { background: linear-gradient(135deg,#ffbde3,#9958bb); }.gem-blue { background: linear-gradient(135deg,#94eaff,#4183bd); }.gem-green { background: linear-gradient(135deg,#d6fa9f,#64a986); }.gem-gold { background: linear-gradient(135deg,#fff59d,#d78951); }.gem-purple { background: linear-gradient(135deg,#e0c3ff,#7c4caf); }
+.start-search-empty { margin: 20px 10px; color: #766d79; font: 12px "Segoe UI",Arial,sans-serif; text-align: center; }
+.all-programs { margin-top: auto; padding: 7px 8px 3px; border-top: 1px solid #ddd4e1; font: 600 12px "Segoe UI",Arial,sans-serif; text-align: right; }
+.all-programs span { margin-left: 5px; color: #74508c; }
+.start-system-pane { display: flex; flex-direction: column; gap: 2px; padding: 14px 8px 8px; border-left: 1px solid rgba(91,56,111,.62); background: linear-gradient(135deg,rgba(220,198,231,.76),rgba(153,119,174,.68)); }
+#osStartMenu .start-system-pane button { min-height: 31px; display: flex !important; flex-direction: row !important; align-items: center; padding: 5px 9px !important; color: #fff !important; background: transparent !important; text-align: left; text-shadow: 1px 1px #543866 !important; }
+#osStartMenu .start-system-pane button:hover { border-color: rgba(255,255,255,.65) !important; background: linear-gradient(90deg,rgba(255,255,255,.32),rgba(211,175,226,.3)) !important; }
+.start-system-divider { height: 1px; margin: 4px 6px; background: linear-gradient(90deg,transparent,rgba(77,45,93,.55),rgba(255,255,255,.48),transparent); }
+.start-menu-footer { min-height: 49px; display: flex; align-items: center; gap: 9px; padding: 7px 4px 7px; }
+.start-search { min-width: 0; flex: 1; display: flex; align-items: center; overflow: hidden; border: 1px solid #4e395a; border-radius: 3px; background: #fff; box-shadow: inset 0 1px 3px #928a96; }
+.start-search input { min-width: 0; width: 100%; height: 27px; padding: 4px 7px; border: 0; outline: 0; color: #343037; background: transparent; font: italic 11px "Segoe UI",Arial,sans-serif; }
+.start-search > span:last-child { padding: 0 7px; color: #6f4b84; font: 19px Arial,sans-serif; }
+#osStartMenu .start-power { min-height: 28px; display: flex !important; flex-direction: row !important; align-items: center; gap: 8px; padding: 3px 8px !important; border-color: rgba(255,255,255,.5) !important; color: #fff !important; background: linear-gradient(#ad81c3,#684479) !important; text-shadow: 1px 1px #3f2452 !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 
 #desktopContextMenu {
     position: fixed;
@@ -405,6 +442,13 @@ html, body {
 .wallpaper-picker-actions .wallpaper-save { border-color: #5b96bb; background: linear-gradient(#fafdff,#cae8f8); box-shadow: inset 0 0 0 1px #fff; }
 
 @media (max-width: 600px) {
+    #osStartMenu { left: 7px !important; }
+    .start-menu-columns { grid-template-columns: 62% 38%; }
+    .start-program small { display: none; }
+    .start-system-pane { padding-right: 4px; padding-left: 4px; }
+    #osStartMenu .start-system-pane button { padding-right: 4px !important; padding-left: 4px !important; font-size: 11px !important; }
+    .start-power { font-size: 0 !important; }
+    .start-power span { font-size: 15px; }
     .wallpaper-explorer-body { grid-template-columns: 1fr; }
     .wallpaper-explorer-body aside { display: none; }
     .wallpaper-grid { grid-template-columns: 1fr 1fr; gap: 8px; }

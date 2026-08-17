@@ -122,17 +122,38 @@
     </aside>
 
     <section id="osStartMenu" aria-label="Start menu" aria-hidden="true">
-        <button class="start-user-card" type="button" onclick="openApp('profile')">
-            <span class="start-user-icon"><img src="pixilart pixie.png" alt=""></span>
-            <span><small>PLAYER</small><strong id="startMenuName">Guest Pixie</strong></span>
-        </button>
-        <div class="start-menu-divider"></div>
-        <button type="button" onclick="openApp('avatarLab')">✦ Avatar Lab.exe</button>
-        <button type="button" onclick="openApp('arcade')">✦ Arcade 01.exe</button>
-        <button type="button" onclick="openApp('inventory')">✦ Inventory.exe</button>
-        <button type="button" onclick="openApp('login')">✦ Login.exe</button>
-        <button type="button" onclick="openApp('storefront')">✦ Storefront.exe</button>
-        <button type="button" onclick="openApp('twitch')">✦ Watch Us Live</button>
+        <header class="start-menu-header">
+            <button class="start-user-card" type="button" onclick="openApp('profile')">
+                <span class="start-user-icon"><img src="pixilart pixie.png" alt=""></span>
+                <span><small>PLAYER PROFILE</small><strong id="startMenuName">Guest Pixie</strong></span>
+            </button>
+        </header>
+        <div class="start-menu-columns">
+            <div class="start-program-pane">
+                <p class="start-pane-label">PROGRAMS</p>
+                <button class="start-program" data-start-program type="button" onclick="openApp('avatarLab')"><span class="program-gem gem-pink">✦</span><span><strong>Avatar Lab</strong><small>Create your Being</small></span></button>
+                <button class="start-program" data-start-program type="button" onclick="openApp('arcade')"><span class="program-gem gem-blue">★</span><span><strong>Arcade 01</strong><small>Games and quests</small></span></button>
+                <button class="start-program" data-start-program type="button" onclick="openApp('inventory')"><span class="program-gem gem-green">◆</span><span><strong>Inventory</strong><small>Your collected items</small></span></button>
+                <button class="start-program" data-start-program type="button" onclick="openApp('storefront')"><span class="program-gem gem-gold">$</span><span><strong>Storefront</strong><small>Browse the shop</small></span></button>
+                <button class="start-program" data-start-program type="button" onclick="openApp('twitch')"><span class="program-gem gem-purple">▶</span><span><strong>Watch Us Live</strong><small>Open the stream</small></span></button>
+                <p class="start-search-empty" hidden>No programs found.</p>
+                <div class="all-programs">All Programs <span>▶</span></div>
+            </div>
+            <aside class="start-system-pane" aria-label="Places and settings">
+                <button type="button" onclick="openApp('profile')"><strong>Player Profile</strong></button>
+                <button type="button" data-open-wallpapers>Pictures</button>
+                <button type="button" onclick="openApp('inventory')">Inventory</button>
+                <span class="start-system-divider"></span>
+                <button type="button" onclick="openApp('login')">Connect / Sign In</button>
+                <button type="button" onclick="openApp('important')">Help &amp; Important</button>
+                <span class="start-system-divider"></span>
+                <button type="button" data-open-wallpapers><strong>Personalize</strong></button>
+            </aside>
+        </div>
+        <footer class="start-menu-footer">
+            <label class="start-search"><span class="sr-only">Search programs</span><input id="startMenuSearch" type="search" placeholder="Search programs and files" autocomplete="off"><span aria-hidden="true">⌕</span></label>
+            <button class="start-power" type="button" data-close-start>Close menu <span>›</span></button>
+        </footer>
     </section>
 
     <menu id="desktopContextMenu" aria-label="Desktop menu" hidden>
@@ -162,10 +183,10 @@
             <div class="wallpaper-browser">
                 <p>Choose your desktop background</p>
                 <div class="wallpaper-grid">
-                    <button type="button" data-wallpaper-index="0"><img src="wallpaper-1.jpg" alt="Blue ocean and clouds"><span>Aqua Horizon</span></button>
-                    <button type="button" data-wallpaper-index="1"><img src="wallpaper-2.jpg" alt="Pool water and palm trees"><span>Palmwater</span></button>
-                    <button type="button" data-wallpaper-index="2"><img src="wallpaper-3.jpg" alt="Purple tropical island"><span>Violet Island</span></button>
-                    <button type="button" data-wallpaper-index="3"><img src="wallpaper-4.jpg" alt="Colorful ocean sunset"><span>Dream Sunset</span></button>
+                    <button type="button" data-wallpaper-index="0"><img src="wallpaper-1-purple.png" alt="Lavender ocean and clouds"><span>Lavender Horizon</span></button>
+                    <button type="button" data-wallpaper-index="1"><img src="wallpaper-2-purple.png" alt="Purple infinity pool and palm trees"><span>Amethyst Palmwater</span></button>
+                    <button type="button" data-wallpaper-index="2"><img src="wallpaper-3-purple.png" alt="Purple tropical palm island"><span>Violet Island</span></button>
+                    <button type="button" data-wallpaper-index="3"><img src="wallpaper-4-purple.png" alt="Moon over purple water and islands"><span>Moonlit Paradise</span></button>
                 </div>
             </div>
         </div>
