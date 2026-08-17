@@ -22,6 +22,10 @@ function loadSavedOutfit() {
         layer.onerror = () => { layer.style.display = "none"; };
         layer.src = source || "";
         layer.style.display = source ? "block" : "none";
+        document.querySelectorAll(`[data-avatar-layer="${id}"]`).forEach((previewLayer) => {
+            previewLayer.src = source || "";
+            previewLayer.style.display = source ? "block" : "none";
+        });
     };
 
     // Avatar Lab v2 saves stable asset paths, not the old numeric option
@@ -70,6 +74,9 @@ function loadSavedOutfit() {
             const y = Math.max(-20, Math.min(20, Number(value.y) || 0));
             const scale = Math.max(.7, Math.min(1.3, Number(value.scale) || 1));
             layer.style.transform = `translate(${x}%, ${y}%) scale(${scale})`;
+            document.querySelectorAll(`[data-avatar-layer="${category}Layer"]`).forEach((previewLayer) => {
+                previewLayer.style.transform = `translate(${x}%, ${y}%) scale(${scale})`;
+            });
         });
         return;
     }
@@ -119,10 +126,12 @@ window.addEventListener("message", (event) => {
 function renderPlayerBadge() {
     const playerName = document.getElementById("playerName");
     const startMenuName = document.getElementById("startMenuName");
+    const startAccountStatus = document.getElementById("startAccountStatus");
     const name = localStorage.getItem("8bitgpu-player-name") || "Guest Pixie";
 
     if (playerName) playerName.textContent = name;
     if (startMenuName) startMenuName.textContent = name;
+    if (startAccountStatus) startAccountStatus.textContent = localStorage.getItem("8bitgpu-account-active") === "true" ? "SIGNED IN" : "GUEST DESKTOP";
 }
 
 function getGameState() {
@@ -206,7 +215,7 @@ const desktopApps = {
     discord: { title: "Community.exe", external: "https://discord.gg/RbqP4BAmH", description: "Join the 8BitGPU Discord community and show us your creature build.", width: 440, height: 305, left: 315, top: 150 },
     important: { title: "IMPORTANT.exe", src: "nick.html", width: 550, height: 450, left: 330, top: 105 },
     sonic: { title: "Sonic.exe", src: "sonic.html", width: 550, height: 450, left: 365, top: 130 },
-    profile: { title: "PROFILE.exe", width: 410, height: 310, left: 510, top: 155, content: () => `<section class="os-welcome os-profile"><p class="os-profile-label">CURRENT CREATURE</p><h2>${escapePlayerName()}</h2><p>Your saved avatar is waiting on the desktop. Online outfits, inventory, and friends will live here once the game account system wakes up.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>` }
+    profile: { title: "MY BEING.exe", width: 410, height: 310, left: 510, top: 155, content: () => `<section class="os-welcome os-profile"><p class="os-profile-label">CURRENT BEING</p><h2>${escapePlayerName()}</h2><p>This is your little desktop companion. Style them in Avatar Lab, collect items, and take them along as the world grows.</p><button type="button" onclick="openApp('avatarLab')">Style My Being</button></section>` }
 };
 
 function toggleStartMenu() {
