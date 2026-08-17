@@ -19,6 +19,29 @@ html, body {
     isolation: isolate;
 }
 
+#wallpaperRotator {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background: #263b6e;
+}
+
+.wallpaper-frame {
+    position: absolute;
+    inset: -2px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0;
+    transform: scale(1.012);
+    transition: opacity 1.8s ease;
+    will-change: opacity;
+}
+
+.wallpaper-frame.is-visible { opacity: 1; }
+
 #osBootScreen {
     position: fixed;
     inset: 0;
@@ -71,7 +94,7 @@ html, body {
 }
 
 .desktop-vine {
-    z-index: 2 !important;
+    z-index: 3 !important;
     opacity: .88 !important;
     filter: saturate(1.16) brightness(1.08) drop-shadow(0 0 4px rgba(208,255,158,.82)) drop-shadow(0 9px 12px rgba(29,58,38,.48)) !important;
 }
@@ -319,6 +342,76 @@ html, body {
     background: linear-gradient(90deg, rgba(240,198,235,.56), rgba(190,230,229,.3)) !important;
 }
 
+#desktopContextMenu {
+    position: fixed;
+    z-index: 40000;
+    width: 218px;
+    display: grid;
+    gap: 1px;
+    margin: 0;
+    padding: 4px;
+    border: 1px solid #6e6873;
+    border-radius: 4px;
+    background: rgba(247,245,248,.96);
+    box-shadow: inset 0 0 0 1px #fff, 4px 5px 15px rgba(25,15,31,.42);
+    font: 13px "Segoe UI", Arial, sans-serif;
+    backdrop-filter: blur(8px);
+}
+#desktopContextMenu[hidden] { display: none; }
+#desktopContextMenu button { min-height: 28px; display: block; padding: 4px 10px 4px 31px; border: 1px solid transparent; border-radius: 2px; color: #242027; background: transparent; font: inherit; text-align: left; }
+#desktopContextMenu button:hover { border-color: #9ac9e9; color: #242027; background: linear-gradient(#e8f5ff,#cfeaff); text-shadow: none; transform: none; }
+.context-divider { height: 1px; margin: 3px 5px; background: #d4d0d6; }
+
+#wallpaperPicker {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 41000;
+    width: min(760px, calc(100vw - 34px));
+    height: min(555px, calc(100dvh - 80px));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.92);
+    border-radius: 10px;
+    color: #27222b;
+    background: linear-gradient(145deg, rgba(221,205,234,.82), rgba(96,71,111,.82));
+    box-shadow: inset 1px 1px rgba(255,255,255,.7), 0 18px 46px rgba(23,13,28,.62);
+    font: 13px "Segoe UI", Arial, sans-serif;
+    transform: translate(-50%,-50%);
+    backdrop-filter: blur(15px) saturate(1.25);
+}
+#wallpaperPicker[hidden] { display: none; }
+.wallpaper-picker-bar { height: 36px; display: flex; align-items: center; justify-content: space-between; padding: 0 7px 0 13px; color: #fff; text-shadow: 1px 1px #3f2c49; }
+.wallpaper-picker-bar button { width: 39px; height: 24px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.75); border-radius: 0 0 5px 5px; color: #fff; background: linear-gradient(#d88e9b,#a83d50); font: 18px/1 Arial,sans-serif; }
+.wallpaper-explorer-toolbar { min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid #fff; border-bottom-color: #b8b4bb; background: linear-gradient(#fbfbfb,#e8e7e9); }
+.wallpaper-explorer-toolbar button { width: 28px; height: 25px; display: grid; place-items: center; border: 1px solid #aaa5ad; border-radius: 4px; color: #555; background: linear-gradient(#fff,#ddd); }
+.wallpaper-explorer-toolbar span { flex: 1; padding: 5px 9px; border: 1px solid #aaa5ad; border-radius: 3px; color: #37333a; background: #fff; }
+.wallpaper-explorer-body { min-height: 0; flex: 1; display: grid; grid-template-columns: 150px 1fr; border-right: 1px solid #fff; border-left: 1px solid #fff; background: #fff; }
+.wallpaper-explorer-body aside { display: flex; flex-direction: column; gap: 7px; padding: 14px 12px; border-right: 1px solid #c9d3dc; color: #3d5367; background: linear-gradient(90deg,#eef5fa,#f8fbfd); }
+.wallpaper-explorer-body aside strong { margin-bottom: 5px; color: #465b6b; }
+.wallpaper-explorer-body aside span { padding: 4px 6px; }
+.wallpaper-browser { min-width: 0; overflow: auto; padding: 15px; }
+.wallpaper-browser > p { margin: 0 0 14px; color: #47404b; font: 16px "Segoe UI",Arial,sans-serif; }
+.wallpaper-grid { display: grid; grid-template-columns: repeat(2,minmax(150px,1fr)); gap: 15px; }
+.wallpaper-grid button { min-width: 0; display: grid; gap: 6px; padding: 8px; border: 1px solid transparent; border-radius: 4px; color: #29252c; background: transparent; font: 12px "Segoe UI",Arial,sans-serif; text-align: center; }
+.wallpaper-grid button:hover { border-color: #9bc9e8; color: #29252c; background: #e9f5fd; text-shadow: none; transform: none; }
+.wallpaper-grid button.is-selected { border-color: #65a7d0; background: linear-gradient(#dff2ff,#cbe9fa); box-shadow: inset 0 0 0 1px #fff; }
+.wallpaper-grid img { width: 100%; aspect-ratio: 16 / 9; display: block; border: 1px solid #9b969d; object-fit: cover; box-shadow: 0 2px 5px #0003; }
+.wallpaper-picker-footer { min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 9px 12px; border: 1px solid #fff; border-top-color: #c3bec6; background: linear-gradient(#f7f7f7,#dfdde1); }
+.wallpaper-picker-footer label { display: flex; align-items: center; gap: 7px; color: #3b363e; }
+.wallpaper-picker-actions { display: flex; gap: 7px; }
+.wallpaper-picker-actions button { min-width: 94px; min-height: 30px; display: block; border: 1px solid #8e8991; border-radius: 3px; color: #29252c; background: linear-gradient(#fff,#dedcdf); font: 13px "Segoe UI",Arial,sans-serif; }
+.wallpaper-picker-actions .wallpaper-save { border-color: #5b96bb; background: linear-gradient(#fafdff,#cae8f8); box-shadow: inset 0 0 0 1px #fff; }
+
+@media (max-width: 600px) {
+    .wallpaper-explorer-body { grid-template-columns: 1fr; }
+    .wallpaper-explorer-body aside { display: none; }
+    .wallpaper-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .wallpaper-picker-footer { align-items: stretch; flex-direction: column; }
+    .wallpaper-picker-actions button { flex: 1; }
+}
+
 @media (max-width: 700px) {
     .desktop {
         background: linear-gradient(180deg, #8d6eba, #addbe8 45%, #73aa99 68%, #3b2b51) !important;
@@ -332,6 +425,10 @@ html, body {
 @media (prefers-reduced-motion: no-preference) {
     .desktop::after { animation: aeroSparkle 7s ease-in-out infinite alternate; }
     .being-frame { animation: aeroFrameGlow 4.5s ease-in-out infinite alternate; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wallpaper-frame { transition: none; }
 }
 
 @keyframes aeroSparkle { from { opacity: .48; } to { opacity: .84; } }
