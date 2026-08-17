@@ -34,14 +34,20 @@ function loadSavedOutfit() {
 
         if (savedOutfit.species === "Pixie") {
             const version = { Nutmeg: 1, Peachy: 2, Creme: 3 }[tone] || 1;
-            body = `body_fem_v${version}.png`;
-            head = `head_fem_v${version}.png`;
+            const buildPrefix = savedOutfit.build === "Masc" ? "masc" : savedOutfit.build === "Chunky Masc" ? "chunky_masc" : "fem";
+            body = `body_${buildPrefix}_v${version}.png`;
+            head = `head_${buildPrefix}_v${version}.png`;
         } else if (savedOutfit.species === "Deerbra") {
-            const version = { Wood: 1, Copper: 2 }[tone] || 1;
+            const version = { Wood: 1, Copper: 2, Pedal: 3 }[tone] || 1;
             body = `body_fem_deerbra_v${version}.png`;
             head = `head_fem_deerbra_v${version}.png`;
+        } else if (savedOutfit.species === "Bovadill") {
+            const toneNumber = { Cocoa: 1, Peachy: 2, Milky: 3 }[tone] || 1;
+            const breedNumber = { Highland: 1, Holstein: 2, Dexter: 3 }[savedOutfit.build] || 1;
+            body = `bovidil_body_fem_v${toneNumber}.${breedNumber}.png`;
+            head = "bovidil_head_fem_v1.png";
         } else if (savedOutfit.species === "Thixie") {
-            const bodyVersion = { Nutmeg: 1, Creme: 2, Peachy: 4 }[tone] || 1;
+            const bodyVersion = { Nutmeg: 1, Creme: 2, Peachy: 3 }[tone] || 1;
             const headVersion = { Nutmeg: 1, Creme: 2, Peachy: 3 }[tone] || 1;
             body = `thixie_body_v${bodyVersion}.png`;
             head = `thixie_head_v${headVersion}.png`;
