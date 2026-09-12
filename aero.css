@@ -620,17 +620,17 @@ button, a, [role="button"], input, label { cursor: url("cursor-purple.png") 2 2,
 }
 
 .vine-top {
-    top: -24px !important;
-    left: -30px !important;
-    width: min(34vw, 560px) !important;
-    opacity: .78 !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: clamp(340px, 24vw, 460px) !important;
+    opacity: .86 !important;
 }
 
 .vine-right {
-    top: 88px !important;
-    right: -76px !important;
-    height: min(54vh, 580px) !important;
-    opacity: .68 !important;
+    top: 110px !important;
+    right: -8px !important;
+    height: clamp(480px, 62vh, 650px) !important;
+    opacity: .82 !important;
 }
 
 .twinkle-field { position: fixed; inset: 0; z-index: 7; overflow: hidden; pointer-events: none; }
@@ -640,8 +640,8 @@ button, a, [role="button"], input, label { cursor: url("cursor-purple.png") 2 2,
 @keyframes twinkleTravel { 0% { opacity: 0; translate: -22px 16px; scale: .3; } 18% { opacity: 1; } 45% { opacity: .25; scale: 1.35; } 67% { opacity: 1; } 100% { opacity: 0; translate: 62px -48px; scale: .2; } }
 
 @media (max-width:700px) {
-    .vine-top { width: min(68vw, 420px) !important; opacity: .62 !important; }
-    .vine-right { right: -86px !important; height: 42vh !important; opacity: .5 !important; }
+    .vine-top { width: min(72vw, 380px) !important; opacity: .72 !important; }
+    .vine-right { top: 84px !important; right: -12px !important; height: 48vh !important; opacity: .68 !important; }
     .twinkle-field i:nth-child(even) { display: none; }
 }
 
