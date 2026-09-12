@@ -609,12 +609,29 @@ button, a, [role="button"], input, label { cursor: url("cursor-purple.png") 2 2,
 .os-window { background: linear-gradient(145deg,rgba(245,228,255,.7),rgba(184,135,218,.52) 43%,rgba(104,69,139,.64)) !important; backdrop-filter: blur(22px) saturate(1.5) !important; }
 .os-window-bar,.wallpaper-picker-bar { background: linear-gradient(180deg,rgba(255,255,255,.94),rgba(235,197,250,.9) 16%,rgba(174,111,211,.84) 47%,rgba(103,62,139,.88) 53%,rgba(190,132,216,.86)) !important; }
 
-.vine-hanging-top,.vine-hanging-bottom,.vine-new-top-right,.vine-new-bottom-left,.vine-new-lower-right { display: block !important; }
-.vine-hanging-top { top: -24px !important; left: 36% !important; width: min(24vw,360px) !important; opacity: .44 !important; }
-.vine-hanging-bottom { right: 22% !important; bottom: 42px !important; width: min(20vw,300px) !important; opacity: .32 !important; transform: rotate(180deg); }
-.vine-new-top-right { top: -12px; right: 10%; width: min(20vw,300px); opacity: .5 !important; transform: scaleX(-1); }
-.vine-new-bottom-left { bottom: 42px; left: -45px; width: min(32vw,470px); opacity: .42 !important; transform: rotate(180deg); }
-.vine-new-lower-right { right: -28px; bottom: 40px; width: min(18vw,270px); opacity: .38 !important; transform: rotate(180deg) scaleX(-1); }
+/* Keep the greenery as a quiet desktop frame. These extra pieces previously
+   crossed the wallpaper and competed with the icons and Being dock. */
+.vine-hanging-top,
+.vine-hanging-bottom,
+.vine-new-top-right,
+.vine-new-bottom-left,
+.vine-new-lower-right {
+    display: none !important;
+}
+
+.vine-top {
+    top: -24px !important;
+    left: -30px !important;
+    width: min(34vw, 560px) !important;
+    opacity: .78 !important;
+}
+
+.vine-right {
+    top: 88px !important;
+    right: -76px !important;
+    height: min(54vh, 580px) !important;
+    opacity: .68 !important;
+}
 
 .twinkle-field { position: fixed; inset: 0; z-index: 7; overflow: hidden; pointer-events: none; }
 .twinkle-field i { position: absolute; top: var(--y); left: var(--x); width: 13px; height: 13px; opacity: 0; transform: scale(var(--s)) rotate(45deg); animation: twinkleTravel 6.2s var(--d) ease-in-out infinite; }
@@ -622,7 +639,11 @@ button, a, [role="button"], input, label { cursor: url("cursor-purple.png") 2 2,
 .twinkle-field i::after { transform: rotate(90deg); }
 @keyframes twinkleTravel { 0% { opacity: 0; translate: -22px 16px; scale: .3; } 18% { opacity: 1; } 45% { opacity: .25; scale: 1.35; } 67% { opacity: 1; } 100% { opacity: 0; translate: 62px -48px; scale: .2; } }
 
-@media (max-width:700px) { .vine-new-bottom-left,.vine-new-lower-right,.vine-hanging-bottom { display:none !important; } .twinkle-field i:nth-child(even){display:none;} }
+@media (max-width:700px) {
+    .vine-top { width: min(68vw, 420px) !important; opacity: .62 !important; }
+    .vine-right { right: -86px !important; height: 42vh !important; opacity: .5 !important; }
+    .twinkle-field i:nth-child(even) { display: none; }
+}
 
 #beingDock,
 #beingHud {
