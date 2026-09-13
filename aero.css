@@ -622,15 +622,51 @@ button, a, [role="button"], input, label { cursor: url("cursor-purple.png") 2 2,
 .vine-top {
     top: 0 !important;
     left: 0 !important;
-    width: clamp(340px, 24vw, 460px) !important;
-    opacity: .86 !important;
+    width: auto !important;
+    height: calc(100vh - 48px) !important;
+    opacity: .85 !important;
 }
 
 .vine-right {
-    top: 110px !important;
-    right: -8px !important;
-    height: clamp(480px, 62vh, 650px) !important;
-    opacity: .82 !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: auto !important;
+    height: calc(100vh - 48px) !important;
+    opacity: .85 !important;
+    transform: scaleX(-1) !important;
+}
+
+.desktop-wordmark {
+    position: fixed;
+    top: 24px;
+    right: 30px;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 190px;
+    padding: 6px 12px 7px 7px;
+    border: 2px solid;
+    border-color: #fff #3d245b #3d245b #fff;
+    background: linear-gradient(90deg, #39206f 0%, #7543a7 54%, #ba83da 100%);
+    box-shadow: 1px 1px 0 #130c23, inset 1px 1px 0 rgba(255,255,255,.42), 0 4px 14px rgba(47,20,78,.4);
+    color: #fff;
+    font: 700 25px/1 'Pixelify Sans', sans-serif;
+    letter-spacing: .5px;
+    text-shadow: 1px 2px 0 #24123d;
+}
+
+.desktop-wordmark-icon {
+    display: grid;
+    width: 29px;
+    height: 29px;
+    place-items: center;
+    border: 1px solid;
+    border-color: #fff #24133d #24133d #fff;
+    background: linear-gradient(135deg, #9ff4e1 0 48%, #9c58d0 49% 100%);
+    color: #291044;
+    font-size: 20px;
+    text-shadow: 1px 1px #fff;
 }
 
 .twinkle-field { position: fixed; inset: 0; z-index: 7; overflow: hidden; pointer-events: none; }
@@ -640,8 +676,10 @@ button, a, [role="button"], input, label { cursor: url("cursor-purple.png") 2 2,
 @keyframes twinkleTravel { 0% { opacity: 0; translate: -22px 16px; scale: .3; } 18% { opacity: 1; } 45% { opacity: .25; scale: 1.35; } 67% { opacity: 1; } 100% { opacity: 0; translate: 62px -48px; scale: .2; } }
 
 @media (max-width:700px) {
-    .vine-top { width: min(72vw, 380px) !important; opacity: .72 !important; }
-    .vine-right { top: 84px !important; right: -12px !important; height: 48vh !important; opacity: .68 !important; }
+    .vine-top,
+    .vine-right { height: calc(100vh - 42px) !important; opacity: .7 !important; }
+    .desktop-wordmark { top: 14px; right: 14px; min-width: 0; font-size: 18px; }
+    .desktop-wordmark-icon { width: 23px; height: 23px; font-size: 16px; }
     .twinkle-field i:nth-child(even) { display: none; }
 }
 
@@ -791,11 +829,3 @@ button, a, [role="button"], input, label { cursor: url("cursor-purple.png") 2 2,
 
 .os-window-bar { height: 38px !important; border: 2px solid rgba(255,255,255,.86) !important; }
 .os-window-actions button { border-radius: 7px !important; background: linear-gradient(#fff,#e4c8f1 42%,#9a68b5 50%,#c69bd8) !important; box-shadow: inset 0 2px #fff,inset 0 -2px #664477,0 0 7px #dfffee66 !important; }
-
-.vine-top {
-top: 0 !important;
-left: 0 !important;
-width: auto !important;
-height: calc(100vh - 48px) !important;
-opacity: 0.85 !important;
-}
