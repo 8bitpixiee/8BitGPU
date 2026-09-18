@@ -932,3 +932,15 @@ button, a, [role="button"], input, label { cursor: pointer !important; }
     filter: none !important;
     box-shadow: inset 1px 1px #ffffffaa, 0 1px 2px #25133488 !important;
 }
+
+/* Window interactions keep the glass gradients without live blur. */
+.os-window, #osTaskbar {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+.os-window { transition: none !important; }
+.os-window.is-dragging { box-shadow: 2px 3px 8px #26123577 !important; }
+.os-window.is-dragging iframe { visibility: hidden; }
+.is-window-dragging .twinkle-field { visibility: hidden; }
+.is-window-dragging .avatar-character, .is-window-dragging #companion,
+.is-window-dragging .twinkle-field * { animation-play-state: paused !important; }

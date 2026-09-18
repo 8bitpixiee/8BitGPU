@@ -126,3 +126,46 @@ h1 { color: #694183; text-shadow: 1px 1px #fff,0 0 9px #cbb3df88; }
 .creator-panel { background: linear-gradient(145deg,rgba(250,237,255,.82),rgba(208,174,229,.66) 44%,rgba(137,99,166,.7)); backdrop-filter: blur(18px) saturate(1.4); }
 .preview-panel { background: radial-gradient(circle at 82% 15%,#fff 0 3px,#d7fff288 4px 12px,transparent 14px),linear-gradient(145deg,rgba(224,255,220,.78),rgba(151,224,203,.66) 40%,rgba(122,184,202,.62) 52%,rgba(147,116,184,.7)); }
 .step-panel { background: radial-gradient(circle at 88% 8%,#fff 0 2px,#d8fff288 3px 8px,transparent 10px),linear-gradient(145deg,rgba(255,254,248,.88),rgba(224,247,240,.82) 48%,rgba(239,221,248,.84)); }
+
+/* 2026 Avatar Lab refresh: one fast, crisp Windows/Aqua skin. */
+body { background:#76578f!important; }
+.lab-window { border:0!important; border-radius:0!important; background:#b79bc8!important; box-shadow:none!important; }
+.studio-toolbar { flex:0 0 38px; height:38px!important; border:0!important; border-bottom:1px solid #4d2c61!important; border-radius:0!important; background:linear-gradient(180deg,#fff 0 5%,#efcffb 8% 27%,#bb7ed3 45%,#71438f 52%,#a865bd 82%,#d2a6df)!important; box-shadow:inset 0 2px #ffffffd9,inset 0 -2px #48285c73!important; }
+.studio-toolbar::after { filter:none!important; opacity:.38; }
+.lab-content { grid-template-columns:minmax(250px,.78fr) minmax(410px,1.22fr); gap:7px!important; padding:7px!important; background:#725486!important; box-shadow:none!important; }
+.preview-panel,.creator-panel { border:1px solid #fff!important; border-radius:8px!important; box-shadow:0 0 0 1px #604374,inset 0 2px #ffffffd1!important; }
+.preview-panel { background:radial-gradient(circle at 82% 14%,#fff 0 3px,transparent 7px),linear-gradient(145deg,#d9f8ed,#9bdacb 44%,#87b7c8 55%,#9d82bc)!important; }
+.creator-panel { background:#d9cce1!important; -webkit-backdrop-filter:none!important; backdrop-filter:none!important; }
+.step-tabs { background:#af93c0!important; }
+.step-panel { background:linear-gradient(145deg,#fffdf7,#e8f4f1 54%,#eee3f3)!important; box-shadow:inset 1px 1px #bdaac7!important; }
+.step-tab,.choice-grid button,.round-button,.picker-category,.adjuster-buttons button,.option-row button,.asset-tile,.color-tile,.swatch { box-shadow:inset 0 1px #fff,0 1px 2px #4b355655!important; transition:none!important; }
+.step-tab:hover,.choice-grid button:hover,.round-button:hover,.picker-category:hover,.adjuster-buttons button:hover,.asset-tile:hover,.color-tile:hover { filter:brightness(1.06); }
+.choice-grid button:hover,.choice-grid button.selected,.picker-category.active,.round-button.primary,.asset-tile.selected,.color-tile.selected,.swatch.selected { box-shadow:inset 0 2px #ffffffbb,0 0 0 1px #67417d!important; }
+.avatar-preview { border:2px solid #fff!important; border-radius:13px!important; background:linear-gradient(145deg,#ddfff0,#a7ded1 46%,#8fb9ca 54%,#8c71ae)!important; box-shadow:inset 0 3px #ffffffa8,inset 0 -4px #52427069,3px 5px 9px #35224470!important; }
+.creator-actions { background:#d9cce1; }
+@media (max-width:730px) { .lab-content { display:block; padding:5px!important; } .creator-panel { margin-top:5px; } }
+
+/* Keep palette colors visible through every theme and selected state. */
+.swatch.nutmeg { --swatch-color: #a06542; }
+.swatch.peachy { --swatch-color: #eb8f62; }
+.swatch.creme { --swatch-color: #f9a97a; }
+.swatch.wood { --swatch-color: #d2794d; }
+.swatch.copper { --swatch-color: #fb9664; }
+.swatch.pedal { --swatch-color: #ffcba2; }
+.swatch.cocoa { --swatch-color: #b36d47; }
+.swatch.milky { --swatch-color: #ffa970; }
+.swatch, .swatch:hover, .swatch.selected {
+    background: var(--swatch-color, #d0d0d0) !important;
+}
+.swatch:focus-visible { outline: 3px solid #40225c; outline-offset: 3px; }
+#breedGrid button[data-breed="Highland"] { background: #d25920 !important; }
+#breedGrid button[data-breed="Holstein"] { background: linear-gradient(120deg,#faf1de 48%,#463023 49%) !important; }
+#breedGrid button[data-breed="Dexter"] { background: #70412c !important; }
+#breedGrid button { color: #fff; text-shadow: 0 1px 3px #000, 0 0 3px #000; }
+#breedGrid button.selected { outline: 3px solid #67417d; outline-offset: 2px; }
+#toneGrid[data-palette-species="Thixie"] .nutmeg { --swatch-color: #b36d47; }
+#toneGrid[data-palette-species="Thixie"] .creme { --swatch-color: #fcd4b7; }
+#toneGrid[data-palette-species="Thixie"] .peachy,
+#toneGrid[data-palette-species="Bovadill"] .milky { --swatch-color: #ffa970; }
+#toneGrid[data-palette-species="Bovadill"] .peachy { --swatch-color: #fcd3b6; }
+
