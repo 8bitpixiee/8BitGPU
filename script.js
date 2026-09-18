@@ -343,18 +343,21 @@ function addDrag(windowElement, handle) {
     let dragFrame = 0;
 
     handle.addEventListener("pointerdown", (event) => {
-        if (event.target.closest("button")) return;
+        if (event.button !== 0 || event.target.closest("button")) return;
         focusWindow(windowElement);
         startX = event.clientX;
         startY = event.clientY;
         initialLeft = windowElement.offsetLeft;
         initialTop = windowElement.offsetTop;
+        nextLeft = initialLeft;
+        nextTop = initialTop;
         minLeft = -windowElement.offsetWidth + 180;
         maxLeft = Math.max(0, window.innerWidth - 180);
         maxTop = Math.max(0, window.innerHeight - 100);
         deltaX = 0;
         deltaY = 0;
         windowElement.classList.add("is-dragging");
+        document.documentElement.classList.add("is-window-dragging");
         handle.setPointerCapture(event.pointerId);
     });
 
@@ -377,6 +380,7 @@ function addDrag(windowElement, handle) {
         windowElement.style.top = `${nextTop}px`;
         windowElement.style.transform = "";
         windowElement.classList.remove("is-dragging");
+        document.documentElement.classList.remove("is-window-dragging");
         dragFrame = 0;
     });
 }

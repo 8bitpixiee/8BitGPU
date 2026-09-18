@@ -4,6 +4,15 @@ const assetPath = "avatar/";
 // selecting a character that can never render.
 const PLAYABLE_SPECIES = ["Pixie", "Deerbra", "Bovadill", "Thixie"];
 const COMING_SOON_SPECIES = [];
+// Keep saved species/build values compatible while exposing each body directly.
+const beingChoices = [
+    { name: "Pixie", species: "Pixie", build: "Fae" },
+    { name: "Masc", species: "Pixie", build: "Masc" },
+    { name: "Chunky Masc", species: "Pixie", build: "Chunky Masc" },
+    { name: "Deerbra", species: "Deerbra", build: "Fae" },
+    { name: "Bovadill", species: "Bovadill", build: "Highland" },
+    { name: "Thixie", species: "Thixie", build: "Fae" }
+];
 
 const speciesData = {
     Pixie: {
@@ -179,7 +188,7 @@ function adjustActiveLayer(action) {
 function visibleOptions(category) {
     return options[category].filter((choice) => {
         const filename = choice.src.split("/").pop();
-        return choice.species.includes(settings.species) && (!choice.src || !unavailableAssets.has(filename));
+        return !choice.src || !unavailableAssets.has(filename);
     });
 }
 function selectedOption(category) {
@@ -252,12 +261,15 @@ function renderPreviewLabel() {
     document.getElementById("previewLabel").textContent = username ? username.toUpperCase() + "'S BEING" : "YOUR BEING";
 }
 function renderSpeciesChoices() {
-    const playable = PLAYABLE_SPECIES.map((name) => '<button type="button" class="' + (settings.species === name ? "selected" : "") + '" data-species="' + name + '">' + name + "</button>").join("");
+    const playable = beingChoices.map(({ name, species, build }) => {
+        const selected = settings.species === species && (species !== "Pixie" || settings.build === build);
+        return '<button type="button" class="' + (selected ? "selected" : "") + '" aria-pressed="' + selected + '" data-species="' + species + '" data-being-build="' + build + '">' + name + '</button>';
+    }).join("");
     const comingSoon = COMING_SOON_SPECIES.map((name) => '<button type="button" disabled aria-disabled="true" title="Character art coming soon">' + name + " — coming soon</button>").join("");
     document.getElementById("speciesGrid").innerHTML = playable + comingSoon;
     document.querySelectorAll("[data-species]").forEach((button) => button.addEventListener("click", () => {
         settings.species = button.dataset.species;
-        settings.build = speciesData[settings.species].builds[0];
+        settings.build = button.dataset.beingBuild;
         settings.skinTone = speciesData[settings.species].tones[0];
         ensureSelections(); renderAll();
         document.getElementById("saveStatus").textContent = settings.species + " selected!";
@@ -266,7 +278,7 @@ function renderSpeciesChoices() {
 function renderBuildChoices() {
     const builds = speciesData[settings.species].builds;
     const group = document.getElementById("buildGroup");
-    group.hidden = builds.length < 2 || settings.species === "Bovadill";
+    group.hidden = true; // Body choices now live together in the Being grid.
     document.getElementById("buildGrid").innerHTML = builds.map((name) => '<button type="button" class="' + (settings.build === name ? "selected" : "") + '" data-build="' + name + '">' + name + "</button>").join("");
     document.querySelectorAll("[data-build]").forEach((button) => button.addEventListener("click", () => {
         settings.build = button.dataset.build;
@@ -292,6 +304,7 @@ function renderBreedChoices() {
     }));
 }
 function renderToneChoices() {
+    document.getElementById("toneGrid").dataset.paletteSpecies = settings.species;
     document.getElementById("toneGrid").innerHTML = speciesData[settings.species].tones.map((tone) => '<button type="button" class="swatch ' + tone.toLowerCase() + (settings.skinTone === tone ? " selected" : "") + '" data-tone="' + tone + '"><span>' + tone + "</span></button>").join("");
     document.querySelectorAll("[data-tone]").forEach((button) => button.addEventListener("click", () => {
         settings.skinTone = button.dataset.tone;
@@ -368,7 +381,6 @@ document.getElementById("randomizeButton").addEventListener("click", () => {
     settings.build = randomChoice(speciesData[settings.species].builds);
     settings.skinTone = randomChoice(speciesData[settings.species].tones);
     Object.keys(selection).forEach((category) => selection[category] = randomChoice(visibleOptions(category)).id);
-    if (settings.build === "Masc" || settings.build === "Chunky Masc") selection.fit = "fit-none";
     renderAll(); document.getElementById("saveStatus").textContent = "New look generated!";
 });
 document.getElementById("saveButton").addEventListener("click", async () => {
@@ -399,3 +411,5 @@ document.getElementById("avatarPreview").addEventListener("keydown", (event) => 
 
 renderAll();
 setStep("species");
+
+
