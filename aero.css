@@ -10,14 +10,17 @@
     --aero-edge: rgba(255, 255, 255, .78);
     --aero-shadow: rgba(34, 12, 55, .62);
 }
-
-html, body {
-    background: #6a5296;
-    cursor: url("cursor-purple.png") 2 2, auto;
+html,
+body {
+    cursor: default;
 }
-
-button, a, [role="button"], input, label { cursor: url("cursor-purple.png") 2 2, pointer !important; }
-
+button,
+a,
+[role="button"],
+input
+label {
+    cursor: pointer;
+}
 .desktop {
     isolation: isolate;
 }
