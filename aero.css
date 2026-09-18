@@ -892,5 +892,43 @@ button, a, [role="button"], input, label { cursor: pointer !important; }
 #osStartMenu,
 #beingDock,
 #beingHud {
-    backdrop-filter: blur(8px) saturate(1.25) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+/* Start-menu hot path: it sits over a full-screen photo, so even a small live
+   blur forces Chrome to repaint a huge area on every hover. */
+#osStartMenu {
+    contain: layout paint !important;
+    transition: none !important;
+    will-change: auto !important;
+    box-shadow: inset 0 0 0 1px #5b2a77, inset 0 3px #ffffffc7,
+                4px 5px 12px #26123599 !important;
+}
+
+#osStartMenu .start-program-pane,
+#osStartMenu .start-system-pane,
+#osStartMenu .start-menu-header,
+#osStartMenu .start-menu-footer {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+#osStartMenu button,
+#osStartMenu .start-program,
+#osStartMenu .start-system-pane button {
+    transition: none !important;
+}
+
+#osStartMenu .start-program:hover,
+#osStartMenu .start-system-pane button:hover {
+    box-shadow: inset 0 1px #ffffffcc !important;
+}
+
+#osStartMenu .program-gem,
+#osStartMenu .system-glyph,
+#osStartMenu .start-user-icon,
+#osStartMenu .start-user-icon img {
+    filter: none !important;
+    box-shadow: inset 1px 1px #ffffffaa, 0 1px 2px #25133488 !important;
 }
