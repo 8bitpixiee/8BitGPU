@@ -60,10 +60,10 @@ button:active, a:active, [role="button"]:active {
 
 html, body {
     background: #6a5296;
-    cursor: url("cursor-purple.png") 2 2, auto;
+    cursor: default;
 }
 
-button, a, [role="button"], input, label { cursor: url("cursor-purple.png") 2 2, pointer !important; }
+button, a, [role="button"], input, label { cursor: pointer !important; }
 
 .desktop {
     isolation: isolate;
