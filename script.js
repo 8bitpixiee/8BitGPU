@@ -333,6 +333,14 @@ function addDrag(windowElement, handle) {
     let startY = 0;
     let initialLeft = 0;
     let initialTop = 0;
+    let minLeft = 0;
+    let maxLeft = 0;
+    let maxTop = 0;
+    let nextLeft = 0;
+    let nextTop = 0;
+    let deltaX = 0;
+    let deltaY = 0;
+    let dragFrame = 0;
 
     handle.addEventListener("pointerdown", (event) => {
         if (event.target.closest("button")) return;
@@ -341,15 +349,35 @@ function addDrag(windowElement, handle) {
         startY = event.clientY;
         initialLeft = windowElement.offsetLeft;
         initialTop = windowElement.offsetTop;
+        minLeft = -windowElement.offsetWidth + 180;
+        maxLeft = Math.max(0, window.innerWidth - 180);
+        maxTop = Math.max(0, window.innerHeight - 100);
+        deltaX = 0;
+        deltaY = 0;
+        windowElement.classList.add("is-dragging");
         handle.setPointerCapture(event.pointerId);
     });
 
     handle.addEventListener("pointermove", (event) => {
         if (!handle.hasPointerCapture(event.pointerId)) return;
-        const maxLeft = Math.max(0, window.innerWidth - 180);
-        const maxTop = Math.max(0, window.innerHeight - 100);
-        windowElement.style.left = `${Math.min(maxLeft, Math.max(-windowElement.offsetWidth + 180, initialLeft + event.clientX - startX))}px`;
-        windowElement.style.top = `${Math.min(maxTop, Math.max(0, initialTop + event.clientY - startY))}px`;
+        nextLeft = Math.min(maxLeft, Math.max(minLeft, initialLeft + event.clientX - startX));
+        nextTop = Math.min(maxTop, Math.max(0, initialTop + event.clientY - startY));
+        deltaX = nextLeft - initialLeft;
+        deltaY = nextTop - initialTop;
+        if (dragFrame) return;
+        dragFrame = requestAnimationFrame(() => {
+            windowElement.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0)`;
+            dragFrame = 0;
+        });
+    });
+
+    handle.addEventListener("lostpointercapture", () => {
+        if (dragFrame) cancelAnimationFrame(dragFrame);
+        windowElement.style.left = `${nextLeft}px`;
+        windowElement.style.top = `${nextTop}px`;
+        windowElement.style.transform = "";
+        windowElement.classList.remove("is-dragging");
+        dragFrame = 0;
     });
 }
 
@@ -514,6 +542,11 @@ function showWallpaper(index, immediate = false, persist = true) {
             if (immediate) requestAnimationFrame(() => { nextFrame.style.transition = ""; });
         });
         activeWallpaperFrame = nextFrameIndex;
+        window.setTimeout(() => {
+            wallpaperFrames.forEach((frame, frameIndex) => {
+                if (frameIndex !== activeWallpaperFrame) frame.style.backgroundImage = "";
+            });
+        }, immediate ? 50 : 1900);
         if (persist) {
             currentWallpaperIndex = index;
             localStorage.setItem("8bitgpu-wallpaper-index", String(index));
