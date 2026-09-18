@@ -1,5 +1,26 @@
+import { STORE_PRODUCTS } from "../store-catalog.js";
+
 const SESSION_LENGTH_SECONDS = 60 * 60 * 24 * 30;
 const encoder = new TextEncoder();
+const PAYPAL_SANDBOX_API = "https://api-m.sandbox.paypal.com";
+const PAYPAL_LIVE_API = "https://api-m.paypal.com";
+
+function storeCatalog(env) {
+  const price = (name) => {
+    const value = Number(env[name]);
+    return Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : null;
+  };
+  return STORE_PRODUCTS.filter((product) => product.enabled !== false).map((product) => ({ ...product, price: product.priceKey ? price(product.priceKey) : null }));
+}
+
+function paypalApi(env) { return env.PAYPAL_ENV === "live" ? PAYPAL_LIVE_API : PAYPAL_SANDBOX_API; }
+async function paypalToken(env) {
+  if (!env.PAYPAL_CLIENT_ID || !env.PAYPAL_CLIENT_SECRET) throw new Error("PayPal credentials are not configured.");
+  const response = await fetch(`${paypalApi(env)}/v1/oauth2/token`, { method: "POST", headers: { Authorization: `Basic ${btoa(`${env.PAYPAL_CLIENT_ID}:${env.PAYPAL_CLIENT_SECRET}`)}`, "content-type": "application/x-www-form-urlencoded" }, body: "grant_type=client_credentials" });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error_description || "PayPal authentication failed.");
+  return data.access_token;
+}
 
 const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), {
   status,
@@ -59,6 +80,7 @@ async function ensureSchema(database) {
   await database.exec("CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE COLLATE NOCASE, password_hash TEXT NOT NULL, password_salt TEXT NOT NULL, created_at INTEGER NOT NULL);");
   await database.exec("CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL, expires_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
   await database.exec("CREATE TABLE IF NOT EXISTS player_data (user_id TEXT PRIMARY KEY, avatar_json TEXT, updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
+  await database.exec("CREATE TABLE IF NOT EXISTS store_orders (paypal_order_id TEXT PRIMARY KEY, status TEXT NOT NULL, amount TEXT NOT NULL, cart_json TEXT NOT NULL, payer_email TEXT, capture_id TEXT, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL);");
 }
 
 async function sha256(value) {
@@ -99,6 +121,47 @@ async function handleApi(request, env, url) {
   }
   await ensureSchema(env.DB);
   const path = url.pathname;
+
+  if (path === "/api/store/catalog" && request.method === "GET") {
+    const products = storeCatalog(env);
+    return json({ products, checkout: { paypalReady: Boolean(env.PAYPAL_CLIENT_ID && env.PAYPAL_CLIENT_SECRET), clientId: env.PAYPAL_CLIENT_ID || null, environment: env.PAYPAL_ENV === "live" ? "live" : "sandbox" } });
+  }
+
+  if (path === "/api/store/orders" && request.method === "POST") {
+    const body = await readBody(request);
+    if (!Array.isArray(body?.items) || !body.items.length || body.items.length > 20) return json({ error: "Your shopping bag is empty or invalid." }, 400);
+    const catalog = new Map(storeCatalog(env).filter((item) => item.price !== null).map((item) => [item.id, item]));
+    const items = [];
+    let totalCents = 0;
+    for (const line of body.items) {
+      const product = catalog.get(line?.id);
+      const quantity = Number(line?.quantity);
+      if (!product || !Number.isInteger(quantity) || quantity < 1 || quantity > 10) return json({ error: "An item in your bag is unavailable." }, 400);
+      totalCents += Math.round(product.price * 100) * quantity;
+      items.push({ name: product.name, sku: product.id, quantity: String(quantity), unit_amount: { currency_code: "USD", value: product.price.toFixed(2) } });
+    }
+    const amount = (totalCents / 100).toFixed(2);
+    const token = await paypalToken(env);
+    const response = await fetch(`${paypalApi(env)}/v2/checkout/orders`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "content-type": "application/json", "paypal-request-id": crypto.randomUUID() }, body: JSON.stringify({ intent: "CAPTURE", purchase_units: [{ description: "8BitGPU Storefront", amount: { currency_code: "USD", value: amount, breakdown: { item_total: { currency_code: "USD", value: amount } } }, items }] }) });
+    const order = await response.json();
+    if (!response.ok) return json({ error: order.message || "PayPal could not create the order." }, 502);
+    await env.DB.prepare("INSERT INTO store_orders (paypal_order_id,status,amount,cart_json,created_at,updated_at) VALUES (?,?,?,?,?,?)").bind(order.id, order.status, amount, JSON.stringify(body.items), Date.now(), Date.now()).run();
+    return json({ id: order.id });
+  }
+
+  const captureMatch = path.match(/^\/api\/store\/orders\/([A-Z0-9-]+)\/capture$/i);
+  if (captureMatch && request.method === "POST") {
+    const orderId = captureMatch[1];
+    const localOrder = await env.DB.prepare("SELECT * FROM store_orders WHERE paypal_order_id = ?").bind(orderId).first();
+    if (!localOrder) return json({ error: "That order was not created by this store." }, 404);
+    const token = await paypalToken(env);
+    const response = await fetch(`${paypalApi(env)}/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "content-type": "application/json", "paypal-request-id": crypto.randomUUID() }, body: "{}" });
+    const order = await response.json();
+    const capture = order.purchase_units?.[0]?.payments?.captures?.[0];
+    if (!response.ok || order.status !== "COMPLETED" || capture?.status !== "COMPLETED") return json({ error: order.message || "The payment was not completed." }, 502);
+    await env.DB.prepare("UPDATE store_orders SET status=?,payer_email=?,capture_id=?,updated_at=? WHERE paypal_order_id=?").bind(order.status, order.payer?.email_address || null, capture.id, Date.now(), orderId).run();
+    return json({ ok: true, orderId, captureId: capture.id });
+  }
 
   if (path === "/api/auth/me" && request.method === "GET") {
     const user = await currentUser(request, env.DB);
