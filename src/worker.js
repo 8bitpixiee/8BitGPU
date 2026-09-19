@@ -92,6 +92,7 @@ async function ensureSchema(database) {
   await database.exec("CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL, expires_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
   await database.exec("CREATE TABLE IF NOT EXISTS player_data (user_id TEXT PRIMARY KEY, avatar_json TEXT, updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
   await database.exec("CREATE TABLE IF NOT EXISTS player_profiles (user_id TEXT PRIMARY KEY, mood TEXT NOT NULL DEFAULT '', about_text TEXT NOT NULL DEFAULT '', favorites_text TEXT NOT NULL DEFAULT '', theme TEXT NOT NULL DEFAULT 'violet', updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
+  await database.exec("CREATE TABLE IF NOT EXISTS player_profile_styles (user_id TEXT PRIMARY KEY, background_color TEXT, paper_color TEXT, panel_color TEXT, edge_color TEXT, accent_color TEXT, ink_color TEXT, wallpaper_url TEXT NOT NULL DEFAULT '', updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
   await database.exec("CREATE TABLE IF NOT EXISTS store_orders (paypal_order_id TEXT PRIMARY KEY, status TEXT NOT NULL, amount TEXT NOT NULL, cart_json TEXT NOT NULL, payer_email TEXT, capture_id TEXT, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL);");
 }
 
@@ -128,11 +129,35 @@ function publicUser(user) {
 }
 
 const profileThemes = new Set(["violet", "pink", "aqua", "midnight"]);
+const defaultProfileStyles = {
+  violet: { background: "#b99ad2", paper: "#fffdf8", panel: "#f0e7f4", edge: "#724a91", accent: "#b95fd4", ink: "#321c48", wallpaperUrl: "" },
+  pink: { background: "#ff8fc4", paper: "#fff9fc", panel: "#ffe3f2", edge: "#de559e", accent: "#ef7db9", ink: "#5a174c", wallpaperUrl: "" },
+  aqua: { background: "#6ec5de", paper: "#f6fdff", panel: "#d9f4fb", edge: "#397ea8", accent: "#48afd0", ink: "#153c58", wallpaperUrl: "" },
+  midnight: { background: "#160f2b", paper: "#2b1b45", panel: "#39285a", edge: "#b075d9", accent: "#d471f2", ink: "#f7e9ff", wallpaperUrl: "" }
+};
+const colorFields = ["background", "paper", "panel", "edge", "accent", "ink"];
 function profileText(value, maxLength) {
   if (typeof value !== "string" || value.length > maxLength || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value)) return null;
   return value.trim();
 }
+function profileStyle(value, theme) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const style = {};
+  for (const field of colorFields) {
+    const color = value[field];
+    if (typeof color !== "string" || !/^#[0-9a-fA-F]{6}$/.test(color)) return null;
+    style[field] = color.toLowerCase();
+  }
+  const wallpaperUrl = typeof value.wallpaperUrl === "string" ? value.wallpaperUrl.trim() : "";
+  if (wallpaperUrl.length > 2048) return null;
+  if (wallpaperUrl) {
+    try { if (new URL(wallpaperUrl).protocol !== "https:") return null; }
+    catch { return null; }
+  }
+  return { ...defaultProfileStyles[theme], ...style, wallpaperUrl };
+}
 function publicProfile(row) {
+  const theme = profileThemes.has(row.theme) ? row.theme : "violet";
   return {
     username: row.username,
     joinedAt: row.createdAt,
@@ -140,7 +165,17 @@ function publicProfile(row) {
     mood: row.mood || "",
     about: row.about || "",
     favorites: row.favorites || "",
-    theme: profileThemes.has(row.theme) ? row.theme : "violet",
+    theme,
+    style: {
+      ...defaultProfileStyles[theme],
+      background: row.backgroundColor || defaultProfileStyles[theme].background,
+      paper: row.paperColor || defaultProfileStyles[theme].paper,
+      panel: row.panelColor || defaultProfileStyles[theme].panel,
+      edge: row.edgeColor || defaultProfileStyles[theme].edge,
+      accent: row.accentColor || defaultProfileStyles[theme].accent,
+      ink: row.inkColor || defaultProfileStyles[theme].ink,
+      wallpaperUrl: row.wallpaperUrl || ""
+    },
     updatedAt: row.updatedAt || null
   };
 }
@@ -153,9 +188,17 @@ async function findProfileBy(database, field, value) {
       player_profiles.favorites_text AS favorites,
       player_profiles.theme,
       player_profiles.updated_at AS updatedAt
+      , player_profile_styles.background_color AS backgroundColor
+      , player_profile_styles.paper_color AS paperColor
+      , player_profile_styles.panel_color AS panelColor
+      , player_profile_styles.edge_color AS edgeColor
+      , player_profile_styles.accent_color AS accentColor
+      , player_profile_styles.ink_color AS inkColor
+      , player_profile_styles.wallpaper_url AS wallpaperUrl
     FROM users
     LEFT JOIN player_data ON player_data.user_id = users.id
     LEFT JOIN player_profiles ON player_profiles.user_id = users.id
+    LEFT JOIN player_profile_styles ON player_profile_styles.user_id = users.id
     WHERE users.${field} = ?
   `).bind(value).first();
 }
@@ -297,9 +340,11 @@ async function handleApi(request, env, url) {
     const about = profileText(body?.about, 1000);
     const favorites = profileText(body?.favorites, 240);
     const theme = typeof body?.theme === "string" && profileThemes.has(body.theme) ? body.theme : null;
+    const style = body?.style === undefined && theme ? defaultProfileStyles[theme] : profileStyle(body?.style, theme);
     if (mood === null || about === null || favorites === null || !theme) {
       return json({ error: "Use up to 80 characters for mood, 1,000 for About Me, and 240 for favorites." }, 400);
     }
+    if (!style) return json({ error: "Those page colors or wall image link are not valid." }, 400);
     await env.DB.prepare(`
       INSERT INTO player_profiles (user_id, mood, about_text, favorites_text, theme, updated_at)
       VALUES (?, ?, ?, ?, ?, ?)
@@ -310,6 +355,19 @@ async function handleApi(request, env, url) {
         theme = excluded.theme,
         updated_at = excluded.updated_at
     `).bind(user.id, mood, about, favorites, theme, Date.now()).run();
+    await env.DB.prepare(`
+      INSERT INTO player_profile_styles (user_id, background_color, paper_color, panel_color, edge_color, accent_color, ink_color, wallpaper_url, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(user_id) DO UPDATE SET
+        background_color = excluded.background_color,
+        paper_color = excluded.paper_color,
+        panel_color = excluded.panel_color,
+        edge_color = excluded.edge_color,
+        accent_color = excluded.accent_color,
+        ink_color = excluded.ink_color,
+        wallpaper_url = excluded.wallpaper_url,
+        updated_at = excluded.updated_at
+    `).bind(user.id, style.background, style.paper, style.panel, style.edge, style.accent, style.ink, style.wallpaperUrl, Date.now()).run();
     return json({ profile: publicProfile(await findProfileBy(env.DB, "id", user.id)) });
   }
 

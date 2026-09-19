@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>8Bit Web</title>
+    <title>MyPixel</title>
     <link rel="stylesheet" href="profile.css">
 </head>
 <body data-theme="violet">
@@ -15,15 +15,15 @@
             <div class="address-bar"><span>✦</span><output id="profileAddress">8bitgpu.net</output></div>
             <a class="browser-link" href="index.html">Desktop</a>
         </header>
-        <nav class="web-nav" aria-label="8Bit Web navigation">
-            <strong>8BIT WEB</strong>
+        <nav class="web-nav" aria-label="MyPixel navigation">
+            <strong>MyPixel</strong>
             <a href="#profile">Profile</a>
             <a href="#collection">Collection</a>
             <a href="#connections">Connections</a>
             <button id="openLounge" type="button">Arcade Lounge</button>
         </nav>
 
-        <p id="pageStatus" role="status">Connecting to 8Bit Web...</p>
+        <p id="pageStatus" role="status">Connecting to MyPixel...</p>
 
         <section id="profile" class="profile-page" hidden>
             <header class="profile-title">
@@ -77,7 +77,7 @@
         </section>
 
         <section id="editor" class="editor-window" hidden>
-            <header><strong>EDIT MY 8BIT WEB PAGE</strong><button id="closeEditor" type="button" aria-label="Close editor">×</button></header>
+            <header><strong>EDIT MY MYPIXEL PAGE</strong><button id="closeEditor" type="button" aria-label="Close editor">×</button></header>
             <form id="profileForm">
                 <label for="moodInput">Current mood <small>80 characters</small></label>
                 <input id="moodInput" maxlength="80" placeholder="feeling sparkly">
@@ -85,13 +85,23 @@
                 <textarea id="aboutInput" maxlength="1000" rows="5" placeholder="Tell the world about your Being..."></textarea>
                 <label for="favoritesInput">Favorite things <small>240 characters</small></label>
                 <input id="favoritesInput" maxlength="240" placeholder="games, colors, snacks, songs...">
-                <fieldset>
-                    <legend>Page theme</legend>
-                    <label><input type="radio" name="theme" value="violet"> Violet Web</label>
-                    <label><input type="radio" name="theme" value="pink"> Bubblegum</label>
-                    <label><input type="radio" name="theme" value="aqua"> Aqua Circuit</label>
-                    <label><input type="radio" name="theme" value="midnight"> Midnight Club</label>
+                <fieldset class="color-mixer">
+                    <legend>Page colors</legend>
+                    <p>Drag the sliders. Your page preview changes right away.</p>
+                    <label for="backgroundHue">Wall color <output id="backgroundHueValue"></output></label>
+                    <input id="backgroundHue" class="hue-slider" type="range" min="0" max="360" value="275">
+                    <label for="paperHue">Page color <output id="paperHueValue"></output></label>
+                    <input id="paperHue" class="hue-slider" type="range" min="0" max="360" value="292">
+                    <label for="accentHue">Accent color <output id="accentHueValue"></output></label>
+                    <input id="accentHue" class="hue-slider" type="range" min="0" max="360" value="310">
+                    <label for="brightnessSlider">Light ↔ dark <output id="brightnessValue"></output></label>
+                    <input id="brightnessSlider" type="range" min="20" max="96" value="80">
                 </fieldset>
+                <div class="desktop-wall-control">
+                    <label for="wallpaperInput">Wall image <small>desktop only</small></label>
+                    <input id="wallpaperInput" type="url" maxlength="2048" placeholder="Paste a direct https:// image link">
+                    <p>Paste an image link to hang it behind your profile.</p>
+                </div>
                 <button id="saveProfile" type="submit">Save My Page</button>
             </form>
         </section>

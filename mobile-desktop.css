@@ -1,0 +1,58 @@
+/* Phone and tablet windows keep the desktop chrome while allowing each app to scroll. */
+@media (max-width: 700px) {
+    html, body { width: 100%; height: 100%; overflow: hidden; overscroll-behavior: none; }
+    .desktop { width: 100%; min-height: 100dvh; }
+    #mobilePocketHome {
+        top: 62px;
+        right: 12px;
+        bottom: 66px;
+        left: 12px;
+        display: block;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        padding: 15px;
+    }
+    #mobilePocketHome h2 { font-size: clamp(27px, 8vw, 39px); }
+    #mobilePocketHome > p:not(.pocket-kicker) { max-width: none; margin-bottom: 12px; }
+    .pocket-launch-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .pocket-launch-grid button { min-height: 64px; }
+    #beingDock, #beingHud { display: none !important; }
+    .os-window.is-pocket-window {
+        position: fixed !important;
+        box-sizing: border-box !important;
+        inset: 0 0 58px 0 !important;
+        width: auto !important;
+        height: auto !important;
+        max-width: none !important;
+        max-height: none !important;
+        overflow: hidden !important;
+        transform: none !important;
+    }
+    .os-window.is-pocket-window .os-window-bar { flex: 0 0 38px; touch-action: manipulation; }
+    .os-window.is-pocket-window iframe,
+    .os-window.is-pocket-window > div:not(.os-window-bar) {
+        min-width: 0;
+        min-height: 0;
+        height: 100%;
+        overflow: auto !important;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x pan-y;
+    }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    .container, .hero, .nav-buttons, #beingDock, #beingHud, #osTaskbar { display: none !important; }
+    #mobilePocketHome { display: block; overflow-y: auto; }
+    #mobilePocketHome { top: 10px; right: 18%; bottom: 54px; left: 18%; }
+    .pocket-launch-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .pocket-launch-grid button { min-height: 52px; }
+    #mobileDock { display: grid; height: 52px; }
+    #osWindowLayer { z-index: 20002; }
+    .os-window.is-pocket-window { position: fixed !important; box-sizing: border-box !important; inset: 0 0 50px 0 !important; width: auto !important; height: auto !important; max-width: none !important; max-height: none !important; overflow: hidden !important; transform: none !important; }
+    .os-window.is-pocket-window .os-window-bar { flex: 0 0 34px; touch-action: manipulation; }
+    .os-window.is-pocket-window iframe, .os-window.is-pocket-window > div:not(.os-window-bar) { min-width: 0; min-height: 0; height: 100%; overflow: auto !important; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; }
+}

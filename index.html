@@ -6,6 +6,7 @@
     <title>8BitGPU</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="aero.css">
+    <link rel="stylesheet" href="mobile-desktop.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -185,7 +186,7 @@
             </div>
             <aside class="start-system-pane" aria-label="Places and settings">
                 <button type="button" onclick="openApp('account')"><span class="system-glyph">⚙</span>Account</button>
-                <button type="button" onclick="openApp('profile')"><span class="system-glyph">✦</span><strong>My 8Bit Web</strong></button>
+                <button type="button" onclick="openApp('profile')"><span class="system-glyph">✦</span><strong>MyPixel</strong></button>
                 <button type="button" data-open-wallpapers><span class="system-glyph">▣</span>Pictures</button>
                 <button type="button" onclick="openApp('inventory')"><span class="system-glyph">◆</span>Inventory</button>
                 <span class="start-system-divider"></span>
@@ -246,15 +247,17 @@
 
     <div id="osWindowLayer" aria-live="polite"></div>
 
-    <section id="mobilePocketHome" aria-label="8BitGPU Pocket home">
-        <p class="pocket-kicker">8BITGPU POCKET</p>
-        <h2>YOUR LITTLE<br>PIXIE OS</h2>
-        <p>Tap a program to enter the world.</p>
+    <section id="mobilePocketHome" aria-label="8BitGPU mobile desktop">
+        <p class="pocket-kicker">8BITGPU MOBILE DESKTOP</p>
+        <h2>YOUR PIXIE<br>DESKTOP</h2>
+        <p>Open every desktop program from here. Turn your phone sideways for a wider window.</p>
         <div class="pocket-launch-grid">
             <button type="button" onclick="openApp('avatarLab')"><span>✦</span> Avatar Lab</button>
-            <button type="button" onclick="openApp('arcade')"><span>✦</span> Arcade 01</button>
+            <button type="button" onclick="openApp('arcade')"><span>✦</span> Arcade Lounge</button>
+            <button type="button" onclick="openApp('profile')"><span>✦</span> MyPixel</button>
             <button type="button" onclick="openApp('twitch')"><span>✦</span> Watch Live</button>
             <button type="button" onclick="openApp('inventory')"><span>✦</span> Inventory</button>
+            <button type="button" onclick="openApp('storefront')"><span>✦</span> Storefront</button>
         </div>
     </section>
 
@@ -263,7 +266,7 @@
         <button type="button" onclick="openApp('avatarLab')"><span>✦</span>Lab</button>
         <button type="button" onclick="openApp('arcade')"><span>◉</span>Arcade</button>
         <button type="button" onclick="openApp('twitch')"><span>▣</span>Live</button>
-        <button type="button" onclick="openApp('inventory')"><span>▤</span>Bag</button>
+        <button type="button" onclick="openApp('profile')"><span>✦</span>MyPixel</button>
     </nav>
 
     <nav id="osTaskbar" aria-label="8BitGPU taskbar">
