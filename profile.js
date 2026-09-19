@@ -2,6 +2,7 @@ const byId = (id) => document.getElementById(id);
 const layers = ["extra", "body", "ears", "head", "eyes", "hair", "fit"];
 let profile = null;
 let isOwnProfile = false;
+let uploadBusy = false;
 
 function setStatus(message) { byId("pageStatus").textContent = message; }
 function setLayer(name, source) {
@@ -56,19 +57,74 @@ function hslToHex(hue, saturation, lightness) {
     const match = l - chroma / 2;
     return `#${rgb.map((channel) => Math.round((channel + match) * 255).toString(16).padStart(2, "0")).join("")}`;
 }
-function paletteFromSliders() {
-    const backgroundHue = Number(byId("backgroundHue").value);
-    const paperHue = Number(byId("paperHue").value);
-    const accentHue = Number(byId("accentHue").value);
-    const brightness = Number(byId("brightnessSlider").value);
-    return {
-        background: hslToHex(backgroundHue, 42, clamp(brightness - 28, 16, 68)),
-        paper: hslToHex(paperHue, 60, brightness),
-        panel: hslToHex(paperHue, 54, clamp(brightness - 10, 16, 90)),
-        edge: hslToHex(accentHue, 43, clamp(brightness - 42, 14, 58)),
-        accent: hslToHex(accentHue, 68, clamp(brightness - 22, 20, 70)),
-        ink: hslToHex(paperHue, 34, clamp(brightness - 72, 8, 34))
-    };
+const colorNames = {background:'Wall',paper:'Page',panel:'Panels',edge:'Window titles',accent:'Accents',ink:'Text'};
+const colorDefaults = {background:'#b99ad2',paper:'#fffdf8',panel:'#f0e7f4',edge:'#724a91',accent:'#b95fd4',ink:'#321c48'};
+let draftColors = {};
+function paletteFromSliders() { return {...draftColors}; }
+function buildColorControls() {
+    byId('colorControls').replaceChildren();
+    for (const [key,label] of Object.entries(colorNames)) {
+        const group = document.createElement('fieldset');
+        group.className = 'color-part';
+        group.innerHTML = '<legend>'+label+'</legend><div class="color-heading"><input type="color" id="'+key+'Color" aria-label="'+label+' full spectrum color"><output id="'+key+'Hex"></output></div>' + [['Hue',360],['Saturation',100],['Lightness',100]].map(([part,max])=>'<label for="'+key+part+'">'+part+'<output id="'+key+part+'Value"></output></label><input id="'+key+part+'" type="range" min="0" max="'+max+'" class="'+part.toLowerCase()+'-slider">').join('');
+        byId('colorControls').append(group);
+        byId(key+'Color').addEventListener('input', event=>{draftColors[key]=event.target.value;syncColorControls(key);previewPalette();});
+        for (const part of ['Hue','Saturation','Lightness']) byId(key+part).addEventListener('input',()=>{
+            draftColors[key]=hslToHex(Number(byId(key+'Hue').value)%360,Number(byId(key+'Saturation').value),Number(byId(key+'Lightness').value));
+            byId(key+'Color').value=draftColors[key];byId(key+'Hex').textContent=draftColors[key];updateColorLabels(key);previewPalette();
+        });
+    }
+}
+function updateColorLabels(key) {
+    for(const part of ['Hue','Saturation','Lightness']) byId(key+part+'Value').textContent=byId(key+part).value+(part==='Hue'?'°':'%');
+    const hue=byId(key+'Hue').value,saturation=byId(key+'Saturation').value;
+    byId(key+'Saturation').style.background=`linear-gradient(90deg,#888,hsl(${hue} 100% 50%))`;
+    byId(key+'Lightness').style.background=`linear-gradient(90deg,#000,hsl(${hue} ${saturation}% 50%),#fff)`;
+}
+function syncColorControls(key) {
+    const value=draftColors[key], hsl=hexToHsl(value);
+    byId(key+'Color').value=value;byId(key+'Hex').textContent=value;
+    byId(key+'Hue').value=hsl.h;byId(key+'Saturation').value=hsl.s;byId(key+'Lightness').value=hsl.l;
+    updateColorLabels(key);
+}
+function renderImages() {
+    for(const slot of [1,2,3]) { const source=profile.images?.[slot];byId('photo'+slot).hidden=!source;byId('photoEmpty'+slot).hidden=Boolean(source);if(source)byId('photo'+slot).src=source;else byId('photo'+slot).removeAttribute('src'); }
+}
+async function prepareImage(file) {
+    if(!['image/png','image/jpeg','image/webp'].includes(file.type)) throw Error('Choose a PNG, JPEG, or WebP file.');
+    if(file.size>15*1024*1024) throw Error('Choose an image smaller than 15 MB.');
+    const bitmap=await createImageBitmap(file);
+    try {
+        const scale=Math.min(1,1400/Math.max(bitmap.width,bitmap.height));
+        const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
+        canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);
+        for(const quality of [.86,.7,.5,.3]) { const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',quality));if(blob&&blob.size<=512*1024)return blob; }
+        throw Error('This image is too detailed. Try a smaller image.');
+    } finally { bitmap.close(); }
+}
+function buildImageControls() {
+    for(const [slot,label] of [['wall','Page wallpaper'],['1','Picture 1'],['2','Picture 2'],['3','Picture 3']]) {
+        const row=document.createElement('div');row.className='image-control';
+        row.innerHTML='<label for="image'+slot+'">'+label+'</label><input id="image'+slot+'" type="file" accept="image/png,image/jpeg,image/webp"><button type="button" id="removeImage'+slot+'">Remove '+label.toLowerCase()+'</button>';
+        byId('imageControls').append(row);
+        const input=byId('image'+slot),remove=byId('removeImage'+slot);
+        async function change(file) {
+            if(uploadBusy)return;
+            uploadBusy=true;
+            document.querySelectorAll('#imageControls input,#imageControls button').forEach(control=>control.disabled=true);
+            byId('closeEditor').disabled=true;byId('saveProfile').disabled=true;
+            byId('uploadStatus').textContent=file?'Uploading '+label+'…':'Removing '+label+'…';
+            try {
+                const blob=file?await prepareImage(file):null;
+                const result=await getJson('/api/profile/images/'+slot,{method:file?'PUT':'DELETE',...(blob?{body:blob,headers:{'content-type':blob.type}}:{})});
+                profile.images ||= {};if(file)profile.images[slot]=result.url;else delete profile.images[slot];
+                if(slot==='wall') profile.style.wallpaperUrl='';
+                renderImages();previewPalette();byId('uploadStatus').textContent=label+(file?' uploaded and saved.':' removed.');
+            } catch(error) {byId('uploadStatus').textContent=error.message;}
+            finally {uploadBusy=false;document.querySelectorAll('#imageControls input,#imageControls button').forEach(control=>control.disabled=false);byId('closeEditor').disabled=false;byId('saveProfile').disabled=false;input.value='';}
+        }
+        input.addEventListener('change',()=>{if(input.files[0])change(input.files[0]);});remove.addEventListener('click',()=>change(null));
+    }
 }
 function applyStyle(style) {
     const colors = style || {};
@@ -80,15 +136,11 @@ function applyStyle(style) {
     document.body.style.setProperty("--accent", colors.accent || defaults.accent);
     document.body.style.setProperty("--ink", colors.ink || defaults.ink);
     const page = byId("profile");
-    const url = colors.wallpaperUrl || "";
+    const url = profile?.images?.wall || colors.wallpaperUrl || "";
     page.classList.toggle("has-wallpaper", Boolean(url));
     page.style.setProperty("--wallpaper-image", url ? `url(\"${url.replace(/[\\\"]/g, "\\\\$&")}\")` : "none");
 }
-function setSliderLabels() {
-    [["backgroundHue", "backgroundHueValue"], ["paperHue", "paperHueValue"], ["accentHue", "accentHueValue"]].forEach(([input, output]) => { byId(output).textContent = `${byId(input).value}°`; });
-    byId("brightnessValue").textContent = byId("brightnessSlider").value < 50 ? "dark" : "light";
-}
-function previewPalette() { setSliderLabels(); applyStyle({ ...paletteFromSliders(), wallpaperUrl: byId("wallpaperInput").value.trim() }); }
+function previewPalette() { applyStyle({...draftColors,wallpaperUrl:profile.style?.wallpaperUrl||''}); }
 function render(nextProfile) {
     profile = nextProfile;
     setTheme(profile.theme);
@@ -101,7 +153,10 @@ function render(nextProfile) {
     byId("moodText").textContent = profile.mood || "Currently decorating this page.";
     byId("aboutText").textContent = profile.about || "This page is still being decorated.";
     byId("favoritesText").textContent = profile.favorites || "Add some favorite things to make this page yours.";
+    byId('streamFavorites').textContent = profile.favorites || 'A few of my favorite things…';
+    byId('streamMood').textContent = profile.mood || 'Currently decorating my corner of the internet.';
     renderAvatar(profile.avatar);
+    renderImages();
     byId("profile").hidden = false;
     byId("editButton").hidden = !isOwnProfile;
 }
@@ -126,19 +181,13 @@ function openEditor() {
     byId("moodInput").value = profile.mood;
     byId("aboutInput").value = profile.about;
     byId("favoritesInput").value = profile.favorites;
-    const background = hexToHsl(profile.style?.background);
-    const paper = hexToHsl(profile.style?.paper);
-    const accent = hexToHsl(profile.style?.accent);
-    byId("backgroundHue").value = background.h;
-    byId("paperHue").value = paper.h;
-    byId("accentHue").value = accent.h;
-    byId("brightnessSlider").value = clamp(paper.l, 20, 96);
-    byId("wallpaperInput").value = profile.style?.wallpaperUrl || "";
-    previewPalette();
+    draftColors={...colorDefaults,...Object.fromEntries(Object.keys(colorNames).map(key=>[key,profile.style?.[key]||colorDefaults[key]]))};
+    Object.keys(colorNames).forEach(syncColorControls);
+    byId('uploadStatus').textContent='';
     byId("editor").hidden = false;
     byId("moodInput").focus();
 }
-function closeEditor() { byId("editor").hidden = true; }
+function closeEditor() { byId("editor").hidden = true; applyStyle(profile.style);byId("editButton").focus(); }
 function openLounge() { window.parent?.postMessage({ type: "8bitgpu-open-app", app: "arcade" }, location.origin); }
 
 byId("editButton").addEventListener("click", openEditor);
@@ -147,13 +196,14 @@ byId("visitLounge").addEventListener("click", openLounge);
 byId("openLounge").addEventListener("click", openLounge);
 byId("backButton").addEventListener("click", () => history.back());
 byId("forwardButton").addEventListener("click", () => history.forward());
-["backgroundHue", "paperHue", "accentHue", "brightnessSlider", "wallpaperInput"].forEach((id) => byId(id).addEventListener("input", previewPalette));
+buildColorControls();
+buildImageControls();
 byId("profileForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const button = byId("saveProfile");
     button.disabled = true;
     try {
-        const data = await getJson("/api/profile/me", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ mood: byId("moodInput").value, about: byId("aboutInput").value, favorites: byId("favoritesInput").value, theme: "violet", style: { ...paletteFromSliders(), wallpaperUrl: byId("wallpaperInput").value.trim() } }) });
+        const data = await getJson("/api/profile/me", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ mood: byId("moodInput").value, about: byId("aboutInput").value, favorites: byId("favoritesInput").value, theme: "violet", style: { ...paletteFromSliders(), wallpaperUrl: profile.style?.wallpaperUrl || "" } }) });
         render(data.profile);
         closeEditor();
         setStatus("Your MyPixel page is saved.");

@@ -61,3 +61,10 @@ Existing local foundation: storefront UI, cart, server checkout code, and setup 
 - [x] Support portrait scrolling and side-by-side landscape Lounge layout.
 - [x] Add synchronized Dance, Smoke, LOL, Spin, and Wave emotes.
 - [ ] Replace temporary CSS emotes with custom body-type sprite sheets.
+
+## MyPixel customization — 2026-09-19
+- [x] Independent hue, saturation, lightness, and full-spectrum picker for all six page colors.
+- [x] Account-persisted uploads for three picture windows and page wallpaper.
+- [x] Original stream frame artwork integrated with MyPixel titles.
+- [x] Image ownership, upload limits, public persistence, removal, and responsive browser tests.
+- [ ] Deploy and verify this update on the live website.

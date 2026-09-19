@@ -36,7 +36,7 @@
             </header>
 
             <div class="profile-grid">
-                <aside class="identity-card">
+                <aside class="identity-card"><h2 class="identity-title">My Being</h2>
                     <div id="beingPortrait" class="being-portrait" aria-label="Player Being">
                         <img id="extraLayer" class="avatar-layer" alt="">
                         <img id="bodyLayer" class="avatar-layer" alt="">
@@ -53,12 +53,15 @@
                 </aside>
 
                 <section class="profile-content">
-                    <article class="web-panel about-panel">
-                        <h2>About Me</h2>
+                    <article class="web-panel about-panel stream-chat">
+                        <h2>About Me — MyPixel</h2>
                         <p id="aboutText">This page is still being decorated.</p>
+                        <div class="stream-note" id="streamFavorites"></div>
+                        <h3 class="stream-mood-title">Current Mood</h3>
+                        <div class="stream-mood" id="streamMood"></div>
                     </article>
                     <article class="web-panel favorites-panel">
-                        <h2>Favorite Things</h2>
+                        <h2>Favorites — Notepad</h2>
                         <p id="favoritesText">Add some favorite things to make this page yours.</p>
                     </article>
                     <article id="collection" class="web-panel collection-panel">
@@ -74,10 +77,15 @@
                     </article>
                 </section>
             </div>
+            <section class="photo-gallery" aria-label="My picture windows">
+                <figure class="photo-window"><figcaption>MyPixel • Picture 1</figcaption><div class="photo-content"><img id="photo1" alt="Profile picture 1" hidden><p id="photoEmpty1">Your little picture window<br><span>Add a favorite moment, artwork, or mood.</span></p></div></figure>
+<figure class="photo-window"><figcaption>MyPixel • Picture 2</figcaption><div class="photo-content"><img id="photo2" alt="Profile picture 2" hidden><p id="photoEmpty2">Your little picture window<br><span>Add a favorite moment, artwork, or mood.</span></p></div></figure>
+<figure class="photo-window"><figcaption>MyPixel • Picture 3</figcaption><div class="photo-content"><img id="photo3" alt="Profile picture 3" hidden><p id="photoEmpty3">Your little picture window<br><span>Add a favorite moment, artwork, or mood.</span></p></div></figure>
+            </section>
         </section>
 
         <section id="editor" class="editor-window" hidden>
-            <header><strong>EDIT MY MYPIXEL PAGE</strong><button id="closeEditor" type="button" aria-label="Close editor">×</button></header>
+            <header><strong>MYPIXEL • MAKE IT YOURS</strong><button id="closeEditor" type="button" aria-label="Close editor">×</button></header>
             <form id="profileForm">
                 <label for="moodInput">Current mood <small>80 characters</small></label>
                 <input id="moodInput" maxlength="80" placeholder="feeling sparkly">
@@ -85,23 +93,8 @@
                 <textarea id="aboutInput" maxlength="1000" rows="5" placeholder="Tell the world about your Being..."></textarea>
                 <label for="favoritesInput">Favorite things <small>240 characters</small></label>
                 <input id="favoritesInput" maxlength="240" placeholder="games, colors, snacks, songs...">
-                <fieldset class="color-mixer">
-                    <legend>Page colors</legend>
-                    <p>Drag the sliders. Your page preview changes right away.</p>
-                    <label for="backgroundHue">Wall color <output id="backgroundHueValue"></output></label>
-                    <input id="backgroundHue" class="hue-slider" type="range" min="0" max="360" value="275">
-                    <label for="paperHue">Page color <output id="paperHueValue"></output></label>
-                    <input id="paperHue" class="hue-slider" type="range" min="0" max="360" value="292">
-                    <label for="accentHue">Accent color <output id="accentHueValue"></output></label>
-                    <input id="accentHue" class="hue-slider" type="range" min="0" max="360" value="310">
-                    <label for="brightnessSlider">Light ↔ dark <output id="brightnessValue"></output></label>
-                    <input id="brightnessSlider" type="range" min="20" max="96" value="80">
-                </fieldset>
-                <div class="desktop-wall-control">
-                    <label for="wallpaperInput">Wall image <small>desktop only</small></label>
-                    <input id="wallpaperInput" type="url" maxlength="2048" placeholder="Paste a direct https:// image link">
-                    <p>Paste an image link to hang it behind your profile.</p>
-                </div>
+                <fieldset class="color-mixer"><legend>Your colors</legend><p>Every part has its own hue, saturation, and lightness. Mix them independently.</p><div id="colorControls"></div></fieldset>
+                <fieldset class="image-mixer"><legend>Your images</legend><p>Choose files from your phone or computer. Images are resized and saved immediately; they are visible on your public page.</p><div id="imageControls"></div><p id="uploadStatus" role="status"></p></fieldset>
                 <button id="saveProfile" type="submit">Save My Page</button>
             </form>
         </section>
