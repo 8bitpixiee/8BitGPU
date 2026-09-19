@@ -1,24 +1,22 @@
-# MyPixel mobile and lounge update
+# MyPixel customization update
 
-Verified locally on 2026-09-19.
+## Included
+- Six independent colors: wall, page, panels, window titles, accents, and text.
+- Each color has a full-spectrum picker and its own hue, saturation, and lightness sliders.
+- Three picture windows and a separate wallpaper upload, available on desktop and mobile.
+- Original stream artwork adapted with MyPixel labels for About Me, Favorites, Being, and pictures.
 
-This is an UPDATE PACKAGE for the existing 8BitGPU site, not a standalone site.
-Extract its contents over the existing project, preserving all existing avatar,
-map, image, stylesheet, and account files. Deploy the complete project through
-the existing Cloudflare Worker workflow, including src/worker.js and src/chat.js.
-Preserve the existing D1 binding and account configuration.
+Choose Edit My Page to customize. PNG, JPEG, and WebP files up to 15 MB are resized in the browser to at most 1400 pixels and 512 KB. Uploaded images and removals save immediately; text and colors save with Save My Page. Closing the editor restores unsaved color changes.
 
-Included:
-- Mobile app scrolling and portrait/landscape window fitting.
-- MyPixel naming and profile UI.
-- Shared Dance, Smoke, LOL, Spin, and Wave lounge emotes.
-- Portrait lounge scrolling and landscape room/chat layout.
+Images are public with the profile. They persist in the existing D1 database in a new profile_images table, created automatically. No new bucket or service is required for this small profile-image feature. Animated image uploads are not supported. Each account has four slots, with at most 512 KB per slot before base64 encoding.
 
-Validation passed:
-- node --test tests/chat.test.mjs (5 tests)
-- node tests/mobile-desktop-browser.mjs
-- node tests/arcade-browser.mjs
-- node tests/profile-browser.mjs
+## Install
+This is an update package, not a standalone site. Extract it over the existing complete 8BitGPU project. Deploy both the frontend files and src/worker.js with the existing Cloudflare Worker and D1 binding. Include profile-assets. Preserve all existing avatar, map, account, and lounge files.
 
-These checks used the local test server. This package has not been deployed
-or verified on the live website. See LOUNGE-EMOTES.md for custom sprite art needs.
+This release has been verified locally; it has not been deployed to the live website.
+
+## Verification
+node --test tests/chat.test.mjs
+node tests/profile-browser.mjs
+
+Tests cover independent color edits, cancel restoring colors, uploads to all four slots, public viewing after reload, removal, account isolation, rejected oversized/unsupported uploads, and portrait/landscape widths.

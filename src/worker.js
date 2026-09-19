@@ -86,6 +86,7 @@ async function readBody(request) {
 }
 
 async function ensureSchema(database) {
+  await database.exec("CREATE TABLE IF NOT EXISTS profile_images (user_id TEXT NOT NULL, slot TEXT NOT NULL, image_base64 TEXT NOT NULL, mime TEXT NOT NULL, updated_at INTEGER NOT NULL, PRIMARY KEY(user_id, slot));");
   await database.exec("CREATE TABLE IF NOT EXISTS recovery_keys (user_id TEXT PRIMARY KEY, token_hash TEXT NOT NULL UNIQUE);");
   await database.exec("CREATE TABLE IF NOT EXISTS auth_limits (bucket TEXT PRIMARY KEY, attempts INTEGER NOT NULL, expires_at INTEGER NOT NULL);");
   await database.exec("CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE COLLATE NOCASE, password_hash TEXT NOT NULL, password_salt TEXT NOT NULL, created_at INTEGER NOT NULL);");
@@ -166,6 +167,7 @@ function publicProfile(row) {
     about: row.about || "",
     favorites: row.favorites || "",
     theme,
+    images: Object.fromEntries((row.images || []).map(image => [image.slot, `/api/profile-images/${encodeURIComponent(row.username)}/${image.slot}?v=${image.updated_at}`])),
     style: {
       ...defaultProfileStyles[theme],
       background: row.backgroundColor || defaultProfileStyles[theme].background,
@@ -180,7 +182,7 @@ function publicProfile(row) {
   };
 }
 async function findProfileBy(database, field, value) {
-  return database.prepare(`
+  const row = await database.prepare(`
     SELECT users.id, users.username, users.created_at AS createdAt,
       player_data.avatar_json AS avatar,
       player_profiles.mood,
@@ -201,6 +203,8 @@ async function findProfileBy(database, field, value) {
     LEFT JOIN player_profile_styles ON player_profile_styles.user_id = users.id
     WHERE users.${field} = ?
   `).bind(value).first();
+  if (row) row.images = (await database.prepare("SELECT slot, updated_at FROM profile_images WHERE user_id = ?").bind(row.id).all()).results;
+  return row;
 }
 
 async function handleApi(request, env, url) {
@@ -210,6 +214,43 @@ async function handleApi(request, env, url) {
   if (!["GET", "HEAD"].includes(request.method) && request.headers.get("Origin") !== url.origin) return json({ error: "Use this website to submit requests." }, 403);
   await ensureSchema(env.DB);
   const path = url.pathname;
+  const imageRead = path.match(/^\/api\/profile-images\/([a-zA-Z0-9_.-]{3,18})\/(wall|1|2|3)$/);
+  if (imageRead && request.method === "GET") {
+    const image = await env.DB.prepare("SELECT image_base64, mime FROM profile_images JOIN users ON users.id = profile_images.user_id WHERE users.username = ? AND slot = ?").bind(imageRead[1], imageRead[2]).first();
+    if (!image) return json({error: "Image not found."}, 404);
+    return new Response(base64ToBytes(image.image_base64), {headers: {"content-type": image.mime, "cache-control": "no-cache", "x-content-type-options": "nosniff"}});
+  }
+  const imageWrite = path.match(/^\/api\/profile\/images\/(wall|1|2|3)$/);
+  if (imageWrite && ["PUT", "DELETE"].includes(request.method)) {
+    const user = await currentUser(request, env.DB);
+    if (!user) return json({error: "Sign in to change your images."}, 401);
+    const slot = imageWrite[1];
+    if (request.method === "DELETE") {
+      await env.DB.prepare("DELETE FROM profile_images WHERE user_id = ? AND slot = ?").bind(user.id, slot).run();
+      if (slot === 'wall') await env.DB.prepare("UPDATE player_profile_styles SET wallpaper_url = '' WHERE user_id = ?").bind(user.id).run();
+      return json({ok: true});
+    }
+    const reader = request.body?.getReader();
+    if (!reader) return json({error: "Choose an image file."}, 400);
+    const chunks = []; let size = 0;
+    while (true) {
+      const {done, value} = await reader.read(); if (done) break;
+      size += value.length;
+      if (size > 512 * 1024) { await reader.cancel(); return json({error: "Image must be smaller than 512 KB after resizing."}, 413); }
+      chunks.push(value);
+    }
+    const bytes = new Uint8Array(size); let offset = 0;
+    for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+    const ascii = (start, end) => String.fromCharCode(...bytes.slice(start, end));
+    const mime = bytes[0] === 137 && ascii(1,4) === "PNG" && bytes[4] === 13 && bytes[5] === 10 && bytes[6] === 26 && bytes[7] === 10 ? "image/png" : bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255 ? "image/jpeg" : ascii(0,4) === "RIFF" && ascii(8,12) === "WEBP" ? "image/webp" : null;
+    if (!mime) return json({error: "Use a PNG, JPEG, or WebP image."}, 400);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 8192) binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+    const now = Date.now();
+    await env.DB.prepare("INSERT INTO profile_images (user_id,slot,image_base64,mime,updated_at) VALUES (?,?,?,?,?) ON CONFLICT(user_id,slot) DO UPDATE SET image_base64=excluded.image_base64,mime=excluded.mime,updated_at=excluded.updated_at").bind(user.id,slot,btoa(binary),mime,now).run();
+    if (slot === 'wall') await env.DB.prepare("UPDATE player_profile_styles SET wallpaper_url = '' WHERE user_id = ?").bind(user.id).run();
+    return json({url: `/api/profile-images/${encodeURIComponent(user.username)}/${slot}?v=${now}`});
+  }
   if (["/api/auth/login", "/api/auth/register", "/api/auth/recover", "/api/auth/recovery-key"].includes(path) && request.method === "POST") {
     const now=Date.now();
     const bucket=await sha256((request.headers.get("CF-Connecting-IP") || "local")+":"+Math.floor(now/600000));
