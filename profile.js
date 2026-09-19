@@ -135,7 +135,7 @@ function applyStyle(style) {
     document.body.style.setProperty("--edge", colors.edge || defaults.edge);
     document.body.style.setProperty("--accent", colors.accent || defaults.accent);
     document.body.style.setProperty("--ink", colors.ink || defaults.ink);
-    const page = document.body;
+    const page = ById("profile");
     const url = profile?.images?.wall || colors.wallpaperUrl || "";
     page.classList.toggle("has-wallpaper", Boolean(url));
     page.style.setProperty("--wallpaper-image", url ? `url(\"${url.replace(/[\\\"]/g, "\\\\$&")}\")` : "none");
