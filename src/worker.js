@@ -91,6 +91,7 @@ async function ensureSchema(database) {
   await database.exec("CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE COLLATE NOCASE, password_hash TEXT NOT NULL, password_salt TEXT NOT NULL, created_at INTEGER NOT NULL);");
   await database.exec("CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL, expires_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
   await database.exec("CREATE TABLE IF NOT EXISTS player_data (user_id TEXT PRIMARY KEY, avatar_json TEXT, updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
+  await database.exec("CREATE TABLE IF NOT EXISTS player_profiles (user_id TEXT PRIMARY KEY, mood TEXT NOT NULL DEFAULT '', about_text TEXT NOT NULL DEFAULT '', favorites_text TEXT NOT NULL DEFAULT '', theme TEXT NOT NULL DEFAULT 'violet', updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
   await database.exec("CREATE TABLE IF NOT EXISTS store_orders (paypal_order_id TEXT PRIMARY KEY, status TEXT NOT NULL, amount TEXT NOT NULL, cart_json TEXT NOT NULL, payer_email TEXT, capture_id TEXT, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL);");
 }
 
@@ -124,6 +125,39 @@ async function createSession(userId, database) {
 
 function publicUser(user) {
   return { id: user.id, username: user.username, avatar: user.avatar ? JSON.parse(user.avatar) : null };
+}
+
+const profileThemes = new Set(["violet", "pink", "aqua", "midnight"]);
+function profileText(value, maxLength) {
+  if (typeof value !== "string" || value.length > maxLength || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value)) return null;
+  return value.trim();
+}
+function publicProfile(row) {
+  return {
+    username: row.username,
+    joinedAt: row.createdAt,
+    avatar: row.avatar ? JSON.parse(row.avatar) : null,
+    mood: row.mood || "",
+    about: row.about || "",
+    favorites: row.favorites || "",
+    theme: profileThemes.has(row.theme) ? row.theme : "violet",
+    updatedAt: row.updatedAt || null
+  };
+}
+async function findProfileBy(database, field, value) {
+  return database.prepare(`
+    SELECT users.id, users.username, users.created_at AS createdAt,
+      player_data.avatar_json AS avatar,
+      player_profiles.mood,
+      player_profiles.about_text AS about,
+      player_profiles.favorites_text AS favorites,
+      player_profiles.theme,
+      player_profiles.updated_at AS updatedAt
+    FROM users
+    LEFT JOIN player_data ON player_data.user_id = users.id
+    LEFT JOIN player_profiles ON player_profiles.user_id = users.id
+    WHERE users.${field} = ?
+  `).bind(value).first();
 }
 
 async function handleApi(request, env, url) {
@@ -247,6 +281,43 @@ async function handleApi(request, env, url) {
     const token = readCookies(request).eightbit_session;
     if (token) await env.DB.prepare("DELETE FROM sessions WHERE token_hash = ?").bind(await sha256(token)).run();
     return json({ ok: true }, 200, { "set-cookie": "eightbit_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0" });
+  }
+
+  if (path === "/api/profile/me" && request.method === "GET") {
+    const user = await currentUser(request, env.DB);
+    if (!user) return json({ error: "Sign in to open your profile." }, 401);
+    return json({ profile: publicProfile(await findProfileBy(env.DB, "id", user.id)) });
+  }
+
+  if (path === "/api/profile/me" && request.method === "PUT") {
+    const user = await currentUser(request, env.DB);
+    if (!user) return json({ error: "Sign in to update your profile." }, 401);
+    const body = await readBody(request);
+    const mood = profileText(body?.mood, 80);
+    const about = profileText(body?.about, 1000);
+    const favorites = profileText(body?.favorites, 240);
+    const theme = typeof body?.theme === "string" && profileThemes.has(body.theme) ? body.theme : null;
+    if (mood === null || about === null || favorites === null || !theme) {
+      return json({ error: "Use up to 80 characters for mood, 1,000 for About Me, and 240 for favorites." }, 400);
+    }
+    await env.DB.prepare(`
+      INSERT INTO player_profiles (user_id, mood, about_text, favorites_text, theme, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+      ON CONFLICT(user_id) DO UPDATE SET
+        mood = excluded.mood,
+        about_text = excluded.about_text,
+        favorites_text = excluded.favorites_text,
+        theme = excluded.theme,
+        updated_at = excluded.updated_at
+    `).bind(user.id, mood, about, favorites, theme, Date.now()).run();
+    return json({ profile: publicProfile(await findProfileBy(env.DB, "id", user.id)) });
+  }
+
+  const profileMatch = path.match(/^\/api\/profile\/([a-zA-Z0-9_.-]{3,18})$/);
+  if (profileMatch && request.method === "GET") {
+    const profile = await findProfileBy(env.DB, "username", profileMatch[1]);
+    if (!profile) return json({ error: "That profile does not exist." }, 404);
+    return json({ profile: publicProfile(profile) });
   }
 
   if (path === "/api/avatar" && request.method === "PUT") {
