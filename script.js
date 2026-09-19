@@ -243,6 +243,8 @@ const desktopApps = {
         top: 105,
         content: `<section class="os-welcome"><h2>Welcome to 8BitGPU</h2><p>A little enchanted computer world for games, glow-ups, streams, store drops, and pixie behavior.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>`
     },
+    account: { title: "Account.exe", src: "account.html", width: 510, height: 650, left: 230, top: 65 },
+    chat: { title: "Chat.exe", src: "chat.html", width: 680, height: 650, left: 190, top: 45 },
     avatarLab: { title: "Avatar Lab.exe", src: "avatar-studio.html", width: 780, height: 590, left: 145, top: 65 },
     storefront: { title: "STORE.exe", src: "storefront.html", width: 690, height: 520, left: 215, top: 88 },
     login: { title: "Login.exe", src: "login.html", width: 510, height: 650, left: 280, top: 80 },
@@ -672,3 +674,5 @@ document.querySelector("[data-wallpaper-close]").addEventListener("click", close
 
 showWallpaper(currentWallpaperIndex, true);
 setWallpaperShuffle(wallpaperShuffleEnabled);
+
+

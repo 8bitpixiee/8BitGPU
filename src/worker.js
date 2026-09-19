@@ -1,3 +1,4 @@
+import { handleChat } from "./chat.js";
 import { STORE_PRODUCTS } from "../store-catalog.js";
 
 const SESSION_LENGTH_SECONDS = 60 * 60 * 24 * 30;
@@ -73,10 +74,20 @@ function validUsername(username) {
 }
 
 async function readBody(request) {
-  try { return await request.json(); } catch { return null; }
+  if (Number(request.headers.get("content-length")) > 16384) return null;
+  const reader = request.body?.getReader();
+  if (!reader) return null;
+  const chunks=[]; let size=0;
+  try {
+    while (true) { const {done,value}=await reader.read(); if(done) break; size+=value.length; if(size>16384){await reader.cancel();return null;} chunks.push(value); }
+    const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch { return null; }
 }
 
 async function ensureSchema(database) {
+  await database.exec("CREATE TABLE IF NOT EXISTS recovery_keys (user_id TEXT PRIMARY KEY, token_hash TEXT NOT NULL UNIQUE);");
+  await database.exec("CREATE TABLE IF NOT EXISTS auth_limits (bucket TEXT PRIMARY KEY, attempts INTEGER NOT NULL, expires_at INTEGER NOT NULL);");
   await database.exec("CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE COLLATE NOCASE, password_hash TEXT NOT NULL, password_salt TEXT NOT NULL, created_at INTEGER NOT NULL);");
   await database.exec("CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL, expires_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
   await database.exec("CREATE TABLE IF NOT EXISTS player_data (user_id TEXT PRIMARY KEY, avatar_json TEXT, updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
@@ -119,8 +130,17 @@ async function handleApi(request, env, url) {
   if (!env.DB || typeof env.DB.prepare !== "function") {
     return json({ error: "The D1 binding named DB is not available to this deployment." }, 500);
   }
+  if (!["GET", "HEAD"].includes(request.method) && request.headers.get("Origin") !== url.origin) return json({ error: "Use this website to submit requests." }, 403);
   await ensureSchema(env.DB);
   const path = url.pathname;
+  if (["/api/auth/login", "/api/auth/register", "/api/auth/recover", "/api/auth/recovery-key"].includes(path) && request.method === "POST") {
+    const now=Date.now();
+    const bucket=await sha256((request.headers.get("CF-Connecting-IP") || "local")+":"+Math.floor(now/600000));
+    await env.DB.prepare("DELETE FROM auth_limits WHERE expires_at < ?").bind(now).run();
+    const limit=await env.DB.prepare("INSERT INTO auth_limits (bucket,attempts,expires_at) VALUES (?,1,?) ON CONFLICT(bucket) DO UPDATE SET attempts=attempts+1 RETURNING attempts").bind(bucket,now+600000).first();
+    if(limit.attempts>20)return json({error:"Too many account attempts. Please wait ten minutes."},429);
+  }
+  if (path.startsWith("/api/chat/")) return handleChat(request, env, await currentUser(request, env.DB), readBody);
 
   if (path === "/api/store/catalog" && request.method === "GET") {
     const products = storeCatalog(env);
@@ -163,6 +183,29 @@ async function handleApi(request, env, url) {
     return json({ ok: true, orderId, captureId: capture.id });
   }
 
+  if (path === "/api/auth/recovery-key" && request.method === "POST") {
+    const user=await currentUser(request,env.DB);
+    if(!user)return json({error:"Sign in first."},401);
+    const body=await readBody(request);
+    const secret=await env.DB.prepare("SELECT password_hash,password_salt FROM users WHERE id=?").bind(user.id).first();
+    if(typeof body?.password!=="string" || body.password.length>128 || !matches(secret.password_hash,await hashPassword(body.password,secret.password_salt)))return json({error:"Your current passcode is incorrect."},401);
+    const key=randomBase64(32);
+    await env.DB.prepare("INSERT INTO recovery_keys (user_id,token_hash) VALUES (?,?) ON CONFLICT(user_id) DO UPDATE SET token_hash=excluded.token_hash").bind(user.id,await sha256(key)).run();
+    return json({recoveryKey:key});
+  }
+  if (path === "/api/auth/recover" && request.method === "POST") {
+    const body=await readBody(request);
+    if(typeof body?.recoveryKey!=="string" || body.recoveryKey.length>100 || typeof body?.password!=="string" || body.password.length<8 || body.password.length>128)return json({error:"Enter your recovery key and a new passcode (8–128 characters)."},400);
+    const tokenHash=await sha256(body.recoveryKey.trim());
+    const salt=randomBase64(16),hash=await hashPassword(body.password,salt);
+    const result=await env.DB.batch([
+      env.DB.prepare("UPDATE users SET password_hash=?,password_salt=? WHERE id=(SELECT user_id FROM recovery_keys WHERE token_hash=?)").bind(hash,salt,tokenHash),
+      env.DB.prepare("DELETE FROM sessions WHERE user_id=(SELECT user_id FROM recovery_keys WHERE token_hash=?)").bind(tokenHash),
+      env.DB.prepare("DELETE FROM recovery_keys WHERE token_hash=?").bind(tokenHash)
+    ]);
+    if(!result[0].meta.changes)return json({error:"That recovery key is invalid or has already been used."},400);
+    return json({ok:true},200,{"set-cookie":"eightbit_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0"});
+  }
   if (path === "/api/auth/me" && request.method === "GET") {
     const user = await currentUser(request, env.DB);
     return json({ user: user ? publicUser(user) : null });
@@ -170,10 +213,10 @@ async function handleApi(request, env, url) {
 
   if (path === "/api/auth/register" && request.method === "POST") {
     const body = await readBody(request);
-    const username = body?.username?.trim();
+    const username = typeof body?.username === "string" ? body.username.trim() : "";
     const password = body?.password;
     if (!validUsername(username || "")) return json({ error: "Use 3–18 letters, numbers, dots, dashes, or underscores." }, 400);
-    if (typeof password !== "string" || password.length < 8) return json({ error: "Your passcode needs at least 8 characters." }, 400);
+    if (typeof password !== "string" || password.length < 8 || password.length > 128) return json({ error: "Your passcode needs at least 8 characters." }, 400);
 
     const existing = await env.DB.prepare("SELECT id FROM users WHERE username = ?").bind(username).first();
     if (existing) return json({ error: "That creature name is already claimed." }, 409);
@@ -189,10 +232,10 @@ async function handleApi(request, env, url) {
 
   if (path === "/api/auth/login" && request.method === "POST") {
     const body = await readBody(request);
-    const username = body?.username?.trim();
+    const username = typeof body?.username === "string" ? body.username.trim() : "";
     const password = body?.password;
     const user = typeof username === "string" ? await env.DB.prepare("SELECT * FROM users WHERE username = ?").bind(username).first() : null;
-    if (!user || typeof password !== "string" || !matches(user.password_hash, await hashPassword(password, user.password_salt))) {
+    if (!user || typeof password !== "string" || password.length > 128 || !matches(user.password_hash, await hashPassword(password, user.password_salt))) {
       return json({ error: "Creature name or passcode is not right." }, 401);
     }
     const cookie = await createSession(user.id, env.DB);
@@ -234,3 +277,6 @@ export default {
     return env.ASSETS.fetch(request);
   }
 };
+
+
+
