@@ -1,67 +1,25 @@
-const avatarPath = "avatar/";
-const options = {
-    hair: ["", "volume_hair_fem_idle_front_v1.png", `${avatarPath}hair_fem_v1.png`, `${avatarPath}hair_fem_deerbra_v1.png`, `${avatarPath}hair_fem_deerbra_v2.png`, `${avatarPath}hair_fem_deerbra_v3.png`, `${avatarPath}hair_fem_deerbra_v4.png`, `${avatarPath}hair_lemon_v1.png`, `${avatarPath}hair_lemon_v2.png`, `${avatarPath}hair_lemon_v3.png`, `${avatarPath}hair_locs_v1.png`, `${avatarPath}hair_locs_v2.png`, `${avatarPath}hair_locs_v3.png`, `${avatarPath}hair_longwaves_v1.png`, `${avatarPath}hair_longwaves_v2.png`, `${avatarPath}hair_longwaves_v3.png`, `${avatarPath}sideswept_hair_v1.png`, `${avatarPath}sideswept_hair_v2.png`, `${avatarPath}sideswept_hair_v3.png`],
-    ears: [`${avatarPath}ears_fem_v1.png`, `${avatarPath}ears_fem_v2.png`, `${avatarPath}ears_fem_v3.png`, `${avatarPath}kittie_ears_v1.png`, `${avatarPath}kittie_ears_v2.png`, `${avatarPath}kittie_ears_v3.png`, `${avatarPath}ears_fem_deerbra_v1.png`, `${avatarPath}ears_fem_deerbra_v3.png`, `${avatarPath}ears_fem_bovidil_v1.png`, `${avatarPath}ears_fem_bovidil_v2.png`, `${avatarPath}ears_fem_bovidil_v3.png`],
-    eyes: ["", `${avatarPath}eyes_fem_v1.png`, `${avatarPath}eyes_fem_v2.png`, `${avatarPath}eyes_mac_v1.png`, `${avatarPath}eyes_mac_v2.png`, `${avatarPath}eyes_mac_v3.png`, `${avatarPath}eyes_lemon.png`],
-    fit: ["", `${avatarPath}fit_fem_v1.png`, `${avatarPath}fit_fem_v2.png`, `${avatarPath}fit_fem_v3.png`, `${avatarPath}fit_kittie_v1.png`, `${avatarPath}fit_kittie_v2.png`, `${avatarPath}fit_kittie_v3.png`, `${avatarPath}drawls_fem_idle_front_v1.png`, `${avatarPath}drawls_fem_idle_front_v2.png`, `${avatarPath}drawls_fem_idle_front_v3.png`],
-    thixieFit: ["", `${avatarPath}thixie_fit_v1.png`, `${avatarPath}thixie_fit_v2.png`, `${avatarPath}thixie_fit_v3.png`],
-    extra: ["", `${avatarPath}wings_v1.png`, `${avatarPath}wings_v2.png`, `${avatarPath}wings_v3.png`, `${avatarPath}kittie_tail_v1.png`, `${avatarPath}kittie_tail_v2.png`, `${avatarPath}kittie_tail_v3.png`]
-};
-
-function setLayer(id, src) { const layer = document.getElementById(id); layer.src = src || ""; layer.style.display = src ? "block" : "none"; }
-function loadBeing() {
-    let outfit; try { outfit = JSON.parse(localStorage.getItem("8bitgpu-avatar-outfit")); } catch { outfit = null; }
-    outfit ||= { species: "Pixies", skinTone: "Nutmeg", ears: 0, hair: 1, eyes: 1, fit: 0, extra: 0 };
-    const thixie = outfit.bodyPreset === "thixie" || outfit.species === "Thixies";
-    const deerbra = outfit.species === "Deerbras";
-    if (thixie) { const body = { Nutmeg:"v1", Creme:"v2", Peachy:"v4" }[outfit.skinTone] || "v1"; const head = { Nutmeg:"v1", Creme:"v2", Peachy:"v3" }[outfit.skinTone] || "v1"; setLayer("bodyLayer", `${avatarPath}thixie_body_${body}.png`); setLayer("headLayer", `${avatarPath}thixie_head_${head}.png`); }
-    else if (deerbra) { const v = outfit.skinTone === "Creme" ? "v2" : "v1"; setLayer("bodyLayer", `${avatarPath}body_fem_deerbra_${v}.png`); setLayer("headLayer", `${avatarPath}head_fem_deerbra_${v}.png`); }
-    else { const v = { Nutmeg:"v1", Peachy:"v2", Creme:"v3" }[outfit.skinTone] || "v1"; setLayer("bodyLayer", `${avatarPath}body_fem_${v}.png`); setLayer("headLayer", `${avatarPath}head_fem_${v}.png`); }
-    setLayer("earsLayer", options.ears[outfit.ears] || options.ears[0]); setLayer("hairLayer", options.hair[outfit.hair] || ""); setLayer("eyesLayer", options.eyes[outfit.eyes] || ""); setLayer("fitLayer", (thixie ? options.thixieFit : options.fit)[outfit.fit] || ""); setLayer("extraLayer", options.extra[outfit.extra] || "");
+const el=id=>document.getElementById(id);
+let x=48,y=73,target=null,keys=new Set(),joined=false,myId=null,messages=[],lastLog='',timer=null,inflight=false,delay=1500,muted=false,movingFrame=0,lastFrame=0;
+const beings=new Map();
+function status(text){el('roomStatus').textContent=text;}
+async function api(path,body,method){const r=await fetch('/api/chat/'+path,{method:method||(body===undefined?'GET':'POST'),headers:body===undefined?{}:{'content-type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store'});const d=await r.json();if(!r.ok){const e=Error(d.error||'Room connection unavailable.');e.code=d.code;e.status=r.status;throw e;}return d;}
+function fitStage(){const size=Math.min(el('arcadeMap').clientWidth,el('arcadeMap').clientHeight);el('mapStage').style.width=size+'px';el('mapStage').style.height=size+'px';}
+new ResizeObserver(fitStage).observe(el('arcadeMap'));
+function positionSelf(){const node=beings.get(myId);if(node){node.style.left=x+'%';node.style.top=y+'%';node.style.zIndex=String(Math.round(y));}}
+function renderMembers(members){const active=new Set(members.map(m=>m.id));for(const[id,node]of beings){if(!active.has(id)){node.remove();beings.delete(id);}}
+ for(const m of members){let node=beings.get(m.id);if(!node){node=document.createElement('div');node.className='being'+(m.id===myId?' self':'');node.dataset.userId=m.id;const bubble=document.createElement('span');bubble.className='bubble';const name=document.createElement('span');name.className='name';name.textContent=m.username+(m.id===myId?' (you)':'');node.append(bubble,name);el('players').append(node);beings.set(m.id,node);}const signature=JSON.stringify(m.avatar);if(node.dataset.avatar!==signature){node.querySelectorAll('img').forEach(i=>i.remove());for(const key of ['extra','body','ears','head','eyes','hair','fit']){const source=m.avatar.layers[key];if(!source)continue;const img=document.createElement('img');img.src=source;img.alt='';img.onerror=()=>img.remove();const adjustment=m.avatar.adjustments[key];if(adjustment)img.style.transform=`translate(${adjustment.x}%,${adjustment.y}%) scale(${adjustment.scale})`;node.insertBefore(img,node.querySelector('.bubble'));}node.dataset.avatar=signature;}node.style.left=(m.id===myId?x:m.x)+'%';node.style.top=(m.id===myId?y:m.y)+'%';node.style.zIndex=String(Math.round(m.id===myId?y:m.y));}
+ el('roomCount').textContent=members.length+' in the room';renderBubbles();
 }
+function renderBubbles(){for(const[id,node]of beings){const latest=[...messages].reverse().find(m=>m.userId===id&&Date.now()-m.createdAt<8000);node.querySelector('.bubble').textContent=latest?latest.body.slice(0,160)+(latest.body.length>160?'…':''):'';}}
+function renderLog(data){messages=data.messages;if(!myId){const seed=[...data.user.id].reduce((n,c)=>n+c.charCodeAt(0),0);x=36+seed%19;y=66+seed%9;}myId=data.user.id;muted=data.mutedUntil>Date.now();el('identity').textContent=data.user.username+(data.owner?' · Owner':' · Member');el('roomMessage').disabled=false;el('sendMessage').disabled=muted;const signature=JSON.stringify(messages);if(signature!==lastLog){const log=el('roomMessages'),bottom=log.scrollHeight-log.scrollTop-log.clientHeight<50;const rows=messages.map(m=>{const p=document.createElement('p'),name=document.createElement('strong'),text=document.createElement('span');name.textContent=m.username;text.textContent=m.body;p.append(name,text);return p;});log.replaceChildren(...rows);if(bottom||!lastLog)log.scrollTop=log.scrollHeight;lastLog=signature;}renderBubbles();}
+async function sync(){if(inflight||document.hidden)return;inflight=true;clearTimeout(timer);try{const data=await api('messages');renderLog(data);const room=await api('presence',{x,y});joined=true;el('roomGate').hidden=true;renderMembers(room.members);delay=1500;status(muted?'You are temporarily muted. You can still walk around.':'');}catch(e){joined=false;keys.clear();target=null;el('roomMessage').disabled=true;el('sendMessage').disabled=true;el('roomCount').textContent='Not connected';status(e.message);delay=Math.min(delay*2,15000);if(e.code==='join_required'){el('roomGate').hidden=false;delay=0;}else if(e.status===401||e.status===403){el('players').replaceChildren();beings.clear();el('roomMessages').replaceChildren();messages=[];lastLog='';delay=0;}}finally{inflight=false;if(delay&&!document.hidden)timer=setTimeout(sync,delay);}}
+el('joinRoom').onclick=async()=>{try{await api('join',{adult:el('adult').checked,rules:el('rules').checked});delay=1500;await sync();}catch(e){status(e.message);}};
+el('roomComposer').onsubmit=async e=>{e.preventDefault();el('sendMessage').disabled=true;try{await api('messages',{message:el('roomMessage').value});el('roomMessage').value='';await sync();}catch(error){status(error.message);}finally{el('sendMessage').disabled=!joined||muted;}};
+function animate(time){const dt=Math.min(.05,(time-lastFrame)/1000||.016);lastFrame=time;let dx=0,dy=0;for(const k of keys){if(k==='a'||k==='arrowleft')dx--;if(k==='d'||k==='arrowright')dx++;if(k==='w'||k==='arrowup')dy--;if(k==='s'||k==='arrowdown')dy++;}if(dx||dy)target=null;else if(target){dx=target.x-x;dy=target.y-y;if(Math.hypot(dx,dy)<.5){target=null;dx=dy=0;el('walkMarker').hidden=true;}}const length=Math.hypot(dx,dy);if(length){const step=Math.min(length,23*dt);x=Math.max(28,Math.min(76,x+dx/length*step));y=Math.max(54,Math.min(84,y+dy/length*step));positionSelf();}if(joined&&(keys.size||target))movingFrame=requestAnimationFrame(animate);else movingFrame=0;}
+function startMoving(){if(!movingFrame){lastFrame=performance.now();movingFrame=requestAnimationFrame(animate);}}
+el('mapStage').addEventListener('pointerdown',e=>{if(!joined||e.button!==0)return;const r=e.currentTarget.getBoundingClientRect();target={x:Math.max(28,Math.min(76,(e.clientX-r.left)/r.width*100)),y:Math.max(54,Math.min(84,(e.clientY-r.top)/r.height*100))};el('walkMarker').style.left=target.x+'%';el('walkMarker').style.top=target.y+'%';el('walkMarker').hidden=false;e.currentTarget.focus();startMoving();});
+document.addEventListener('keydown',e=>{if(!joined||e.target.closest('textarea,input,button,a'))return;const key=e.key.toLowerCase();if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(key)){e.preventDefault();keys.add(key);startMoving();}});document.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>{keys.clear();target=null;});
+function leave(){keys.clear();target=null;clearTimeout(timer);if(joined)fetch('/api/chat/presence',{method:'DELETE',keepalive:true}).catch(()=>{});}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)leave();else{delay=1500;sync();}});window.addEventListener('pagehide',leave);fitStage();sync();
 
-function state() { try { return JSON.parse(localStorage.getItem("8bitgpu-game-state")) || { xp:120, mana:80, inventory:[] }; } catch { return { xp:120, mana:80, inventory:[] }; } }
-const tutorialItems = ["Arcade Token", "Bag of Pixie Dust", "Magic Mushroom", "Yak", "Bits & Bobs"];
-function updateTutorial() {
-    const game = state();
-    const progress = tutorialItems.filter((item) => game.inventory.includes(item)).length;
-    const progressElement = document.getElementById("tutorialProgress");
-    if (progressElement) progressElement.textContent = `${progress} / ${tutorialItems.length} machines awakened`;
-    if (progress === tutorialItems.length) {
-        document.getElementById("tutorialTitle").textContent = "ARCADE AWAKENED!";
-        document.getElementById("tutorialCopy").textContent = "The portal is glowing… Map 02 signal detected.";
-    }
-}
-function saveState(next) { localStorage.setItem("8bitgpu-game-state", JSON.stringify(next)); parent.postMessage({ type:"8bitgpu-game-updated" }, location.origin); updateStats(); }
-function updateStats() { const s = state(); const level = Math.floor(s.xp / 300) + 1; document.getElementById("arcadeStats").textContent = `LVL ${String(level).padStart(2,"0")} · XP ${s.xp % 300} / 300 · MANA ${s.mana} / 100`; }
-function reward(button) {
-    const s = state();
-    const item = button.dataset.reward;
-    const xp = Number(button.dataset.xp);
-    const mana = Number(button.dataset.mana);
-    const toast = document.getElementById("rewardToast");
-    if (s.inventory.includes(item)) {
-        toast.textContent = `${item} already collected!`;
-        toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 1800);
-        return;
-    }
-    s.xp += xp;
-    s.mana = Math.min(100, s.mana + mana);
-    s.inventory.push(item);
-    saveState(s);
-    updateTutorial();
-    toast.textContent = `+${xp} XP${mana ? ` · +${mana} MANA` : ""} · ${item}`;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2600);
-}
 
-const player = document.getElementById("gamePlayer"); let x = 48, y = 75;
-function move(dx, dy) { x = Math.max(10, Math.min(89, x + dx)); y = Math.max(38, Math.min(86, y + dy)); player.style.left = `${x}%`; player.style.top = `${y}%`; }
-document.addEventListener("keydown", (event) => { const key = event.key.toLowerCase(); const moves = { arrowleft:[-2,0], a:[-2,0], arrowright:[2,0], d:[2,0], arrowup:[0,-2], w:[0,-2], arrowdown:[0,2], s:[0,2] }; if (moves[key]) { event.preventDefault(); move(...moves[key]); } });
-const touchMoves = { up:[0,-3], left:[-3,0], down:[0,3], right:[3,0] };
-document.querySelectorAll("#touchControls [data-move]").forEach((button) => button.addEventListener("click", () => move(...touchMoves[button.dataset.move])));
-document.querySelectorAll(".hotspot").forEach((button) => button.addEventListener("click", () => reward(button)));
-document.getElementById("focusButton").addEventListener("click", () => document.getElementById("arcadeGame").focus());
-document.getElementById("tutorialHide").addEventListener("click", () => document.getElementById("tutorialPanel").classList.toggle("is-hidden"));
-loadBeing(); updateStats(); updateTutorial(); document.getElementById("arcadeGame").focus();

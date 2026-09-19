@@ -18,8 +18,8 @@
     }
   ],
   "vars": {
-    "CHAT_ENABLED": "false",
+    "CHAT_ENABLED": "true",
     "CHAT_TEST_USER_IDS": "",
-    "CHAT_OWNER_IDS": ""
+    "CHAT_OWNER_IDS": "98038eed-e9f0-48e6-a05c-b7d012b57388"
   }
 }

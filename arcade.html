@@ -1,52 +1,10 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Arcade 01</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="arcade.css">
-</head>
-<body>
-    <main id="arcadeGame" tabindex="0" aria-label="Arcade 01 game. Use arrow keys or WASD to move.">
-        <header class="arcade-header"><span>✦ ARCADE 01: PIXIE LAUNCHPAD</span><small>WASD / ARROWS TO MOVE · CLICK SPARKLES</small></header>
-        <div id="arcadeMap">
-            <div id="mapStage">
-            <aside id="tutorialPanel">
-                <header><strong>QUEST LOG.exe</strong><button id="tutorialHide" type="button" aria-label="Hide quest log">_</button></header>
-                <h2 id="tutorialTitle">WAKE THE ARCADE</h2>
-                <p id="tutorialCopy">Follow the sparkles and power up the old machines.</p>
-                <p id="tutorialProgress">0 / 5 machines awakened</p>
-                <span>REWARD: +50 XP · ARCADE AWAKENED BADGE</span>
-            </aside>
-            <button class="hotspot cabinets" data-reward="Arcade Token" data-xp="10" data-mana="0"><span>ARCADE MACHINES</span></button>
-            <button class="hotspot portal" data-reward="Bag of Pixie Dust" data-xp="25" data-mana="0"><span>PORTAL WINDOW</span></button>
-            <button class="hotspot cafe" data-reward="Magic Mushroom" data-xp="5" data-mana="8"><span>PIXIE CAFÉ</span></button>
-            <button class="hotspot terminal" data-reward="Yak" data-xp="12" data-mana="0"><span>CHAT TERMINAL</span></button>
-            <button class="hotspot stump" data-reward="Bits &amp; Bobs" data-xp="8" data-mana="4"><span>STUMP TABLE</span></button>
-
-            <div id="gamePlayer" aria-label="Your Being">
-                <img id="extraLayer" class="avatar-layer" alt="">
-                <img id="bodyLayer" class="avatar-layer" alt="">
-                <img id="earsLayer" class="avatar-layer" alt="">
-                <img id="headLayer" class="avatar-layer" alt="">
-                <img id="eyesLayer" class="avatar-layer" alt="">
-                <img id="hairLayer" class="avatar-layer" alt="">
-                <img id="fitLayer" class="avatar-layer" alt="">
-            </div>
-            <div id="rewardToast" role="status" aria-live="polite"></div>
-            <div id="touchControls" aria-label="Move your Being">
-                <button type="button" data-move="up" aria-label="Move up">&uarr;</button>
-                <button type="button" data-move="left" aria-label="Move left">&larr;</button>
-                <button type="button" data-move="down" aria-label="Move down">&darr;</button>
-                <button type="button" data-move="right" aria-label="Move right">&rarr;</button>
-            </div>
-            </div>
-        </div>
-        <footer><span id="arcadeStats">LVL 01 · XP 120 / 300 · MANA 80 / 100</span><button id="focusButton" type="button">FOCUS GAME</button></footer>
-    </main>
-    <script src="arcade.js"></script>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Arcade Lounge · 8BitGPU</title><link rel="stylesheet" href="arcade.css"></head>
+<body><main id="arcadeGame">
+<header class="arcade-header"><div><strong>✦ ARCADE LOUNGE</strong><small>OUR FIRST SHARED ROOM · 18+</small></div><span id="roomCount">Connecting...</span><a href="account.html">Account</a></header>
+<div id="roomStatus" role="status">Checking your access...</div>
+<section id="roomGate" hidden><h1>Come hang out in the arcade</h1><p>This private room is for approved adults. Be respectful. No harassment, threats, spam, or sharing another person's private information.</p><label><input id="adult" type="checkbox"> I am 18 or older.</label><label><input id="rules" type="checkbox"> I agree to the room rules.</label><button id="joinRoom">Enter room</button></section>
+<div class="room-layout"><section id="arcadeMap" aria-label="Arcade room"><div id="mapStage" tabindex="0" role="application" aria-label="Use arrows or WASD to walk. Click the floor to move."><div class="room-sign">PIXIE LAUNCHPAD<small>Make yourself at home ✦</small></div><div id="players"></div><div id="walkMarker" hidden></div></div><p class="movement-hint">CLICK / TAP TO WALK · WASD / ARROWS</p></section>
+<aside class="room-chat"><div class="chat-heading">ROOM CHAT <a href="chat.html">Moderation &amp; blocks ↗</a></div><div id="roomMessages" role="log" aria-label="Room messages" aria-live="polite"></div><form id="roomComposer"><label for="roomMessage">Say something</label><textarea id="roomMessage" maxlength="500" rows="2" placeholder="Say hello..." required disabled></textarea><button id="sendMessage" disabled>Send ✦</button></form></aside></div>
+<footer><span id="identity">Sign in with your own Being</span><span>Private preview</span></footer>
+</main><script src="arcade.js"></script></body></html>
