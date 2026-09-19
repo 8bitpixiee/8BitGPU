@@ -4,7 +4,7 @@ let profile = null;
 let isOwnProfile = false;
 let uploadBusy = false;
 
-function setStatus(message) { byId("pageStatus").textContent = message; }
+let statusTimer, fadeTimer; function setStatus(message) { clearTimeout(statusTimer); clearTimeout(fadeTimer); const box=byId("pageStatus"); box.classList.remove("fading"); box.textContent = message; if (/saved\.$/.test(message)) { fadeTimer=setTimeout(()=>box.classList.add("fading"),3200); statusTimer=setTimeout(()=>{box.textContent="";box.classList.remove("fading");},4200); } }
 function setLayer(name, source) {
     const image = byId(name + "Layer");
     image.src = source || "";
@@ -135,6 +135,7 @@ function applyStyle(style) {
     document.body.style.setProperty("--edge", colors.edge || defaults.edge);
     document.body.style.setProperty("--accent", colors.accent || defaults.accent);
     document.body.style.setProperty("--ink", colors.ink || defaults.ink);
+    window.applyWindowTheme?.(colors);
     const page = byId("profile");
     const url = profile?.images?.wall || colors.wallpaperUrl || "";
     page.classList.toggle("has-wallpaper", Boolean(url));
@@ -206,9 +207,11 @@ byId("profileForm").addEventListener("submit", async (event) => {
         const data = await getJson("/api/profile/me", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ mood: byId("moodInput").value, about: byId("aboutInput").value, favorites: byId("favoritesInput").value, theme: "violet", style: { ...paletteFromSliders(), wallpaperUrl: profile.style?.wallpaperUrl || "" } }) });
         render(data.profile);
         closeEditor();
+        parent.postMessage({type:"8bitgpu-theme-saved",colors:data.profile.style},location.origin);
         setStatus("Your MyPixel page is saved.");
     } catch (error) { setStatus(error.message); }
     finally { button.disabled = false; }
 });
 
 loadProfile();
+
