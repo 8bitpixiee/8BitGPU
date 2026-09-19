@@ -67,7 +67,7 @@ export async function handleChat(request, env, user, readBody) {
     const body=await readBody(request);
     if(typeof body?.x!=='number'||typeof body?.y!=='number'||!Number.isFinite(body.x)||!Number.isFinite(body.y))return reply({error:'Invalid position.'},400);
     const now=Date.now();
-    const x=Math.max(28,Math.min(76,body.x)),y=Math.max(54,Math.min(84,body.y));
+    const x=Math.max(6,Math.min(94,body.x)),y=Math.max(12,Math.min(94,body.y));
     await db.prepare('INSERT INTO chat_presence (user_id,x,y,updated_at) VALUES (?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET x=excluded.x,y=excluded.y,updated_at=excluded.updated_at WHERE chat_presence.updated_at<=?').bind(user.id,x,y,now,now-800).run();
     await db.prepare('DELETE FROM chat_presence WHERE updated_at<?').bind(now-20000).run();
     await db.prepare('DELETE FROM chat_emotes WHERE expires_at<=?').bind(now).run();

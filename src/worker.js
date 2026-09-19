@@ -94,6 +94,7 @@ async function ensureSchema(database) {
   await database.exec("CREATE TABLE IF NOT EXISTS player_data (user_id TEXT PRIMARY KEY, avatar_json TEXT, updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
   await database.exec("CREATE TABLE IF NOT EXISTS player_profiles (user_id TEXT PRIMARY KEY, mood TEXT NOT NULL DEFAULT '', about_text TEXT NOT NULL DEFAULT '', favorites_text TEXT NOT NULL DEFAULT '', theme TEXT NOT NULL DEFAULT 'violet', updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
   await database.exec("CREATE TABLE IF NOT EXISTS player_profile_styles (user_id TEXT PRIMARY KEY, background_color TEXT, paper_color TEXT, panel_color TEXT, edge_color TEXT, accent_color TEXT, ink_color TEXT, wallpaper_url TEXT NOT NULL DEFAULT '', updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
+  await database.exec("CREATE TABLE IF NOT EXISTS player_friends (user_id TEXT NOT NULL, friend_id TEXT NOT NULL, created_at INTEGER NOT NULL, PRIMARY KEY(user_id, friend_id), FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (friend_id) REFERENCES users(id));");
   await database.exec("CREATE TABLE IF NOT EXISTS store_orders (paypal_order_id TEXT PRIMARY KEY, status TEXT NOT NULL, amount TEXT NOT NULL, cart_json TEXT NOT NULL, payer_email TEXT, capture_id TEXT, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL);");
 }
 
@@ -259,6 +260,37 @@ async function handleApi(request, env, url) {
     if(limit.attempts>20)return json({error:"Too many account attempts. Please wait ten minutes."},429);
   }
   if (path.startsWith("/api/chat/")) return handleChat(request, env, await currentUser(request, env.DB), readBody);
+
+  if (path === "/api/friends" && request.method === "GET") {
+    const user = await currentUser(request, env.DB);
+    if (!user) return json({ error: "Sign in to view your friends." }, 401);
+    const friends = await env.DB.prepare(`SELECT users.id, users.username, player_profiles.updated_at AS profileUpdatedAt
+      FROM player_friends JOIN users ON users.id = player_friends.friend_id
+      LEFT JOIN player_profiles ON player_profiles.user_id = users.id
+      WHERE player_friends.user_id = ? ORDER BY users.username COLLATE NOCASE`).bind(user.id).all();
+    return json({ friends: friends.results });
+  }
+
+  if (path === "/api/friends" && request.method === "POST") {
+    const user = await currentUser(request, env.DB);
+    if (!user) return json({ error: "Sign in to add a friend." }, 401);
+    const body = await readBody(request);
+    const username = typeof body?.username === "string" ? body.username.trim() : "";
+    if (!validUsername(username)) return json({ error: "Enter a valid creature name." }, 400);
+    const friend = await env.DB.prepare("SELECT id, username FROM users WHERE username = ?").bind(username).first();
+    if (!friend) return json({ error: "That account does not exist yet." }, 404);
+    if (friend.id === user.id) return json({ error: "Your page is already in MyPixel." }, 400);
+    await env.DB.prepare("INSERT OR IGNORE INTO player_friends (user_id, friend_id, created_at) VALUES (?, ?, ?)").bind(user.id, friend.id, Date.now()).run();
+    return json({ friend: { id: friend.id, username: friend.username } }, 201);
+  }
+
+  const friendMatch = path.match(/^\/api\/friends\/([^/]+)$/);
+  if (friendMatch && request.method === "DELETE") {
+    const user = await currentUser(request, env.DB);
+    if (!user) return json({ error: "Sign in to change your friends." }, 401);
+    await env.DB.prepare("DELETE FROM player_friends WHERE user_id = ? AND friend_id = ?").bind(user.id, decodeURIComponent(friendMatch[1])).run();
+    return json({ ok: true });
+  }
 
   if (path === "/api/store/catalog" && request.method === "GET") {
     const products = storeCatalog(env);

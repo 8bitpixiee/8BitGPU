@@ -1,10 +1,8 @@
 /* A Being can be clicked to visit their public 8Bit Web page. */
-#players .being {
-    pointer-events: auto;
-    cursor: pointer;
-}
+#players .being { pointer-events: none; }
+#players .being-profile-link { pointer-events: auto; cursor: pointer; }
 
-#players .being:focus-visible {
+#players .being-profile-link:focus-visible {
     outline: 3px solid #caffc1;
     outline-offset: 5px;
 }
