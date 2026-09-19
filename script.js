@@ -260,7 +260,7 @@ const desktopApps = {
     discord: { title: "Community.exe", external: "https://discord.gg/RbqP4BAmH", description: "Join the 8BitGPU Discord community and show us your creature build.", width: 440, height: 305, left: 315, top: 150 },
     important: { title: "IMPORTANT.exe", src: "nick.html", width: 550, height: 450, left: 330, top: 105 },
     sonic: { title: "Sonic.exe", src: "sonic.html", width: 550, height: 450, left: 365, top: 130 },
-    profile: { title: "8Bit Web.exe", src: "profile.html", width: 900, height: 650, left: 125, top: 50 }
+    profile: { title: "MyPixel.exe", src: "profile.html", width: 900, height: 650, left: 125, top: 50 }
 };
 
 function toggleStartMenu() {
@@ -278,7 +278,7 @@ function closeStartMenu() {
 }
 
 function isPocketMode() {
-    return window.matchMedia("(max-width: 700px)").matches;
+    return window.matchMedia("(max-width: 700px), (max-height: 520px) and (orientation: landscape)").matches;
 }
 
 function closePocketApps() {
@@ -409,7 +409,7 @@ function openApp(appName, profileUsername) {
     if (isPocketMode()) {
         windowElement.classList.add("is-pocket-window");
         windowElement.style.width = "100vw";
-        windowElement.style.height = "calc(100vh - 58px)";
+        windowElement.style.height = "calc(100dvh - 58px)";
         windowElement.style.left = "0";
         windowElement.style.top = "0";
     } else {

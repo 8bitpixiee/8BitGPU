@@ -1,0 +1,46 @@
+.emote-bar {
+    display: flex;
+    gap: 4px;
+    padding: 6px;
+    overflow-x: auto;
+    background: #bda2cc;
+    border-bottom: 1px solid #8f70a4;
+}
+.emote-bar button { flex: 0 0 auto; padding: 4px 7px; font-size: 10px; }
+.emote-effect { position: absolute; z-index: 8; left: 68%; bottom: 66%; display: none; color: #fff; font-weight: bold; text-shadow: 1px 1px 2px #44215e; pointer-events: none; }
+.being.emote-dance { animation: loungeDance .55s ease-in-out infinite alternate; }
+.being.emote-spin { animation: loungeSpin .8s linear infinite; }
+.being.emote-wave img { animation: loungeWave .45s ease-in-out infinite alternate; transform-origin: 50% 80%; }
+.being.emote-smoke .emote-effect, .being.emote-laugh .emote-effect { display: block; }
+.being.emote-smoke .emote-effect::before { content: "☁"; font-size: 22px; animation: smokeRise 1.6s ease-out infinite; }
+.being.emote-laugh .emote-effect::before { content: "HA!"; font-size: 13px; color: #fff59a; animation: laughPop .5s ease-in-out infinite alternate; }
+@keyframes loungeDance { to { translate: 0 -8%; rotate: 7deg; scale: 1.04; } }
+@keyframes loungeSpin { to { rotate: 360deg; } }
+@keyframes loungeWave { to { rotate: 7deg; translate: 2% -2%; } }
+@keyframes smokeRise { from { opacity: .95; translate: 0 8px; scale: .7; } to { opacity: 0; translate: 12px -35px; scale: 1.25; } }
+@keyframes laughPop { to { translate: 0 -7px; scale: 1.15; } }
+
+@media (max-width: 650px) and (orientation: portrait) {
+    html, body { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
+    #arcadeGame { height: auto; min-height: 100dvh; overflow: visible; }
+    .room-layout { display: block; overflow: visible; }
+    #arcadeMap { height: min(66svh, 560px); min-height: 360px; }
+    .room-chat { min-height: 360px; border-top: 2px solid #ab87c3; }
+    #roomMessages { min-height: 190px; max-height: 38svh; }
+    .emote-bar { position: sticky; top: 0; z-index: 4; }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+    #arcadeGame { min-height: 0; }
+    .arcade-header { padding: 4px 8px; }
+    .arcade-header small, footer { display: none; }
+    .room-layout { grid-template-columns: minmax(0,1fr) minmax(220px,34vw); grid-template-rows: 1fr; }
+    .room-chat { border-top: 0; border-left: 2px solid #ab87c3; }
+    .chat-heading { padding: 4px 7px; }
+    .emote-bar { padding: 3px; }
+    .emote-bar button { padding: 3px 5px; }
+    #roomComposer { padding: 4px; }
+    #roomComposer textarea { height: 34px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .being.emote-dance, .being.emote-spin, .being.emote-wave img, .emote-effect::before { animation: none !important; }
+}

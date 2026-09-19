@@ -50,8 +50,14 @@ Existing local foundation: storefront UI, cart, server checkout code, and setup 
 - [x] Central walking area, desktop/touch controls, and chat typing isolation.
 - [ ] Deploy the release and run a private multi-device check on Cloudflare.
 
-## 8Bit Web profiles
+## MyPixel profiles
 - [x] Public MySpace-inspired profile page opened from the desktop.
-- [x] Account-backed mood, About Me, favorite things, and built-in page themes.
+- [x] Account-backed mood, About Me, favorite things, saved color-slider palette, and desktop wall-image links.
 - [x] Lounge Being click opens the matching public profile.
 - [ ] Add connections, a guestbook, inventory badges, and journal posts after profile testing.
+
+## Mobile and lounge emotes
+- [x] Restore touch scrolling inside mobile app windows.
+- [x] Support portrait scrolling and side-by-side landscape Lounge layout.
+- [x] Add synchronized Dance, Smoke, LOL, Spin, and Wave emotes.
+- [ ] Replace temporary CSS emotes with custom body-type sprite sheets.
