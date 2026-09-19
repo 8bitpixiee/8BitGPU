@@ -49,3 +49,9 @@ Existing local foundation: storefront UI, cart, server checkout code, and setup 
 - [x] Screenshot account ID configured as sole owner for the private room.
 - [x] Central walking area, desktop/touch controls, and chat typing isolation.
 - [ ] Deploy the release and run a private multi-device check on Cloudflare.
+
+## 8Bit Web profiles
+- [x] Public MySpace-inspired profile page opened from the desktop.
+- [x] Account-backed mood, About Me, favorite things, and built-in page themes.
+- [x] Lounge Being click opens the matching public profile.
+- [ ] Add connections, a guestbook, inventory badges, and journal posts after profile testing.

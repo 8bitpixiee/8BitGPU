@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>8Bit Web</title>
+    <link rel="stylesheet" href="profile.css">
+</head>
+<body data-theme="violet">
+    <main class="web-shell">
+        <header class="browser-bar">
+            <div class="browser-buttons" aria-hidden="true"><i></i><i></i><i></i></div>
+            <button id="backButton" type="button" aria-label="Back">←</button>
+            <button id="forwardButton" type="button" aria-label="Forward">→</button>
+            <div class="address-bar"><span>✦</span><output id="profileAddress">8bitgpu.net</output></div>
+            <a class="browser-link" href="index.html">Desktop</a>
+        </header>
+        <nav class="web-nav" aria-label="8Bit Web navigation">
+            <strong>8BIT WEB</strong>
+            <a href="#profile">Profile</a>
+            <a href="#collection">Collection</a>
+            <a href="#connections">Connections</a>
+            <button id="openLounge" type="button">Arcade Lounge</button>
+        </nav>
+
+        <p id="pageStatus" role="status">Connecting to 8Bit Web...</p>
+
+        <section id="profile" class="profile-page" hidden>
+            <header class="profile-title">
+                <div>
+                    <p>WELCOME TO</p>
+                    <h1 id="profileName">Loading...</h1>
+                    <span id="profileUrl">8bitgpu.net/~</span>
+                </div>
+                <button id="editButton" type="button" hidden>Edit My Page</button>
+            </header>
+
+            <div class="profile-grid">
+                <aside class="identity-card">
+                    <div id="beingPortrait" class="being-portrait" aria-label="Player Being">
+                        <img id="extraLayer" class="avatar-layer" alt="">
+                        <img id="bodyLayer" class="avatar-layer" alt="">
+                        <img id="earsLayer" class="avatar-layer" alt="">
+                        <img id="headLayer" class="avatar-layer" alt="">
+                        <img id="eyesLayer" class="avatar-layer" alt="">
+                        <img id="hairLayer" class="avatar-layer" alt="">
+                        <img id="fitLayer" class="avatar-layer" alt="">
+                    </div>
+                    <h2 id="cardName"></h2>
+                    <p class="mood-label">CURRENT MOOD</p>
+                    <p id="moodText" class="mood">Loading...</p>
+                    <button id="visitLounge" type="button">✦ Find me in the Lounge</button>
+                </aside>
+
+                <section class="profile-content">
+                    <article class="web-panel about-panel">
+                        <h2>About Me</h2>
+                        <p id="aboutText">This page is still being decorated.</p>
+                    </article>
+                    <article class="web-panel favorites-panel">
+                        <h2>Favorite Things</h2>
+                        <p id="favoritesText">Add some favorite things to make this page yours.</p>
+                    </article>
+                    <article id="collection" class="web-panel collection-panel">
+                        <h2>Character Collection</h2>
+                        <div class="badge-row">
+                            <span>✦ Being</span><span>✦ Arcade Visitor</span><span>✦ Profile Owner</span>
+                        </div>
+                        <p>Badges, inventory showcases, and game achievements will live here.</p>
+                    </article>
+                    <article id="connections" class="web-panel connections-panel">
+                        <h2>Connections</h2>
+                        <p>Connections and a guestbook are coming after the first private-room test.</p>
+                    </article>
+                </section>
+            </div>
+        </section>
+
+        <section id="editor" class="editor-window" hidden>
+            <header><strong>EDIT MY 8BIT WEB PAGE</strong><button id="closeEditor" type="button" aria-label="Close editor">×</button></header>
+            <form id="profileForm">
+                <label for="moodInput">Current mood <small>80 characters</small></label>
+                <input id="moodInput" maxlength="80" placeholder="feeling sparkly">
+                <label for="aboutInput">About me <small>1,000 characters</small></label>
+                <textarea id="aboutInput" maxlength="1000" rows="5" placeholder="Tell the world about your Being..."></textarea>
+                <label for="favoritesInput">Favorite things <small>240 characters</small></label>
+                <input id="favoritesInput" maxlength="240" placeholder="games, colors, snacks, songs...">
+                <fieldset>
+                    <legend>Page theme</legend>
+                    <label><input type="radio" name="theme" value="violet"> Violet Web</label>
+                    <label><input type="radio" name="theme" value="pink"> Bubblegum</label>
+                    <label><input type="radio" name="theme" value="aqua"> Aqua Circuit</label>
+                    <label><input type="radio" name="theme" value="midnight"> Midnight Club</label>
+                </fieldset>
+                <button id="saveProfile" type="submit">Save My Page</button>
+            </form>
+        </section>
+    </main>
+    <script src="profile.js"></script>
+</body>
+</html>

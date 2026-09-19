@@ -260,7 +260,7 @@ const desktopApps = {
     discord: { title: "Community.exe", external: "https://discord.gg/RbqP4BAmH", description: "Join the 8BitGPU Discord community and show us your creature build.", width: 440, height: 305, left: 315, top: 150 },
     important: { title: "IMPORTANT.exe", src: "nick.html", width: 550, height: 450, left: 330, top: 105 },
     sonic: { title: "Sonic.exe", src: "sonic.html", width: 550, height: 450, left: 365, top: 130 },
-    profile: { title: "MY BEING.exe", width: 410, height: 310, left: 510, top: 155, content: () => `<section class="os-welcome os-profile"><p class="os-profile-label">CURRENT BEING</p><h2>${escapePlayerName()}</h2><p>This is your little desktop companion. Style them in Avatar Lab, collect items, and take them along as the world grows.</p><button type="button" onclick="openApp('avatarLab')">Style My Being</button></section>` }
+    profile: { title: "8Bit Web.exe", src: "profile.html", width: 900, height: 650, left: 125, top: 50 }
 };
 
 function toggleStartMenu() {
@@ -387,13 +387,17 @@ function addDrag(windowElement, handle) {
     });
 }
 
-function openApp(appName) {
+function openApp(appName, profileUsername) {
     closeStartMenu();
     const app = desktopApps[appName];
     if (!app) return;
 
     let windowElement = openWindows.get(appName);
     if (windowElement) {
+        if (appName === "profile" && profileUsername) {
+            const frame = windowElement.querySelector("iframe");
+            if (frame) frame.src = `${app.src}?u=${encodeURIComponent(profileUsername)}`;
+        }
         windowElement.classList.remove("is-minimized");
         focusWindow(windowElement);
         return;
@@ -450,7 +454,7 @@ function openApp(appName) {
 
     if (app.src) {
         const frame = document.createElement("iframe");
-        frame.src = app.src;
+        frame.src = appName === "profile" && profileUsername ? `${app.src}?u=${encodeURIComponent(profileUsername)}` : app.src;
         frame.title = app.title;
         frame.scrolling = "auto";
         windowElement.appendChild(frame);
@@ -474,6 +478,10 @@ function openApp(appName) {
 }
 
 window.openApp = openApp;
+window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin || event.data?.type !== "8bitgpu-open-profile") return;
+    openApp("profile", event.data.username);
+});
 
 function escapePlayerName() {
     const value = localStorage.getItem("8bitgpu-player-name") || "Guest Pixie";
