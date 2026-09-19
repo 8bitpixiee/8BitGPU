@@ -5,7 +5,10 @@
   "compatibility_date": "2026-07-20",
   "assets": {
     "directory": ".",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
   },
   "d1_databases": [
     {
@@ -13,5 +16,10 @@
       "database_name": "8bit-players",
       "database_id": "c0825d53-8914-4749-bdc2-c421deca9654"
     }
-  ]
+  ],
+  "vars": {
+    "CHAT_ENABLED": "false",
+    "CHAT_TEST_USER_IDS": "",
+    "CHAT_OWNER_IDS": ""
+  }
 }

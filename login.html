@@ -40,9 +40,12 @@
                 <span>Checking the player database...</span>
             </div>
 
+            <details><summary>Forgot your passcode?</summary><form id="recoveryForm"><label for="savedRecoveryKey">Your saved recovery key</label><input id="savedRecoveryKey" type="password" autocomplete="off" maxlength="100" required><label for="newPassword">New passcode</label><input id="newPassword" type="password" autocomplete="new-password" minlength="8" maxlength="128" required><button class="secondary-button">Reset passcode</button></form><p>A recovery key must have been created in Account.exe before losing access.</p></details>
+            <p><a href="account.html">Account settings &amp; recovery key</a></p>
             <p class="future-note">Logged-in creatures keep their Avatar Lab outfit online. Inventory and game progress are next.</p>
         </section>
     </main>
     <script src="login.js"></script>
 </body>
 </html>
+

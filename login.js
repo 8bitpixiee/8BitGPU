@@ -101,3 +101,8 @@ async function loadExistingAccount() {
 }
 
 loadExistingAccount();
+
+document.getElementById('recoveryForm').addEventListener('submit',async event=>{
+ event.preventDefault();const button=event.submitter;button.disabled=true;
+ try{const r=await fetch('/api/auth/recover',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({recoveryKey:document.getElementById('savedRecoveryKey').value,password:document.getElementById('newPassword').value})});const d=await r.json();if(!r.ok)throw Error(d.error);event.target.reset();setStatus('Passcode reset. Sign in with your new passcode, then create a new recovery key in Account.exe.');}catch(e){setStatus(e.message);}finally{button.disabled=false;}
+});
