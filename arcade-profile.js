@@ -1,7 +1,8 @@
 document.getElementById("players")?.addEventListener("click", (event) => {
-    const being = event.target.closest(".being");
-    if (!being) return;
+    const nameButton = event.target.closest(".being-profile-link");
+    if (!nameButton) return;
+    const being = nameButton.closest(".being");
     event.stopPropagation();
-    const name = being.querySelector(".name")?.textContent?.replace(/ \(you\)$/, "");
+    const name = nameButton.textContent?.replace(/ \(you\)$/, "");
     if (name) window.parent?.postMessage({ type: "8bitgpu-open-profile", username: name }, location.origin);
 });
