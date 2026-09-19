@@ -1,0 +1,8 @@
+.git
+.git/**
+mode_modules/**
+src/**
+tests/**
+releases/**
+backups/**
+*.zip
