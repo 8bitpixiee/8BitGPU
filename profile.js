@@ -135,7 +135,7 @@ function applyStyle(style) {
     document.body.style.setProperty("--edge", colors.edge || defaults.edge);
     document.body.style.setProperty("--accent", colors.accent || defaults.accent);
     document.body.style.setProperty("--ink", colors.ink || defaults.ink);
-    const page = byId("profile");
+    const page = document.body;
     const url = profile?.images?.wall || colors.wallpaperUrl || "";
     page.classList.toggle("has-wallpaper", Boolean(url));
     page.style.setProperty("--wallpaper-image", url ? `url(\"${url.replace(/[\\\"]/g, "\\\\$&")}\")` : "none");
@@ -212,3 +212,20 @@ byId("profileForm").addEventListener("submit", async (event) => {
 });
 
 loadProfile();
+/*Full-page wallpaper, with its original colors.*/
+body.has-wallpaper {
+    background-image: var(--wallpaper-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attatchment: fixed;
+}
+.profile-page,
+.profile-page.has-wallpaper {
+    max-width: none;
+    margin: 0;
+    background: transparent;
+    background-image: none;
+    border: 0;
+    box-shadow: none;
+}
