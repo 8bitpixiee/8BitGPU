@@ -42,3 +42,10 @@ Existing local foundation: storefront UI, cart, server checkout code, and setup 
 - [x] Local API and two-browser tests.
 - [ ] Configure owner/tester IDs and validate on Cloudflare before enabling the private room.
 - [ ] Future: scalable live connections, membership/payment entitlements, retention policy.
+
+## Arcade Lounge upgrade
+- [x] Owner-managed member access from Account.exe (friends remain ordinary users).
+- [x] Existing arcade converted to shared avatar room with movement and speech bubbles.
+- [x] Screenshot account ID configured as sole owner for the private room.
+- [x] Central walking area, desktop/touch controls, and chat typing isolation.
+- [ ] Deploy the release and run a private multi-device check on Cloudflare.

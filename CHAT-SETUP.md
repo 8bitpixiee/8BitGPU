@@ -1,3 +1,5 @@
+> Current release: see ARCADE-LOUNGE-SETUP.md for owner-managed invitations and the shared arcade. The notes below describe the original private-chat foundation.
+
 # Private 18+ community test — 8BitGPU
 
 ## What is ready locally
@@ -44,4 +46,5 @@ Tests use local SQLite through a D1-compatible adapter. They do not certify Clou
 
 Cloudflare reference: https://developers.cloudflare.com/workers/static-assets/routing/worker-script/
 The /api/* routes run through the Worker. .assetsignore prevents backend source, test fixtures, and configuration artifacts from being published as static downloads.
+
 

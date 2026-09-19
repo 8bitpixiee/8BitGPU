@@ -251,7 +251,7 @@ const desktopApps = {
     coaching: { title: "1:1 Coaching.exe", external: "https://forms.gle/18ea3aWxwWu9c1rj9", description: "Book a one-on-one coaching session with 8Bit Pixiee.", width: 430, height: 290, left: 210, top: 145 },
     mealPlanning: { title: "Meal Planning.exe", external: "https://forms.gle/uD31jM6uUzGe3tUa7", description: "Open the meal-planning sign-up portal.", width: 430, height: 290, left: 245, top: 170 },
     twitch: { title: "8Bit Media Player.exe", src: "media-player.html", width: 920, height: 570, left: 185, top: 75 },
-    arcade: { title: "Arcade 01.exe", src: "arcade.html", width: 900, height: 650, left: 125, top: 50 },
+    arcade: { title: "Arcade Lounge.exe", src: "arcade.html", width: 900, height: 650, left: 125, top: 50 },
     inventory: { title: "INVENTORY.exe", width: 440, height: 400, left: 435, top: 140, content: () => {
         const inventory = getGameState().inventory || [];
         const items = inventory.length ? inventory.map((item) => `<li>✦ ${item}</li>`).join("") : "<li>Nothing collected yet. Visit Arcade 01!</li>";
@@ -674,5 +674,6 @@ document.querySelector("[data-wallpaper-close]").addEventListener("click", close
 
 showWallpaper(currentWallpaperIndex, true);
 setWallpaperShuffle(wallpaperShuffleEnabled);
+
 
 
