@@ -149,6 +149,11 @@ function applyStyle(style) {
     page.classList.toggle("has-wallpaper", Boolean(url));
     const wallpaper = url ? `url(\"${url.replace(/[\\\"]/g, "\\\\$&")}\")` : "none";
     document.body.style.setProperty("--wallpaper-image", wallpaper);
+    // The canvas (#profile), not the document body, paints the wallpaper.
+    // That leaves only one image layer behind draggable windows.
+    document.body.style.removeProperty("background-image");
+    document.body.style.removeProperty("background-size");
+    document.body.style.removeProperty("background-position");
 }
 function previewPalette() { applyStyle({...draftColors,wallpaperUrl:profile.style?.wallpaperUrl||''}); }
 function render(nextProfile) {
