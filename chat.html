@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chat.exe · 8BitGPU</title><link rel="stylesheet" href="chat.css"></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chat.exe · 8BitGPU</title><link rel="stylesheet" href="chat.css"><link rel="stylesheet" href="retro-windows.css"></head>
 <body><main class="chat-shell">
 <header><span class="flower">✿</span><div><strong>PIXIE CHAT</strong><small>THE GARDEN · ADULTS 18+</small></div><span id="connection">Connecting…</span></header>
 <nav><span id="identity">Private community preview</span><a href="account.html">Account</a><button id="logout" hidden>Sign out</button></nav>
@@ -8,5 +8,6 @@
 <section id="room" hidden><div id="messages" role="log" aria-label="Garden messages" aria-live="polite" aria-relevant="additions"></div><form id="composer"><label for="message">Your message</label><textarea id="message" maxlength="500" rows="2" placeholder="Say hello to the Garden…" required></textarea><div><small>Up to 500 characters · text only</small><button id="send">Send ✦</button></div></form><details><summary>Blocked members</summary><div id="blocks"></div></details></section>
 <details id="moderation" hidden><summary>Owner moderation</summary><button id="refreshReports">Refresh reports</button><div id="reports"></div><div id="restrictions"></div></details>
 <dialog id="reportDialog"><form id="reportForm"><h2>Report a message</h2><label for="reason">What happened?</label><textarea id="reason" maxlength="300" required></textarea><button>Submit report</button><button type="button" id="cancelReport">Cancel</button></form></dialog>
-</main><script src="chat.js"></script></body></html>
+</main><script src="chat.js"></script><script src="window-theme.js"></script></body></html>
+
 

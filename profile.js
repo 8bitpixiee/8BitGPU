@@ -4,7 +4,7 @@ let profile = null;
 let isOwnProfile = false;
 let uploadBusy = false;
 
-let statusTimer, fadeTimer; function setStatus(message) { clearTimeout(statusTimer); clearTimeout(fadeTimer); const box=byId("pageStatus"); box.classList.remove("fading"); box.textContent = message; if (/saved\.$/.test(message)) { fadeTimer=setTimeout(()=>box.classList.add("fading"),3200); statusTimer=setTimeout(()=>{box.textContent="";box.classList.remove("fading");},4200); } }
+let statusTimer; function setStatus(message) { clearTimeout(statusTimer); byId("pageStatus").textContent = message; if (/saved\.$/.test(message)) statusTimer=setTimeout(()=>byId("pageStatus").textContent="",4000); }
 function setLayer(name, source) {
     const image = byId(name + "Layer");
     image.src = source || "";
