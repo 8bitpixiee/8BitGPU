@@ -116,8 +116,7 @@ body.has-wallpaper { background-image:var(--wallpaper-image)!important; backgrou
 #windowCanvas .identity-title{
   margin:0!important;
   padding:9px 12px;
-  border:3px solid;
-  border-color:#fff color-mix(in srgb,var(--edge) 65%,#000) color-mix(in srgb,var(--edge) 65%,#000) #fff;
+  border:0;
   background:linear-gradient(90deg,var(--accent),var(--edge));
   color:var(--title-ink,white);
 }
@@ -125,7 +124,7 @@ body.has-wallpaper { background-image:var(--wallpaper-image)!important; backgrou
   height:286px;
   margin:0;
   background-color:transparent;
-  background-size:100% 100%;
+  background-size:158% 108%;
 }
 #windowCanvas .identity-card #cardName{margin:9px 0 4px;color:var(--title-ink,white);text-shadow:1px 1px var(--edge)}
 #windowCanvas .identity-card .mood-label,#windowCanvas .identity-card .mood{color:var(--title-ink,white);text-shadow:1px 1px var(--edge)}
@@ -138,6 +137,31 @@ body.has-wallpaper { background-image:var(--wallpaper-image)!important; backgrou
 #windowCanvas .favorites-panel{position:relative;padding:0;overflow:hidden}
 #windowCanvas .favorites-panel h2{position:absolute;left:2%;top:3%;width:84%;height:5.2%;margin:0;z-index:1}
 #windowCanvas .favorites-panel p{position:absolute;inset:16% 5% 7%;height:auto;min-height:0;margin:0;padding:10px;background:var(--panel);border:1px inset var(--paper);overflow:auto}
+
+/* The page wallpaper is the canvas now.  These former containers only made
+   a second, unrelated frame around the actual draggable windows. */
+.profile-page{
+  padding:0;
+  border:0;
+  box-shadow:none;
+}
+.profile-title{
+  border:0;
+  box-shadow:none;
+}
+#windowCanvas{margin-top:12px}
+
+/* Editing is a compact modal, never another draggable page panel. */
+.editor-window{
+  z-index:10000;
+  width:min(650px,calc(100% - 24px));
+  max-height:78dvh;
+  border:2px outset var(--panel)!important;
+  box-shadow:5px 5px 0 #0007!important;
+}
+.editor-window header{border:0!important}
+.editor-window form{padding:10px}
+@media(max-width:650px){.editor-window{max-height:88dvh;width:calc(100% - 16px)}}
 
 @media(max-width:550px){
   #windowCanvas .being-portrait{height:286px}

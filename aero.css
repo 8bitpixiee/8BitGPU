@@ -940,7 +940,7 @@ button, a, [role="button"], input, label { cursor: pointer !important; }
 }
 .os-window { transition: none !important; }
 .os-window.is-dragging { box-shadow: 2px 3px 8px #26123577 !important; }
-.os-window.is-dragging iframe { visibility: hidden; }
+.os-window.is-dragging iframe { visibility: visible; }
 .is-window-dragging .twinkle-field { visibility: hidden; }
 .is-window-dragging .avatar-character, .is-window-dragging #companion,
 .is-window-dragging .twinkle-field * { animation-play-state: paused !important; }
