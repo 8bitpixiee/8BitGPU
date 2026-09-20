@@ -169,6 +169,14 @@ body.has-wallpaper { background-image:var(--wallpaper-image)!important; backgrou
 .editor-window form{padding:10px}
 @media(max-width:650px){.editor-window{max-height:88dvh;width:calc(100% - 16px)}}
 
+/* MyPixel keeps its notes and favorites in separate draggable windows. */
+#windowCanvas .notepad-panel{position:relative;padding:0;overflow:hidden}
+#windowCanvas .notepad-panel h2{position:absolute;left:2%;top:3%;width:84%;height:5.2%;margin:0;z-index:1}
+#windowCanvas .notepad-panel p{position:absolute;inset:16% 5% 7%;height:auto;min-height:0;margin:0;padding:10px;background:var(--panel);border:1px inset var(--paper);overflow:auto}
+#windowCanvas .favorites-summary{padding:0;min-height:165px;border:2px outset var(--panel);background:var(--paper);box-shadow:none}
+#windowCanvas .favorites-summary h2{margin:0;padding:8px 10px;color:var(--title-ink);background:linear-gradient(90deg,var(--edge),var(--accent));font:bold 14px 'Courier New',monospace}
+#windowCanvas .favorites-summary p{margin:0;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+
 @media(max-width:550px){
   #windowCanvas .being-portrait{height:286px}
   #windowCanvas .identity-card #cardName{margin-top:8px}

@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS social_presence (user_id TEXT PRIMARY KEY,updated_at 
     if(method==='GET') return reply({layout:JSON.parse((await db.prepare('SELECT layout FROM profile_layouts WHERE user_id=?').bind(user.id).first())?.layout || '{}')});
     if(method==='PUT') {
       const body=await readBody(request), layout=body?.layout;
-      if(!layout || Array.isArray(layout) || typeof layout!=='object' || Object.keys(layout).length>12 || Object.entries(layout).some(([key,p])=> !/^(being|about|favorites|collection|connections|photo[123])$/.test(key)|| !p || !Number.isFinite(p.x)||!Number.isFinite(p.y)||p.x<0||p.x>1||p.y<0||p.y>10000)) return reply({error:'Invalid window arrangement.'},400);
+      if(!layout || Array.isArray(layout) || typeof layout!=='object' || Object.keys(layout).length>12 || Object.entries(layout).some(([key,p])=> !/^(being|about|notepad|favorites|collection|connections|photo[123])$/.test(key)|| !p || !Number.isFinite(p.x)||!Number.isFinite(p.y)||p.x<0||p.x>1||p.y<0||p.y>10000)) return reply({error:'Invalid window arrangement.'},400);
       await db.prepare('INSERT INTO profile_layouts VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET layout=excluded.layout').bind(user.id,JSON.stringify(layout)).run();
       return reply({ok:true});
     }
@@ -52,9 +52,9 @@ CREATE TABLE IF NOT EXISTS social_presence (user_id TEXT PRIMARY KEY,updated_at 
     return reply({ok:true});
   }
   if(path==='/api/friends' && method==='GET') {
-    const friends=await rows("SELECT u.id,u.username,d.avatar_json AS avatar,pi.updated_at AS selfieUpdatedAt,sp.updated_at AS activeAt FROM social_pairs p JOIN users u ON u.id=CASE WHEN p.a=? THEN p.b ELSE p.a END LEFT JOIN player_data d ON d.user_id=u.id LEFT JOIN profile_images pi ON pi.user_id=u.id AND pi.slot='1' LEFT JOIN social_presence sp ON sp.user_id=u.id WHERE (p.a=? OR p.b=?) AND p.status='accepted' ORDER BY u.username",user.id,user.id,user.id);
+    const friends=await rows("SELECT u.id,u.username,d.avatar_json AS avatar,pi.updated_at AS selfieUpdatedAt,sp.updated_at AS activeAt FROM social_pairs p JOIN users u ON u.id=CASE WHEN p.a=? THEN p.b ELSE p.a END LEFT JOIN player_data d ON d.user_id=u.id LEFT JOIN profile_images pi ON pi.user_id=u.id AND pi.slot='profile' LEFT JOIN social_presence sp ON sp.user_id=u.id WHERE (p.a=? OR p.b=?) AND p.status='accepted' ORDER BY u.username",user.id,user.id,user.id);
     const requests=await rows("SELECT u.id,u.username,p.sender FROM social_pairs p JOIN users u ON u.id=CASE WHEN p.a=? THEN p.b ELSE p.a END WHERE (p.a=? OR p.b=?) AND p.status='pending'",user.id,user.id,user.id);
-    return reply({friends:friends.map(f=>({...f,selfie:f.selfieUpdatedAt?`/api/profile-images/${encodeURIComponent(f.username)}/1?v=${f.selfieUpdatedAt}`:null,online:!!f.activeAt&&f.activeAt>Date.now()-70000,avatar:f.avatar?JSON.parse(f.avatar):null})),requests:requests.map(r=>({...r,incoming:r.sender!==user.id}))});
+    return reply({friends:friends.map(f=>({...f,selfie:f.selfieUpdatedAt?`/api/profile-images/${encodeURIComponent(f.username)}/profile?v=${f.selfieUpdatedAt}`:null,online:!!f.activeAt&&f.activeAt>Date.now()-70000,avatar:f.avatar?JSON.parse(f.avatar):null})),requests:requests.map(r=>({...r,incoming:r.sender!==user.id}))});
   }
   if(path==='/api/friends' && method==='POST') {
     const body=await readBody(request);
