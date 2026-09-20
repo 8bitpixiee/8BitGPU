@@ -20,7 +20,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .profile-content { display:grid; grid-template-columns:1fr 1fr; gap:10px; }.web-panel { min-height:130px; padding:10px; }.web-panel h2 { margin:-10px -10px 10px; padding:6px 9px; color:#fff; background:var(--edge); font:700 13px "Courier New",monospace; }.web-panel p { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; font-size:12px; line-height:1.5; }.about-panel { grid-column:span 2; }.badge-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:11px; }.badge-row span { padding:5px; color:#fff; background:var(--accent); border:1px solid #fff; font-size:10px; }
 .editor-window { position:fixed; z-index:5; inset:8% 50% auto 50%; width:min(570px,calc(100% - 24px)); max-height:84dvh; overflow:auto; transform:translateX(-50%); color:var(--ink); background:var(--paper); border:3px outset #fff; box-shadow:7px 7px 0 #321c4888; }.editor-window header { display:flex; justify-content:space-between; align-items:center; padding:8px; color:#fff; background:var(--edge); font:700 12px "Courier New",monospace; }.editor-window header button { border:1px solid #fff; background:#f2d9fa; color:#42225d; font-weight:bold; }.editor-window form { display:grid; gap:7px; padding:13px; }.editor-window label { font-size:12px; font-weight:bold; }.editor-window small { font-weight:normal; }.editor-window input,.editor-window textarea { width:100%; padding:7px; color:#2b1a3d; background:#fff; border:2px inset #fff; }.editor-window fieldset { display:flex; flex-wrap:wrap; gap:8px; border:1px solid var(--edge); }.editor-window fieldset label { font-weight:normal; }
 body { background-color:var(--wall) !important; background-image:none; }
-.profile-page.has-wallpaper { background-image:linear-gradient(#ffffffa8,#ffffffa8),var(--wallpaper-image); background-size:cover; background-position:center; }
+body.has-wallpaper { background-image:var(--wallpaper-image)!important; background-size:cover!important; background-position:center!important; background-attachment:fixed; }
+.profile-page.has-wallpaper { background-image:var(--wallpaper-image); background-size:cover; background-position:center; }
 .color-mixer { display:grid !important; grid-template-columns:1fr auto; align-items:center; }.color-mixer p { grid-column:1 / -1; margin:0; font-size:11px; }.color-mixer output { font-weight:normal; }.color-mixer input[type="range"] { grid-column:1 / -1; padding:0; border:0; accent-color:var(--accent); background:linear-gradient(90deg,#f44,#ff4,#4f4,#4ff,#44f,#f4f,#f44); }.desktop-wall-control { display:grid; gap:4px; }.desktop-wall-control p { margin:0; font-size:10px; }
 @media(max-width:650px) { .browser-buttons,.browser-bar button,.desktop-wall-control { display:none; }.browser-bar { height:35px; }.web-nav { gap:7px; flex-wrap:wrap; }.web-nav strong { width:100%; }.profile-page { margin:7px; padding:6px; }.profile-title { min-height:70px; padding:10px; align-items:start; flex-direction:column; }.profile-title h1 { font-size:26px; }.profile-grid,.profile-content { grid-template-columns:1fr; }.about-panel { grid-column:auto; }.being-portrait { height:190px; }.web-panel { min-height:auto; }.profile-title button { align-self:flex-end; } }
 /* MyPixel: personal stream windows and independent color mixing. */
@@ -101,3 +102,44 @@ body { background-color:var(--wall) !important; background-image:none; }
 .top-eight{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}.top-eight a{padding:8px;border:2px outset var(--panel);background:var(--panel);color:var(--ink);overflow-wrap:anywhere}
 @media(max-width:800px){#windowCanvas>[data-window]{width:calc((100% - 18px)/2)}}
 @media(max-width:550px){#windowCanvas>[data-window]{width:88%}#windowCanvas .stream-chat h2{font-size:12px}#windowCanvas .identity-card{display:block}.profile-page{overflow:visible}#windowCanvas .stream-mood-title{font-size:13px}}
+
+/* The Being is already a complete window illustration.  Do not put a second
+   card behind it: its title, portrait, name, and actions sit directly on the
+   page wallpaper like the other draggable windows. */
+#windowCanvas .identity-card{
+  padding:0;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+  text-align:center;
+}
+#windowCanvas .identity-title{
+  margin:0!important;
+  padding:9px 12px;
+  border:3px solid;
+  border-color:#fff color-mix(in srgb,var(--edge) 65%,#000) color-mix(in srgb,var(--edge) 65%,#000) #fff;
+  background:linear-gradient(90deg,var(--accent),var(--edge));
+  color:var(--title-ink,white);
+}
+#windowCanvas .being-portrait{
+  height:286px;
+  margin:0;
+  background-color:transparent;
+  background-size:100% 100%;
+}
+#windowCanvas .identity-card #cardName{margin:9px 0 4px;color:var(--title-ink,white);text-shadow:1px 1px var(--edge)}
+#windowCanvas .identity-card .mood-label,#windowCanvas .identity-card .mood{color:var(--title-ink,white);text-shadow:1px 1px var(--edge)}
+#windowCanvas .identity-card .mood-label{margin:8px 0 3px}
+#windowCanvas .identity-card .mood{margin-bottom:9px}
+#windowCanvas .identity-card #visitLounge{width:100%;color:var(--control-ink,var(--ink));background:var(--panel);border:2px outset var(--panel)}
+
+/* Keep the Notepad writing area inside the window instead of letting it drift
+   toward the bottom when a profile uses a tall or narrow arrangement. */
+#windowCanvas .favorites-panel{position:relative;padding:0;overflow:hidden}
+#windowCanvas .favorites-panel h2{position:absolute;left:2%;top:3%;width:84%;height:5.2%;margin:0;z-index:1}
+#windowCanvas .favorites-panel p{position:absolute;inset:16% 5% 7%;height:auto;min-height:0;margin:0;padding:10px;background:var(--panel);border:1px inset var(--paper);overflow:auto}
+
+@media(max-width:550px){
+  #windowCanvas .being-portrait{height:286px}
+  #windowCanvas .identity-card #cardName{margin-top:8px}
+}

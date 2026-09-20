@@ -138,8 +138,9 @@ function applyStyle(style) {
     window.applyWindowTheme?.(colors);
     const page = byId("profile");
     const url = profile?.images?.wall || colors.wallpaperUrl || "";
+    document.body.classList.toggle("has-wallpaper", Boolean(url));
     page.classList.toggle("has-wallpaper", Boolean(url));
-    page.style.setProperty("--wallpaper-image", url ? `url(\"${url.replace(/[\\\"]/g, "\\\\$&")}\")` : "none");
+    document.body.style.setProperty("--wallpaper-image", url ? `url(\"${url.replace(/[\\\"]/g, "\\\\$&")}\")` : "none");
 }
 function previewPalette() { applyStyle({...draftColors,wallpaperUrl:profile.style?.wallpaperUrl||''}); }
 function render(nextProfile) {
