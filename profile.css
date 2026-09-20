@@ -23,7 +23,17 @@ body { background-color:var(--wall) !important; background-image:none; }
 body.has-wallpaper { background-image:var(--wallpaper-image)!important; background-size:cover!important; background-position:center!important; background-attachment:fixed; }
 /* The wallpaper belongs to the MyPixel window itself.  Keeping it off this
    inner page prevents the same image from repeating behind the panels. */
-.profile-page.has-wallpaper { background-image:none; }
+.profile-page {
+   background-color :var(--wall);
+}
+.profile-page.has-wallpaper {
+   background-color: transparent !important;
+   background-image: var(--wallpaper-image) !important;
+   background-size: cover !important;
+   background-position: center !important;
+   background-repeat: no-repeat !important;
+   background-attatchment: fixed !important;
+}
 .color-mixer { display:grid !important; grid-template-columns:1fr auto; align-items:center; }.color-mixer p { grid-column:1 / -1; margin:0; font-size:11px; }.color-mixer output { font-weight:normal; }.color-mixer input[type="range"] { grid-column:1 / -1; padding:0; border:0; accent-color:var(--accent); background:linear-gradient(90deg,#f44,#ff4,#4f4,#4ff,#44f,#f4f,#f44); }.desktop-wall-control { display:grid; gap:4px; }.desktop-wall-control p { margin:0; font-size:10px; }
 @media(max-width:650px) { .browser-buttons,.browser-bar button,.desktop-wall-control { display:none; }.browser-bar { height:35px; }.web-nav { gap:7px; flex-wrap:wrap; }.web-nav strong { width:100%; }.profile-page { margin:7px; padding:6px; }.profile-title { min-height:70px; padding:10px; align-items:start; flex-direction:column; }.profile-title h1 { font-size:26px; }.profile-grid,.profile-content { grid-template-columns:1fr; }.about-panel { grid-column:auto; }.being-portrait { height:190px; }.web-panel { min-height:auto; }.profile-title button { align-self:flex-end; } }
 /* MyPixel: personal stream windows and independent color mixing. */
