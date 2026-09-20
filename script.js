@@ -235,7 +235,7 @@ restoreOnlinePlayer().then((isLoggedIn) => {
 });
 
 const desktopApps = {
-    social: { title: "Social.exe", src: "social.html", width: 430, height: 570, left: 280, top: 100 },
+    social: { title: "Social.exe", src: "social.html", width: 370, height: 500, left: 280, top: 100 },
     welcome: {
         title: "WELCOME.exe",
         width: 470,
@@ -479,9 +479,21 @@ function openApp(appName, profileUsername) {
 }
 
 window.openApp = openApp;
+window.openSocialDm = (friend) => {
+    if (!friend?.id || !friend?.username) return;
+    const appName = `dm-${friend.id}`;
+    desktopApps[appName] = {
+        title: `${friend.username} • DM`,
+        src: `social.html?dm=${encodeURIComponent(friend.id)}&name=${encodeURIComponent(friend.username)}`,
+        width: 340, height: 430, left: 620, top: 145
+    };
+    openApp(appName);
+};
 window.addEventListener("message", (event) => {
-    if (event.origin !== window.location.origin || event.data?.type !== "8bitgpu-open-profile") return;
-    openApp("profile", event.data.username);
+    if (event.origin !== window.location.origin) return;
+    if (event.data?.type === "8bitgpu-open-profile") openApp("profile", event.data.username);
+    if (event.data?.type === "8bitgpu-open-social-dm") window.openSocialDm(event.data.friend);
+    if (event.data?.type === "8bitgpu-open-app") openApp(event.data.app);
 });
 
 function escapePlayerName() {

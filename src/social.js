@@ -4,7 +4,8 @@ export async function handleSocial(request, db, user, readBody) {
 CREATE TABLE IF NOT EXISTS social_events (id INTEGER PRIMARY KEY AUTOINCREMENT,recipient TEXT NOT NULL,sender TEXT NOT NULL,kind TEXT NOT NULL,body TEXT NOT NULL DEFAULT '',seen INTEGER NOT NULL DEFAULT 0,created_at INTEGER NOT NULL);
 CREATE INDEX IF NOT EXISTS social_inbox ON social_events(recipient,id);
 CREATE TABLE IF NOT EXISTS social_top (user_id TEXT PRIMARY KEY,ids TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS profile_layouts (user_id TEXT PRIMARY KEY,layout TEXT NOT NULL);`);
+CREATE TABLE IF NOT EXISTS profile_layouts (user_id TEXT PRIMARY KEY,layout TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS social_presence (user_id TEXT PRIMARY KEY,updated_at INTEGER NOT NULL);`);
   await db.exec('CREATE TABLE IF NOT EXISTS social_migrations (name TEXT PRIMARY KEY);');
   if(!await db.prepare("SELECT 1 FROM social_migrations WHERE name='legacy-friends'").first()) {
     await db.batch([
@@ -30,6 +31,10 @@ CREATE TABLE IF NOT EXISTS profile_layouts (user_id TEXT PRIMARY KEY,layout TEXT
     return reply({friends});
   }
   if (!user) return reply({error:'Sign in to use your social window.'},401);
+  if(path==='/api/social/presence' && method==='POST') {
+    await db.prepare('INSERT INTO social_presence(user_id,updated_at) VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET updated_at=excluded.updated_at').bind(user.id,Date.now()).run();
+    return reply({ok:true});
+  }
   if (path === '/api/social/layout') {
     if(method==='GET') return reply({layout:JSON.parse((await db.prepare('SELECT layout FROM profile_layouts WHERE user_id=?').bind(user.id).first())?.layout || '{}')});
     if(method==='PUT') {
@@ -47,9 +52,9 @@ CREATE TABLE IF NOT EXISTS profile_layouts (user_id TEXT PRIMARY KEY,layout TEXT
     return reply({ok:true});
   }
   if(path==='/api/friends' && method==='GET') {
-    const friends=await rows("SELECT u.id,u.username FROM social_pairs p JOIN users u ON u.id=CASE WHEN p.a=? THEN p.b ELSE p.a END WHERE (p.a=? OR p.b=?) AND p.status='accepted' ORDER BY u.username",user.id,user.id,user.id);
+    const friends=await rows("SELECT u.id,u.username,d.avatar_json AS avatar,pi.updated_at AS selfieUpdatedAt,sp.updated_at AS activeAt FROM social_pairs p JOIN users u ON u.id=CASE WHEN p.a=? THEN p.b ELSE p.a END LEFT JOIN player_data d ON d.user_id=u.id LEFT JOIN profile_images pi ON pi.user_id=u.id AND pi.slot='1' LEFT JOIN social_presence sp ON sp.user_id=u.id WHERE (p.a=? OR p.b=?) AND p.status='accepted' ORDER BY u.username",user.id,user.id,user.id);
     const requests=await rows("SELECT u.id,u.username,p.sender FROM social_pairs p JOIN users u ON u.id=CASE WHEN p.a=? THEN p.b ELSE p.a END WHERE (p.a=? OR p.b=?) AND p.status='pending'",user.id,user.id,user.id);
-    return reply({friends,requests:requests.map(r=>({...r,incoming:r.sender!==user.id}))});
+    return reply({friends:friends.map(f=>({...f,selfie:f.selfieUpdatedAt?`/api/profile-images/${encodeURIComponent(f.username)}/1?v=${f.selfieUpdatedAt}`:null,online:!!f.activeAt&&f.activeAt>Date.now()-70000,avatar:f.avatar?JSON.parse(f.avatar):null})),requests:requests.map(r=>({...r,incoming:r.sender!==user.id}))});
   }
   if(path==='/api/friends' && method==='POST') {
     const body=await readBody(request);
@@ -75,6 +80,7 @@ CREATE TABLE IF NOT EXISTS profile_layouts (user_id TEXT PRIMARY KEY,layout TEXT
   if(path==='/api/social/events' && method==='GET') return reply({events:await rows('SELECT e.*,u.username FROM social_events e JOIN users u ON u.id=e.sender WHERE recipient=? ORDER BY e.id DESC LIMIT 100',user.id),unread:(await db.prepare('SELECT COUNT(*) AS n FROM social_events WHERE recipient=? AND seen=0').bind(user.id).first()).n});
   if(path==='/api/social/read' && method==='POST') {
     const body=await readBody(request);
+    if(typeof body?.friend==='string') { await db.prepare("UPDATE social_events SET seen=1 WHERE recipient=? AND sender=? AND kind='message'").bind(user.id,body.friend).run(); return reply({ok:true}); }
     if(!Number.isSafeInteger(body?.through)) return reply({error:'Invalid notification.'},400);
     await db.prepare('UPDATE social_events SET seen=1 WHERE recipient=? AND id<=?').bind(user.id,body.through).run(); return reply({ok:true});
   }
