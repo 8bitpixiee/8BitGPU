@@ -397,6 +397,24 @@ document.getElementById("saveButton").addEventListener("click", async () => {
     } catch { document.getElementById("saveStatus").textContent = "Saved here. Online save is unavailable right now."; }
 });
 document.getElementById("mobileSaveButton").addEventListener("click", () => document.getElementById("saveButton").click());
+document.getElementById("cameraButton").addEventListener("click", async () => {
+    const button = document.getElementById("cameraButton"), slot = document.getElementById("snapshotSlot").value;
+    button.disabled = true;
+    try {
+        const canvas = document.createElement("canvas"); canvas.width = canvas.height = 700;
+        const context = canvas.getContext("2d"), gradient = context.createLinearGradient(0, 0, 700, 700);
+        gradient.addColorStop(0, "#e4fff1"); gradient.addColorStop(.5, "#9ed9ca"); gradient.addColorStop(1, "#7760ad"); context.fillStyle = gradient; context.fillRect(0, 0, 700, 700);
+        const images = [...document.querySelectorAll("#avatarCharacter img")].filter(image => image.src && !image.hidden);
+        await Promise.all(images.map(image => image.decode?.().catch(() => {})));
+        for (const image of images) context.drawImage(image, 0, 0, 700, 700);
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/webp", .88));
+        if (!blob) throw Error("Camera could not create a snapshot.");
+        const response = await fetch("/api/profile/images/" + slot, {method:"PUT",headers:{"content-type":"image/webp"},body:blob});
+        const data = await response.json(); if (!response.ok) throw Error(data.error || "Snapshot could not save.");
+        document.getElementById("saveStatus").textContent = "Camera snapshot saved to Photo " + slot + ".";
+    } catch (error) { document.getElementById("saveStatus").textContent = error.message; }
+    finally { button.disabled = false; }
+});
 function playPreviewMotion() {
     const character = document.getElementById("avatarCharacter");
     character.classList.remove("is-hop");

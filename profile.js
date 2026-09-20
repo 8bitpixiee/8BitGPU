@@ -103,7 +103,7 @@ async function prepareImage(file) {
     } finally { bitmap.close(); }
 }
 function buildImageControls() {
-    for(const [slot,label] of [['wall','Page wallpaper'],['1','Picture 1'],['2','Picture 2'],['3','Picture 3']]) {
+    for(const [slot,label] of [['profile','Profile picture'],['wall','Page wallpaper'],['1','Picture 1'],['2','Picture 2'],['3','Picture 3']]) {
         const row=document.createElement('div');row.className='image-control';
         row.innerHTML='<label for="image'+slot+'">'+label+'</label><input id="image'+slot+'" type="file" accept="image/png,image/jpeg,image/webp"><button type="button" id="removeImage'+slot+'">Remove '+label.toLowerCase()+'</button>';
         byId('imageControls').append(row);
@@ -124,6 +124,11 @@ function buildImageControls() {
             finally {uploadBusy=false;document.querySelectorAll('#imageControls input,#imageControls button').forEach(control=>control.disabled=false);byId('closeEditor').disabled=false;byId('saveProfile').disabled=false;input.value='';}
         }
         input.addEventListener('change',()=>{if(input.files[0])change(input.files[0]);});remove.addEventListener('click',()=>change(null));
+        if(['1','2','3'].includes(slot)) {
+            const use=document.createElement('button');use.type='button';use.textContent='Use as page background';use.disabled=!profile.images?.[slot];
+            use.addEventListener('click',async()=>{if(!profile.images?.[slot])return;try{const data=await getJson('/api/profile/images/wall/from/'+slot,{method:'POST'});profile.images.wall=data.url;previewPalette();byId('uploadStatus').textContent=label+' is now your page background.';}catch(error){byId('uploadStatus').textContent=error.message;}});
+            row.append(use);
+        }
     }
 }
 function applyStyle(style) {
@@ -140,7 +145,11 @@ function applyStyle(style) {
     const url = profile?.images?.wall || colors.wallpaperUrl || "";
     document.body.classList.toggle("has-wallpaper", Boolean(url));
     page.classList.toggle("has-wallpaper", Boolean(url));
-    document.body.style.setProperty("--wallpaper-image", url ? `url(\"${url.replace(/[\\\"]/g, "\\\\$&")}\")` : "none");
+    const wallpaper = url ? `url(\"${url.replace(/[\\\"]/g, "\\\\$&")}\")` : "none";
+    document.body.style.setProperty("--wallpaper-image", wallpaper);
+    document.body.style.setProperty("background-image", wallpaper, "important");
+    document.body.style.setProperty("background-size", "cover", "important");
+    document.body.style.setProperty("background-position", "center", "important");
 }
 function previewPalette() { applyStyle({...draftColors,wallpaperUrl:profile.style?.wallpaperUrl||''}); }
 function render(nextProfile) {
@@ -155,8 +164,6 @@ function render(nextProfile) {
     byId("moodText").textContent = profile.mood || "Currently decorating this page.";
     byId("aboutText").textContent = profile.about || "This page is still being decorated.";
     byId("favoritesText").textContent = profile.favorites || "Add some favorite things to make this page yours.";
-    byId('streamFavorites').textContent = profile.favorites || 'A few of my favorite things…';
-    byId('streamMood').textContent = profile.mood || 'Currently decorating my corner of the internet.';
     renderAvatar(profile.avatar);
     renderImages();
     byId("profile").hidden = false;

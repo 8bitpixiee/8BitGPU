@@ -216,13 +216,24 @@ async function handleApi(request, env, url) {
   if (!["GET", "HEAD"].includes(request.method) && request.headers.get("Origin") !== url.origin) return json({ error: "Use this website to submit requests." }, 403);
   await ensureSchema(env.DB);
   const path = url.pathname;
-  const imageRead = path.match(/^\/api\/profile-images\/([a-zA-Z0-9_.-]{3,18})\/(wall|1|2|3)$/);
+  const imageRead = path.match(/^\/api\/profile-images\/([a-zA-Z0-9_.-]{3,18})\/(profile|wall|1|2|3)$/);
   if (imageRead && request.method === "GET") {
     const image = await env.DB.prepare("SELECT image_base64, mime FROM profile_images JOIN users ON users.id = profile_images.user_id WHERE users.username = ? AND slot = ?").bind(imageRead[1], imageRead[2]).first();
     if (!image) return json({error: "Image not found."}, 404);
     return new Response(base64ToBytes(image.image_base64), {headers: {"content-type": image.mime, "cache-control": "no-cache", "x-content-type-options": "nosniff"}});
   }
-  const imageWrite = path.match(/^\/api\/profile\/images\/(wall|1|2|3)$/);
+  const imageWrite = path.match(/^\/api\/profile\/images\/(profile|wall|1|2|3)$/);
+  const imageCopy = path.match(/^\/api\/profile\/images\/wall\/from\/(1|2|3)$/);
+  if (imageCopy && request.method === "POST") {
+    const user = await currentUser(request, env.DB);
+    if (!user) return json({error: "Sign in to change your images."}, 401);
+    const source = await env.DB.prepare("SELECT image_base64,mime FROM profile_images WHERE user_id=? AND slot=?").bind(user.id,imageCopy[1]).first();
+    if (!source) return json({error: "Upload that picture first."}, 404);
+    const now=Date.now();
+    await env.DB.prepare("INSERT INTO profile_images(user_id,slot,image_base64,mime,updated_at) VALUES(?,?,?,?,?) ON CONFLICT(user_id,slot) DO UPDATE SET image_base64=excluded.image_base64,mime=excluded.mime,updated_at=excluded.updated_at").bind(user.id,'wall',source.image_base64,source.mime,now).run();
+    await env.DB.prepare("UPDATE player_profile_styles SET wallpaper_url='' WHERE user_id=?").bind(user.id).run();
+    return json({url:`/api/profile-images/${encodeURIComponent(user.username)}/wall?v=${now}`});
+  }
   if (imageWrite && ["PUT", "DELETE"].includes(request.method)) {
     const user = await currentUser(request, env.DB);
     if (!user) return json({error: "Sign in to change your images."}, 401);

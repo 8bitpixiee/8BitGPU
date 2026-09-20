@@ -489,11 +489,18 @@ window.openSocialDm = (friend) => {
     };
     openApp(appName);
 };
+window.openProfileCard = (username) => {
+    if (!username) return;
+    const appName = `profile-card-${username.toLowerCase()}`;
+    desktopApps[appName] = { title: `${username} • MyPixel`, src: `profile-card.html?u=${encodeURIComponent(username)}`, width: 360, height: 400, left: 560, top: 130 };
+    openApp(appName);
+};
 window.addEventListener("message", (event) => {
     if (event.origin !== window.location.origin) return;
     if (event.data?.type === "8bitgpu-open-profile") openApp("profile", event.data.username);
     if (event.data?.type === "8bitgpu-open-social-dm") window.openSocialDm(event.data.friend);
     if (event.data?.type === "8bitgpu-open-app") openApp(event.data.app);
+    if (event.data?.type === "8bitgpu-open-profile-card") window.openProfileCard(event.data.username);
 });
 
 function escapePlayerName() {

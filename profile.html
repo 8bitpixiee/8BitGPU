@@ -18,6 +18,8 @@
         <nav class="web-nav" aria-label="MyPixel navigation">
             <strong>MyPixel</strong>
             <a href="#profile">Profile</a>
+            <a href="#favorites">Favorites</a>
+            <a href="#notepad">Notepad</a>
             <a href="#collection">Collection</a>
             <a href="#connections">Connections</a>
             <button id="openLounge" type="button">Arcade Lounge</button>
@@ -53,15 +55,12 @@
                 </aside>
 
                 <section class="profile-content">
-                    <article class="web-panel about-panel stream-chat">
-                        <h2>About Me — MyPixel</h2>
+                    <article id="notepad" class="web-panel favorites-panel notepad-panel">
+                        <h2>My Notepad</h2>
                         <p id="aboutText">This page is still being decorated.</p>
-                        <div class="stream-note" id="streamFavorites"></div>
-                        <h3 class="stream-mood-title">Current Mood</h3>
-                        <div class="stream-mood" id="streamMood"></div>
                     </article>
-                    <article class="web-panel favorites-panel">
-                        <h2>Favorites — Notepad</h2>
+                    <article id="favorites" class="web-panel favorites-summary">
+                        <h2>Favorites</h2>
                         <p id="favoritesText">Add some favorite things to make this page yours.</p>
                     </article>
                     <article id="collection" class="web-panel collection-panel">
@@ -89,8 +88,8 @@
             <form id="profileForm">
                 <label for="moodInput">Current mood <small>80 characters</small></label>
                 <input id="moodInput" maxlength="80" placeholder="feeling sparkly">
-                <label for="aboutInput">About me <small>1,000 characters</small></label>
-                <textarea id="aboutInput" maxlength="1000" rows="5" placeholder="Tell the world about your Being..."></textarea>
+                <label for="aboutInput">Notepad <small>1,000 characters</small></label>
+                <textarea id="aboutInput" maxlength="1000" rows="5" placeholder="Write whatever you want here..."></textarea>
                 <label for="favoritesInput">Favorite things <small>240 characters</small></label>
                 <input id="favoritesInput" maxlength="240" placeholder="games, colors, snacks, songs...">
                 <fieldset class="color-mixer"><legend>Your colors</legend><p>Every part has its own hue, saturation, and lightness. Mix them independently.</p><div id="colorControls"></div></fieldset>
