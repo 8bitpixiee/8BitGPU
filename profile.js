@@ -125,7 +125,9 @@ function buildImageControls() {
         }
         input.addEventListener('change',()=>{if(input.files[0])change(input.files[0]);});remove.addEventListener('click',()=>change(null));
         if(['1','2','3'].includes(slot)) {
-            const use=document.createElement('button');use.type='button';use.textContent='Use as page background';use.disabled=!profile.images?.[slot];
+            // The editor controls are built before the profile request returns.
+            // Keep this disabled until render() has a real image list to inspect.
+            const use=document.createElement('button');use.type='button';use.textContent='Use as page background';use.dataset.backgroundSource=slot;use.disabled=true;
             use.addEventListener('click',async()=>{if(!profile.images?.[slot])return;try{const data=await getJson('/api/profile/images/wall/from/'+slot,{method:'POST'});profile.images.wall=data.url;previewPalette();byId('uploadStatus').textContent=label+' is now your page background.';}catch(error){byId('uploadStatus').textContent=error.message;}});
             row.append(use);
         }
@@ -166,6 +168,9 @@ function render(nextProfile) {
     byId("favoritesText").textContent = profile.favorites || "Add some favorite things to make this page yours.";
     renderAvatar(profile.avatar);
     renderImages();
+    document.querySelectorAll('[data-background-source]').forEach((button) => {
+        button.disabled = !profile.images?.[button.dataset.backgroundSource];
+    });
     byId("profile").hidden = false;
     byId("editButton").hidden = !isOwnProfile;
 }
