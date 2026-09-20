@@ -13,7 +13,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .browser-buttons { display:flex; gap:4px; }.browser-buttons i { width:10px; height:10px; border:1px solid #fff; border-radius:50%; background:#7c4d99; }.browser-bar button { width:27px; height:25px; padding:0; border:1px solid #fff; color:#43225c; background:#eee0f4; border-radius:3px; }
 .address-bar { flex:1; min-width:90px; padding:5px 8px; border:2px inset #fff; color:#332044; background:#fff; font:12px "Courier New",monospace; }.address-bar span { color:#a45bba; }.browser-link { color:#fff; font-size:11px; }
 .web-nav { display:flex; align-items:center; gap:12px; padding:8px 13px; background:var(--paper); border-bottom:2px solid var(--edge); }.web-nav strong { margin-right:auto; letter-spacing:1px; color:var(--edge); }.web-nav a,.web-nav button { color:var(--ink); background:none; border:0; text-decoration:underline; font-size:11px; padding:3px; }
-#pageStatus:empty { display:none; }
+#pageStatus { margin:9px auto; max-width:940px; padding:8px 11px; color:var(--ink); background:#fff3c9; border:1px solid #b89852; font-size:12px; } #pageStatus:empty { display:none; }
 .profile-page { max-width:940px; margin:12px auto 0; padding:10px; color:var(--ink); background:var(--paper); border:3px outset #fff; box-shadow:4px 4px #39214888; }
 .profile-title { display:flex; align-items:end; justify-content:space-between; gap:12px; min-height:94px; padding:14px 17px; color:#fff; background:linear-gradient(135deg,var(--edge),var(--accent)); border:2px solid #fff; box-shadow:inset 0 2px #ffffff99; }.profile-title p { margin:0 0 3px; font-size:10px; letter-spacing:2px; }.profile-title h1 { margin:0; font:700 clamp(24px,6vw,49px) "Courier New",monospace; overflow-wrap:anywhere; text-shadow:2px 2px #3c214f; }.profile-title span { font-size:11px; }.profile-title button,#visitLounge,#saveProfile { border:2px outset #fff; color:var(--ink); background:#fff5ff; padding:7px 10px; font-weight:bold; }
 .profile-grid { display:grid; grid-template-columns:230px minmax(0,1fr); gap:10px; margin-top:10px; }.identity-card,.web-panel { border:2px solid var(--edge); background:var(--panel); box-shadow:inset 0 2px #fff9; }.identity-card { padding:9px; text-align:center; }.being-portrait { position:relative; height:220px; overflow:hidden; background:linear-gradient(155deg,var(--soft),#fff 50%,var(--accent)); border:2px inset #fff; }.avatar-layer { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; image-rendering:pixelated; }.identity-card h2 { margin:10px 0 3px; font:700 18px "Courier New",monospace; overflow-wrap:anywhere; }.mood-label { margin:13px 0 3px; font-size:9px; font-weight:bold; letter-spacing:1px; }.mood { min-height:28px; margin:0 0 12px; font-size:12px; overflow-wrap:anywhere; }.identity-card button { width:100%; font-size:11px; }
@@ -101,31 +101,3 @@ body { background-color:var(--wall) !important; background-image:none; }
 .top-eight{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}.top-eight a{padding:8px;border:2px outset var(--panel);background:var(--panel);color:var(--ink);overflow-wrap:anywhere}
 @media(max-width:800px){#windowCanvas>[data-window]{width:calc((100% - 18px)/2)}}
 @media(max-width:550px){#windowCanvas>[data-window]{width:88%}#windowCanvas .stream-chat h2{font-size:12px}#windowCanvas .identity-card{display:block}.profile-page{overflow:visible}#windowCanvas .stream-mood-title{font-size:13px}}
-
-/* ===== MyPixel windows: one shared retro frame (matches retro-windows.css), colored only by the page palette ===== */
-.profile-page{border:3px outset var(--panel);box-shadow:inset 1px 1px #fff,inset -1px -1px #222,6px 7px 0 #2a143e60}
-.profile-title{border:3px outset var(--panel);color:var(--title-ink,#fff)}
-.identity-card,.web-panel:not(.stream-chat),.photo-window{position:relative;padding:4px;border:3px outset var(--panel);border-radius:0;background:var(--panel);box-shadow:inset 1px 1px #fff,inset -1px -1px #222,3px 3px 0 #22152e66;color:var(--ink)}
-.web-panel:not(.stream-chat){padding:4px 4px 10px;min-height:0}
-.identity-title,.web-panel:not(.stream-chat)>h2,.photo-window figcaption{position:static;display:flex;align-items:center;justify-content:flex-start;gap:8px;width:auto;height:27px;margin:0 0 4px!important;padding:0 3px 0 6px;border:1px outset var(--panel);background:linear-gradient(90deg,var(--edge),var(--accent));color:var(--title-ink,#fff);font:bold 15px 'Courier New',monospace;letter-spacing:0;text-align:left;text-shadow:none;overflow:hidden;white-space:nowrap}
-.identity-title::after,.web-panel:not(.stream-chat)>h2::after,.photo-window figcaption::after{content:'_ \25A1 \00D7';float:none;flex:none;margin-left:auto;padding:0 4px;border:2px outset var(--panel);background:var(--panel);color:var(--control-ink,#321c48);font:bold 13px/17px Arial,sans-serif;letter-spacing:5px}
-#windowCanvas .identity-title{margin:0 0 4px!important}
-.identity-card{display:block}
-.being-portrait{position:relative;height:250px;margin:0;border:2px inset var(--panel);background:var(--paper)}
-.being-portrait::before{content:none}
-.being-portrait .avatar-layer{inset:6%;width:88%;height:88%}
-.identity-card #cardName,.identity-card .mood-label,.identity-card .mood,.identity-card #visitLounge{margin-left:8px;margin-right:8px}
-.identity-card #visitLounge{width:calc(100% - 16px);margin-bottom:6px}
-#visitLounge{background:var(--panel);color:var(--control-ink,#321c48);border:2px outset var(--panel)}
-.web-panel:not(.stream-chat):not(.favorites-panel)>:not(h2){margin-left:8px;margin-right:8px}
-.web-panel:not(.stream-chat)>p{margin-top:8px;margin-bottom:8px}
-.favorites-panel{aspect-ratio:auto;min-height:0}
-.favorites-panel h2::before{content:'\25A4\00A0'}
-.favorites-panel p{height:auto;min-height:96px;margin:0;padding:10px;border:2px inset var(--panel);background:var(--paper);color:var(--ink);overflow:auto;font:13px/1.6 'Courier New',monospace}
-.top-eight{margin-top:8px}
-.connections-panel button{margin-bottom:6px;padding:6px 10px;border:2px outset var(--panel);background:var(--panel);color:var(--control-ink,#321c48);font-weight:bold}
-.connections-panel button:active{border-style:inset}
-#windowCanvas .photo-window{aspect-ratio:auto}
-.photo-content{position:relative;inset:auto;aspect-ratio:1.45;border:2px inset var(--panel);background:var(--paper);color:var(--ink)}
-#profile>button{margin:14px 0 0;font:bold 13px 'Courier New',monospace}
-#pageStatus{transition:opacity .8s ease}#pageStatus.fading{opacity:0}

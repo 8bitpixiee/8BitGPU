@@ -1,3 +1,4 @@
+import { handleSocial } from "./social.js";
 import { handleChat } from "./chat.js";
 import { STORE_PRODUCTS } from "../store-catalog.js";
 
@@ -261,37 +262,7 @@ async function handleApi(request, env, url) {
   }
   if (path.startsWith("/api/chat/")) return handleChat(request, env, await currentUser(request, env.DB), readBody);
 
-  if (path === "/api/friends" && request.method === "GET") {
-    const user = await currentUser(request, env.DB);
-    if (!user) return json({ error: "Sign in to view your friends." }, 401);
-    const friends = await env.DB.prepare(`SELECT users.id, users.username, player_profiles.updated_at AS profileUpdatedAt
-      FROM player_friends JOIN users ON users.id = player_friends.friend_id
-      LEFT JOIN player_profiles ON player_profiles.user_id = users.id
-      WHERE player_friends.user_id = ? ORDER BY users.username COLLATE NOCASE`).bind(user.id).all();
-    return json({ friends: friends.results });
-  }
-
-  if (path === "/api/friends" && request.method === "POST") {
-    const user = await currentUser(request, env.DB);
-    if (!user) return json({ error: "Sign in to add a friend." }, 401);
-    const body = await readBody(request);
-    const username = typeof body?.username === "string" ? body.username.trim() : "";
-    if (!validUsername(username)) return json({ error: "Enter a valid creature name." }, 400);
-    const friend = await env.DB.prepare("SELECT id, username FROM users WHERE username = ?").bind(username).first();
-    if (!friend) return json({ error: "That account does not exist yet." }, 404);
-    if (friend.id === user.id) return json({ error: "Your page is already in MyPixel." }, 400);
-    await env.DB.prepare("INSERT OR IGNORE INTO player_friends (user_id, friend_id, created_at) VALUES (?, ?, ?)").bind(user.id, friend.id, Date.now()).run();
-    return json({ friend: { id: friend.id, username: friend.username } }, 201);
-  }
-
-  const friendMatch = path.match(/^\/api\/friends\/([^/]+)$/);
-  if (friendMatch && request.method === "DELETE") {
-    const user = await currentUser(request, env.DB);
-    if (!user) return json({ error: "Sign in to change your friends." }, 401);
-    await env.DB.prepare("DELETE FROM player_friends WHERE user_id = ? AND friend_id = ?").bind(user.id, decodeURIComponent(friendMatch[1])).run();
-    return json({ ok: true });
-  }
-
+  if (path.startsWith("/api/social/") || path === "/api/friends" || path.startsWith("/api/friends/")) return handleSocial(request, env.DB, await currentUser(request, env.DB), readBody);
   if (path === "/api/store/catalog" && request.method === "GET") {
     const products = storeCatalog(env);
     return json({ products, checkout: { paypalReady: Boolean(env.PAYPAL_CLIENT_ID && env.PAYPAL_CLIENT_SECRET), clientId: env.PAYPAL_CLIENT_ID || null, environment: env.PAYPAL_ENV === "live" ? "live" : "sandbox" } });
@@ -479,6 +450,7 @@ export default {
     return env.ASSETS.fetch(request);
   }
 };
+
 
 
 

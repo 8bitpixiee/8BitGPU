@@ -235,6 +235,7 @@ restoreOnlinePlayer().then((isLoggedIn) => {
 });
 
 const desktopApps = {
+    social: { title: "Social.exe", src: "social.html", width: 430, height: 570, left: 280, top: 100 },
     welcome: {
         title: "WELCOME.exe",
         width: 470,
@@ -682,6 +683,7 @@ document.querySelector("[data-wallpaper-close]").addEventListener("click", close
 
 showWallpaper(currentWallpaperIndex, true);
 setWallpaperShuffle(wallpaperShuffleEnabled);
+
 
 
 
