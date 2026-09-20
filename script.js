@@ -555,6 +555,7 @@ if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
 }
 
 const desktopWallpapers = ["wallpaper-1-purple.png", "wallpaper-2-purple.png", "wallpaper-3-purple.png", "wallpaper-4-purple.png"];
+const builtInWallpaperCount = desktopWallpapers.length;
 const wallpaperFrames = Array.from(document.querySelectorAll(".wallpaper-frame"));
 let activeWallpaperFrame = 0;
 let currentWallpaperIndex = Number.parseInt(localStorage.getItem("8bitgpu-wallpaper-index") || "1", 10);
@@ -624,6 +625,25 @@ function closeDesktopContextMenu() { desktopContextMenu.hidden = true; }
 function renderWallpaperSelection() {
     document.querySelectorAll("[data-wallpaper-index]").forEach((button) => button.classList.toggle("is-selected", Number(button.dataset.wallpaperIndex) === pendingWallpaperIndex));
 }
+function addSavedDesktopBackground(url, label) {
+    if (!url || desktopWallpapers.includes(url)) return;
+    const index = desktopWallpapers.push(url) - 1;
+    const button = document.createElement('button');
+    button.type = 'button'; button.dataset.wallpaperIndex = String(index);
+    button.innerHTML = `<img src="${url}" alt="${label}"><span>${label}</span>`;
+    document.querySelector('.wallpaper-grid').append(button);
+}
+async function loadSavedDesktopBackgrounds() {
+    try {
+        const response = await fetch('/api/profile/me', {cache:'no-store'});
+        if (!response.ok) return;
+        const profile = (await response.json()).profile;
+        ['desktop1','desktop2','desktop3'].forEach((slot, index) => {
+            if (profile.images?.[slot]) addSavedDesktopBackground(profile.images[slot], `My Background ${index + 1}`);
+        });
+        renderWallpaperSelection();
+    } catch { /* The built-in backgrounds stay available offline. */ }
+}
 function openWallpaperPicker() {
     pendingWallpaperIndex = currentWallpaperIndex;
     document.getElementById("wallpaperShuffleToggle").checked = wallpaperShuffleEnabled;
@@ -684,11 +704,27 @@ document.addEventListener("keydown", (event) => {
     closeWallpaperPicker();
 });
 
-document.querySelectorAll("[data-wallpaper-index]").forEach((button) => button.addEventListener("click", () => {
+document.querySelector('.wallpaper-grid').addEventListener("click", (event) => {
+    const button = event.target.closest('[data-wallpaper-index]');
+    if (!button) return;
     pendingWallpaperIndex = Number(button.dataset.wallpaperIndex);
     renderWallpaperSelection();
     showWallpaper(pendingWallpaperIndex, false, false);
-}));
+});
+document.getElementById('desktopWallpaperUpload')?.addEventListener('change', async (event) => {
+    const file = event.target.files?.[0]; if (!file) return;
+    if (!['image/png','image/jpeg','image/webp'].includes(file.type)) { alert('Choose a PNG, JPEG, or WebP image.'); event.target.value=''; return; }
+    const slots=['desktop1','desktop2','desktop3'];
+    try {
+        const response = await fetch('/api/profile/me',{cache:'no-store'}); const current=response.ok ? (await response.json()).profile : null;
+        const slot=slots.find(name=>!current?.images?.[name]) || 'desktop3';
+        const image=await createImageBitmap(file), scale=Math.min(1,1400/Math.max(image.width,image.height)), canvas=document.createElement('canvas');canvas.width=Math.round(image.width*scale);canvas.height=Math.round(image.height*scale);canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);image.close();let blob=null;for(const quality of [.85,.68,.5,.32]){blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',quality));if(blob?.size<=512*1024)break;}if(!blob||blob.size>512*1024)throw Error('That image is too detailed. Try a smaller photo.');
+        const saved=await fetch('/api/profile/images/'+slot,{method:'PUT',headers:{'content-type':'image/webp'},body:blob}); const data=await saved.json();
+        if (!saved.ok) throw Error(data.error || 'Could not save that background.');
+        addSavedDesktopBackground(data.url, 'My Background '+(slots.indexOf(slot)+1));
+        pendingWallpaperIndex=desktopWallpapers.indexOf(data.url); renderWallpaperSelection(); showWallpaper(pendingWallpaperIndex,false,false);
+    } catch(error) { alert(error.message); } finally { event.target.value=''; }
+});
 document.querySelector("[data-wallpaper-save]").addEventListener("click", () => {
     showWallpaper(pendingWallpaperIndex);
     setWallpaperShuffle(document.getElementById("wallpaperShuffleToggle").checked);
@@ -702,6 +738,7 @@ document.querySelector("[data-wallpaper-close]").addEventListener("click", close
 
 showWallpaper(currentWallpaperIndex, true);
 setWallpaperShuffle(wallpaperShuffleEnabled);
+loadSavedDesktopBackgrounds();
 
 
 
