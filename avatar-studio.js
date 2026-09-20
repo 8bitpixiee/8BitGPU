@@ -411,7 +411,7 @@ document.getElementById("cameraButton").addEventListener("click", async () => {
         if (!blob) throw Error("Camera could not create a snapshot.");
         const response = await fetch("/api/profile/images/" + slot, {method:"PUT",headers:{"content-type":"image/webp"},body:blob});
         const data = await response.json(); if (!response.ok) throw Error(data.error || "Snapshot could not save.");
-        document.getElementById("saveStatus").textContent = "Camera snapshot saved to Photo " + slot + ".";
+        document.getElementById("saveStatus").textContent = "Camera snapshot saved to Desktop Backgrounds.";
     } catch (error) { document.getElementById("saveStatus").textContent = error.message; }
     finally { button.disabled = false; }
 });

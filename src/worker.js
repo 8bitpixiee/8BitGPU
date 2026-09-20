@@ -216,13 +216,13 @@ async function handleApi(request, env, url) {
   if (!["GET", "HEAD"].includes(request.method) && request.headers.get("Origin") !== url.origin) return json({ error: "Use this website to submit requests." }, 403);
   await ensureSchema(env.DB);
   const path = url.pathname;
-  const imageRead = path.match(/^\/api\/profile-images\/([a-zA-Z0-9_.-]{3,18})\/(profile|wall|1|2|3)$/);
+  const imageRead = path.match(/^\/api\/profile-images\/([a-zA-Z0-9_.-]{3,18})\/(profile|wall|1|2|3|desktop1|desktop2|desktop3)$/);
   if (imageRead && request.method === "GET") {
     const image = await env.DB.prepare("SELECT image_base64, mime FROM profile_images JOIN users ON users.id = profile_images.user_id WHERE users.username = ? AND slot = ?").bind(imageRead[1], imageRead[2]).first();
     if (!image) return json({error: "Image not found."}, 404);
     return new Response(base64ToBytes(image.image_base64), {headers: {"content-type": image.mime, "cache-control": "no-cache", "x-content-type-options": "nosniff"}});
   }
-  const imageWrite = path.match(/^\/api\/profile\/images\/(profile|wall|1|2|3)$/);
+  const imageWrite = path.match(/^\/api\/profile\/images\/(profile|wall|1|2|3|desktop1|desktop2|desktop3)$/);
   const imageCopy = path.match(/^\/api\/profile\/images\/wall\/from\/(1|2|3)$/);
   if (imageCopy && request.method === "POST") {
     const user = await currentUser(request, env.DB);
