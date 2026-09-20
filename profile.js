@@ -149,9 +149,6 @@ function applyStyle(style) {
     page.classList.toggle("has-wallpaper", Boolean(url));
     const wallpaper = url ? `url(\"${url.replace(/[\\\"]/g, "\\\\$&")}\")` : "none";
     document.body.style.setProperty("--wallpaper-image", wallpaper);
-    document.body.style.setProperty("background-image", wallpaper, "important");
-    document.body.style.setProperty("background-size", "cover", "important");
-    document.body.style.setProperty("background-position", "center", "important");
 }
 function previewPalette() { applyStyle({...draftColors,wallpaperUrl:profile.style?.wallpaperUrl||''}); }
 function render(nextProfile) {
