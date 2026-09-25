@@ -11,6 +11,11 @@ CREATE TABLE IF NOT EXISTS chat_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, 
 CREATE INDEX IF NOT EXISTS chat_messages_user_time ON chat_messages(user_id, created_at);
 CREATE TABLE IF NOT EXISTS chat_blocks (user_id TEXT NOT NULL, blocked_id TEXT NOT NULL, PRIMARY KEY(user_id, blocked_id));
 CREATE TABLE IF NOT EXISTS chat_reports (message_id INTEGER NOT NULL, reporter_id TEXT NOT NULL, reason TEXT NOT NULL, created_at INTEGER NOT NULL, resolved INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(message_id, reporter_id));`);
+  // These columns are added separately so existing lounge databases upgrade in place.
+  for (const sql of [
+    "ALTER TABLE chat_presence ADD COLUMN facing TEXT NOT NULL DEFAULT 'down'",
+    "ALTER TABLE chat_presence ADD COLUMN flying INTEGER NOT NULL DEFAULT 0"
+  ]) { try { await db.exec(sql); } catch { /* The column already exists. */ } }
 }
 
 export async function handleChat(request, env, user, readBody) {
@@ -52,7 +57,7 @@ export async function handleChat(request, env, user, readBody) {
   if (!member) return reply({error:'This community is for adults 18+. Please accept the room rules.',code:'join_required'},403);
   if(path==='/api/chat/emote' && request.method==='POST') {
     const body=await readBody(request);
-    const allowed=new Set(['dance','smoke','laugh','spin','wave']);
+    const allowed=new Set(['dance','twerk','smoke','drink','shroom','laugh','spin','wave','crashout']);
     if(!allowed.has(body?.emote))return reply({error:'Choose an available emote.'},400);
     const expiresAt=Date.now()+8000;
     await db.prepare('INSERT INTO chat_emotes (user_id,emote,expires_at) VALUES (?,?,?) ON CONFLICT(user_id) DO UPDATE SET emote=excluded.emote,expires_at=excluded.expires_at').bind(user.id,body.emote,expiresAt).run();
@@ -66,12 +71,14 @@ export async function handleChat(request, env, user, readBody) {
     if(request.method!=='POST')return reply({error:'Method not supported.'},405);
     const body=await readBody(request);
     if(typeof body?.x!=='number'||typeof body?.y!=='number'||!Number.isFinite(body.x)||!Number.isFinite(body.y))return reply({error:'Invalid position.'},400);
+    const facing=['up','down','left','right'].includes(body?.facing)?body.facing:'down';
+    const flying=body?.flying===true?1:0;
     const now=Date.now();
     const x=Math.max(6,Math.min(94,body.x)),y=Math.max(12,Math.min(94,body.y));
-    await db.prepare('INSERT INTO chat_presence (user_id,x,y,updated_at) VALUES (?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET x=excluded.x,y=excluded.y,updated_at=excluded.updated_at WHERE chat_presence.updated_at<=?').bind(user.id,x,y,now,now-800).run();
+    await db.prepare('INSERT INTO chat_presence (user_id,x,y,updated_at,facing,flying) VALUES (?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET x=excluded.x,y=excluded.y,updated_at=excluded.updated_at,facing=excluded.facing,flying=excluded.flying WHERE chat_presence.updated_at<=?').bind(user.id,x,y,now,facing,flying,now-800).run();
     await db.prepare('DELETE FROM chat_presence WHERE updated_at<?').bind(now-20000).run();
     await db.prepare('DELETE FROM chat_emotes WHERE expires_at<=?').bind(now).run();
-    const rows=await db.prepare(`SELECT p.user_id AS id,u.username,p.x,p.y,d.avatar_json AS avatar,a.allowed,e.emote,e.expires_at AS emoteUntil
+    const rows=await db.prepare(`SELECT p.user_id AS id,u.username,p.x,p.y,p.facing,p.flying,d.avatar_json AS avatar,a.allowed,e.emote,e.expires_at AS emoteUntil
       FROM chat_presence p JOIN users u ON u.id=p.user_id JOIN chat_members m ON m.user_id=u.id
       LEFT JOIN player_data d ON d.user_id=u.id LEFT JOIN chat_access a ON a.user_id=u.id LEFT JOIN chat_emotes e ON e.user_id=u.id
       WHERE p.updated_at>? AND m.banned=0 AND NOT EXISTS (SELECT 1 FROM chat_blocks b WHERE b.user_id=? AND b.blocked_id=p.user_id)

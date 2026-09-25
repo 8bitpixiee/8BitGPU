@@ -7,18 +7,47 @@
     border-bottom: 1px solid #8f70a4;
 }
 .emote-bar button { flex: 0 0 auto; padding: 4px 7px; font-size: 10px; }
+.emote-bar button[aria-pressed="true"] { background:#c7ffe1; color:#183f35; }
+#mapStage::after { content:""; position:absolute; inset:0; pointer-events:none; z-index:20; opacity:0; transition:opacity .25s; mix-blend-mode:screen; }
+#mapStage.screen-smoke::after { opacity:.32; background:radial-gradient(circle at 32% 28%,#ff78d4aa,transparent 33%),radial-gradient(circle at 73% 72%,#55ffe499,transparent 40%),linear-gradient(115deg,#9e62df77,#fdb0d166); animation:screenHaze 2.1s ease-in-out infinite alternate; }
+#mapStage.screen-drink::after { opacity:.22; background:repeating-linear-gradient(100deg,transparent 0 18px,#b2ecff55 19px 23px,transparent 24px 40px); animation:screenDizzy .75s ease-in-out infinite alternate; }
+#mapStage.screen-shroom::after { opacity:.45; background:repeating-linear-gradient(90deg,#ff639955 0 3px,transparent 4px 34px),repeating-linear-gradient(176deg,#61fff855 0 2px,transparent 3px 47px); animation:screenShroom .18s steps(2) infinite; }
+.avatar-art { position:absolute; inset:0; transform-origin:50% 76%; }
+.avatar-art img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; image-rendering:pixelated; }
+.being[data-facing="left"] .avatar-art { scale:-1 1; }
+.being[data-facing="right"] .avatar-art { scale:1 1; }
 .emote-effect { position: absolute; z-index: 8; left: 68%; bottom: 66%; display: none; color: #fff; font-weight: bold; text-shadow: 1px 1px 2px #44215e; pointer-events: none; }
-.being.emote-dance { animation: loungeDance .55s ease-in-out infinite alternate; }
-.being.emote-spin { animation: loungeSpin .8s linear infinite; }
-.being.emote-wave img { animation: loungeWave .45s ease-in-out infinite alternate; transform-origin: 50% 80%; }
-.being.emote-smoke .emote-effect, .being.emote-laugh .emote-effect { display: block; }
-.being.emote-smoke .emote-effect::before { content: "☁"; font-size: 22px; animation: smokeRise 1.6s ease-out infinite; }
+.being.emote-dance .avatar-art { animation: loungeDance .55s ease-in-out infinite alternate; }
+.being.emote-twerk .avatar-art { animation: loungeTwerk .38s ease-in-out infinite alternate; }
+.being.emote-drink .avatar-art { animation: loungeDrinkIdle .68s ease-in-out infinite alternate; }
+.being.emote-spin .avatar-art { animation: loungeSpin .8s linear infinite; }
+.being.emote-wave .avatar-art { animation: loungeWave .45s ease-in-out infinite alternate; }
+.being.emote-laugh .avatar-art { animation: loungeLaugh .38s ease-in-out infinite alternate; }
+.being.emote-crashout .avatar-art { animation: loungeCrashout .22s ease-in-out infinite alternate; }
+.being.is-flying .avatar-art { animation: loungeFly 1.1s ease-in-out infinite alternate; }
+.being.emote-smoke .emote-effect, .being.emote-laugh .emote-effect, .being.emote-drink .emote-effect, .being.emote-shroom .emote-effect, .being.emote-crashout .emote-effect { display: block; }
+.being.emote-smoke .emote-effect::before { content: "☁ ✿"; font-size: 19px; animation: smokeRise 1.6s ease-out infinite; }
+.being.emote-smoke .avatar-art::after { content:""; position:absolute; left:43%; top:38%; width:5%; height:3%; background:#ff3f54; box-shadow:20px 0 #ff3f54; opacity:.8; }
 .being.emote-laugh .emote-effect::before { content: "HA!"; font-size: 13px; color: #fff59a; animation: laughPop .5s ease-in-out infinite alternate; }
-@keyframes loungeDance { to { translate: 0 -8%; rotate: 7deg; scale: 1.04; } }
-@keyframes loungeSpin { to { rotate: 360deg; } }
-@keyframes loungeWave { to { rotate: 7deg; translate: 2% -2%; } }
+.being.emote-drink .emote-effect::before { content: "° o °"; font-size: 17px; color:#bff7ff; animation: bubblesRise 1.25s ease-out infinite; }
+.being.emote-shroom .emote-effect::before { content: "✦ ✧ ✦"; font-size: 17px; color:#ffb7fa; animation: sparkleOrbit 1.1s linear infinite; }
+.being.emote-crashout .emote-effect::before { content: "! # @"; font-size: 14px; color:#ff8b8b; animation: crashSteam .55s ease-out infinite; }
+@keyframes loungeDance { to { translate:0 -8%; rotate:7deg; scale:1.04; } }
+@keyframes loungeTwerk { to { translate:0 3%; scale:1.08 .94; } }
+@keyframes loungeDrinkIdle { to { translate:2% -4%; rotate:3deg; } }
+@keyframes loungeSpin { to { rotate:360deg; } }
+@keyframes loungeWave { to { rotate:7deg; translate:2% -2%; } }
+@keyframes loungeLaugh { to { rotate:5deg; translate:0 -3%; } }
+@keyframes loungeCrashout { to { rotate:-6deg; translate:-4% 1%; } }
+@keyframes loungeFly { to { translate:0 -18%; } }
 @keyframes smokeRise { from { opacity: .95; translate: 0 8px; scale: .7; } to { opacity: 0; translate: 12px -35px; scale: 1.25; } }
 @keyframes laughPop { to { translate: 0 -7px; scale: 1.15; } }
+@keyframes bubblesRise { from { opacity:1; translate:0 7px; } to { opacity:0; translate:4px -30px; } }
+@keyframes sparkleOrbit { to { rotate:360deg; scale:1.13; } }
+@keyframes crashSteam { to { opacity:0; translate:3px -25px; scale:1.2; } }
+@keyframes screenHaze { to { filter:hue-rotate(70deg) blur(2px); } }
+@keyframes screenDizzy { to { rotate:.7deg; scale:1.025; filter:blur(.6px); } }
+@keyframes screenShroom { to { filter:hue-rotate(130deg) saturate(1.7); clip-path:polygon(0 2%,100% 0,98% 42%,100% 46%,100% 100%,0 98%,2% 60%,0 56%); } }
 
 @media (max-width: 650px) and (orientation: portrait) {
     html, body { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
@@ -42,5 +71,5 @@
     #roomComposer textarea { height: 34px; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .being.emote-dance, .being.emote-spin, .being.emote-wave img, .emote-effect::before { animation: none !important; }
+    .being .avatar-art, .emote-effect::before { animation: none !important; }
 }
