@@ -170,4 +170,12 @@ body { background:#76578f!important; }
 #toneGrid[data-palette-species="Thixie"] .peachy,
 #toneGrid[data-palette-species="Bovadill"] .milky { --swatch-color: #ffa970; }
 #toneGrid[data-palette-species="Bovadill"] .peachy { --swatch-color: #fcd3b6; }
+.skin-slider-controls { display:grid; grid-template-columns:120px minmax(0,1fr); gap:7px 11px; margin:16px 0 8px; padding:11px; border:2px groove #fff; color:#4b3558; }
+.skin-slider-controls legend { padding:0 5px; font-weight:700; }
+.skin-slider-controls p { grid-column:1 / -1; margin:0 0 2px; font-size:11px; line-height:1.35; }
+.skin-slider-controls label { display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:700; }
+.skin-slider-controls output { color:#74438f; }
+.skin-slider-controls input { width:100%; accent-color:#8b55af; }
+.skin-slider-controls button { grid-column:1 / -1; justify-self:start; padding:5px 9px; }
+@media (max-width:730px) { .skin-slider-controls { grid-template-columns:1fr; gap:4px; } .skin-slider-controls label { margin-top:4px; } }
 

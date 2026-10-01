@@ -52,6 +52,17 @@
                     <h1>Choose Colors</h1>
                     <p class="helper-text">Choose a palette available for your selected species and build.</p>
                     <div class="swatch-grid" id="toneGrid"></div>
+                    <fieldset class="skin-slider-controls" id="skinSliderControls">
+                        <legend>Fine-tune skin color</legend>
+                        <p>These sliders tint your body and face only. Hair, eyes, clothes, and extras keep their own colors.</p>
+                        <label for="skinHue">Hue <output id="skinHueValue">0°</output></label>
+                        <input id="skinHue" type="range" min="-180" max="180" value="0">
+                        <label for="skinSaturation">Saturation <output id="skinSaturationValue">100%</output></label>
+                        <input id="skinSaturation" type="range" min="0" max="200" value="100">
+                        <label for="skinLightness">Lightness <output id="skinLightnessValue">100%</output></label>
+                        <input id="skinLightness" type="range" min="60" max="140" value="100">
+                        <button type="button" id="resetSkinColor">Reset skin color</button>
+                    </fieldset>
                     <div id="breedGroup" hidden>
                         <h2>Choose Bovadill Coat</h2>
                         <div class="choice-grid species-grid" id="breedGrid"></div>

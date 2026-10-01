@@ -6,6 +6,7 @@ export async function ensureChatSchema(db) {
   await db.exec(`CREATE TABLE IF NOT EXISTS chat_access (user_id TEXT PRIMARY KEY, allowed INTEGER NOT NULL, granted_by TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS chat_presence (user_id TEXT PRIMARY KEY, x REAL NOT NULL, y REAL NOT NULL, updated_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS chat_emotes (user_id TEXT PRIMARY KEY, emote TEXT NOT NULL, expires_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS chat_activities (user_id TEXT PRIMARY KEY, state_json TEXT NOT NULL, updated_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS chat_members (user_id TEXT PRIMARY KEY, adult_at INTEGER NOT NULL, muted_until INTEGER NOT NULL DEFAULT 0, banned INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS chat_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, body TEXT NOT NULL, created_at INTEGER NOT NULL, deleted INTEGER NOT NULL DEFAULT 0);
 CREATE INDEX IF NOT EXISTS chat_messages_user_time ON chat_messages(user_id, created_at);
@@ -55,6 +56,11 @@ export async function handleChat(request, env, user, readBody) {
     return reply({ok:true});
   }
   if (!member) return reply({error:'This community is for adults 18+. Please accept the room rules.',code:'join_required'},403);
+  if(path==='/api/chat/activities') {
+    if(request.method==='GET') { const row=await db.prepare('SELECT state_json AS state FROM chat_activities WHERE user_id=?').bind(user.id).first(); return reply({state:row?.state||null}); }
+    if(request.method==='POST') { const body=await readBody(request); if(typeof body?.state!=='string'||body.state.length>5000)return reply({error:'Activity save is not valid.'},400); try{JSON.parse(body.state);}catch{return reply({error:'Activity save is not valid.'},400);} await db.prepare('INSERT INTO chat_activities (user_id,state_json,updated_at) VALUES (?,?,?) ON CONFLICT(user_id) DO UPDATE SET state_json=excluded.state_json,updated_at=excluded.updated_at').bind(user.id,body.state,Date.now()).run(); return reply({ok:true}); }
+    return reply({error:'Method not supported.'},405);
+  }
   if(path==='/api/chat/emote' && request.method==='POST') {
     const body=await readBody(request);
     const allowed=new Set(['dance','twerk','smoke','drink','shroom','laugh','spin','wave','crashout']);

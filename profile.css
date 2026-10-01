@@ -113,7 +113,7 @@ body.has-wallpaper { background-image:none!important; }
 .drag-handle{cursor:grab;touch-action:none;user-select:none}.drag-handle:active{cursor:grabbing}
 .top-eight{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}.top-eight a{padding:8px;border:2px outset var(--panel);background:var(--panel);color:var(--ink);overflow-wrap:anywhere}
 @media(max-width:800px){#windowCanvas>[data-window]{width:calc((100% - 18px)/2)}}
-@media(max-width:550px){#windowCanvas>[data-window]{width:88%}#windowCanvas .stream-chat h2{font-size:12px}#windowCanvas .identity-card{display:block}.profile-page{overflow:visible}#windowCanvas .stream-mood-title{font-size:13px}}
+@media(max-width:550px){#windowCanvas{margin-top:8px;min-height:calc(100dvh - 180px)}#windowCanvas>[data-window]{width:calc(100% - 16px);max-width:480px}#windowCanvas .stream-chat h2{font-size:12px}#windowCanvas .identity-card{display:block}.profile-page{overflow:visible}#windowCanvas .stream-mood-title{font-size:13px}.drag-handle{min-height:30px;padding-top:7px!important}.web-nav{position:sticky;top:0;z-index:20;box-shadow:0 2px 5px #0004}.profile-title{min-height:82px;padding:12px}.profile-title h1{font-size:clamp(27px,9vw,38px)}}
 
 /* The Being is already a complete window illustration.  Do not put a second
    card behind it: its title, portrait, name, and actions sit directly on the
