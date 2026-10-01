@@ -27,6 +27,14 @@ function loadSavedOutfit() {
             previewLayer.style.display = source ? "block" : "none";
         });
     };
+    const applySkinColor = (color) => {
+        const value = (key, fallback) => Number.isFinite(Number(color?.[key])) ? Number(color[key]) : fallback;
+        const filter = `hue-rotate(${Math.max(-180, Math.min(180, value("hue", 0)))}deg) saturate(${Math.max(0, Math.min(200, value("saturation", 100)))}%) brightness(${Math.max(60, Math.min(140, value("lightness", 100)))}%)`;
+        ["bodyLayer", "headLayer"].forEach((id) => {
+            const layer = document.getElementById(id); if (layer) layer.style.filter = filter;
+            document.querySelectorAll(`[data-avatar-layer="${id}"]`).forEach((previewLayer) => { previewLayer.style.filter = filter; });
+        });
+    };
 
     // Avatar Lab v2 saves stable asset paths, not the old numeric option
     // indexes. Render those paths directly so every studio button maps to the
@@ -65,6 +73,7 @@ function loadSavedOutfit() {
         setLayer("eyesLayer", layers.eyes);
         setLayer("fitLayer", layers.fit);
         setLayer("extraLayer", layers.extra);
+        applySkinColor(savedOutfit.skinColor);
         const adjustments = savedOutfit.adjustments || {};
         ["ears", "hair", "eyes", "fit", "extra"].forEach((category) => {
             const layer = document.getElementById(category + "Layer");

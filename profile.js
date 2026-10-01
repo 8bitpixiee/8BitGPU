@@ -214,6 +214,8 @@ byId("visitLounge").addEventListener("click", openLounge);
 byId("openLounge").addEventListener("click", openLounge);
 byId("backButton").addEventListener("click", () => history.back());
 byId("forwardButton").addEventListener("click", () => history.forward());
+window.addEventListener("storage", (event) => { if (event.key === "8bitgpu-avatar-outfit" && isOwnProfile) loadProfile(); });
+window.addEventListener("message", (event) => { if (event.origin === location.origin && event.data?.type === "8bitgpu-avatar-saved" && isOwnProfile) loadProfile(); });
 buildColorControls();
 buildImageControls();
 byId("profileForm").addEventListener("submit", async (event) => {
