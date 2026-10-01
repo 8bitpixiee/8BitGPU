@@ -5,6 +5,7 @@ let isOwnProfile = false;
 let uploadBusy = false;
 
 let statusTimer; function setStatus(message) { clearTimeout(statusTimer); byId("pageStatus").textContent = message; if (/saved\.$/.test(message)) statusTimer=setTimeout(()=>byId("pageStatus").textContent="",4000); }
+function skinFilter(color) { const value=(key,fallback)=>Number.isFinite(Number(color?.[key]))?Number(color[key]):fallback; return `hue-rotate(${Math.max(-180,Math.min(180,value('hue',0)))}deg) saturate(${Math.max(0,Math.min(200,value('saturation',100)))}%) brightness(${Math.max(60,Math.min(140,value('lightness',100)))}%)`; }
 function setLayer(name, source) {
     const image = byId(name + "Layer");
     image.src = source || "";
@@ -29,6 +30,7 @@ function renderAvatar(avatar) {
     const base = baseLayers(avatar);
     const saved = avatar?.layers || {};
     layers.forEach((name) => setLayer(name, base[name] || saved[name] || ""));
+    ["body", "head"].forEach((name) => { const image=byId(name+"Layer"); if(image)image.style.filter=skinFilter(avatar?.skinColor); });
 }
 function setTheme(theme) { document.body.dataset.theme = theme || "violet"; }
 function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }

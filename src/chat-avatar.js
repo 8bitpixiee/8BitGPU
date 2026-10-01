@@ -18,6 +18,8 @@ export function roomAvatar(json) {
  const layers={body,...face};
  for(const key of ['extra','fit']){const value=a.layers?.[key];if(typeof value==='string'&&/^avatar\/[a-zA-Z0-9_ .-]+\.png$/.test(value)&&!value.includes('..'))layers[key]=value;}
  const adjustments={};for(const key of ['ears','eyes','hair','fit','extra']){const v=a.adjustments?.[key]||{};adjustments[key]={x:Math.max(-20,Math.min(20,Number(v.x)||0)),y:Math.max(-20,Math.min(20,Number(v.y)||0)),scale:Math.max(.7,Math.min(1.3,Number(v.scale)||1))};}
- return {layers,adjustments};
+ const color=a.skinColor||{};const value=(key,fallback)=>Number.isFinite(Number(color[key]))?Number(color[key]):fallback;
+ const skinColor={hue:Math.max(-180,Math.min(180,value('hue',0))),saturation:Math.max(0,Math.min(200,value('saturation',100))),lightness:Math.max(60,Math.min(140,value('lightness',100)))};
+ return {layers,adjustments,skinColor};
 }
 

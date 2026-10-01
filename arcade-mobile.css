@@ -7,30 +7,35 @@
     border-bottom: 1px solid #8f70a4;
 }
 .emote-bar button { flex: 0 0 auto; padding: 4px 7px; font-size: 10px; }
+.activity-bar { padding:4px 6px; background:#d6c1df; border-bottom:1px solid #8f70a4; }.activity-bar button { width:100%; padding:4px 7px; font-size:10px; }
+#loungeActivities { padding:7px; color:#412553; background:linear-gradient(145deg,#fff8ff,#e3d1ed); border-bottom:2px solid #8f70a4; }.activity-tabs,.activity-actions { display:flex; flex-wrap:wrap; gap:4px; }.activity-tabs { margin-bottom:6px; }.activity-tabs button.active { color:#fff; background:#794595; }.activity-lede,.inventory-line { margin:5px 0; font-size:10px; line-height:1.35; }.inventory-line { padding:4px; background:#f7effb; border:1px inset #fff; }.activity-actions { align-items:center; }.activity-actions button,.activity-actions select,.mix-grid select { padding:4px 6px; font-size:10px; }.grow-pot { display:grid; place-items:center; width:42px; height:42px; margin:5px auto; border:2px outset #fff; background:#6f4a47; color:#c9ff9b; font-size:24px; }.grow-seeded{color:#fff0a1}.grow-watered{color:#9ff9ff}.grow-pruned{color:#aaff80}.grow-harvested{color:#d0ff91}.mix-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px; }.mix-grid label { display:grid; gap:2px; font-size:10px; font-weight:bold; }
 .emote-bar button[aria-pressed="true"] { background:#c7ffe1; color:#183f35; }
 #mapStage::after { content:""; position:absolute; inset:0; pointer-events:none; z-index:20; opacity:0; transition:opacity .25s; mix-blend-mode:screen; }
-#mapStage.screen-smoke::after { opacity:.32; background:radial-gradient(circle at 32% 28%,#ff78d4aa,transparent 33%),radial-gradient(circle at 73% 72%,#55ffe499,transparent 40%),linear-gradient(115deg,#9e62df77,#fdb0d166); animation:screenHaze 2.1s ease-in-out infinite alternate; }
-#mapStage.screen-drink::after { opacity:.22; background:repeating-linear-gradient(100deg,transparent 0 18px,#b2ecff55 19px 23px,transparent 24px 40px); animation:screenDizzy .75s ease-in-out infinite alternate; }
-#mapStage.screen-shroom::after { opacity:.45; background:repeating-linear-gradient(90deg,#ff639955 0 3px,transparent 4px 34px),repeating-linear-gradient(176deg,#61fff855 0 2px,transparent 3px 47px); animation:screenShroom .18s steps(2) infinite; }
-.avatar-art { position:absolute; inset:0; transform-origin:50% 76%; }
-.avatar-art img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; image-rendering:pixelated; }
-.being[data-facing="left"] .avatar-art { scale:-1 1; }
-.being[data-facing="right"] .avatar-art { scale:1 1; }
+#mapStage.screen-smoke::after { opacity:.68; background:radial-gradient(circle at 32% 28%,#ff78d4dd,transparent 34%),radial-gradient(circle at 73% 72%,#55ffe4cc,transparent 42%),linear-gradient(115deg,#9e62dfaa,#fdb0d199); animation:screenHaze 1.5s ease-in-out infinite alternate; }
+#mapStage.screen-drink::after { opacity:.52; background:repeating-linear-gradient(100deg,transparent 0 18px,#b2ecffaa 19px 23px,transparent 24px 40px),radial-gradient(circle,#b56ff088,transparent 70%); animation:screenDizzy .5s ease-in-out infinite alternate; }
+#mapStage.screen-shroom::after { opacity:.72; background:repeating-linear-gradient(90deg,#ff6399aa 0 3px,transparent 4px 34px),repeating-linear-gradient(176deg,#61fff8aa 0 2px,transparent 3px 47px),radial-gradient(circle,#fff29c66,transparent 65%); animation:screenShroom .13s steps(2) infinite; }
+.avatar-art,.avatar-motion { position:absolute; inset:0; transform-origin:50% 76%; }
+.avatar-motion img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; image-rendering:pixelated; }
+/* The existing base sprites are drawn facing left, so the horizontal mapping
+   is intentionally inverted. Directional sprite sheets will use this same
+   facing contract when they replace the fallback art. */
+.being[data-facing="left"] .avatar-art { scale:1 1; }
+.being[data-facing="right"] .avatar-art { scale:-1 1; }
 .emote-effect { position: absolute; z-index: 8; left: 68%; bottom: 66%; display: none; color: #fff; font-weight: bold; text-shadow: 1px 1px 2px #44215e; pointer-events: none; }
-.being.emote-dance .avatar-art { animation: loungeDance .55s ease-in-out infinite alternate; }
-.being.emote-twerk .avatar-art { animation: loungeTwerk .38s ease-in-out infinite alternate; }
-.being.emote-drink .avatar-art { animation: loungeDrinkIdle .68s ease-in-out infinite alternate; }
-.being.emote-spin .avatar-art { animation: loungeSpin .8s linear infinite; }
-.being.emote-wave .avatar-art { animation: loungeWave .45s ease-in-out infinite alternate; }
-.being.emote-laugh .avatar-art { animation: loungeLaugh .38s ease-in-out infinite alternate; }
-.being.emote-crashout .avatar-art { animation: loungeCrashout .22s ease-in-out infinite alternate; }
-.being.is-flying .avatar-art { animation: loungeFly 1.1s ease-in-out infinite alternate; }
+.being.emote-dance .avatar-motion { animation: loungeDance .55s ease-in-out infinite alternate; }
+.being.emote-twerk .avatar-motion { animation: loungeTwerk .38s ease-in-out infinite alternate; }
+.being.emote-drink .avatar-motion { animation: loungeDrinkIdle .68s ease-in-out infinite alternate; }
+.being.emote-spin .avatar-motion { animation: loungeSpin .8s linear infinite; }
+.being.emote-wave .avatar-motion { animation: loungeWave .45s ease-in-out infinite alternate; }
+.being.emote-laugh .avatar-motion { animation: loungeLaugh .38s ease-in-out infinite alternate; }
+.being.emote-crashout .avatar-motion { animation: loungeCrashout .22s ease-in-out infinite alternate; }
+.being.is-flying .avatar-motion { animation: loungeFly 1.1s ease-in-out infinite alternate; }
 .being.emote-smoke .emote-effect, .being.emote-laugh .emote-effect, .being.emote-drink .emote-effect, .being.emote-shroom .emote-effect, .being.emote-crashout .emote-effect { display: block; }
-.being.emote-smoke .emote-effect::before { content: "☁ ✿"; font-size: 19px; animation: smokeRise 1.6s ease-out infinite; }
-.being.emote-smoke .avatar-art::after { content:""; position:absolute; left:43%; top:38%; width:5%; height:3%; background:#ff3f54; box-shadow:20px 0 #ff3f54; opacity:.8; }
+.being.emote-smoke .emote-effect::before { content: "☁ ✿ ✧"; font-size: 22px; animation: smokeRise 1.35s ease-out infinite; }
+.being.emote-smoke .avatar-motion::after { content:""; position:absolute; left:43%; top:38%; width:5%; height:3%; background:#ff3f54; box-shadow:20px 0 #ff3f54; opacity:.8; }
 .being.emote-laugh .emote-effect::before { content: "HA!"; font-size: 13px; color: #fff59a; animation: laughPop .5s ease-in-out infinite alternate; }
-.being.emote-drink .emote-effect::before { content: "° o °"; font-size: 17px; color:#bff7ff; animation: bubblesRise 1.25s ease-out infinite; }
-.being.emote-shroom .emote-effect::before { content: "✦ ✧ ✦"; font-size: 17px; color:#ffb7fa; animation: sparkleOrbit 1.1s linear infinite; }
+.being.emote-drink .emote-effect::before { content: "♡ ° o ° ♡"; font-size: 18px; color:#bff7ff; animation: bubblesRise 1.1s ease-out infinite; }
+.being.emote-shroom .emote-effect::before { content: "✦ ♡ ✧ ♡ ✦"; font-size: 19px; color:#ffb7fa; animation: sparkleOrbit .9s linear infinite; }
 .being.emote-crashout .emote-effect::before { content: "! # @"; font-size: 14px; color:#ff8b8b; animation: crashSteam .55s ease-out infinite; }
 @keyframes loungeDance { to { translate:0 -8%; rotate:7deg; scale:1.04; } }
 @keyframes loungeTwerk { to { translate:0 3%; scale:1.08 .94; } }
@@ -71,5 +76,5 @@
     #roomComposer textarea { height: 34px; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .being .avatar-art, .emote-effect::before { animation: none !important; }
+    .being .avatar-motion, .emote-effect::before { animation: none !important; }
 }
