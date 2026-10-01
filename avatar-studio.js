@@ -421,6 +421,8 @@ document.getElementById("saveButton").addEventListener("click", async () => {
     const adjustments = JSON.parse(JSON.stringify(activeAdjustments()));
     const outfit = { version: 2, ...settings, skinColor: normalizeSkinColor(settings.skinColor), bodyPreset: settings.species === "Thixie" ? "thixie" : "custom", selection: { ...selection }, layers, adjustments };
     localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(outfit));
+    localStorage.setItem("8bitgpu-user-avatar", "saved-being");
+    localStorage.setItem("8bitgpu-user-avatar", "saved-being");
     if (window.parent && window.parent !== window) window.parent.postMessage({ type: "8bitgpu-avatar-saved" }, window.location.origin);
     if (window.opener) window.opener.postMessage({ type: "8bitgpu-avatar-saved" }, window.location.origin);
     try {

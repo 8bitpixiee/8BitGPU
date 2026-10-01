@@ -129,6 +129,8 @@ window.addEventListener("storage", (event) => {
 window.addEventListener("message", (event) => {
     if (event.origin === window.location.origin && event.data?.type === "8bitgpu-avatar-saved") {
         loadSavedOutfit();
+        localStorage.setItem("8bitgpu-user-avatar", "saved-being");
+        renderUserAvatar("saved-being");
     }
 });
 
@@ -229,7 +231,9 @@ async function restoreOnlinePlayer() {
         localStorage.setItem("8bitgpu-account-active", "true");
         if (data.user.avatar) {
             localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(data.user.avatar));
+            localStorage.setItem("8bitgpu-user-avatar", "saved-being");
             loadSavedOutfit();
+            renderUserAvatar("saved-being");
         }
         renderPlayerBadge();
         return true;
