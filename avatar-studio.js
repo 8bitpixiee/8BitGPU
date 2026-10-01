@@ -247,6 +247,7 @@ function renderSkinSliders() {
     const controls = [["skinHue", "hue", "°"], ["skinSaturation", "saturation", "%"], ["skinLightness", "lightness", "%"]];
     controls.forEach(([id, key, suffix]) => {
         const input = document.getElementById(id), output = document.getElementById(id + "Value");
+        if (!input || !output) return;
         input.value = color[key]; output.textContent = color[key] + suffix;
     });
 }
@@ -398,10 +399,10 @@ try {
 
 document.querySelectorAll("[data-picker-category]").forEach((button) => button.addEventListener("click", () => { activePickerCategory = button.dataset.pickerCategory; renderPicker(); }));
 document.querySelectorAll("[data-adjust]").forEach((button) => button.addEventListener("click", () => adjustActiveLayer(button.dataset.adjust)));
-[["skinHue", "hue"], ["skinSaturation", "saturation"], ["skinLightness", "lightness"]].forEach(([id, key]) => document.getElementById(id).addEventListener("input", (event) => {
+[["skinHue", "hue"], ["skinSaturation", "saturation"], ["skinLightness", "lightness"]].forEach(([id, key]) => { const input=document.getElementById(id); if(input) input.addEventListener("input", (event) => {
     settings.skinColor[key] = Number(event.target.value); renderSkinSliders(); applySkinColor();
-}));
-document.getElementById("resetSkinColor").addEventListener("click", () => {
+}); });
+document.getElementById("resetSkinColor")?.addEventListener("click", () => {
     settings.skinColor = { hue: 0, saturation: 100, lightness: 100 }; renderSkinSliders(); applySkinColor();
 });
 document.querySelectorAll("[data-step-target]").forEach((button) => button.addEventListener("click", () => setStep(button.dataset.stepTarget)));
