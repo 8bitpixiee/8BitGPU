@@ -33,6 +33,7 @@ function renderAvatar(avatar) {
     const saved = avatar?.layers || {};
     layers.forEach((name) => setLayer(name, base[name] || saved[name] || ""));
     layers.forEach((name) => { const image=byId(name+"Layer"); const isBody=name === "body" || name === "head"; const color=isBody ? avatar?.skinColor : avatar?.itemColors?.[avatar?.selection?.[name]]; if(image)image.style.filter=avatar?.bodyAsset && isBody ? whiteSpriteFilter(color) : skinFilter(color); });
+    layers.forEach((name) => { const image=byId(name+"Layer"); const adjustment=avatar?.adjustments?.[name]; if(!image)return; const x=Math.max(-20,Math.min(20,Number(adjustment?.x)||0)), y=Math.max(-20,Math.min(20,Number(adjustment?.y)||0)), scale=Math.max(.7,Math.min(1.3,Number(adjustment?.scale)||1)); image.style.transform=`translate(${x}%, ${y}%) scale(${scale})`; });
 }
 function setTheme(theme) { document.body.dataset.theme = theme || "violet"; }
 function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
