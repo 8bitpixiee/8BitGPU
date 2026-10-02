@@ -333,6 +333,11 @@ function renderSpeciesChoices() {
         settings.build = button.dataset.beingBuild;
         settings.bodyAsset = button.dataset.bodyAsset || "";
         settings.skinTone = speciesData[settings.species].tones[0];
+        // The white body-build assets are full silhouettes. Start them clean
+        // so a previous Pixie's outfit cannot hide the newly selected shape.
+        if (settings.species === "Custom") {
+            Object.keys(selection).forEach((category) => { selection[category] = category + "-none"; });
+        }
         ensureSelections(); renderAll();
         document.getElementById("saveStatus").textContent = settings.species + " selected!";
     }));
