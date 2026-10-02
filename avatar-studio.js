@@ -417,9 +417,25 @@ function renderPicker() {
     document.getElementById("colorGrid").innerHTML = family.choices.map((choice) => tileMarkup(choice, "color-tile", choice.id === selection[category])).join("");
     document.querySelectorAll(".asset-tile").forEach((button) => button.addEventListener("click", () => {
         const selectedFamily = groups.find((group) => group.choices.some((choice) => choice.id === button.dataset.choiceId));
+        const emptyChoice = selectedFamily.choices.find((choice) => !choice.src);
+        if (emptyChoice) {
+            selection[category] = emptyChoice.id;
+            setLayer(category, "");
+            document.getElementById("saveStatus").textContent = category.toUpperCase() + " removed.";
+            renderPicker();
+            return;
+        }
         activeFamily[category] = selectedFamily.name; selection[category] = selectedFamily.choices[0].id; renderAvatar(); renderPicker();
     }));
     document.querySelectorAll(".color-tile").forEach((button) => button.addEventListener("click", () => {
+        const choice = visibleOptions(category).find((entry) => entry.id === button.dataset.choiceId);
+        if (choice && !choice.src) {
+            selection[category] = choice.id;
+            setLayer(category, "");
+            document.getElementById("saveStatus").textContent = category.toUpperCase() + " removed.";
+            renderPicker();
+            return;
+        }
         selection[category] = button.dataset.choiceId; renderAvatar(); renderPicker();
     }));
     renderAdjuster(); renderItemSliders();
