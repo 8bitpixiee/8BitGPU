@@ -6,6 +6,7 @@ let uploadBusy = false;
 
 let statusTimer; function setStatus(message) { clearTimeout(statusTimer); byId("pageStatus").textContent = message; if (/saved\.$/.test(message)) statusTimer=setTimeout(()=>byId("pageStatus").textContent="",4000); }
 function skinFilter(color) { const value=(key,fallback)=>Number.isFinite(Number(color?.[key]))?Number(color[key]):fallback; return `hue-rotate(${Math.max(-180,Math.min(180,value('hue',0)))}deg) saturate(${Math.max(0,Math.min(200,value('saturation',100)))}%) brightness(${Math.max(60,Math.min(140,value('lightness',100)))}%)`; }
+function whiteSpriteFilter(color) { const value=(key,fallback)=>Number.isFinite(Number(color?.[key]))?Number(color[key]):fallback; const hue=Math.max(-180,Math.min(180,value('hue',0))), saturation=Math.max(0,Math.min(200,value('saturation',100))), lightness=Math.max(60,Math.min(140,value('lightness',100))); return (hue === 0 && saturation === 100 && lightness === 100) ? "none" : `sepia(100%) saturate(${Math.max(100,saturation*4)}%) hue-rotate(${hue-28}deg) brightness(${lightness}%)`; }
 function setLayer(name, source) {
     const image = byId(name + "Layer");
     image.src = source || "";
@@ -31,7 +32,7 @@ function renderAvatar(avatar) {
     const base = baseLayers(avatar);
     const saved = avatar?.layers || {};
     layers.forEach((name) => setLayer(name, base[name] || saved[name] || ""));
-    layers.forEach((name) => { const image=byId(name+"Layer"); const color=(name === "body" || name === "head") ? avatar?.skinColor : avatar?.itemColors?.[avatar?.selection?.[name]]; if(image)image.style.filter=skinFilter(color); });
+    layers.forEach((name) => { const image=byId(name+"Layer"); const isBody=name === "body" || name === "head"; const color=isBody ? avatar?.skinColor : avatar?.itemColors?.[avatar?.selection?.[name]]; if(image)image.style.filter=avatar?.bodyAsset && isBody ? whiteSpriteFilter(color) : skinFilter(color); });
 }
 function setTheme(theme) { document.body.dataset.theme = theme || "violet"; }
 function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
