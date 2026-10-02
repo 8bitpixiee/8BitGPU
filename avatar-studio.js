@@ -26,6 +26,7 @@ const beingChoices = [
     ,{ name: "Voidling F", species: "Custom", build: "Voidling F", bodyAsset: "voidling_f.png" }
     ,{ name: "Voidling M", species: "Custom", build: "Voidling M", bodyAsset: "voidling_m.png" }
 ];
+const customBodyAssets = Object.fromEntries(beingChoices.filter((choice) => choice.bodyAsset).map((choice) => [choice.build, choice.bodyAsset]));
 
 const speciesData = {
     Pixie: {
@@ -294,7 +295,8 @@ function renderItemSliders() {
     });
 }
 function baseFiles() {
-    if (settings.bodyAsset) return { body: asset(settings.bodyAsset), head: "" };
+    const customBody = settings.bodyAsset || customBodyAssets[settings.build];
+    if (customBody) return { body: asset(customBody), head: "" };
     const tone = settings.skinTone;
     if (settings.species === "Pixie") {
         const number = { Nutmeg: 1, Peachy: 2, Creme: 3 }[tone];
@@ -451,7 +453,8 @@ try {
 document.querySelectorAll("[data-picker-category]").forEach((button) => button.addEventListener("click", () => { activePickerCategory = button.dataset.pickerCategory; renderPicker(); }));
 document.getElementById("removeSelectedItem")?.addEventListener("click", () => {
     selection[activePickerCategory] = activePickerCategory + "-none";
-    renderAvatar(); renderPicker();
+    delete settings.itemColors[activePickerCategory + "-none"];
+    setLayer(activePickerCategory, ""); renderPicker();
     document.getElementById("saveStatus").textContent = activePickerCategory.toUpperCase() + " removed.";
 });
 document.querySelectorAll("[data-adjust]").forEach((button) => button.addEventListener("click", () => adjustActiveLayer(button.dataset.adjust)));
@@ -479,7 +482,8 @@ document.getElementById("saveButton").addEventListener("click", async () => {
     const layers = {};
     Object.keys(selection).forEach((category) => layers[category] = selectedOption(category).src);
     const adjustments = JSON.parse(JSON.stringify(activeAdjustments()));
-    const outfit = { version: 3, ...settings, skinColor: normalizeSkinColor(settings.skinColor), itemColors: Object.fromEntries(Object.entries(settings.itemColors).map(([id, color]) => [id, normalizeSkinColor(color)])), bodyPreset: settings.species === "Thixie" ? "thixie" : "custom", selection: { ...selection }, layers, adjustments };
+    const bodyAsset = settings.bodyAsset || customBodyAssets[settings.build] || "";
+    const outfit = { version: 3, ...settings, bodyAsset, skinColor: normalizeSkinColor(settings.skinColor), itemColors: Object.fromEntries(Object.entries(settings.itemColors).map(([id, color]) => [id, normalizeSkinColor(color)])), bodyPreset: settings.species === "Thixie" ? "thixie" : "custom", selection: { ...selection }, layers, adjustments };
     localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(outfit));
     localStorage.setItem("8bitgpu-user-avatar", "saved-being");
     localStorage.setItem("8bitgpu-user-avatar", "saved-being");
