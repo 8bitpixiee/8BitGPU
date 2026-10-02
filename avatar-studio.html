@@ -26,6 +26,7 @@
                         <img id="bodyLayer" class="avatar-layer" alt="">
                         <img id="earsLayer" class="avatar-layer" alt="">
                         <img id="headLayer" class="avatar-layer" alt="">
+                        <img id="chestLayer" class="avatar-layer" alt="">
                         <img id="eyesLayer" class="avatar-layer" alt="">
                         <img id="hairLayer" class="avatar-layer" alt="">
                         <img id="fitLayer" class="avatar-layer" alt="">
@@ -53,10 +54,8 @@
                     <p class="helper-text">Choose a palette available for your selected species and build.</p>
                     <div class="swatch-grid" id="toneGrid"></div>
                     <fieldset class="skin-slider-controls" id="skinSliderControls">
-                        <legend>Color each layer</legend>
-                        <p>Choose one part, then adjust its hue, saturation, and lightness without changing the rest of your Being.</p>
-                        <label for="colorTarget">Part</label>
-                        <select id="colorTarget"><option value="body">Body</option><option value="head">Face</option><option value="hair">Hair</option><option value="eyes">Eyes / blush</option><option value="ears">Ears</option><option value="fit">Outfit</option><option value="extra">Extras</option></select>
+                        <legend>Skin color</legend>
+                        <p>These sliders only color your Being's skin.</p>
                         <label for="skinHue">Hue <output id="skinHueValue">0°</output></label>
                         <input id="skinHue" type="range" min="-180" max="180" value="0">
                         <label for="skinSaturation">Saturation <output id="skinSaturationValue">100%</output></label>
@@ -78,6 +77,7 @@
                             <button type="button" class="picker-category active" data-picker-category="hair">Hair</button>
                             <button type="button" class="picker-category" data-picker-category="eyes">Eyes</button>
                             <button type="button" class="picker-category" data-picker-category="ears">Ears</button>
+                            <button type="button" class="picker-category" data-picker-category="chest">Chest</button>
                             <button type="button" class="picker-category" data-picker-category="fit">Fit</button>
                             <button type="button" class="picker-category" data-picker-category="extra">Extra</button>
                         </nav>
@@ -86,6 +86,17 @@
                             <div class="asset-grid" id="assetGrid"></div>
                             <p class="picker-label color-label" id="colorLabel">COLORWAY</p>
                             <div class="color-grid" id="colorGrid"></div>
+                            <fieldset class="skin-slider-controls item-color-controls" id="itemColorControls">
+                                <legend id="itemColorLegend">Color selected item</legend>
+                                <p>These sliders color only the item selected above.</p>
+                                <label for="itemHue">Hue <output id="itemHueValue">0°</output></label>
+                                <input id="itemHue" type="range" min="-180" max="180" value="0">
+                                <label for="itemSaturation">Saturation <output id="itemSaturationValue">100%</output></label>
+                                <input id="itemSaturation" type="range" min="0" max="200" value="100">
+                                <label for="itemLightness">Lightness <output id="itemLightnessValue">100%</output></label>
+                                <input id="itemLightness" type="range" min="60" max="140" value="100">
+                                <button type="button" id="resetItemColor">Reset item color</button>
+                            </fieldset>
                             <div class="sprite-adjuster" aria-label="Adjust selected layer">
                                 <p class="picker-label adjuster-label">POSITION + SCALE</p>
                                 <p class="adjuster-readout" id="adjusterReadout">HAIR · X 0 · Y 0 · 100%</p>

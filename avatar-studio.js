@@ -12,6 +12,19 @@ const beingChoices = [
     { name: "Deerbra", species: "Deerbra", build: "Fae" },
     { name: "Bovadill", species: "Bovadill", build: "Highland" },
     { name: "Thixie", species: "Thixie", build: "Fae" }
+    ,{ name: "Null", species: "Custom", build: "Null", bodyAsset: "Null.png" }
+    ,{ name: "Femme", species: "Custom", build: "Femme", bodyAsset: "femme.png" }
+    ,{ name: "Macho", species: "Custom", build: "Macho", bodyAsset: "macho.png" }
+    ,{ name: "Maxie F", species: "Custom", build: "Maxie F", bodyAsset: "Maxie_F.png" }
+    ,{ name: "Maxie M", species: "Custom", build: "Maxie M", bodyAsset: "Maxie_M.png" }
+    ,{ name: "Anthro F", species: "Custom", build: "Anthro F", bodyAsset: "antrho_f.png" }
+    ,{ name: "Anthro M", species: "Custom", build: "Anthro M", bodyAsset: "anthro_m.png" }
+    ,{ name: "Clanker F", species: "Custom", build: "Clanker F", bodyAsset: "Clanker_F.png" }
+    ,{ name: "Clanker M", species: "Custom", build: "Clanker M", bodyAsset: "Clanker_M.png" }
+    ,{ name: "Mermaid F", species: "Custom", build: "Mermaid F", bodyAsset: "mermaid_f.png" }
+    ,{ name: "Mermaid M", species: "Custom", build: "Mermaid M", bodyAsset: "mermaid_m.png" }
+    ,{ name: "Voidling F", species: "Custom", build: "Voidling F", bodyAsset: "voidling_f.png" }
+    ,{ name: "Voidling M", species: "Custom", build: "Voidling M", bodyAsset: "voidling_m.png" }
 ];
 
 const speciesData = {
@@ -30,7 +43,8 @@ const speciesData = {
     Thixie: {
         tones: ["Nutmeg", "Creme", "Peachy"],
         builds: ["Fae"]
-    }
+    },
+    Custom: { tones: ["White"], builds: ["Null", "Femme", "Macho", "Maxie F", "Maxie M", "Anthro F", "Anthro M", "Clanker F", "Clanker M", "Mermaid F", "Mermaid M", "Voidling F", "Voidling M"] }
 };
 
 // These filenames are referenced by the catalogue but have not been uploaded
@@ -131,18 +145,17 @@ const options = {
         item("bovadill-tail-holstein", "Bovadill Tail - Holstein", "bovidil_tail_v2.png", "Bovadill Tail", ["Bovadill"]),
         item("bovadill-tail-dexter", "Bovadill Tail - Dexter", "bovidil_tail_v3.png", "Bovadill Tail", ["Bovadill"])
     ]
+    ,chest: [item("chest-none", "No Chest Overlay", "", "No Chest Overlay"), item("chest-1", "Chest Size 1", "Boob_1.png", "Chest Size")]
 };
 
-const colorLayers = ["body", "head", "hair", "eyes", "ears", "fit", "extra"];
 const neutralColor = () => ({ hue: 0, saturation: 100, lightness: 100 });
-const settings = { species: "Pixie", build: "Fae", skinTone: "Nutmeg", skinColor: neutralColor(), layerColors: Object.fromEntries(colorLayers.map((layer) => [layer, neutralColor()])) };
-let colorTarget = "body";
-const selection = { ears: "pixie-ears-nutmeg", hair: "bombshell-original", eyes: "lashes-purple", fit: "chillouts-magma", extra: "wings-lavender" };
+const settings = { species: "Pixie", build: "Fae", skinTone: "Nutmeg", skinColor: neutralColor(), itemColors: {}, bodyAsset: "" };
+const selection = { ears: "pixie-ears-nutmeg", chest: "chest-none", hair: "bombshell-original", eyes: "lashes-purple", fit: "chillouts-magma", extra: "wings-lavender" };
 const steps = ["species", "skinTone", "style"];
 let currentStep = 0;
 let activePickerCategory = "hair";
 const activeFamily = {};
-const adjustableCategories = ["ears", "hair", "eyes", "fit", "extra"];
+const adjustableCategories = ["ears", "chest", "hair", "eyes", "fit", "extra"];
 const adjustmentProfiles = {};
 
 function profileKey() { return settings.species + ":" + settings.build; }
@@ -238,15 +251,19 @@ function normalizeSkinColor(value) {
         lightness: Math.max(60, Math.min(140, number("lightness", 100)))
     };
 }
-function skinFilter(color = settings.layerColors[colorTarget]) {
+function skinFilter(color = settings.skinColor) {
     return "hue-rotate(" + color.hue + "deg) saturate(" + color.saturation + "%) brightness(" + color.lightness + "%)";
 }
 function applySkinColor() {
-    colorLayers.forEach((layer) => { const image = document.getElementById(layer + "Layer"); if (image) image.style.filter = skinFilter(settings.layerColors[layer]); });
+    ["body", "head"].forEach((layer) => { const image = document.getElementById(layer + "Layer"); if (image) image.style.filter = skinFilter(settings.skinColor); });
+    adjustableCategories.forEach((category) => {
+        const image = document.getElementById(category + "Layer");
+        const selected = selectedOption(category);
+        if (image) image.style.filter = skinFilter(settings.itemColors[selected.id] || neutralColor());
+    });
 }
 function renderSkinSliders() {
-    const color = settings.layerColors[colorTarget];
-    const target = document.getElementById("colorTarget"); if (target) target.value = colorTarget;
+    const color = settings.skinColor;
     const controls = [["skinHue", "hue", "°"], ["skinSaturation", "saturation", "%"], ["skinLightness", "lightness", "%"]];
     controls.forEach(([id, key, suffix]) => {
         const input = document.getElementById(id), output = document.getElementById(id + "Value");
@@ -254,7 +271,18 @@ function renderSkinSliders() {
         input.value = color[key]; output.textContent = color[key] + suffix;
     });
 }
+function renderItemSliders() {
+    const selected = selectedOption(activePickerCategory);
+    const color = settings.itemColors[selected.id] || neutralColor();
+    document.getElementById("itemColorLegend").textContent = "Color " + selected.name;
+    [["itemHue", "hue", "°"], ["itemSaturation", "saturation", "%"], ["itemLightness", "lightness", "%"]].forEach(([id, key, suffix]) => {
+        const input = document.getElementById(id), output = document.getElementById(id + "Value");
+        if (!input || !output) return;
+        input.value = color[key]; output.textContent = color[key] + suffix;
+    });
+}
 function baseFiles() {
+    if (settings.bodyAsset) return { body: asset(settings.bodyAsset), head: "" };
     const tone = settings.skinTone;
     if (settings.species === "Pixie") {
         const number = { Nutmeg: 1, Peachy: 2, Creme: 3 }[tone];
@@ -280,7 +308,7 @@ function renderAvatar() {
     const base = baseFiles();
     setLayer("body", base.body);
     setLayer("head", base.head);
-    ["ears", "hair", "eyes", "fit", "extra"].forEach((category) => setLayer(category, selectedOption(category).src));
+    ["ears", "chest", "hair", "eyes", "fit", "extra"].forEach((category) => setLayer(category, selectedOption(category).src));
     adjustableCategories.forEach(applyLayerAdjustment);
     applySkinColor();
 }
@@ -289,15 +317,16 @@ function renderPreviewLabel() {
     document.getElementById("previewLabel").textContent = username ? username.toUpperCase() + "'S BEING" : "YOUR BEING";
 }
 function renderSpeciesChoices() {
-    const playable = beingChoices.map(({ name, species, build }) => {
-        const selected = settings.species === species && (species !== "Pixie" || settings.build === build);
-        return '<button type="button" class="' + (selected ? "selected" : "") + '" aria-pressed="' + selected + '" data-species="' + species + '" data-being-build="' + build + '">' + name + '</button>';
+    const playable = beingChoices.map(({ name, species, build, bodyAsset }) => {
+        const selected = settings.species === species && settings.build === build;
+        return '<button type="button" class="' + (selected ? "selected" : "") + '" aria-pressed="' + selected + '" data-species="' + species + '" data-being-build="' + build + '" data-body-asset="' + (bodyAsset || "") + '">' + name + '</button>';
     }).join("");
     const comingSoon = COMING_SOON_SPECIES.map((name) => '<button type="button" disabled aria-disabled="true" title="Character art coming soon">' + name + " — coming soon</button>").join("");
     document.getElementById("speciesGrid").innerHTML = playable + comingSoon;
     document.querySelectorAll("[data-species]").forEach((button) => button.addEventListener("click", () => {
         settings.species = button.dataset.species;
         settings.build = button.dataset.beingBuild;
+        settings.bodyAsset = button.dataset.bodyAsset || "";
         settings.skinTone = speciesData[settings.species].tones[0];
         ensureSelections(); renderAll();
         document.getElementById("saveStatus").textContent = settings.species + " selected!";
@@ -373,7 +402,7 @@ function renderPicker() {
     document.querySelectorAll(".color-tile").forEach((button) => button.addEventListener("click", () => {
         selection[category] = button.dataset.choiceId; renderAvatar(); renderPicker();
     }));
-    renderAdjuster();
+    renderAdjuster(); renderItemSliders();
 }
 function renderAll() {
     renderSpeciesChoices(); renderBuildChoices(); renderToneChoices(); renderBreedChoices(); renderSkinSliders(); renderAvatar(); renderPicker(); renderPreviewLabel();
@@ -384,11 +413,12 @@ try {
     const saved = JSON.parse(localStorage.getItem("8bitgpu-avatar-outfit"));
     if (saved) {
         const migration = { Pixies: "Pixie", Deerbras: "Deerbra", Thixies: "Thixie" };
-        settings.species = migration[saved.species] || (PLAYABLE_SPECIES.includes(saved.species) ? saved.species : "Pixie");
+        settings.species = migration[saved.species] || (speciesData[saved.species] ? saved.species : "Pixie");
         settings.build = speciesData[settings.species].builds.includes(saved.build) ? saved.build : speciesData[settings.species].builds[0];
         settings.skinTone = speciesData[settings.species].tones.includes(saved.skinTone) ? saved.skinTone : speciesData[settings.species].tones[0];
-        const legacy = normalizeSkinColor(saved.skinColor);
-        settings.layerColors = Object.fromEntries(colorLayers.map((layer) => [layer, normalizeSkinColor(saved.layerColors?.[layer] || legacy)]));
+        settings.bodyAsset = saved.bodyAsset || beingChoices.find((choice) => choice.species === settings.species && choice.build === settings.build)?.bodyAsset || "";
+        settings.skinColor = normalizeSkinColor(saved.skinColor);
+        settings.itemColors = Object.fromEntries(Object.entries(saved.itemColors || {}).map(([id, color]) => [id, normalizeSkinColor(color)]));
         Object.keys(selection).forEach((category) => {
             if (saved.selection && options[category].some((choice) => choice.id === saved.selection[category])) selection[category] = saved.selection[category];
         });
@@ -403,13 +433,16 @@ try {
 
 document.querySelectorAll("[data-picker-category]").forEach((button) => button.addEventListener("click", () => { activePickerCategory = button.dataset.pickerCategory; renderPicker(); }));
 document.querySelectorAll("[data-adjust]").forEach((button) => button.addEventListener("click", () => adjustActiveLayer(button.dataset.adjust)));
-document.getElementById("colorTarget")?.addEventListener("change", (event) => { colorTarget = event.target.value; renderSkinSliders(); });
 [["skinHue", "hue"], ["skinSaturation", "saturation"], ["skinLightness", "lightness"]].forEach(([id, key]) => { const input=document.getElementById(id); if(input) input.addEventListener("input", (event) => {
-    settings.layerColors[colorTarget][key] = Number(event.target.value); renderSkinSliders(); applySkinColor();
+    settings.skinColor[key] = Number(event.target.value); renderSkinSliders(); applySkinColor();
 }); });
 document.getElementById("resetSkinColor")?.addEventListener("click", () => {
-    settings.layerColors[colorTarget] = neutralColor(); renderSkinSliders(); applySkinColor();
+    settings.skinColor = neutralColor(); renderSkinSliders(); applySkinColor();
 });
+[["itemHue", "hue"], ["itemSaturation", "saturation"], ["itemLightness", "lightness"]].forEach(([id, key]) => { const input=document.getElementById(id); if(input) input.addEventListener("input", (event) => {
+    const selected = selectedOption(activePickerCategory); settings.itemColors[selected.id] = { ...(settings.itemColors[selected.id] || neutralColor()), [key]: Number(event.target.value) }; renderItemSliders(); applySkinColor();
+}); });
+document.getElementById("resetItemColor")?.addEventListener("click", () => { delete settings.itemColors[selectedOption(activePickerCategory).id]; renderItemSliders(); applySkinColor(); });
 document.querySelectorAll("[data-step-target]").forEach((button) => button.addEventListener("click", () => setStep(button.dataset.stepTarget)));
 document.getElementById("previousButton").addEventListener("click", () => setStep(steps[Math.max(0, currentStep - 1)]));
 document.getElementById("nextButton").addEventListener("click", () => setStep(steps[Math.min(steps.length - 1, currentStep + 1)]));
@@ -424,7 +457,7 @@ document.getElementById("saveButton").addEventListener("click", async () => {
     const layers = {};
     Object.keys(selection).forEach((category) => layers[category] = selectedOption(category).src);
     const adjustments = JSON.parse(JSON.stringify(activeAdjustments()));
-    const outfit = { version: 2, ...settings, layerColors: Object.fromEntries(colorLayers.map((layer) => [layer, normalizeSkinColor(settings.layerColors[layer])])), bodyPreset: settings.species === "Thixie" ? "thixie" : "custom", selection: { ...selection }, layers, adjustments };
+    const outfit = { version: 3, ...settings, skinColor: normalizeSkinColor(settings.skinColor), itemColors: Object.fromEntries(Object.entries(settings.itemColors).map(([id, color]) => [id, normalizeSkinColor(color)])), bodyPreset: settings.species === "Thixie" ? "thixie" : "custom", selection: { ...selection }, layers, adjustments };
     localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(outfit));
     localStorage.setItem("8bitgpu-user-avatar", "saved-being");
     localStorage.setItem("8bitgpu-user-avatar", "saved-being");
@@ -445,7 +478,7 @@ document.getElementById("cameraButton").addEventListener("click", async () => {
         gradient.addColorStop(0, "#e4fff1"); gradient.addColorStop(.5, "#9ed9ca"); gradient.addColorStop(1, "#7760ad"); context.fillStyle = gradient; context.fillRect(0, 0, 700, 700);
         const images = [...document.querySelectorAll("#avatarCharacter img")].filter(image => image.src && !image.hidden);
         await Promise.all(images.map(image => image.decode?.().catch(() => {})));
-        for (const image of images) { context.filter = skinFilter(); context.drawImage(image, 0, 0, 700, 700); }
+        for (const image of images) { const key = image.id.replace("Layer", ""); const color = (key === "body" || key === "head") ? settings.skinColor : settings.itemColors[selectedOption(key)?.id] || neutralColor(); context.filter = skinFilter(color); context.drawImage(image, 0, 0, 700, 700); }
         context.filter = "none";
         const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/webp", .88));
         if (!blob) throw Error("Camera could not create a snapshot.");

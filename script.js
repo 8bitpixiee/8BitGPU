@@ -29,13 +29,13 @@ function loadSavedOutfit() {
     };
     const applySkinColor = (saved) => {
         const filterFor = (color) => { const value=(key,fallback)=>Number.isFinite(Number(color?.[key]))?Number(color[key]):fallback; return `hue-rotate(${Math.max(-180,Math.min(180,value("hue",0)))}deg) saturate(${Math.max(0,Math.min(200,value("saturation",100)))}%) brightness(${Math.max(60,Math.min(140,value("lightness",100)))}%)`; };
-        document.querySelectorAll("#companion .avatar-layer, [data-avatar-layer]").forEach((layer) => { const key=(layer.id||layer.dataset.avatarLayer||"").replace("Layer",""); layer.style.filter=filterFor(saved.layerColors?.[key]||saved.skinColor); });
+        document.querySelectorAll("#companion .avatar-layer, [data-avatar-layer]").forEach((layer) => { const key=(layer.id||layer.dataset.avatarLayer||"").replace("Layer",""); const color=(key === "body" || key === "head") ? saved.skinColor : saved.itemColors?.[saved.selection?.[key]]; layer.style.filter=filterFor(color); });
     };
 
     // Avatar Lab v2 saves stable asset paths, not the old numeric option
     // indexes. Render those paths directly so every studio button maps to the
     // same PNG on the desktop after Save.
-    if (savedOutfit.version === 2) {
+    if (savedOutfit.version >= 2) {
         const tone = savedOutfit.skinTone;
         let body = "body_fem_v1.png";
         let head = "head_fem_v1.png";
@@ -61,17 +61,19 @@ function loadSavedOutfit() {
             head = `thixie_head_v${headVersion}.png`;
         }
 
+        if (savedOutfit.bodyAsset) { body = savedOutfit.bodyAsset; head = ""; }
         setLayer("bodyLayer", avatarPath + body);
-        setLayer("headLayer", avatarPath + head);
+        setLayer("headLayer", head ? avatarPath + head : "");
         const layers = savedOutfit.layers || {};
         setLayer("earsLayer", layers.ears);
+        setLayer("chestLayer", layers.chest);
         setLayer("hairLayer", layers.hair);
         setLayer("eyesLayer", layers.eyes);
         setLayer("fitLayer", layers.fit);
         setLayer("extraLayer", layers.extra);
         applySkinColor(savedOutfit);
         const adjustments = savedOutfit.adjustments || {};
-        ["ears", "hair", "eyes", "fit", "extra"].forEach((category) => {
+        ["ears", "chest", "hair", "eyes", "fit", "extra"].forEach((category) => {
             const layer = document.getElementById(category + "Layer");
             if (!layer) return;
             const value = adjustments[category] || { x: 0, y: 0, scale: 1 };
