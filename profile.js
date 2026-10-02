@@ -1,5 +1,5 @@
 const byId = (id) => document.getElementById(id);
-const layers = ["extra", "body", "ears", "head", "eyes", "hair", "fit"];
+const layers = ["extra", "body", "ears", "head", "chest", "eyes", "hair", "fit"];
 let profile = null;
 let isOwnProfile = false;
 let uploadBusy = false;
@@ -13,6 +13,7 @@ function setLayer(name, source) {
     image.onerror = () => { image.hidden = true; };
 }
 function baseLayers(avatar) {
+    if (avatar?.bodyAsset) return { body: `avatar/${avatar.bodyAsset}`, head: "" };
     const tone = avatar?.skinTone;
     const species = avatar?.species;
     const build = avatar?.build;
@@ -30,7 +31,7 @@ function renderAvatar(avatar) {
     const base = baseLayers(avatar);
     const saved = avatar?.layers || {};
     layers.forEach((name) => setLayer(name, base[name] || saved[name] || ""));
-    layers.forEach((name) => { const image=byId(name+"Layer"); if(image)image.style.filter=skinFilter(avatar?.layerColors?.[name]||avatar?.skinColor); });
+    layers.forEach((name) => { const image=byId(name+"Layer"); const color=(name === "body" || name === "head") ? avatar?.skinColor : avatar?.itemColors?.[avatar?.selection?.[name]]; if(image)image.style.filter=skinFilter(color); });
 }
 function setTheme(theme) { document.body.dataset.theme = theme || "violet"; }
 function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
