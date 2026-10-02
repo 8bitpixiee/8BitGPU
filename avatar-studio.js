@@ -449,6 +449,11 @@ try {
 } catch { /* Start with the default Pixie if saved data is unavailable. */ }
 
 document.querySelectorAll("[data-picker-category]").forEach((button) => button.addEventListener("click", () => { activePickerCategory = button.dataset.pickerCategory; renderPicker(); }));
+document.getElementById("removeSelectedItem")?.addEventListener("click", () => {
+    selection[activePickerCategory] = activePickerCategory + "-none";
+    renderAvatar(); renderPicker();
+    document.getElementById("saveStatus").textContent = activePickerCategory.toUpperCase() + " removed.";
+});
 document.querySelectorAll("[data-adjust]").forEach((button) => button.addEventListener("click", () => adjustActiveLayer(button.dataset.adjust)));
 [["skinHue", "hue"], ["skinSaturation", "saturation"], ["skinLightness", "lightness"]].forEach(([id, key]) => { const input=document.getElementById(id); if(input) input.addEventListener("input", (event) => {
     settings.skinColor[key] = Number(event.target.value); renderSkinSliders(); applySkinColor();
