@@ -415,6 +415,7 @@ function renderPicker() {
     document.getElementById("assetGrid").innerHTML = groups.map((group) => tileMarkup(group.choices[0], "asset-tile", group.name === activeFamily[category])).join("");
     document.getElementById("colorLabel").textContent = family.choices.length > 1 ? "COLORWAY" : "SELECTED ITEM";
     document.getElementById("colorGrid").innerHTML = family.choices.map((choice) => tileMarkup(choice, "color-tile", choice.id === selection[category])).join("");
+    const removeButton = document.getElementById("removeSelectedItem"); if (removeButton) removeButton.textContent = "Remove " + category;
     document.querySelectorAll(".asset-tile").forEach((button) => button.addEventListener("click", () => {
         const selectedFamily = groups.find((group) => group.choices.some((choice) => choice.id === button.dataset.choiceId));
         activeFamily[category] = selectedFamily.name; selection[category] = selectedFamily.choices[0].id; renderAvatar(); renderPicker();
