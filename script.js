@@ -28,8 +28,8 @@ function loadSavedOutfit() {
         });
     };
     const applySkinColor = (saved) => {
-        const filterFor = (color) => { const value=(key,fallback)=>Number.isFinite(Number(color?.[key]))?Number(color[key]):fallback; return `hue-rotate(${Math.max(-180,Math.min(180,value("hue",0)))}deg) saturate(${Math.max(0,Math.min(200,value("saturation",100)))}%) brightness(${Math.max(60,Math.min(140,value("lightness",100)))}%)`; };
-        document.querySelectorAll("#companion .avatar-layer, [data-avatar-layer]").forEach((layer) => { const key=(layer.id||layer.dataset.avatarLayer||"").replace("Layer",""); const color=(key === "body" || key === "head") ? saved.skinColor : saved.itemColors?.[saved.selection?.[key]]; layer.style.filter=filterFor(color); });
+        const filterFor = (color, tintWhite=false) => { const value=(key,fallback)=>Number.isFinite(Number(color?.[key]))?Number(color[key]):fallback; const hue=Math.max(-180,Math.min(180,value("hue",0))), saturation=Math.max(0,Math.min(200,value("saturation",100))), lightness=Math.max(60,Math.min(140,value("lightness",100))); if (tintWhite && (hue !== 0 || saturation !== 100 || lightness !== 100)) return `sepia(100%) saturate(${Math.max(100,saturation*4)}%) hue-rotate(${hue-28}deg) brightness(${lightness}%)`; return tintWhite ? "none" : `hue-rotate(${hue}deg) saturate(${saturation}%) brightness(${lightness}%)`; };
+        document.querySelectorAll("#companion .avatar-layer, [data-avatar-layer]").forEach((layer) => { const key=(layer.id||layer.dataset.avatarLayer||"").replace("Layer",""); const isBody=key === "body" || key === "head"; const color=isBody ? saved.skinColor : saved.itemColors?.[saved.selection?.[key]]; layer.style.filter=filterFor(color, Boolean(saved.bodyAsset && isBody)); });
     };
 
     // Avatar Lab v2 saves stable asset paths, not the old numeric option

@@ -259,8 +259,15 @@ function normalizeSkinColor(value) {
 function skinFilter(color = settings.skinColor) {
     return "hue-rotate(" + color.hue + "deg) saturate(" + color.saturation + "%) brightness(" + color.lightness + "%)";
 }
+function whiteSpriteFilter(color = settings.skinColor) {
+    const unchanged = color.hue === 0 && color.saturation === 100 && color.lightness === 100;
+    if (unchanged) return "none";
+    // A hue rotation cannot change pure white. Sepia creates a color base
+    // while black pixel outlines remain dark, then hue rotates that base.
+    return "sepia(100%) saturate(" + Math.max(100, color.saturation * 4) + "%) hue-rotate(" + (color.hue - 28) + "deg) brightness(" + color.lightness + "%)";
+}
 function applySkinColor() {
-    ["body", "head"].forEach((layer) => { const image = document.getElementById(layer + "Layer"); if (image) image.style.filter = skinFilter(settings.skinColor); });
+    ["body", "head"].forEach((layer) => { const image = document.getElementById(layer + "Layer"); if (image) image.style.filter = settings.bodyAsset ? whiteSpriteFilter(settings.skinColor) : skinFilter(settings.skinColor); });
     adjustableCategories.forEach((category) => {
         const image = document.getElementById(category + "Layer");
         const selected = selectedOption(category);
@@ -488,7 +495,7 @@ document.getElementById("cameraButton").addEventListener("click", async () => {
         gradient.addColorStop(0, "#e4fff1"); gradient.addColorStop(.5, "#9ed9ca"); gradient.addColorStop(1, "#7760ad"); context.fillStyle = gradient; context.fillRect(0, 0, 700, 700);
         const images = [...document.querySelectorAll("#avatarCharacter img")].filter(image => image.src && !image.hidden);
         await Promise.all(images.map(image => image.decode?.().catch(() => {})));
-        for (const image of images) { const key = image.id.replace("Layer", ""); const color = (key === "body" || key === "head") ? settings.skinColor : settings.itemColors[selectedOption(key)?.id] || neutralColor(); context.filter = skinFilter(color); context.drawImage(image, 0, 0, 700, 700); }
+        for (const image of images) { const key = image.id.replace("Layer", ""); const color = (key === "body" || key === "head") ? settings.skinColor : settings.itemColors[selectedOption(key)?.id] || neutralColor(); context.filter = (settings.bodyAsset && (key === "body" || key === "head")) ? whiteSpriteFilter(color) : skinFilter(color); context.drawImage(image, 0, 0, 700, 700); }
         context.filter = "none";
         const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/webp", .88));
         if (!blob) throw Error("Camera could not create a snapshot.");
