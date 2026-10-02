@@ -420,6 +420,7 @@ function renderPicker() {
         const emptyChoice = selectedFamily.choices.find((choice) => !choice.src);
         if (emptyChoice) {
             selection[category] = emptyChoice.id;
+            activeFamily[category] = selectedFamily.name;
             setLayer(category, "");
             document.getElementById("saveStatus").textContent = category.toUpperCase() + " removed.";
             renderPicker();
@@ -431,6 +432,7 @@ function renderPicker() {
         const choice = visibleOptions(category).find((entry) => entry.id === button.dataset.choiceId);
         if (choice && !choice.src) {
             selection[category] = choice.id;
+            activeFamily[category] = choice.family;
             setLayer(category, "");
             document.getElementById("saveStatus").textContent = category.toUpperCase() + " removed.";
             renderPicker();
