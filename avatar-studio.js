@@ -229,6 +229,11 @@ function setLayer(name, source) {
     const layer = document.getElementById(name + "Layer");
     layer.onerror = () => {
         layer.hidden = true;
+        layer.style.display = "none";
+
+        // An empty source means the player chose the X tile. Do not turn that
+        // intentional removal into the first available item.
+        if (!source) return;
 
         if (name === "body" && settings.bodyAsset) {
             document.getElementById("saveStatus").textContent = "That body PNG is missing from /avatar: " + settings.bodyAsset;
