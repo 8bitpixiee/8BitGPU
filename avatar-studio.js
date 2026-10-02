@@ -248,6 +248,7 @@ function setLayer(name, source) {
     };
     layer.src = source;
     layer.hidden = !source;
+    layer.style.display = source ? "block" : "none";
 }
 function normalizeSkinColor(value) {
     const number = (key, fallback) => Number.isFinite(Number(value?.[key])) ? Number(value[key]) : fallback;
