@@ -53,8 +53,10 @@
                     <p class="helper-text">Choose a palette available for your selected species and build.</p>
                     <div class="swatch-grid" id="toneGrid"></div>
                     <fieldset class="skin-slider-controls" id="skinSliderControls">
-                        <legend>Fine-tune skin color</legend>
-                        <p>These sliders tint your body and face only. Hair, eyes, clothes, and extras keep their own colors.</p>
+                        <legend>Color each layer</legend>
+                        <p>Choose one part, then adjust its hue, saturation, and lightness without changing the rest of your Being.</p>
+                        <label for="colorTarget">Part</label>
+                        <select id="colorTarget"><option value="body">Body</option><option value="head">Face</option><option value="hair">Hair</option><option value="eyes">Eyes / blush</option><option value="ears">Ears</option><option value="fit">Outfit</option><option value="extra">Extras</option></select>
                         <label for="skinHue">Hue <output id="skinHueValue">0°</output></label>
                         <input id="skinHue" type="range" min="-180" max="180" value="0">
                         <label for="skinSaturation">Saturation <output id="skinSaturationValue">100%</output></label>

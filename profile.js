@@ -30,7 +30,7 @@ function renderAvatar(avatar) {
     const base = baseLayers(avatar);
     const saved = avatar?.layers || {};
     layers.forEach((name) => setLayer(name, base[name] || saved[name] || ""));
-    ["body", "head"].forEach((name) => { const image=byId(name+"Layer"); if(image)image.style.filter=skinFilter(avatar?.skinColor); });
+    layers.forEach((name) => { const image=byId(name+"Layer"); if(image)image.style.filter=skinFilter(avatar?.layerColors?.[name]||avatar?.skinColor); });
 }
 function setTheme(theme) { document.body.dataset.theme = theme || "violet"; }
 function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }

@@ -133,7 +133,10 @@ const options = {
     ]
 };
 
-const settings = { species: "Pixie", build: "Fae", skinTone: "Nutmeg", skinColor: { hue: 0, saturation: 100, lightness: 100 } };
+const colorLayers = ["body", "head", "hair", "eyes", "ears", "fit", "extra"];
+const neutralColor = () => ({ hue: 0, saturation: 100, lightness: 100 });
+const settings = { species: "Pixie", build: "Fae", skinTone: "Nutmeg", skinColor: neutralColor(), layerColors: Object.fromEntries(colorLayers.map((layer) => [layer, neutralColor()])) };
+let colorTarget = "body";
 const selection = { ears: "pixie-ears-nutmeg", hair: "bombshell-original", eyes: "lashes-purple", fit: "chillouts-magma", extra: "wings-lavender" };
 const steps = ["species", "skinTone", "style"];
 let currentStep = 0;
@@ -235,15 +238,15 @@ function normalizeSkinColor(value) {
         lightness: Math.max(60, Math.min(140, number("lightness", 100)))
     };
 }
-function skinFilter() {
-    const color = settings.skinColor;
+function skinFilter(color = settings.layerColors[colorTarget]) {
     return "hue-rotate(" + color.hue + "deg) saturate(" + color.saturation + "%) brightness(" + color.lightness + "%)";
 }
 function applySkinColor() {
-    ["bodyLayer", "headLayer"].forEach((id) => { document.getElementById(id).style.filter = skinFilter(); });
+    colorLayers.forEach((layer) => { const image = document.getElementById(layer + "Layer"); if (image) image.style.filter = skinFilter(settings.layerColors[layer]); });
 }
 function renderSkinSliders() {
-    const color = settings.skinColor;
+    const color = settings.layerColors[colorTarget];
+    const target = document.getElementById("colorTarget"); if (target) target.value = colorTarget;
     const controls = [["skinHue", "hue", "°"], ["skinSaturation", "saturation", "%"], ["skinLightness", "lightness", "%"]];
     controls.forEach(([id, key, suffix]) => {
         const input = document.getElementById(id), output = document.getElementById(id + "Value");
@@ -384,7 +387,8 @@ try {
         settings.species = migration[saved.species] || (PLAYABLE_SPECIES.includes(saved.species) ? saved.species : "Pixie");
         settings.build = speciesData[settings.species].builds.includes(saved.build) ? saved.build : speciesData[settings.species].builds[0];
         settings.skinTone = speciesData[settings.species].tones.includes(saved.skinTone) ? saved.skinTone : speciesData[settings.species].tones[0];
-        settings.skinColor = normalizeSkinColor(saved.skinColor);
+        const legacy = normalizeSkinColor(saved.skinColor);
+        settings.layerColors = Object.fromEntries(colorLayers.map((layer) => [layer, normalizeSkinColor(saved.layerColors?.[layer] || legacy)]));
         Object.keys(selection).forEach((category) => {
             if (saved.selection && options[category].some((choice) => choice.id === saved.selection[category])) selection[category] = saved.selection[category];
         });
@@ -399,11 +403,12 @@ try {
 
 document.querySelectorAll("[data-picker-category]").forEach((button) => button.addEventListener("click", () => { activePickerCategory = button.dataset.pickerCategory; renderPicker(); }));
 document.querySelectorAll("[data-adjust]").forEach((button) => button.addEventListener("click", () => adjustActiveLayer(button.dataset.adjust)));
+document.getElementById("colorTarget")?.addEventListener("change", (event) => { colorTarget = event.target.value; renderSkinSliders(); });
 [["skinHue", "hue"], ["skinSaturation", "saturation"], ["skinLightness", "lightness"]].forEach(([id, key]) => { const input=document.getElementById(id); if(input) input.addEventListener("input", (event) => {
-    settings.skinColor[key] = Number(event.target.value); renderSkinSliders(); applySkinColor();
+    settings.layerColors[colorTarget][key] = Number(event.target.value); renderSkinSliders(); applySkinColor();
 }); });
 document.getElementById("resetSkinColor")?.addEventListener("click", () => {
-    settings.skinColor = { hue: 0, saturation: 100, lightness: 100 }; renderSkinSliders(); applySkinColor();
+    settings.layerColors[colorTarget] = neutralColor(); renderSkinSliders(); applySkinColor();
 });
 document.querySelectorAll("[data-step-target]").forEach((button) => button.addEventListener("click", () => setStep(button.dataset.stepTarget)));
 document.getElementById("previousButton").addEventListener("click", () => setStep(steps[Math.max(0, currentStep - 1)]));
@@ -419,7 +424,7 @@ document.getElementById("saveButton").addEventListener("click", async () => {
     const layers = {};
     Object.keys(selection).forEach((category) => layers[category] = selectedOption(category).src);
     const adjustments = JSON.parse(JSON.stringify(activeAdjustments()));
-    const outfit = { version: 2, ...settings, skinColor: normalizeSkinColor(settings.skinColor), bodyPreset: settings.species === "Thixie" ? "thixie" : "custom", selection: { ...selection }, layers, adjustments };
+    const outfit = { version: 2, ...settings, layerColors: Object.fromEntries(colorLayers.map((layer) => [layer, normalizeSkinColor(settings.layerColors[layer])])), bodyPreset: settings.species === "Thixie" ? "thixie" : "custom", selection: { ...selection }, layers, adjustments };
     localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(outfit));
     localStorage.setItem("8bitgpu-user-avatar", "saved-being");
     localStorage.setItem("8bitgpu-user-avatar", "saved-being");
@@ -440,7 +445,7 @@ document.getElementById("cameraButton").addEventListener("click", async () => {
         gradient.addColorStop(0, "#e4fff1"); gradient.addColorStop(.5, "#9ed9ca"); gradient.addColorStop(1, "#7760ad"); context.fillStyle = gradient; context.fillRect(0, 0, 700, 700);
         const images = [...document.querySelectorAll("#avatarCharacter img")].filter(image => image.src && !image.hidden);
         await Promise.all(images.map(image => image.decode?.().catch(() => {})));
-        for (const image of images) { context.filter = (image.id === "bodyLayer" || image.id === "headLayer") ? skinFilter() : "none"; context.drawImage(image, 0, 0, 700, 700); }
+        for (const image of images) { context.filter = skinFilter(); context.drawImage(image, 0, 0, 700, 700); }
         context.filter = "none";
         const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/webp", .88));
         if (!blob) throw Error("Camera could not create a snapshot.");
