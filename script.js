@@ -30,10 +30,11 @@ function loadSavedOutfit() {
     const applySkinColor = (color) => {
         const value = (key, fallback) => Number.isFinite(Number(color?.[key])) ? Number(color[key]) : fallback;
         const filter = `hue-rotate(${Math.max(-180, Math.min(180, value("hue", 0)))}deg) saturate(${Math.max(0, Math.min(200, value("saturation", 100)))}%) brightness(${Math.max(60, Math.min(140, value("lightness", 100)))}%)`;
-        ["bodyLayer", "headLayer"].forEach((id) => {
-            const layer = document.getElementById(id); if (layer) layer.style.filter = filter;
-            document.querySelectorAll(`[data-avatar-layer="${id}"]`).forEach((previewLayer) => { previewLayer.style.filter = filter; });
-        });
+        // Tint each completed Being preview as one image. Applying the filter
+        // to a parent keeps every layered pixel in the Start-menu mini tile
+        // together and avoids different layers cancelling each other out.
+        document.querySelectorAll("#companion .avatar-layer, [data-avatar-layer]").forEach((layer) => { layer.style.filter = "none"; });
+        document.querySelectorAll("#companion, #startUserBeing, .saved-being-choice .start-being-preview").forEach((preview) => { preview.style.filter = filter; });
     };
 
     // Avatar Lab v2 saves stable asset paths, not the old numeric option
