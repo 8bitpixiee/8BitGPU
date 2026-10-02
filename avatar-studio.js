@@ -229,6 +229,11 @@ function setLayer(name, source) {
     layer.onerror = () => {
         layer.hidden = true;
 
+        if (name === "body" && settings.bodyAsset) {
+            document.getElementById("saveStatus").textContent = "That body PNG is missing from /avatar: " + settings.bodyAsset;
+            return;
+        }
+
         // A saved outfit can point at an art file that has not been uploaded
         // yet. Fall back to the first real option instead of leaving a broken
         // little strip in the preview.
