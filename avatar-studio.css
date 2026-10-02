@@ -147,6 +147,24 @@ body { background:#76578f!important; }
 .creator-actions { background:#d9cce1; }
 @media (max-width:730px) { .lab-content { display:block; padding:5px!important; } .creator-panel { margin-top:5px; } }
 
+/* Phone layout: every creator control remains in the page flow and each
+   category stays easy to tap without relying on a tiny nested scrollbar. */
+@media (max-width:730px) {
+    .studio-toolbar { position:sticky; top:0; z-index:40; min-height:38px; }
+    .preview-panel { position:sticky; top:38px; z-index:10; min-height:188px; padding:27px 12px 25px; }
+    .avatar-preview { width:min(148px,42vw); }
+    .creator-panel { padding:6px 5px 94px; }
+    .step-panel { padding:14px 8px 16px; overflow:visible; }
+    .choice-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+    .choice-grid button { min-height:52px; font-size:13px; }
+    .customizer-shell { grid-template-columns:76px minmax(0,1fr); }
+    .picker-category { min-height:44px; font-size:11px; }
+    .asset-grid,.color-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .asset-tile,.color-tile { min-height:66px; }
+    #removeSelectedItem { width:100%; min-height:42px; font-size:13px; }
+    .item-color-controls { margin-bottom:14px; }
+}
+
 /* Keep palette colors visible through every theme and selected state. */
 .swatch.nutmeg { --swatch-color: #a06542; }
 .swatch.peachy { --swatch-color: #eb8f62; }
