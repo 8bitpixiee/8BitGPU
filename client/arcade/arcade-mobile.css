@@ -15,6 +15,8 @@
 #mapStage.screen-drink::after { opacity:.52; background:repeating-linear-gradient(100deg,transparent 0 18px,#b2ecffaa 19px 23px,transparent 24px 40px),radial-gradient(circle,#b56ff088,transparent 70%); animation:screenDizzy .5s ease-in-out infinite alternate; }
 #mapStage.screen-shroom::after { opacity:.72; background:repeating-linear-gradient(90deg,#ff6399aa 0 3px,transparent 4px 34px),repeating-linear-gradient(176deg,#61fff8aa 0 2px,transparent 3px 47px),radial-gradient(circle,#fff29c66,transparent 65%); animation:screenShroom .13s steps(2) infinite; }
 .avatar-art,.avatar-motion { position:absolute; inset:0; transform-origin:50% 76%; }
+.avatar-motion canvas { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; image-rendering:pixelated; }
+.being.has-sprite-animation .avatar-motion { animation:none !important; }
 .avatar-motion img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; image-rendering:pixelated; }
 /* The existing base sprites are drawn facing left, so the horizontal mapping
    is intentionally inverted. Directional sprite sheets will use this same

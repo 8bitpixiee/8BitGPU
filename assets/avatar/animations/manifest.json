@@ -1,0 +1,542 @@
+{
+  "anthro_m.png": {
+    "width": 50,
+    "height": 50
+  },
+  "antrho_f.png": {
+    "width": 50,
+    "height": 50
+  },
+  "body_base_fem_idle_front_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_chunky_masc_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_chunky_masc_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_chunky_masc_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_fem_deerbra_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_fem_deerbra_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_fem_deerbra_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_fem_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_masc_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_masc_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_masc_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "Boob_1.png": {
+    "width": 50,
+    "height": 50
+  },
+  "bovidil_body_fem_v1.1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v1.2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v1.3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v2.1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v2.2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v2.3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v3.1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v3.2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v3.3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_head_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_tail_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_tail_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_tail_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "Clanker_F.png": {
+    "width": 50,
+    "height": 50
+  },
+  "Clanker_M.png": {
+    "width": 50,
+    "height": 50
+  },
+  "comfy_hair_m_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "comfy_hair_m_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "comfy_hair_m_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "comfy_hair_m_v4.png": {
+    "width": 48,
+    "height": 43
+  },
+  "donnie_hair_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "donnie_hair_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "donnie_hair_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "drawls_fem_idle_front_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "drawls_fem_idle_front_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "drawls_fem_idle_front_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_bovidil_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_bovidil_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_bovidil_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_deerbra_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_deerbra_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_deerbra_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "extra_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "extra_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_fem_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_lemon.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_mac_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_mac_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_mac_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_mac_v4.png": {
+    "width": 48,
+    "height": 43
+  },
+  "femme.png": {
+    "width": 50,
+    "height": 50
+  },
+  "fit_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "fit_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "fit_fem_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "fit_kittie_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "fit_kittie_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "fit_kittie_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "frolic_fit_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "frolic_fit_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "frolic_fit_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "frolic_skirt_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "frolic_skirt_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "frolic_skirt_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_fem_deerbra_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_fem_deerbra_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_fem_deerbra_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_fem_deerbra_v4.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_lemon_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_lemon_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_lemon_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_locs_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_locs_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_locs_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_longwaves_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_longwaves_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_longwaves_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_chunky_masc_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_chunky_masc_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_chunky_masc_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_fem_deerbra_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_fem_deerbra_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_fem_deerbra_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_fem_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_masc_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_masc_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_masc_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "kittie_ears_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "kittie_ears_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "kittie_ears_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "kittie_tail_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "kittie_tail_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "kittie_tail_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "macho.png": {
+    "width": 50,
+    "height": 50
+  },
+  "Maxie_F.png": {
+    "width": 50,
+    "height": 50
+  },
+  "Maxie_M.png": {
+    "width": 50,
+    "height": 50
+  },
+  "mermaid_f.png": {
+    "width": 50,
+    "height": 50
+  },
+  "mermaid_m.png": {
+    "width": 50,
+    "height": 50
+  },
+  "Null.png": {
+    "width": 50,
+    "height": 50
+  },
+  "ponytail v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ponytail v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ponytail v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ponytail v4.png": {
+    "width": 48,
+    "height": 43
+  },
+  "sideswept_hair_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "sideswept_hair_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "sideswept_hair_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_body_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_body_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_body_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_body_v4.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_fit_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_fit_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_fit_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_head_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_head_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_head_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "voidling_f.png": {
+    "width": 50,
+    "height": 50
+  },
+  "voidling_m.png": {
+    "width": 50,
+    "height": 50
+  },
+  "volume_hair_fem_idle_front_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "wings_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "wings_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "wings_v3.png": {
+    "width": 48,
+    "height": 43
+  }
+}

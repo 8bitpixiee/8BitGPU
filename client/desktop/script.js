@@ -469,6 +469,10 @@ function openApp(appName, profileUsername) {
         frame.src = appName === "profile" && profileUsername ? `${app.src}?u=${encodeURIComponent(profileUsername)}` : app.src;
         frame.title = app.title;
         frame.scrolling = "auto";
+        if (appName === "twitch") {
+            frame.allow = "autoplay; fullscreen";
+            frame.allowFullscreen = true;
+        }
         windowElement.appendChild(frame);
     } else if (app.external) {
         const content = document.createElement("div");
