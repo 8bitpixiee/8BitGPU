@@ -4,8 +4,9 @@ This is an overwrite update for the current live 8BitGPU workspace. Upload every
 
 ## Upload these files together
 
-- All root HTML, CSS, and JavaScript files in this package.
-- `src/worker.js` and `src/social.js`.
+- All root HTML entry pages, the `avatar/avatar-studio.html` entry page, and the `client/` scripts and styles.
+- `server/worker.js` and the other modules under `server/`.
+- Runtime images under `assets/`, plus `_redirects`, `.assetsignore`, and `wrangler.jsonc`.
 
 The Worker and D1 binding already configured in `wrangler.jsonc` are reused. Deploy the Worker after uploading the frontend files. No new Cloudflare resources, variables, or secrets are needed. Existing profile images, accounts, avatars, chat data, and legacy friends are retained.
 

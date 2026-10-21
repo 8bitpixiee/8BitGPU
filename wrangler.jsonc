@@ -1,7 +1,7 @@
 {
   "$schema": "https://unpkg.com/wrangler/config-schema.json",
   "name": "8bitgpu",
-  "main": "src/worker.js",
+  "main": "server/worker.js",
   "compatibility_date": "2026-07-20",
   "assets": {
     "directory": ".",
