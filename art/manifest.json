@@ -1399,6 +1399,951 @@
       "source": "art/source/ui/windowstask.aseprite",
       "sha256": "c0719d7adfaf4061e6be30cd57caf1f0a7d0f3f242a6b339e81ffe03498f8041",
       "source_sha256": "055484b6a416d890b98e7949ee7a603e8a97170366100c990c552b50f337ac9f"
+    },
+    {
+      "original": "assets/avatar/anthro_m.png",
+      "runtime": "assets/avatar/animations/anthro_m.png",
+      "source": "art/source/avatar/animated/anthro_m.aseprite",
+      "sha256": "754d786e673a15fb34e4a569dc0f4afea417f13d882524ca656e5e5d533d2cf0",
+      "source_sha256": "16d3ceb808f5683f903927b68256d24c8ec2c3429137012f257aea6d790982fc"
+    },
+    {
+      "original": "assets/avatar/antrho_f.png",
+      "runtime": "assets/avatar/animations/antrho_f.png",
+      "source": "art/source/avatar/animated/antrho_f.aseprite",
+      "sha256": "85be1cc669d89b8f2775975d2399a334e4d5275a67a1a78b7253ea8c0a2471bf",
+      "source_sha256": "163dbd734f58f7e810a5efbfceff07b70b8aedbda619c3c0549db2c3ee29fbdf"
+    },
+    {
+      "original": "assets/avatar/body_base_fem_idle_front_v1.png",
+      "runtime": "assets/avatar/animations/body_base_fem_idle_front_v1.png",
+      "source": "art/source/avatar/animated/body_base_fem_idle_front_v1.aseprite",
+      "sha256": "078cb3e281eaaea28331ca88a01ceb1313fef96dec49b40ac6563437260ccff0",
+      "source_sha256": "44f9571bfbcf51575b4ef8b6542becd1ae3767f006deb44eda7110251fee7b1b"
+    },
+    {
+      "original": "assets/avatar/body_chunky_masc_v1.png",
+      "runtime": "assets/avatar/animations/body_chunky_masc_v1.png",
+      "source": "art/source/avatar/animated/body_chunky_masc_v1.aseprite",
+      "sha256": "35ccda4707dca829703262aced9a64edb6e8d962350a5b4caf55f03e94f497e6",
+      "source_sha256": "d2ae52ff851c0294525fa57ac6cb07be7b7423abee05c70c9804b138108ddf76"
+    },
+    {
+      "original": "assets/avatar/body_chunky_masc_v2.png",
+      "runtime": "assets/avatar/animations/body_chunky_masc_v2.png",
+      "source": "art/source/avatar/animated/body_chunky_masc_v2.aseprite",
+      "sha256": "b068ba6aec24f03e6d02189ca2b2468d740567069a4f7df63ca42e3ecf4bcc29",
+      "source_sha256": "a0609db047e9fcde013eb10ef67cf4e9400af9fe86c50746f289963e32104701"
+    },
+    {
+      "original": "assets/avatar/body_chunky_masc_v3.png",
+      "runtime": "assets/avatar/animations/body_chunky_masc_v3.png",
+      "source": "art/source/avatar/animated/body_chunky_masc_v3.aseprite",
+      "sha256": "1a952ad9fc6a2290e8db849524c11dc1c2d741d7162ea8d6e36320d7e950c5db",
+      "source_sha256": "3f69433a308408fcdb8e4c63d9f1ed7b2bb622afbe4424624c8d9197fe35383a"
+    },
+    {
+      "original": "assets/avatar/body_fem_deerbra_v1.png",
+      "runtime": "assets/avatar/animations/body_fem_deerbra_v1.png",
+      "source": "art/source/avatar/animated/body_fem_deerbra_v1.aseprite",
+      "sha256": "aa93f29fc7daa85acb000774b2c991b2837f2dd91dea869e95f9b6bcd60d9143",
+      "source_sha256": "76445ed10abfcc402c21d588bc08a722d89ed078e1bbcb4dfe5080f9a43fbf1c"
+    },
+    {
+      "original": "assets/avatar/body_fem_deerbra_v2.png",
+      "runtime": "assets/avatar/animations/body_fem_deerbra_v2.png",
+      "source": "art/source/avatar/animated/body_fem_deerbra_v2.aseprite",
+      "sha256": "6cda72faa405ef1d5332e398e0165c3013b84deab0b1de116f5b0808bcd57ecb",
+      "source_sha256": "494b7e5732e36f512156dd1077d77a0a90603362301a20dde20d43ee5aee9d1f"
+    },
+    {
+      "original": "assets/avatar/body_fem_deerbra_v3.png",
+      "runtime": "assets/avatar/animations/body_fem_deerbra_v3.png",
+      "source": "art/source/avatar/animated/body_fem_deerbra_v3.aseprite",
+      "sha256": "c47cfd1437870451c8887c71710d9eea74b86bcb4949f4de423f811732bac71d",
+      "source_sha256": "2188dc13af07a82a28e205b7ec1523b7d1936f58f301f5ce6ddf6a6da62d3bec"
+    },
+    {
+      "original": "assets/avatar/body_fem_v1.png",
+      "runtime": "assets/avatar/animations/body_fem_v1.png",
+      "source": "art/source/avatar/animated/body_fem_v1.aseprite",
+      "sha256": "b9616e106e559b2fe7bdade5350567bc0caeb92e89c4ea54ccc61a92d392ab7a",
+      "source_sha256": "fb07cd81b02f5cb985bf8fc063dd7ec616468f3a3915568c07202d77f9c679e9"
+    },
+    {
+      "original": "assets/avatar/body_fem_v2.png",
+      "runtime": "assets/avatar/animations/body_fem_v2.png",
+      "source": "art/source/avatar/animated/body_fem_v2.aseprite",
+      "sha256": "9f202bc21e4779d448ddf570b6cf03cebbd83c228698c50240a4b55313bead2a",
+      "source_sha256": "4467cccadf1a05aafd08e5856c32d7ce930666a1eb214a4b6fe07239e2d97b8d"
+    },
+    {
+      "original": "assets/avatar/body_fem_v3.png",
+      "runtime": "assets/avatar/animations/body_fem_v3.png",
+      "source": "art/source/avatar/animated/body_fem_v3.aseprite",
+      "sha256": "8714c7e8c96aad13c3584d03389cb22aa174532cef1ff8263128e8cba97bb29b",
+      "source_sha256": "7a63e3bf40ceec4ffc85f31eaebd2b7e6740a0da4c34b39a523c117dcbf6bc58"
+    },
+    {
+      "original": "assets/avatar/body_masc_v1.png",
+      "runtime": "assets/avatar/animations/body_masc_v1.png",
+      "source": "art/source/avatar/animated/body_masc_v1.aseprite",
+      "sha256": "1bc6fc0192b7661392e62cfd5edf1f926820a2f193d17ddb668d78dd20eeefc0",
+      "source_sha256": "fc1e0d4a7c032b103d7263eee5c29ed1fc70c32e9e84ca96a5841188de40a5b7"
+    },
+    {
+      "original": "assets/avatar/body_masc_v2.png",
+      "runtime": "assets/avatar/animations/body_masc_v2.png",
+      "source": "art/source/avatar/animated/body_masc_v2.aseprite",
+      "sha256": "435ad5b4414d5e85912f4fb1f8d702986745cb09b13ee0535b28661a6b49d507",
+      "source_sha256": "8fb57a427f2b61d347d4afde42fc39160092f8a7126fe76fe081eb58a16538e1"
+    },
+    {
+      "original": "assets/avatar/body_masc_v3.png",
+      "runtime": "assets/avatar/animations/body_masc_v3.png",
+      "source": "art/source/avatar/animated/body_masc_v3.aseprite",
+      "sha256": "93b44dcf6a06bd20aaae64d94e474561ee1ce2010e9358a546eaf0a8c883a9f6",
+      "source_sha256": "81908cf1233f179bd3ca0242e87fd7e11cf5a1273be7a31bb0bba7abd7514b38"
+    },
+    {
+      "original": "assets/avatar/Boob_1.png",
+      "runtime": "assets/avatar/animations/Boob_1.png",
+      "source": "art/source/avatar/animated/Boob_1.aseprite",
+      "sha256": "9de65de4bd515778f7e89d1d386913e2df046e7783cb9ed0d4c935c6fafe78c8",
+      "source_sha256": "044071feea5c12cab635366ed968661ec35b204f40023172094acdda1c3df9fc"
+    },
+    {
+      "original": "assets/avatar/bovidil_body_fem_v1.1.png",
+      "runtime": "assets/avatar/animations/bovidil_body_fem_v1.1.png",
+      "source": "art/source/avatar/animated/bovidil_body_fem_v1.1.aseprite",
+      "sha256": "fb17757e6b0dfef74e947051c4bf40b28810743a328d5ce430652943a1e73b49",
+      "source_sha256": "59b0f80dc7801bf948ff4d22107062584b989807c9870592c8c28a9300f02683"
+    },
+    {
+      "original": "assets/avatar/bovidil_body_fem_v1.2.png",
+      "runtime": "assets/avatar/animations/bovidil_body_fem_v1.2.png",
+      "source": "art/source/avatar/animated/bovidil_body_fem_v1.2.aseprite",
+      "sha256": "ec182e6f05f9baf5ae4b8fec37e3878fb4df40021d5a4bc2f910e0bf9096c88d",
+      "source_sha256": "846247eb0b95795c9a941772f24059eb066cb7623315a4e18d883bfef4e17250"
+    },
+    {
+      "original": "assets/avatar/bovidil_body_fem_v1.3.png",
+      "runtime": "assets/avatar/animations/bovidil_body_fem_v1.3.png",
+      "source": "art/source/avatar/animated/bovidil_body_fem_v1.3.aseprite",
+      "sha256": "fdbe95a29237a6e8ecba0e6ac0e65fbb1722add5e5943083b6c2563ebae3fc24",
+      "source_sha256": "cfd07b4884776147d50301fc99be37b33a7ac03092528023c07a87dc1ac6b310"
+    },
+    {
+      "original": "assets/avatar/bovidil_body_fem_v2.1.png",
+      "runtime": "assets/avatar/animations/bovidil_body_fem_v2.1.png",
+      "source": "art/source/avatar/animated/bovidil_body_fem_v2.1.aseprite",
+      "sha256": "1856229cb6bc7023e30be3458519b8acdb0da41afc49589e81a5682c181606d0",
+      "source_sha256": "81c55fd59538711145b60e86f9a30c9364ca2ac6ea621a1c20b253fc02544967"
+    },
+    {
+      "original": "assets/avatar/bovidil_body_fem_v2.2.png",
+      "runtime": "assets/avatar/animations/bovidil_body_fem_v2.2.png",
+      "source": "art/source/avatar/animated/bovidil_body_fem_v2.2.aseprite",
+      "sha256": "03478ea317c5dfcf432e63bf14a345f74eb7f0770a62c723f1bd5143b3025f9a",
+      "source_sha256": "3a858ae2d8a21cda3c1512c6503565c2acac1a40e8d81b97b90b40c398c86906"
+    },
+    {
+      "original": "assets/avatar/bovidil_body_fem_v2.3.png",
+      "runtime": "assets/avatar/animations/bovidil_body_fem_v2.3.png",
+      "source": "art/source/avatar/animated/bovidil_body_fem_v2.3.aseprite",
+      "sha256": "7a82da1ae9b2f09149f21e7bec3330dcce7b6cba76f4e327ea5edce6da0c019e",
+      "source_sha256": "6483067c3ab936603a3da6b8a18db584b328313728ad45a611d390a92abeb965"
+    },
+    {
+      "original": "assets/avatar/bovidil_body_fem_v3.1.png",
+      "runtime": "assets/avatar/animations/bovidil_body_fem_v3.1.png",
+      "source": "art/source/avatar/animated/bovidil_body_fem_v3.1.aseprite",
+      "sha256": "cd221cb2e7037f10cadcf1c5c7771981c6dd454b4e98ec8cac4b053b83875e00",
+      "source_sha256": "a8a399dd45cb3eb6adb77b0b3f8bb3dcf7ebbaa9402ab90d83503aec9772d1c0"
+    },
+    {
+      "original": "assets/avatar/bovidil_body_fem_v3.2.png",
+      "runtime": "assets/avatar/animations/bovidil_body_fem_v3.2.png",
+      "source": "art/source/avatar/animated/bovidil_body_fem_v3.2.aseprite",
+      "sha256": "3a05e4c923bb51d775ee4de2f296970cfbd3b1f140a2772a929fa2f155c05e96",
+      "source_sha256": "5808ae1b2704607cc8a52f8724079bab7a693f60a6f8a5cd11da4f1d73e8b1f2"
+    },
+    {
+      "original": "assets/avatar/bovidil_body_fem_v3.3.png",
+      "runtime": "assets/avatar/animations/bovidil_body_fem_v3.3.png",
+      "source": "art/source/avatar/animated/bovidil_body_fem_v3.3.aseprite",
+      "sha256": "e5332bdd4885effa93ddecadafa7d3baf7a8f324d7149f93718b443aff4369f9",
+      "source_sha256": "3ca412135e351fc9130e1cf3fe52f824b67ae9d2ca23366db5de129cd03d0809"
+    },
+    {
+      "original": "assets/avatar/bovidil_head_fem_v1.png",
+      "runtime": "assets/avatar/animations/bovidil_head_fem_v1.png",
+      "source": "art/source/avatar/animated/bovidil_head_fem_v1.aseprite",
+      "sha256": "35e6d03ac92044d84bd23b1407a5eea61754dd279cfdc455481cee4aff87024c",
+      "source_sha256": "6890fb11f7ca2cf5feca646a5bbce21ab2264531495e4235a53890417c0c44c1"
+    },
+    {
+      "original": "assets/avatar/bovidil_tail_v1.png",
+      "runtime": "assets/avatar/animations/bovidil_tail_v1.png",
+      "source": "art/source/avatar/animated/bovidil_tail_v1.aseprite",
+      "sha256": "2d3351db1c5203d269309a99ec5139e9f146c4cf5f81db07dcfdb09357e70733",
+      "source_sha256": "de8b57f318198e654bbb95f1b54ab5b68050e257ba4db6c6421063035fcb7113"
+    },
+    {
+      "original": "assets/avatar/bovidil_tail_v2.png",
+      "runtime": "assets/avatar/animations/bovidil_tail_v2.png",
+      "source": "art/source/avatar/animated/bovidil_tail_v2.aseprite",
+      "sha256": "c0119ab989f65f77e793e02387316f0d2b7575060db993391791279a464a7094",
+      "source_sha256": "aec4393b841876e50a68fcb0884eb5e435f85d0ac8727400e16f402a758b3b08"
+    },
+    {
+      "original": "assets/avatar/bovidil_tail_v3.png",
+      "runtime": "assets/avatar/animations/bovidil_tail_v3.png",
+      "source": "art/source/avatar/animated/bovidil_tail_v3.aseprite",
+      "sha256": "49b56d4c60100f36da3424c6a904068545933fed3f35a3c40b229e008ae8b83a",
+      "source_sha256": "44bcba830f51d62ebf1b2952caf51a681c6c764bbcf69eeff895f26d53bedbde"
+    },
+    {
+      "original": "assets/avatar/Clanker_F.png",
+      "runtime": "assets/avatar/animations/Clanker_F.png",
+      "source": "art/source/avatar/animated/Clanker_F.aseprite",
+      "sha256": "1949fbcd01c053eee6f9d58574b313b2b3df9726428eb84543aca3e03ca526b4",
+      "source_sha256": "ea750c668814106d6c37ca30431ec3a6d04e7a2c060c0ba5a2c3be832f7cd287"
+    },
+    {
+      "original": "assets/avatar/Clanker_M.png",
+      "runtime": "assets/avatar/animations/Clanker_M.png",
+      "source": "art/source/avatar/animated/Clanker_M.aseprite",
+      "sha256": "8be0e0b50f320d14cd3f03265844fe4b2ec2b42c057efac608dd5cb09810bb59",
+      "source_sha256": "5cedd78738af1807fb4c612dde25871ae12b16b8ac8425aa7a91f0c14e8efac0"
+    },
+    {
+      "original": "assets/avatar/comfy_hair_m_v1.png",
+      "runtime": "assets/avatar/animations/comfy_hair_m_v1.png",
+      "source": "art/source/avatar/animated/comfy_hair_m_v1.aseprite",
+      "sha256": "d9691ab18510a451a94014e8388dc521494fddb8e0be6a46e95ca09f99c3b337",
+      "source_sha256": "4713497ccec86efdd42e666b152f587d8e90d6340c9b33abedc3908c0bbb2c09"
+    },
+    {
+      "original": "assets/avatar/comfy_hair_m_v2.png",
+      "runtime": "assets/avatar/animations/comfy_hair_m_v2.png",
+      "source": "art/source/avatar/animated/comfy_hair_m_v2.aseprite",
+      "sha256": "5a19ee3dff1a3552ae75e255a49493ee68ec970e00a781cde566cfc389151af9",
+      "source_sha256": "c6d19921982b9afb2bb598b3eaa9b462f4d7187ceb8db401e8b8d9d6abd44092"
+    },
+    {
+      "original": "assets/avatar/comfy_hair_m_v3.png",
+      "runtime": "assets/avatar/animations/comfy_hair_m_v3.png",
+      "source": "art/source/avatar/animated/comfy_hair_m_v3.aseprite",
+      "sha256": "63a685556938f2d27a01e24c097f03b48d71fcb2cb7ea16e06287ee1e24a4571",
+      "source_sha256": "0d0cf41307b325dac5c97a60b0be02809177b5af16ad2650b4ea6edba352fc70"
+    },
+    {
+      "original": "assets/avatar/comfy_hair_m_v4.png",
+      "runtime": "assets/avatar/animations/comfy_hair_m_v4.png",
+      "source": "art/source/avatar/animated/comfy_hair_m_v4.aseprite",
+      "sha256": "6278e769fc8a8f0c6b14bdfb64374ba30859e6f559308ee5fdb09b816b97daf8",
+      "source_sha256": "13bd7e340e3d3a1e42e1136d7ca8b252aa4392adf09d890ffd5c21e571ef6043"
+    },
+    {
+      "original": "assets/avatar/donnie_hair_v1.png",
+      "runtime": "assets/avatar/animations/donnie_hair_v1.png",
+      "source": "art/source/avatar/animated/donnie_hair_v1.aseprite",
+      "sha256": "df80b472fc80b555eaf70c72c1f5da00971ec26e09bba9bdd3d769e990748a8b",
+      "source_sha256": "549dbb5503af1ec458f167e32d3bfe3ea248c4111f5945110c13c041cdf723e6"
+    },
+    {
+      "original": "assets/avatar/donnie_hair_v2.png",
+      "runtime": "assets/avatar/animations/donnie_hair_v2.png",
+      "source": "art/source/avatar/animated/donnie_hair_v2.aseprite",
+      "sha256": "042bde64917a05dc91d9e25204128aa77158e6f7f6b97d195314a8a0ac330316",
+      "source_sha256": "d54b04cc84d0446a885e6c55a3efe1df34702a90fa41158b811a2216396326c7"
+    },
+    {
+      "original": "assets/avatar/donnie_hair_v3.png",
+      "runtime": "assets/avatar/animations/donnie_hair_v3.png",
+      "source": "art/source/avatar/animated/donnie_hair_v3.aseprite",
+      "sha256": "b2fdc6dcac95246eb4577f63e7f9253d1ac94c9966479cd3e4a1583fa6dbbe4e",
+      "source_sha256": "e23b11e5dba783a332555f9e2bd3d317c5fa7dcefde7ccbbab7fd93fba851815"
+    },
+    {
+      "original": "assets/avatar/drawls_fem_idle_front_v1.png",
+      "runtime": "assets/avatar/animations/drawls_fem_idle_front_v1.png",
+      "source": "art/source/avatar/animated/drawls_fem_idle_front_v1.aseprite",
+      "sha256": "1478b54df766f2dd27e14c295449f5b8a2deb441b5ffed12201696a2cc48dd73",
+      "source_sha256": "31835bb3b4f7606a0b58796d15dbdc6a4e1b3eab1f01304af10d8c1f0657b212"
+    },
+    {
+      "original": "assets/avatar/drawls_fem_idle_front_v2.png",
+      "runtime": "assets/avatar/animations/drawls_fem_idle_front_v2.png",
+      "source": "art/source/avatar/animated/drawls_fem_idle_front_v2.aseprite",
+      "sha256": "df5ed5d7c6d7536cc7211135ba942d77d0898b96d0cbfe6206dcad9c5e9f22d0",
+      "source_sha256": "d42e42a2e4fed6cbfecfa41e4bc13053ad774f496151d2c69e56c30a65b0a2e1"
+    },
+    {
+      "original": "assets/avatar/drawls_fem_idle_front_v3.png",
+      "runtime": "assets/avatar/animations/drawls_fem_idle_front_v3.png",
+      "source": "art/source/avatar/animated/drawls_fem_idle_front_v3.aseprite",
+      "sha256": "e7840716f34435c68e691cd83485c03cfe1c02c8169dfa8f385bf23c440d202e",
+      "source_sha256": "cf12f7c73ed047b41cd4df8b1fd2676ba25b4b7b629a25f898258e9ba65a9f35"
+    },
+    {
+      "original": "assets/avatar/ears_fem_bovidil_v1.png",
+      "runtime": "assets/avatar/animations/ears_fem_bovidil_v1.png",
+      "source": "art/source/avatar/animated/ears_fem_bovidil_v1.aseprite",
+      "sha256": "49c4bd5fbba995adbfdb2dd67edf6dba7c16d26c8b7b1765075923f8b45f1274",
+      "source_sha256": "9fe3c843fb84b72c33d31023903502d615f9bfde329b098d884a45cef6adb7f8"
+    },
+    {
+      "original": "assets/avatar/ears_fem_bovidil_v2.png",
+      "runtime": "assets/avatar/animations/ears_fem_bovidil_v2.png",
+      "source": "art/source/avatar/animated/ears_fem_bovidil_v2.aseprite",
+      "sha256": "e6d4bfa23a607d92f7f512984f9767e9895f2203528407637d828cfa53734db3",
+      "source_sha256": "bd9036d12d8390fe64a1e37f9f7fb3ec0bb6c6b49c001562a93a6cf606dfab30"
+    },
+    {
+      "original": "assets/avatar/ears_fem_bovidil_v3.png",
+      "runtime": "assets/avatar/animations/ears_fem_bovidil_v3.png",
+      "source": "art/source/avatar/animated/ears_fem_bovidil_v3.aseprite",
+      "sha256": "36fcb0d3ad5ff2aed9789ec7e2af4d5a5e04ef2d147da527d2dee3b2a0f87d71",
+      "source_sha256": "f83388561e41b106055e422a5f205bb371230dfa79178ec38160690061bb35d1"
+    },
+    {
+      "original": "assets/avatar/ears_fem_deerbra_v1.png",
+      "runtime": "assets/avatar/animations/ears_fem_deerbra_v1.png",
+      "source": "art/source/avatar/animated/ears_fem_deerbra_v1.aseprite",
+      "sha256": "71b56e50c7c6aaf6be9d87bda93151183f962ef159a7d774fce97c75f2d339f4",
+      "source_sha256": "af2f8fda8e9b34676434e8a0bcbd737c91ea1a460fdcb1ac2a0ae2defc681786"
+    },
+    {
+      "original": "assets/avatar/ears_fem_deerbra_v2.png",
+      "runtime": "assets/avatar/animations/ears_fem_deerbra_v2.png",
+      "source": "art/source/avatar/animated/ears_fem_deerbra_v2.aseprite",
+      "sha256": "aa19f24f1bfa55b917282f992e35f3aa45df29bfea8e17bfc7599309162e59dd",
+      "source_sha256": "a61aadc9a91dfafef1cb574abbfaab76ae5bedf0138a85f17344c42f1af78677"
+    },
+    {
+      "original": "assets/avatar/ears_fem_deerbra_v3.png",
+      "runtime": "assets/avatar/animations/ears_fem_deerbra_v3.png",
+      "source": "art/source/avatar/animated/ears_fem_deerbra_v3.aseprite",
+      "sha256": "0834e3cb33ad48bd5996e3dbe53296d8e90abfe9a61caf8a2cb50c05e6dadaf8",
+      "source_sha256": "27456e64702c08f26b8866ba5c4fffdcd1f12841731a092a2620a2d67a714c0c"
+    },
+    {
+      "original": "assets/avatar/ears_fem_v1.png",
+      "runtime": "assets/avatar/animations/ears_fem_v1.png",
+      "source": "art/source/avatar/animated/ears_fem_v1.aseprite",
+      "sha256": "0b3e784df8ad464f179c3130ee077467b0332d4bdc9bb818fdc08adedc321008",
+      "source_sha256": "5c2128f80a11d0e9f5fac3b34b9dc6bd3c067c2383b4a63ea39aa03a445ee871"
+    },
+    {
+      "original": "assets/avatar/ears_fem_v2.png",
+      "runtime": "assets/avatar/animations/ears_fem_v2.png",
+      "source": "art/source/avatar/animated/ears_fem_v2.aseprite",
+      "sha256": "bb31bc20e4e1eae2eeedfb78d9bb97703ef3d2f827a941893769fb8d9856060b",
+      "source_sha256": "e7ea62e9c60a5bc366a720d18905894fb4e94fdb4e128e890d3b3b2019d97cd6"
+    },
+    {
+      "original": "assets/avatar/ears_fem_v3.png",
+      "runtime": "assets/avatar/animations/ears_fem_v3.png",
+      "source": "art/source/avatar/animated/ears_fem_v3.aseprite",
+      "sha256": "4eec36592774e940a17a7ea4b7c5b20570c17aea3b3bacb85c9b7d866ae77276",
+      "source_sha256": "f89f74eaa35dc70efddcd7de17ecce2356d4420f2a609311e516244c82ac1a0c"
+    },
+    {
+      "original": "assets/avatar/extra_fem_v1.png",
+      "runtime": "assets/avatar/animations/extra_fem_v1.png",
+      "source": "art/source/avatar/animated/extra_fem_v1.aseprite",
+      "sha256": "d7500eaac3d03fa99a84c289d5000f90e57c41b869073b537e35ef91d3e17d9d",
+      "source_sha256": "54f2feb94e90d8bcf485c6b69f61e49467c6917e550a62ebd81db809014359ef"
+    },
+    {
+      "original": "assets/avatar/extra_fem_v2.png",
+      "runtime": "assets/avatar/animations/extra_fem_v2.png",
+      "source": "art/source/avatar/animated/extra_fem_v2.aseprite",
+      "sha256": "5c203796be590eeef5befac923b78969194451a0a54073ea008ad24049c9742b",
+      "source_sha256": "c98f0ae28a0c6ae4eeab056d548dc4990ae6ea7f3851dc10cd3961b68b343c4f"
+    },
+    {
+      "original": "assets/avatar/eyes_fem_v1.png",
+      "runtime": "assets/avatar/animations/eyes_fem_v1.png",
+      "source": "art/source/avatar/animated/eyes_fem_v1.aseprite",
+      "sha256": "db8d03cea86e724edc39fb03c1a789792b02f138dc1ec8c159eafc9c250cdc7f",
+      "source_sha256": "d1b7fe44274b3e4b9ef6ccfb3ab62f32953c43b34320d338450bd257bfd31b99"
+    },
+    {
+      "original": "assets/avatar/eyes_fem_v2.png",
+      "runtime": "assets/avatar/animations/eyes_fem_v2.png",
+      "source": "art/source/avatar/animated/eyes_fem_v2.aseprite",
+      "sha256": "dfcfeb3d45c8d25d438c778f4fe480293b54f4601bebcd116a507d0d730124ff",
+      "source_sha256": "8ad7fbd4426f6b83202d016cad0a8c730746a7281c95c9b9b4196f715dc81890"
+    },
+    {
+      "original": "assets/avatar/eyes_fem_v3.png",
+      "runtime": "assets/avatar/animations/eyes_fem_v3.png",
+      "source": "art/source/avatar/animated/eyes_fem_v3.aseprite",
+      "sha256": "2144ac967b26e01cbf07e1a6b88f33bed37ea0d435a299e196636af470b9b20d",
+      "source_sha256": "f97515b0ac81287771cf7eaae5390a120563e5af2e81a2b5697d04b9123ee7b6"
+    },
+    {
+      "original": "assets/avatar/eyes_lemon.png",
+      "runtime": "assets/avatar/animations/eyes_lemon.png",
+      "source": "art/source/avatar/animated/eyes_lemon.aseprite",
+      "sha256": "c57ec81cf89b132e01916bf450baf5f9adb9b7aa1393889ede0d4f15346b6ab4",
+      "source_sha256": "f23004f427200627c872c381d6ded79cf0d847caaf46919d7aa67fff00a648e6"
+    },
+    {
+      "original": "assets/avatar/eyes_mac_v1.png",
+      "runtime": "assets/avatar/animations/eyes_mac_v1.png",
+      "source": "art/source/avatar/animated/eyes_mac_v1.aseprite",
+      "sha256": "b4017026dc7ad3e1ec4adbdce7654ab2d9b59e0b2952502b2ceffb6cb25c6111",
+      "source_sha256": "6ad8c26e261d29c0c0eecf180a66a7c4776de8fad30a479c046e426fe5f1b7f1"
+    },
+    {
+      "original": "assets/avatar/eyes_mac_v2.png",
+      "runtime": "assets/avatar/animations/eyes_mac_v2.png",
+      "source": "art/source/avatar/animated/eyes_mac_v2.aseprite",
+      "sha256": "5bb11a3b13b09d313e64af9e2e06b437c2e4884c99965b5a86d30a45004e17ca",
+      "source_sha256": "3534de8dd4af188247efc3927e1d9fb2339b77d52ed5240ae33c9fdd7430caa1"
+    },
+    {
+      "original": "assets/avatar/eyes_mac_v3.png",
+      "runtime": "assets/avatar/animations/eyes_mac_v3.png",
+      "source": "art/source/avatar/animated/eyes_mac_v3.aseprite",
+      "sha256": "6f2587e15f95b161eb495a0b12b54ad45532f061547150639007d2e1b6a6db8a",
+      "source_sha256": "329c7d73c859e1ce0807c715ee09a282a9141dd8d664aff86bc62011840a038b"
+    },
+    {
+      "original": "assets/avatar/eyes_mac_v4.png",
+      "runtime": "assets/avatar/animations/eyes_mac_v4.png",
+      "source": "art/source/avatar/animated/eyes_mac_v4.aseprite",
+      "sha256": "e106e38cecf7c09aad9c2592fbbec360de8a51ac1a851c20e9b10326187a8f76",
+      "source_sha256": "08c10f078b70255b3964b9ab83bc5a60d77107c1b7e1203e583a503abe8bbc12"
+    },
+    {
+      "original": "assets/avatar/femme.png",
+      "runtime": "assets/avatar/animations/femme.png",
+      "source": "art/source/avatar/animated/femme.aseprite",
+      "sha256": "5af1a6e1c4ba30e415940a14e2c72a339f2dd5aee6582ded9ffdc03e5be14cc8",
+      "source_sha256": "39a5ba588d8bbd8262ec033cc730049c34ff299e58e9e154331234e420d565c6"
+    },
+    {
+      "original": "assets/avatar/fit_fem_v1.png",
+      "runtime": "assets/avatar/animations/fit_fem_v1.png",
+      "source": "art/source/avatar/animated/fit_fem_v1.aseprite",
+      "sha256": "8b862772fda9447c1621f4408889e910381a0a54c26e23c419e3106535888395",
+      "source_sha256": "ea7a97d09260e403d77af6131d21640a15a8315fd2a67e46f4fb30d20e31fd83"
+    },
+    {
+      "original": "assets/avatar/fit_fem_v2.png",
+      "runtime": "assets/avatar/animations/fit_fem_v2.png",
+      "source": "art/source/avatar/animated/fit_fem_v2.aseprite",
+      "sha256": "9adbc200d87e9a3445f226d93b7f883e9c5f063b62899dc80be7f9dc7acfbf55",
+      "source_sha256": "1586e15e5781deef40d2b1d3a854f7286958185f68a614a5be31d4b3c9b4c5e4"
+    },
+    {
+      "original": "assets/avatar/fit_fem_v3.png",
+      "runtime": "assets/avatar/animations/fit_fem_v3.png",
+      "source": "art/source/avatar/animated/fit_fem_v3.aseprite",
+      "sha256": "037fb9590cb2dad32191f30ba3be6283e30e97f5647001fd7c0fecfc5d6734af",
+      "source_sha256": "c83348b33b9a5bc5a2a01c1c3f8151c3d7c9f3531a7717066decdb35c3159604"
+    },
+    {
+      "original": "assets/avatar/fit_kittie_v1.png",
+      "runtime": "assets/avatar/animations/fit_kittie_v1.png",
+      "source": "art/source/avatar/animated/fit_kittie_v1.aseprite",
+      "sha256": "bc9ea084f4a7306768ca7aba700562d2d579ff3861efae9eea2465c28a122b34",
+      "source_sha256": "cd6754ea3b29c5352a658ca0ab6b70cdddb11c185532f3a1d5a417307e3f7d0e"
+    },
+    {
+      "original": "assets/avatar/fit_kittie_v2.png",
+      "runtime": "assets/avatar/animations/fit_kittie_v2.png",
+      "source": "art/source/avatar/animated/fit_kittie_v2.aseprite",
+      "sha256": "7ea66385ec413093e15cd191a27137928253d6610ca01d2a6922a169babaad1c",
+      "source_sha256": "85094293a483988c0aed6cbe5cdff718d7fc2644fb8b5f2afb71850b40741d54"
+    },
+    {
+      "original": "assets/avatar/fit_kittie_v3.png",
+      "runtime": "assets/avatar/animations/fit_kittie_v3.png",
+      "source": "art/source/avatar/animated/fit_kittie_v3.aseprite",
+      "sha256": "6fb4d40630dde4b94c483428580163cc322e2372e0a0c3967285bc4eed3a507d",
+      "source_sha256": "528f6e1a7a5747520f4030b8a9ce27a32d8398d18f044806224e12ec4f6b72d1"
+    },
+    {
+      "original": "assets/avatar/frolic_fit_v1.png",
+      "runtime": "assets/avatar/animations/frolic_fit_v1.png",
+      "source": "art/source/avatar/animated/frolic_fit_v1.aseprite",
+      "sha256": "f2a468738adec303ccaf80102bccc6171db790274fc88550238e90a96f48ad6b",
+      "source_sha256": "5d5b8597d32e7a9991ff1b01926b77a8749c35d3d50790b23ec6c59decc6ce25"
+    },
+    {
+      "original": "assets/avatar/frolic_fit_v2.png",
+      "runtime": "assets/avatar/animations/frolic_fit_v2.png",
+      "source": "art/source/avatar/animated/frolic_fit_v2.aseprite",
+      "sha256": "c155c9f1e7512fd02786d3921bae704bdbdd16186c03e7bb5a008878eb07a139",
+      "source_sha256": "24a06553c5021a27ca480bf888ca6d10ffb14a501428010c242bf0b6c9b9794b"
+    },
+    {
+      "original": "assets/avatar/frolic_fit_v3.png",
+      "runtime": "assets/avatar/animations/frolic_fit_v3.png",
+      "source": "art/source/avatar/animated/frolic_fit_v3.aseprite",
+      "sha256": "ef0122d086e0ef429f159309c268c3826f6bc9a1668d5c6699878a41afae83db",
+      "source_sha256": "57b7b7581caa774864562e1ef69fd52d76628d8b6ee761063f65cf875d45b708"
+    },
+    {
+      "original": "assets/avatar/frolic_skirt_v1.png",
+      "runtime": "assets/avatar/animations/frolic_skirt_v1.png",
+      "source": "art/source/avatar/animated/frolic_skirt_v1.aseprite",
+      "sha256": "766659443f19f3e36c88925d1cd4f03cb5639608ab4d2a48e6be19bb2994f446",
+      "source_sha256": "48b0ca4120407ce07022068d47cb4fe28b442b54791639f38d0373a3ac4e669e"
+    },
+    {
+      "original": "assets/avatar/frolic_skirt_v2.png",
+      "runtime": "assets/avatar/animations/frolic_skirt_v2.png",
+      "source": "art/source/avatar/animated/frolic_skirt_v2.aseprite",
+      "sha256": "804e0f5f718fb2d29fa7594c038b4e3ba95948063a48fbd3e722e4c4bf393100",
+      "source_sha256": "f33bf7959c5642df116e1faceff7c8763e0c969904f511d67102a90b41468a98"
+    },
+    {
+      "original": "assets/avatar/frolic_skirt_v3.png",
+      "runtime": "assets/avatar/animations/frolic_skirt_v3.png",
+      "source": "art/source/avatar/animated/frolic_skirt_v3.aseprite",
+      "sha256": "37197787d839037dbca4e6fae9b62e11cb92ab65336cbf258869947afaff4e1c",
+      "source_sha256": "0788bc9a751d6b7f5e6d5dc2351eaa0bf5ce4804dabb6ed30579da87e1a79ae6"
+    },
+    {
+      "original": "assets/avatar/hair_fem_deerbra_v1.png",
+      "runtime": "assets/avatar/animations/hair_fem_deerbra_v1.png",
+      "source": "art/source/avatar/animated/hair_fem_deerbra_v1.aseprite",
+      "sha256": "82c5c62d9b428dcd6fad0edee16626781cb8fc6b398dea54c76c2d08cd280b9c",
+      "source_sha256": "6e0b71a867a5c760d039455d025fcd7d3303e3506c4f58a6ba68fe828b0aa5b2"
+    },
+    {
+      "original": "assets/avatar/hair_fem_deerbra_v2.png",
+      "runtime": "assets/avatar/animations/hair_fem_deerbra_v2.png",
+      "source": "art/source/avatar/animated/hair_fem_deerbra_v2.aseprite",
+      "sha256": "7388ce9e93b1dd4769cb13a07100afa0fa29dfdcce879aa1a59b18f16a5b1341",
+      "source_sha256": "16257293d73b88ff709ba772d635da9e42d9944e2fcc481c6823d755df694db4"
+    },
+    {
+      "original": "assets/avatar/hair_fem_deerbra_v3.png",
+      "runtime": "assets/avatar/animations/hair_fem_deerbra_v3.png",
+      "source": "art/source/avatar/animated/hair_fem_deerbra_v3.aseprite",
+      "sha256": "cba74aa91accad740b2a91a99cf405e3486ced8d8c0ee8d710de50d72ead710c",
+      "source_sha256": "25f3a78ec7aa9d00e79cfc19bbeee92bb853e272534fec69595c7178931804ac"
+    },
+    {
+      "original": "assets/avatar/hair_fem_deerbra_v4.png",
+      "runtime": "assets/avatar/animations/hair_fem_deerbra_v4.png",
+      "source": "art/source/avatar/animated/hair_fem_deerbra_v4.aseprite",
+      "sha256": "a1c2ecc332286aea1449f15deb56469b75aefa360a91c0c39b8ddc17ca3bd6aa",
+      "source_sha256": "4cc92baaf9798ccb51d7f52c30dcffd882efa2ad440b3d303b07250416e6046a"
+    },
+    {
+      "original": "assets/avatar/hair_fem_v1.png",
+      "runtime": "assets/avatar/animations/hair_fem_v1.png",
+      "source": "art/source/avatar/animated/hair_fem_v1.aseprite",
+      "sha256": "61f76f8490611d893007154763bda41313aa4c27cac6821a93074a7b0b33c821",
+      "source_sha256": "a106c35b12236a99507bc12cd90439f4c8e0d9c27ac805bbbe03076dc0b9d524"
+    },
+    {
+      "original": "assets/avatar/hair_fem_v2.png",
+      "runtime": "assets/avatar/animations/hair_fem_v2.png",
+      "source": "art/source/avatar/animated/hair_fem_v2.aseprite",
+      "sha256": "200a6358cc118e3579c97c43f64ceb57c95639f186979d1da4acd3a8b1c9114b",
+      "source_sha256": "1479d958e07a140b73c6f47fc61e0dcca8c52ae861acb00215476f3dcca995a9"
+    },
+    {
+      "original": "assets/avatar/hair_lemon_v1.png",
+      "runtime": "assets/avatar/animations/hair_lemon_v1.png",
+      "source": "art/source/avatar/animated/hair_lemon_v1.aseprite",
+      "sha256": "26dfc4458521c9274e2cc1ee373f0e37ce241f37d7802f42723a3483e2123698",
+      "source_sha256": "89dca353d55967ccdf48ca4c5faa4bc1e00b3d4072d673d9ee30021d74030882"
+    },
+    {
+      "original": "assets/avatar/hair_lemon_v2.png",
+      "runtime": "assets/avatar/animations/hair_lemon_v2.png",
+      "source": "art/source/avatar/animated/hair_lemon_v2.aseprite",
+      "sha256": "2737c2da674e1567d608e48b338eba234c4b8aa892b82ddce43beb4a3e7c509e",
+      "source_sha256": "e2cf71c47f29316dcab6cd7bafcedcff668aa9e29c012d3ca07a6829c830f810"
+    },
+    {
+      "original": "assets/avatar/hair_lemon_v3.png",
+      "runtime": "assets/avatar/animations/hair_lemon_v3.png",
+      "source": "art/source/avatar/animated/hair_lemon_v3.aseprite",
+      "sha256": "074e7e7ec1cc800871d191a04e042a92460df14292e84df923ff35a2a30bcbbf",
+      "source_sha256": "a13695651410719906581270e050367e6c4f8dc12ce7a284cba2a531762a9c5c"
+    },
+    {
+      "original": "assets/avatar/hair_locs_v1.png",
+      "runtime": "assets/avatar/animations/hair_locs_v1.png",
+      "source": "art/source/avatar/animated/hair_locs_v1.aseprite",
+      "sha256": "a55b13c75b93f0798f0e6a5c6901d5d96a636f0416ba74016dff341c2e045ce8",
+      "source_sha256": "b487a539a462f43fd844e26e33d7cc7f7be833a285263d7db4ec1549e2a4d801"
+    },
+    {
+      "original": "assets/avatar/hair_locs_v2.png",
+      "runtime": "assets/avatar/animations/hair_locs_v2.png",
+      "source": "art/source/avatar/animated/hair_locs_v2.aseprite",
+      "sha256": "12a7cf8070037d33367257c64a9fb69373ec06452154863caa239b394fa73d1c",
+      "source_sha256": "e1253b455d9ee6b072547a88a4bc229e412053a7c3cdbaa726cf4b661f87fbeb"
+    },
+    {
+      "original": "assets/avatar/hair_locs_v3.png",
+      "runtime": "assets/avatar/animations/hair_locs_v3.png",
+      "source": "art/source/avatar/animated/hair_locs_v3.aseprite",
+      "sha256": "0c6c3de3133a17848b6b737777dfc26942af8cf19e5ec04f07fff74af2e38522",
+      "source_sha256": "57c4c9eb66540eef385d8325b5b7a807227e489307f50436275659ed00420d50"
+    },
+    {
+      "original": "assets/avatar/hair_longwaves_v1.png",
+      "runtime": "assets/avatar/animations/hair_longwaves_v1.png",
+      "source": "art/source/avatar/animated/hair_longwaves_v1.aseprite",
+      "sha256": "3d9f0f4c9b5ecf5e2c183e358e17402bac7ab6d8ae2a02b1b388374272297088",
+      "source_sha256": "4d37e6bf9c257cc1270da5298271b0ecb0033a1d3f6cb6c5a159931c97587bf6"
+    },
+    {
+      "original": "assets/avatar/hair_longwaves_v2.png",
+      "runtime": "assets/avatar/animations/hair_longwaves_v2.png",
+      "source": "art/source/avatar/animated/hair_longwaves_v2.aseprite",
+      "sha256": "fbfdddc68589580cc13e38f3a4e2b0129a47b80e3c383240f5b05114e127c812",
+      "source_sha256": "1c333720a256ce75215e5aa4f6d25da07a112d010877d2ea2cdaea2c50f4a503"
+    },
+    {
+      "original": "assets/avatar/hair_longwaves_v3.png",
+      "runtime": "assets/avatar/animations/hair_longwaves_v3.png",
+      "source": "art/source/avatar/animated/hair_longwaves_v3.aseprite",
+      "sha256": "de0569f2c8b445328e6564012659b7cc0477961d613c8f8f0d7d2f276379ae8f",
+      "source_sha256": "ac9f708aa88d4d85d37f3e736c65346d2efef6472ab93efb687d7e2deb98369f"
+    },
+    {
+      "original": "assets/avatar/head_chunky_masc_v1.png",
+      "runtime": "assets/avatar/animations/head_chunky_masc_v1.png",
+      "source": "art/source/avatar/animated/head_chunky_masc_v1.aseprite",
+      "sha256": "c1309bc34df27c736c9360bccbb4e421dbf624a5a9a636b3597cb7025d1fb6ae",
+      "source_sha256": "1eab2512696dba9a7f1c3abb3b9bb67ceedc9a0acee096ee641af34abe5e1e84"
+    },
+    {
+      "original": "assets/avatar/head_chunky_masc_v2.png",
+      "runtime": "assets/avatar/animations/head_chunky_masc_v2.png",
+      "source": "art/source/avatar/animated/head_chunky_masc_v2.aseprite",
+      "sha256": "65c61f28c0f7b01b8cf5bf56dc07419136f57f01d40686cc92033a0f1831574c",
+      "source_sha256": "ea5cfa2b99c7d673ecbb352b2e425a3ec5a82ba3e6acf2f914886dd7943374fb"
+    },
+    {
+      "original": "assets/avatar/head_chunky_masc_v3.png",
+      "runtime": "assets/avatar/animations/head_chunky_masc_v3.png",
+      "source": "art/source/avatar/animated/head_chunky_masc_v3.aseprite",
+      "sha256": "3d8ae6bf7ebea3134cbafe2e53139d28ed4f3b5cf3009c6644d5b39cd204728d",
+      "source_sha256": "418d94aced85c512400e2733c916f67ee16ba8ca77955d503cfa38aae6bf9cbe"
+    },
+    {
+      "original": "assets/avatar/head_fem_deerbra_v1.png",
+      "runtime": "assets/avatar/animations/head_fem_deerbra_v1.png",
+      "source": "art/source/avatar/animated/head_fem_deerbra_v1.aseprite",
+      "sha256": "53b5f25ea400a8fe6ca343b3597703c874a79855094069229277570bee96e8ec",
+      "source_sha256": "33de431f9455021393f7f4eb734c814a0f45b71fddd384a8e1fac10b4d72e6a0"
+    },
+    {
+      "original": "assets/avatar/head_fem_deerbra_v2.png",
+      "runtime": "assets/avatar/animations/head_fem_deerbra_v2.png",
+      "source": "art/source/avatar/animated/head_fem_deerbra_v2.aseprite",
+      "sha256": "971f56c94281431140ecbab5792b27751b01cd77bab5546b8c9cc86205c3438d",
+      "source_sha256": "fa81b30d5a8f7dd9757c6066a6284f3bef1389dba9f24a5101eb3affa8580a87"
+    },
+    {
+      "original": "assets/avatar/head_fem_deerbra_v3.png",
+      "runtime": "assets/avatar/animations/head_fem_deerbra_v3.png",
+      "source": "art/source/avatar/animated/head_fem_deerbra_v3.aseprite",
+      "sha256": "dc947c7d26975e7b9ba530922d1fc4018fa8e26bdfd5170299ef91390ed186e0",
+      "source_sha256": "38f6cf97ca6adceefd8a743a6d8579988bea6ef31ab049a9bc5ff19ed1b67bbe"
+    },
+    {
+      "original": "assets/avatar/head_fem_v1.png",
+      "runtime": "assets/avatar/animations/head_fem_v1.png",
+      "source": "art/source/avatar/animated/head_fem_v1.aseprite",
+      "sha256": "45d59053da3a8068c3a353a9ce78f6f2a1dfb451a7906b15e9e7370b2c974eb6",
+      "source_sha256": "471dbb0f504c8a408d6aed03cb4cf39ef065b2c18c41a2a2bd9c628c2566c6b9"
+    },
+    {
+      "original": "assets/avatar/head_fem_v2.png",
+      "runtime": "assets/avatar/animations/head_fem_v2.png",
+      "source": "art/source/avatar/animated/head_fem_v2.aseprite",
+      "sha256": "659e2d8f740ed471a1ba6dfdf0d9dcb2e08c47b7d72b5d0c56e0d2407d182b97",
+      "source_sha256": "3beaaa2c84d2ac4c7de2b6685511e0cfcc6d971e5011138a771d428eb75e1b18"
+    },
+    {
+      "original": "assets/avatar/head_fem_v3.png",
+      "runtime": "assets/avatar/animations/head_fem_v3.png",
+      "source": "art/source/avatar/animated/head_fem_v3.aseprite",
+      "sha256": "f027aa2458c526d384ad361fae174a948a3849d7ad7ddf7231e8afc1e832b059",
+      "source_sha256": "76e86648f8d84c2c54c5c78f164c86c53d9f52cbafc46fc3c104c11c5b90149f"
+    },
+    {
+      "original": "assets/avatar/head_masc_v1.png",
+      "runtime": "assets/avatar/animations/head_masc_v1.png",
+      "source": "art/source/avatar/animated/head_masc_v1.aseprite",
+      "sha256": "b3f47f6f6cdb15e75c0900e3d4daa36db2b26ef49c35d0b2a4819aec3bca4c69",
+      "source_sha256": "3535096023f2cd2687a7acac7a1c0331a3eaa87e8b19dc3fc9bd07ee2890713c"
+    },
+    {
+      "original": "assets/avatar/head_masc_v2.png",
+      "runtime": "assets/avatar/animations/head_masc_v2.png",
+      "source": "art/source/avatar/animated/head_masc_v2.aseprite",
+      "sha256": "3ad0ae5b4809a7a35c85e7c729eca71c67fa29b9275d2d64894a879c09d394c9",
+      "source_sha256": "288a8c8a8f8c42b8977c864f1139c32081635bd07cba6a05653aab818cb85596"
+    },
+    {
+      "original": "assets/avatar/head_masc_v3.png",
+      "runtime": "assets/avatar/animations/head_masc_v3.png",
+      "source": "art/source/avatar/animated/head_masc_v3.aseprite",
+      "sha256": "688eeee4395fabee06c627a6840d428a16c570e7b40e00e9bf46a08a6e47da70",
+      "source_sha256": "5565ffefdc755de3940581438a8d3a2349f4d96462ed1d12c407d188f61e5d32"
+    },
+    {
+      "original": "assets/avatar/kittie_ears_v1.png",
+      "runtime": "assets/avatar/animations/kittie_ears_v1.png",
+      "source": "art/source/avatar/animated/kittie_ears_v1.aseprite",
+      "sha256": "3325dff06d5d2bcfd301325af34cefbfd661a01dad983c9f85f1999db30180a2",
+      "source_sha256": "23a65f8dd78d73718f70344baf076c7a95b2e73ecf55d91cee5f3cc95c5e8b48"
+    },
+    {
+      "original": "assets/avatar/kittie_ears_v2.png",
+      "runtime": "assets/avatar/animations/kittie_ears_v2.png",
+      "source": "art/source/avatar/animated/kittie_ears_v2.aseprite",
+      "sha256": "1e917668359366ef5b15a66c8378bb695075dec5531c39e0a02494666e78b9d3",
+      "source_sha256": "444f85aefe26598ffdbaf1d6008904862ae01eca3447db631e506e75a35dfe74"
+    },
+    {
+      "original": "assets/avatar/kittie_ears_v3.png",
+      "runtime": "assets/avatar/animations/kittie_ears_v3.png",
+      "source": "art/source/avatar/animated/kittie_ears_v3.aseprite",
+      "sha256": "67d651cca6643b2794363e34c62a58f413e34bcd1b3b1558df923634e7ef2e41",
+      "source_sha256": "de79810eab6b51d98ee5f7eda218f6fa5ff6ff195e0e3fbd792c8903baf90347"
+    },
+    {
+      "original": "assets/avatar/kittie_tail_v1.png",
+      "runtime": "assets/avatar/animations/kittie_tail_v1.png",
+      "source": "art/source/avatar/animated/kittie_tail_v1.aseprite",
+      "sha256": "c8d02b037c56cd3db8588bef90d64182f60e09f2c4c89417584bf06793b0f43b",
+      "source_sha256": "482af0b9ae215db5d79844b41adb68a81dd5cecfa76008a01c9d490f14819fa2"
+    },
+    {
+      "original": "assets/avatar/kittie_tail_v2.png",
+      "runtime": "assets/avatar/animations/kittie_tail_v2.png",
+      "source": "art/source/avatar/animated/kittie_tail_v2.aseprite",
+      "sha256": "d94b9bf33a60db8e9d8049c46f14dff886fb81cbf506bdb8ce5e22590efa9bca",
+      "source_sha256": "734dde6821040e9b1a43d202a84dc5498555cc14d85660eb1c6429d2a105e84e"
+    },
+    {
+      "original": "assets/avatar/kittie_tail_v3.png",
+      "runtime": "assets/avatar/animations/kittie_tail_v3.png",
+      "source": "art/source/avatar/animated/kittie_tail_v3.aseprite",
+      "sha256": "e41bb27880fb62076d466a106b2a5748b8418002d443a86c3af077c2fa7b19f3",
+      "source_sha256": "e3bf9454850a98802cd0113820c5b6ce25927e06637494972225f22b035144f6"
+    },
+    {
+      "original": "assets/avatar/macho.png",
+      "runtime": "assets/avatar/animations/macho.png",
+      "source": "art/source/avatar/animated/macho.aseprite",
+      "sha256": "7eb1faca18c89c5408f4a3861c6407599e6bbf7621305eeab9869a1683c352b5",
+      "source_sha256": "932b23b6b68a3a1be19ecd2de15a5bc984520a7014b3b591919b8d15842dd071"
+    },
+    {
+      "original": "assets/avatar/Maxie_F.png",
+      "runtime": "assets/avatar/animations/Maxie_F.png",
+      "source": "art/source/avatar/animated/Maxie_F.aseprite",
+      "sha256": "0f088a5d3c9b48863c81c4ce0dced072031d7df10bd7f21b252c8f33e4403a3a",
+      "source_sha256": "235b99b4513a191a2c98c5eb9e8669db2877f2c8f490f7d37df0f541256d37e2"
+    },
+    {
+      "original": "assets/avatar/Maxie_M.png",
+      "runtime": "assets/avatar/animations/Maxie_M.png",
+      "source": "art/source/avatar/animated/Maxie_M.aseprite",
+      "sha256": "7a92c0ac5273f70e2b2f758f1c8a4d2e6796ddf95df198e300c4a796f5c73dd7",
+      "source_sha256": "7a787aff0d4fc44b34f31da8add983a0549029d7b11c34a581386b40e904c184"
+    },
+    {
+      "original": "assets/avatar/mermaid_f.png",
+      "runtime": "assets/avatar/animations/mermaid_f.png",
+      "source": "art/source/avatar/animated/mermaid_f.aseprite",
+      "sha256": "730cd49e51c8ac7e3cbcdb0c38822885ae2db4297b909c74832a9c43b82d57dd",
+      "source_sha256": "f3a419351d345e5dddbcda61f95aff45add2f9545c2a13157f75403ed2c4b201"
+    },
+    {
+      "original": "assets/avatar/mermaid_m.png",
+      "runtime": "assets/avatar/animations/mermaid_m.png",
+      "source": "art/source/avatar/animated/mermaid_m.aseprite",
+      "sha256": "8fddb2698a4a867166c1c836eb3e4657624c731f941781625fc5f6aec4a3a179",
+      "source_sha256": "57f775968ff124cc9715db9d2757bf824985beb46c56e1e6d56322da06699271"
+    },
+    {
+      "original": "assets/avatar/Null.png",
+      "runtime": "assets/avatar/animations/Null.png",
+      "source": "art/source/avatar/animated/Null.aseprite",
+      "sha256": "bfa4ee5cdc2fb6faaf9e8fab99d0dde0a2a95cf703cb8da06e40beb221864f55",
+      "source_sha256": "f6825546021c71b4230abef44ae57d836c2e152324c89868c755954bc08d348a"
+    },
+    {
+      "original": "assets/avatar/ponytail v1.png",
+      "runtime": "assets/avatar/animations/ponytail v1.png",
+      "source": "art/source/avatar/animated/ponytail v1.aseprite",
+      "sha256": "ee5f9dc8901a64e8c4570cd6716ff9e7a7294d352050270ff3b0185ae33c047b",
+      "source_sha256": "08b136c092a53431434f7ce3ecb25b033f5e0eef09493870ead86373e81bb4ab"
+    },
+    {
+      "original": "assets/avatar/ponytail v2.png",
+      "runtime": "assets/avatar/animations/ponytail v2.png",
+      "source": "art/source/avatar/animated/ponytail v2.aseprite",
+      "sha256": "23f4544f768babc1a34eb34ac5e24a1923dc29b57d7543ad49b396d1d58fbbfd",
+      "source_sha256": "e3885e36033354287fadeed25a8420647ea151bb8454d61d995230b1e1da2aaf"
+    },
+    {
+      "original": "assets/avatar/ponytail v3.png",
+      "runtime": "assets/avatar/animations/ponytail v3.png",
+      "source": "art/source/avatar/animated/ponytail v3.aseprite",
+      "sha256": "78482cf85542ccde8a15081b2dfcf276ed360be34db30aefe6369f46f35c0f1a",
+      "source_sha256": "a27312774791a44523967e115d04fa6b5ca395b9ec4d6a6d7e6cda9567346c74"
+    },
+    {
+      "original": "assets/avatar/ponytail v4.png",
+      "runtime": "assets/avatar/animations/ponytail v4.png",
+      "source": "art/source/avatar/animated/ponytail v4.aseprite",
+      "sha256": "f999c8a9e15f95fb04d7844ca5a94ff7a471df764d93fc9c9b34d684d76ab42c",
+      "source_sha256": "406c144d1e1e4c2676b431edd3356a03ebe0a63b6219e110995ce8421028f6c9"
+    },
+    {
+      "original": "assets/avatar/sideswept_hair_v1.png",
+      "runtime": "assets/avatar/animations/sideswept_hair_v1.png",
+      "source": "art/source/avatar/animated/sideswept_hair_v1.aseprite",
+      "sha256": "c17c04779ab2fb3f82a776e0fbb281c1145901caf15aa45ee8914e730f8641d0",
+      "source_sha256": "abba73ed3df4df78a435ed28c1209442235a6d8cce85e62c7d571202d239f99e"
+    },
+    {
+      "original": "assets/avatar/sideswept_hair_v2.png",
+      "runtime": "assets/avatar/animations/sideswept_hair_v2.png",
+      "source": "art/source/avatar/animated/sideswept_hair_v2.aseprite",
+      "sha256": "5c6a1546dd917819a42634f385c371c52c010a55a50be60d7a38b046e58c90c6",
+      "source_sha256": "751065abb1e6e9449dbc51f663427ee53e51d4d293864e51e0fcd10e35b6bdb1"
+    },
+    {
+      "original": "assets/avatar/sideswept_hair_v3.png",
+      "runtime": "assets/avatar/animations/sideswept_hair_v3.png",
+      "source": "art/source/avatar/animated/sideswept_hair_v3.aseprite",
+      "sha256": "142c54cd3158bd7a63cb652c1380ef61137dec416ac96e7f6d775de2d31db218",
+      "source_sha256": "206919a4c187612e39fbf776e9fae816220fe34d38d209881b47e74aefd89d5e"
+    },
+    {
+      "original": "assets/avatar/thixie_body_v1.png",
+      "runtime": "assets/avatar/animations/thixie_body_v1.png",
+      "source": "art/source/avatar/animated/thixie_body_v1.aseprite",
+      "sha256": "d1579a3ae43e9c72f026656b3545efcc49a3e55b19b2196e2bdcd74024fdbf90",
+      "source_sha256": "99819089694ac4089d5a17dd9aab0df57a13fdd578bb21cc2db5ba3a8a058a0e"
+    },
+    {
+      "original": "assets/avatar/thixie_body_v2.png",
+      "runtime": "assets/avatar/animations/thixie_body_v2.png",
+      "source": "art/source/avatar/animated/thixie_body_v2.aseprite",
+      "sha256": "497e7ada8f2b6b76e8696c67b8b2adafc4549f01030c868c3a6ac23a65d11990",
+      "source_sha256": "95b0896e4832f10ca466f33da1f04ff162502480a50d939f917428bb6a1e3af1"
+    },
+    {
+      "original": "assets/avatar/thixie_body_v3.png",
+      "runtime": "assets/avatar/animations/thixie_body_v3.png",
+      "source": "art/source/avatar/animated/thixie_body_v3.aseprite",
+      "sha256": "a112f9a579ce322cc21cc4953eccadb5fc08432f188fffe43e8b30fb2b8b3731",
+      "source_sha256": "b8fd43561a0f09d6ded74adfe70b18473385356d45b69a09bdd8232c71f4e861"
+    },
+    {
+      "original": "assets/avatar/thixie_body_v4.png",
+      "runtime": "assets/avatar/animations/thixie_body_v4.png",
+      "source": "art/source/avatar/animated/thixie_body_v4.aseprite",
+      "sha256": "9db3058216b6c3a7db674ac100904029632cf95215af0bfcc836f9045bd28f67",
+      "source_sha256": "a43206f409a93afe6557cbe275688be7e94b109e571d35a526c5cad7a0dc9b85"
+    },
+    {
+      "original": "assets/avatar/thixie_fit_v1.png",
+      "runtime": "assets/avatar/animations/thixie_fit_v1.png",
+      "source": "art/source/avatar/animated/thixie_fit_v1.aseprite",
+      "sha256": "25fe7ef422343a09c1c785b416b401db54c476b28186a96c45010a569dfe2ec4",
+      "source_sha256": "5fbe8b6d87e526feb2f8f2dbd7019b4a292cd7d7d97ec0e8e17c875a34467138"
+    },
+    {
+      "original": "assets/avatar/thixie_fit_v2.png",
+      "runtime": "assets/avatar/animations/thixie_fit_v2.png",
+      "source": "art/source/avatar/animated/thixie_fit_v2.aseprite",
+      "sha256": "c09a4b9fd1aec18975c5dc98a8776b5fbfbfd2e1ecb133214f61ffb062fbe4b4",
+      "source_sha256": "124c24c87cd989a5b5cdd039114a0753d2842a6ddbee85c914a73a99a95b4f65"
+    },
+    {
+      "original": "assets/avatar/thixie_fit_v3.png",
+      "runtime": "assets/avatar/animations/thixie_fit_v3.png",
+      "source": "art/source/avatar/animated/thixie_fit_v3.aseprite",
+      "sha256": "1660c1b017de4857c0d7ebdd4ec4814ff9e92c51a01dc77428dfbdc86e5e32de",
+      "source_sha256": "980a364a008c6e7177ea9e654ac04155c6d0e246a3b816e17a2bf1e9712bcd95"
+    },
+    {
+      "original": "assets/avatar/thixie_head_v1.png",
+      "runtime": "assets/avatar/animations/thixie_head_v1.png",
+      "source": "art/source/avatar/animated/thixie_head_v1.aseprite",
+      "sha256": "119828d01871f5469bbd59c802c44ad4f58c628aec9d8745ce62cc2ca40c1f0a",
+      "source_sha256": "658852d4f9fccf4d9c0519c32b025022a4f09dfaa9d3a3bfadfebb2ca742b59b"
+    },
+    {
+      "original": "assets/avatar/thixie_head_v2.png",
+      "runtime": "assets/avatar/animations/thixie_head_v2.png",
+      "source": "art/source/avatar/animated/thixie_head_v2.aseprite",
+      "sha256": "99bb748bb4d5a14711d13715f2af06c62755bc1ffad0a174e6da1ba183efc9af",
+      "source_sha256": "163fd7176690ad0ef36e9b84957032e13370c64c639d4a3db038479bfb88ad71"
+    },
+    {
+      "original": "assets/avatar/thixie_head_v3.png",
+      "runtime": "assets/avatar/animations/thixie_head_v3.png",
+      "source": "art/source/avatar/animated/thixie_head_v3.aseprite",
+      "sha256": "73081e7518c9b0aa47158882c5b533d6c6a11d2842e2c02a7fe111f1902bb5f6",
+      "source_sha256": "d21045f19fb3f660daf9bb930ca56538997eb729742b0a492a8c65ed3292f53c"
+    },
+    {
+      "original": "assets/avatar/voidling_f.png",
+      "runtime": "assets/avatar/animations/voidling_f.png",
+      "source": "art/source/avatar/animated/voidling_f.aseprite",
+      "sha256": "be0cfd5ce3dd80ac93fc93b956093a88fea194c6a65e65d450ac867aae1469dc",
+      "source_sha256": "9bd059c92deea32a589a566548bf9ce9647b48e63abf145e13605361ce6b14fc"
+    },
+    {
+      "original": "assets/avatar/voidling_m.png",
+      "runtime": "assets/avatar/animations/voidling_m.png",
+      "source": "art/source/avatar/animated/voidling_m.aseprite",
+      "sha256": "3b1d6d7a5632c75a2da1f7def930310870a2e2ce0576b15df363ce9c2b5d4312",
+      "source_sha256": "9baba501fe99fc2f422d4931f8e288223d04f52dee1cf6fed7caa78a258a4530"
+    },
+    {
+      "original": "assets/avatar/volume_hair_fem_idle_front_v1.png",
+      "runtime": "assets/avatar/animations/volume_hair_fem_idle_front_v1.png",
+      "source": "art/source/avatar/animated/volume_hair_fem_idle_front_v1.aseprite",
+      "sha256": "69c7628916ddff1222f5a6a26a923f0539b38d348b7ff484b6b37dd9c8cff78e",
+      "source_sha256": "dacaec748a5c4462646cf68056d9c94b7eac3eb05797d50271c3c90b154db5b0"
+    },
+    {
+      "original": "assets/avatar/wings_v1.png",
+      "runtime": "assets/avatar/animations/wings_v1.png",
+      "source": "art/source/avatar/animated/wings_v1.aseprite",
+      "sha256": "e2b973d090bcb1a0edebecbb9baa8daf207dc78af4a82c6343ee613444f34b3e",
+      "source_sha256": "08f8cdc04e00871f2b9e28655153601e8f7f1e2acfb1621c2dcd7fe0fd3564a9"
+    },
+    {
+      "original": "assets/avatar/wings_v2.png",
+      "runtime": "assets/avatar/animations/wings_v2.png",
+      "source": "art/source/avatar/animated/wings_v2.aseprite",
+      "sha256": "c48691d963bac11911c83e0e1365a4c9bee2067cb164ed2b893e413ea5eb493b",
+      "source_sha256": "51aecb8a282ceb82f537fd245196e8460807f83f5dd32c693f278c70a8670833"
+    },
+    {
+      "original": "assets/avatar/wings_v3.png",
+      "runtime": "assets/avatar/animations/wings_v3.png",
+      "source": "art/source/avatar/animated/wings_v3.aseprite",
+      "sha256": "2c18fbefa48a915da8316c95dff4c6f4eb5ea297a8f51593f8bda7f139e3e02e",
+      "source_sha256": "70b33d1eb20af8e4a57ae9fc87c0e01a2aea3cacd163e3e49c396af5fecf96de"
     }
   ]
 }

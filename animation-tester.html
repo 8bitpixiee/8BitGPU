@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8BitGPU animation tester</title>
+<style>
+:root{color-scheme:dark;--bg:#181b19;--ink:#eeeee3;--accent:#c6f27c;font-family:Tahoma,Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}
+main{display:grid;grid-template-columns:290px minmax(0,1fr);min-height:100dvh}
+form{padding:20px 16px;display:flex;flex-direction:column;gap:12px;border-right:1px solid #42493e}
+label{display:grid;gap:5px;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+select{font:13px Consolas,monospace;background:#252c26;color:var(--ink);border:1px solid #65715e;border-radius:0;padding:8px;width:100%;min-width:0}
+select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section{display:grid;place-items:center;min-width:0;padding:24px;background-color:#4d4359;background-image:conic-gradient(#ffffff09 25%,transparent 0 50%,#ffffff09 0 75%,transparent 0);background-size:32px 32px}
+canvas{width:min(100%,600px);height:auto;image-rendering:pixelated}output{font:12px Consolas,monospace;color:#ffb9a2;overflow-wrap:anywhere}output:empty{display:none}
+@media(max-width:640px){main{grid-template-columns:1fr}form{display:grid;grid-template-columns:1fr 1fr;border-right:0;border-bottom:1px solid #42493e;padding:12px;gap:8px}section{min-height:360px;padding:12px}canvas{max-width:360px}}
+</style>
+<main>
+<form aria-label="Animation selectors" onsubmit="return false">
+<label>Character type<select id="body"></select></label>
+<label>Animation<select id="animation"></select></label>
+<label>Head<select id="head"></select></label>
+<label>Ears<select id="ears"></select></label>
+<label>Eyes<select id="eyes"></select></label>
+<label>Hair<select id="hair"></select></label>
+<label>Clothing<select id="fit"></select></label>
+<label>Wings / tail<select id="extra"></select></label>
+<label>Chest overlay<select id="chest"></select></label>
+<label>Facing<select id="facing"><option value="left">Left</option><option value="right">Right</option></select></label>
+<label>Playback<select id="speed"><option value="1">Normal</option><option value="0.5">Half speed</option><option value="0.25">Quarter speed</option><option value="2">Double speed</option><option value="0">Paused</option></select></label>
+<label>Frame<select id="frame"><option value="auto">Auto</option></select></label>
+<output id="status" aria-live="polite"></output>
+</form>
+<section aria-label="Animated character preview"><canvas id="preview" width="400" height="400" aria-label="Selected character animation"></canvas></section>
+</main>
+<script id="asset-catalog" type="application/json">{
+  "anthro_m.png": {
+    "width": 50,
+    "height": 50
+  },
+  "antrho_f.png": {
+    "width": 50,
+    "height": 50
+  },
+  "body_base_fem_idle_front_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_chunky_masc_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_chunky_masc_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_chunky_masc_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_fem_deerbra_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_fem_deerbra_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_fem_deerbra_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_fem_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_masc_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_masc_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "body_masc_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "Boob_1.png": {
+    "width": 50,
+    "height": 50
+  },
+  "bovidil_body_fem_v1.1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v1.2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v1.3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v2.1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v2.2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v2.3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v3.1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v3.2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_body_fem_v3.3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_head_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_tail_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_tail_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "bovidil_tail_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "Clanker_F.png": {
+    "width": 50,
+    "height": 50
+  },
+  "Clanker_M.png": {
+    "width": 50,
+    "height": 50
+  },
+  "comfy_hair_m_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "comfy_hair_m_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "comfy_hair_m_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "comfy_hair_m_v4.png": {
+    "width": 48,
+    "height": 43
+  },
+  "donnie_hair_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "donnie_hair_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "donnie_hair_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "drawls_fem_idle_front_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "drawls_fem_idle_front_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "drawls_fem_idle_front_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_bovidil_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_bovidil_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_bovidil_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_deerbra_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_deerbra_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_deerbra_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ears_fem_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "extra_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "extra_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_fem_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_lemon.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_mac_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_mac_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_mac_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "eyes_mac_v4.png": {
+    "width": 48,
+    "height": 43
+  },
+  "femme.png": {
+    "width": 50,
+    "height": 50
+  },
+  "fit_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "fit_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "fit_fem_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "fit_kittie_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "fit_kittie_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "fit_kittie_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "frolic_fit_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "frolic_fit_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "frolic_fit_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "frolic_skirt_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "frolic_skirt_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "frolic_skirt_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_fem_deerbra_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_fem_deerbra_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_fem_deerbra_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_fem_deerbra_v4.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_lemon_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_lemon_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_lemon_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_locs_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_locs_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_locs_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_longwaves_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_longwaves_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "hair_longwaves_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_chunky_masc_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_chunky_masc_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_chunky_masc_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_fem_deerbra_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_fem_deerbra_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_fem_deerbra_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_fem_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_fem_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_fem_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_masc_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_masc_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "head_masc_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "kittie_ears_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "kittie_ears_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "kittie_ears_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "kittie_tail_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "kittie_tail_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "kittie_tail_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "macho.png": {
+    "width": 50,
+    "height": 50
+  },
+  "Maxie_F.png": {
+    "width": 50,
+    "height": 50
+  },
+  "Maxie_M.png": {
+    "width": 50,
+    "height": 50
+  },
+  "mermaid_f.png": {
+    "width": 50,
+    "height": 50
+  },
+  "mermaid_m.png": {
+    "width": 50,
+    "height": 50
+  },
+  "Null.png": {
+    "width": 50,
+    "height": 50
+  },
+  "ponytail v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ponytail v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ponytail v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "ponytail v4.png": {
+    "width": 48,
+    "height": 43
+  },
+  "sideswept_hair_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "sideswept_hair_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "sideswept_hair_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_body_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_body_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_body_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_body_v4.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_fit_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_fit_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_fit_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_head_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_head_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "thixie_head_v3.png": {
+    "width": 48,
+    "height": 43
+  },
+  "voidling_f.png": {
+    "width": 50,
+    "height": 50
+  },
+  "voidling_m.png": {
+    "width": 50,
+    "height": 50
+  },
+  "volume_hair_fem_idle_front_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "wings_v1.png": {
+    "width": 48,
+    "height": 43
+  },
+  "wings_v2.png": {
+    "width": 48,
+    "height": 43
+  },
+  "wings_v3.png": {
+    "width": 48,
+    "height": 43
+  }
+}
+</script>
+<script>
+'use strict';
+const catalog=JSON.parse(document.getElementById('asset-catalog').textContent);
+const states=['idle','walk','fly','dance','twerk','smoke','drink','shroom','laugh','spin','wave','crashout'];
+const timings=[200,100,120,100,100,180,160,180,100,100,140,80];
+const order=['extra','body','ears','head','chest','eyes','hair','fit'];
+const el=id=>document.getElementById(id), canvas=el('preview'), ctx=canvas.getContext('2d');
+const sheets=new Map(), errors=new Set();
+let elapsed=0,lastTime=null;
+function category(name){
+ if(/^(body_|bovidil_body_|thixie_body_)/i.test(name))return 'body';
+ if(/head/i.test(name))return 'head';
+ if(/ears/i.test(name))return 'ears';
+ if(/^eyes/i.test(name))return 'eyes';
+ if(/hair|ponytail/i.test(name))return 'hair';
+ if(/wings|tail/i.test(name))return 'extra';
+ if(/Boob|extra_fem/i.test(name))return 'chest';
+ if(/fit|skirt|drawls/i.test(name))return 'fit';
+ return 'body';
+}
+function option(select,value,label){const item=document.createElement('option');item.value=value;item.textContent=label;select.append(item);}
+for(const key of order){
+ option(el(key),'','None');
+ for(const name of Object.keys(catalog).filter(name=>category(name)===key))option(el(key),name,name.replace(/\.png$/,''));
+}
+states.forEach(state=>option(el('animation'),state,state[0].toUpperCase()+state.slice(1)));
+for(let i=0;i<8;i++)option(el('frame'),String(i),String(i+1));
+function select(key,name){el(key).value=catalog[name]?name:'';}
+function pairedHead(name){
+ if(name==='body_base_fem_idle_front_v1.png')return 'head_fem_v1.png';
+ if(name.startsWith('bovidil_body_'))return 'bovidil_head_fem_v1.png';
+ if(name.startsWith('thixie_body_'))return name.replace('body','head').replace(/v4/,'v3');
+ if(name.startsWith('body_'))return name.replace(/^body_/,'head_');
+ return '';
+}
+function load(name){
+ if(!name||sheets.has(name))return;
+ const img=new Image();sheets.set(name,img);
+ img.onload=()=>{errors.delete(name);report();};
+ img.onerror=()=>{errors.add(name);report();};
+ img.src='assets/avatar/animations/'+encodeURIComponent(name);
+}
+function report(){el('status').textContent=[...errors].filter(name=>order.some(key=>el(key).value===name)).map(name=>'Could not load '+name).join('; ');}
+function refresh(){order.forEach(key=>load(el(key).value));report();}
+el('body').addEventListener('change',()=>{
+ select('head',pairedHead(el('body').value));
+ // Custom complete characters use a different canvas and need no default overlays.
+ for(const key of ['ears','eyes','hair','fit','extra','chest'])select(key,'');
+ refresh();
+});
+document.querySelector('form').addEventListener('change',event=>{
+ if(event.target.id==='animation'){elapsed=0;lastTime=null;}
+ refresh();
+});
+select('body','body_fem_v1.png');select('head','head_fem_v1.png');
+select('ears','ears_fem_v1.png');select('eyes','eyes_fem_v1.png');
+select('hair','volume_hair_fem_idle_front_v1.png');select('fit','fit_fem_v1.png');select('extra','wings_v1.png');
+refresh();
+function render(time){
+ if(lastTime!==null&&!document.hidden)elapsed+=Math.min(time-lastTime,100)*Number(el('speed').value);
+ lastTime=time;
+ const row=states.indexOf(el('animation').value);
+ const frame=el('frame').value==='auto'?Math.floor(elapsed/timings[row])%8:Number(el('frame').value);
+ ctx.clearRect(0,0,400,400);ctx.imageSmoothingEnabled=false;ctx.save();
+ if(el('facing').value==='right'){ctx.translate(400,0);ctx.scale(-1,1);}
+ for(const key of order){
+  const name=el(key).value, image=sheets.get(name), info=catalog[name];
+  if(!info||!image?.complete||!image.naturalWidth)continue;
+  const {width,height}=info,scale=Math.min(400/width,400/height);
+  const w=width*scale,h=height*scale;
+  ctx.drawImage(image,frame*width,row*height,width,height,(400-w)/2,(400-h)/2,w,h);
+ }
+ ctx.restore();requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+</script>
+</html>
