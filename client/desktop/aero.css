@@ -1,0 +1,948 @@
+:root {
+    --aero-violet: #7d55b8;
+    --aero-plum: #4b286d;
+    --aero-pink: #f0a9d1;
+    --aero-blue: #91dded;
+    --aero-mint: #a9f2b1;
+    --aero-cream: #fff8e7;
+    --aero-glass: rgba(112, 71, 153, .46);
+    --aero-glass-light: rgba(239, 221, 255, .4);
+    --aero-edge: rgba(255, 255, 255, .78);
+    --aero-shadow: rgba(34, 12, 55, .62);
+}
+
+/* Performance + direct interaction pass ---------------------------------- */
+button, a, [role="button"] {
+    touch-action: manipulation;
+    transition: transform 65ms linear, filter 65ms linear, background-color 65ms linear !important;
+}
+
+button:active, a:active, [role="button"]:active {
+    transform: translateY(1px) scale(.985) !important;
+    filter: brightness(.88) !important;
+}
+
+.os-window {
+    contain: layout paint;
+    transform: translateZ(0);
+}
+
+.os-window.is-dragging {
+    will-change: transform;
+    pointer-events: none;
+}
+
+.os-window.is-dragging iframe {
+    pointer-events: none;
+}
+
+/* Full-screen live blur is the largest paint cost. Keep the glass color and
+   highlights, but use precomposited translucent fills instead of recalculating
+   the wallpaper underneath on every frame. */
+#beingDock, #beingHud, #osTaskbar, #osStartMenu,
+.start-program-pane, .start-system-pane, .os-window,
+#desktopContextMenu, #wallpaperPicker {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+.desktop::after, .being-frame {
+    animation: none !important;
+}
+
+.desktop-vine {
+    filter: none !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .twinkle-field i { animation-duration: 8s !important; }
+}
+
+html, body {
+    background: #6a5296;
+    cursor: default;
+}
+
+button, a, [role="button"], input, label { cursor: pointer !important; }
+
+.desktop {
+    isolation: isolate;
+}
+
+#wallpaperRotator {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background: #263b6e;
+}
+
+.wallpaper-frame {
+    position: absolute;
+    inset: -2px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0;
+    transform: scale(1.012);
+    transition: opacity 1.8s ease;
+    will-change: opacity;
+}
+
+.wallpaper-frame.is-visible { opacity: 1; }
+
+#osBootScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 50000;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background: radial-gradient(circle at 50% 42%, #654181, #261731 58%, #110b18);
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 600ms ease, visibility 600ms step-end;
+}
+
+#osBootScreen.is-finished { opacity: 0; visibility: hidden; }
+.boot-shell { width: min(340px, 76vw); text-align: center; }
+.boot-mark { width: 74px; height: 62px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 0 auto 18px; filter: drop-shadow(0 0 11px rgba(211,174,255,.7)); transform: perspective(180px) rotateY(-8deg); }
+.boot-mark i { display: block; border: 1px solid rgba(255,255,255,.68); box-shadow: inset 3px 3px rgba(255,255,255,.38); }
+.boot-mark i:nth-child(1) { background: linear-gradient(135deg,#d5a6ef,#8655b0); }
+.boot-mark i:nth-child(2) { background: linear-gradient(135deg,#8ee5e0,#3e92ad); }
+.boot-mark i:nth-child(3) { background: linear-gradient(135deg,#b8ec8a,#609655); }
+.boot-mark i:nth-child(4) { background: linear-gradient(135deg,#f5b5d3,#b05a87); }
+.boot-title { margin: 0 !important; color: #fff; font-size: 34px; letter-spacing: .5px; text-shadow: 1px 2px #31193f, 0 0 12px rgba(230,204,255,.55); }
+.boot-status { margin: 7px 0 18px !important; color: #d8cbe1; font-family: Arial, sans-serif !important; font-size: 12px; }
+.boot-track { width: 205px; height: 12px; display: block; overflow: hidden; margin: auto; border: 1px solid rgba(255,255,255,.58); border-radius: 7px; background: rgba(5,2,9,.5); box-shadow: inset 0 1px 3px #000, 0 0 8px rgba(206,164,244,.24); }
+.boot-track span { width: 42%; height: 100%; display: block; border-radius: inherit; background: linear-gradient(90deg, transparent, #d9a9ee 26%, #9ee8e1 70%, transparent); animation: bootProgress 1.1s linear infinite; }
+@keyframes bootProgress { from { transform: translateX(-105%); } to { transform: translateX(345%); } }
+
+.desktop::before {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(75,55,121,.08), transparent 48%, rgba(51,31,75,.16));
+}
+
+.desktop::after {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    content: "";
+    pointer-events: none;
+    opacity: .3;
+    background:
+        radial-gradient(circle at 19% 21%, rgba(255,255,255,.88) 0 2px, rgba(225,184,255,.55) 3px, transparent 5px),
+        radial-gradient(circle at 61% 28%, rgba(255,255,255,.82) 0 2px, rgba(156,240,233,.5) 3px, transparent 6px),
+        radial-gradient(circle at 88% 62%, rgba(255,255,255,.8) 0 1px, rgba(241,169,223,.5) 2px, transparent 5px),
+        radial-gradient(circle at 48% 77%, rgba(255,255,255,.65) 0 1px, transparent 4px),
+        radial-gradient(circle at 35% 45%, rgba(255,255,255,.26) 0 10px, rgba(255,255,255,.08) 11px, transparent 14px);
+}
+
+.desktop-vine {
+    z-index: 3 !important;
+    opacity: .88 !important;
+    filter: saturate(1.16) brightness(1.08) drop-shadow(0 0 4px rgba(208,255,158,.82)) drop-shadow(0 9px 12px rgba(29,58,38,.48)) !important;
+}
+
+.vine-top {
+    top: -26px !important;
+    left: -28px !important;
+    width: min(47vw, 720px) !important;
+}
+
+.vine-right {
+    top: 72px !important;
+    right: -70px !important;
+    height: min(66vh, 680px) !important;
+    opacity: .7 !important;
+}
+
+.nav-buttons {
+    top: 72px !important;
+    left: 24px !important;
+    width: 124px !important;
+    gap: 8px !important;
+    padding: 10px 6px 12px !important;
+}
+
+.nav-buttons::before {
+    display: none !important;
+}
+
+.nav-buttons button {
+    width: 112px !important;
+    min-height: 68px !important;
+    border: 1px solid transparent !important;
+    border-radius: 9px !important;
+    color: #fff !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: 1px 1px 0 #2d1541, 0 0 5px rgba(72,31,94,.8) !important;
+}
+
+.nav-buttons button:hover,
+.nav-buttons button:focus-visible {
+    border-color: rgba(255,255,255,.72) !important;
+    background: linear-gradient(135deg, rgba(255,255,255,.42), rgba(197,144,238,.28)) !important;
+    box-shadow: inset 1px 1px rgba(255,255,255,.6), 0 0 16px rgba(227,185,255,.45) !important;
+    transform: translateX(3px) !important;
+    outline: none;
+}
+
+.desktop-icon,
+.nav-buttons .desktop-icon {
+    filter: drop-shadow(0 3px 2px rgba(35,14,48,.6)) drop-shadow(0 0 5px rgba(255,255,255,.28));
+}
+
+.hero h1 {
+    position: fixed;
+    top: 32px;
+    right: 32px;
+    z-index: 8;
+    margin: 0;
+    display: none;
+    color: rgba(255,255,255,.9);
+    font-size: clamp(45px, 5vw, 78px);
+    line-height: .9;
+    letter-spacing: -2px;
+    text-shadow: 2px 3px 0 #513070, 0 0 16px rgba(255,220,250,.62);
+}
+
+.hero > p {
+    position: fixed;
+    top: 103px;
+    right: 36px;
+    z-index: 8;
+    margin: 0;
+    display: none;
+    color: #fdf4ff;
+    text-shadow: 1px 2px #4a2c62;
+}
+
+#beingDock,
+#beingHud,
+.being-frame,
+#osStartMenu {
+    border: 1px solid var(--aero-edge) !important;
+    background: linear-gradient(145deg, rgba(126,83,170,.66), rgba(62,38,87,.56)) !important;
+    box-shadow: inset 1px 1px rgba(255,255,255,.52), inset -1px -1px rgba(54,27,74,.48), 0 9px 24px rgba(37,15,53,.42), 0 0 17px rgba(216,170,255,.2) !important;
+    backdrop-filter: blur(12px) saturate(1.3);
+}
+
+#playerBadge { display: none !important; }
+
+#beingDock {
+    right: 22px !important;
+    bottom: 56px !important;
+    padding: 8px 8px 7px !important;
+    border-radius: 17px !important;
+    background: linear-gradient(145deg, rgba(224,210,246,.42), rgba(85,54,115,.52)) !important;
+    box-shadow: inset 1px 1px rgba(255,255,255,.62), inset -1px -1px rgba(52,28,72,.5), 0 12px 30px rgba(31,14,45,.46), 0 0 18px rgba(203,161,240,.2) !important;
+    backdrop-filter: blur(13px) saturate(1.35);
+}
+
+#beingHud {
+    right: 266px !important;
+    bottom: 61px !important;
+    padding: 10px !important;
+    border-radius: 14px !important;
+    background: linear-gradient(145deg, rgba(224,210,246,.48), rgba(76,48,105,.62)) !important;
+    backdrop-filter: blur(13px) saturate(1.35);
+}
+
+#beingDock .being-dock-label {
+    color: #fff !important;
+    text-shadow: 1px 1px #4f2a67, 0 0 8px rgba(217,255,205,.5);
+}
+
+.being-frame {
+    border-radius: 14px !important;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 78% 17%, rgba(255,255,255,.42) 0 2px, transparent 5px),
+        linear-gradient(145deg, rgba(190,239,217,.62), rgba(90,65,120,.68)) !important;
+}
+
+.being-actions button,
+#inventoryButton {
+    border: 1px solid rgba(255,255,255,.72) !important;
+    border-radius: 6px !important;
+    color: #402253 !important;
+    background: linear-gradient(#f7eaff, #bfa2d8) !important;
+    box-shadow: inset 1px 1px #fff, inset -1px -1px #725484, 0 2px 5px rgba(37,18,49,.35) !important;
+}
+
+.os-window {
+    border: 1px solid rgba(255,255,255,.88) !important;
+    border-radius: 12px !important;
+    padding: 4px !important;
+    background: linear-gradient(145deg, rgba(224,202,246,.56), rgba(85,50,112,.62)) !important;
+    box-shadow: inset 1px 1px rgba(255,255,255,.72), inset -1px -1px rgba(45,19,63,.58), 0 14px 38px rgba(31,13,46,.58), 0 0 25px rgba(196,142,236,.28) !important;
+    backdrop-filter: blur(14px) saturate(1.35);
+    animation: aeroWindowOpen 180ms cubic-bezier(.2,.75,.3,1);
+}
+
+.os-window:not(.is-active-window) { filter: saturate(.76) brightness(.9); }
+.os-window.is-active-window { filter: none; }
+
+.os-window::before {
+    position: absolute;
+    top: 1px;
+    right: 18%;
+    left: 12%;
+    height: 18px;
+    z-index: 0;
+    border-radius: 50%;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(rgba(255,255,255,.36), transparent);
+    filter: blur(2px);
+}
+
+.os-window-bar {
+    position: relative;
+    z-index: 1;
+    height: 34px !important;
+    margin: 0 0 4px !important;
+    border: 1px solid rgba(255,255,255,.48) !important;
+    border-radius: 8px 8px 4px 4px !important;
+    background: linear-gradient(180deg, rgba(207,160,238,.92), rgba(112,66,151,.94) 48%, rgba(73,40,101,.96)) !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.72), inset 0 -1px rgba(42,17,60,.68), 0 1px 2px rgba(34,14,45,.5) !important;
+}
+
+.os-window-actions button {
+    width: 23px !important;
+    height: 23px !important;
+    border: 1px solid rgba(255,255,255,.86) !important;
+    border-radius: 4px !important;
+    color: #2f173f !important;
+    background: linear-gradient(#f9f3ff, #c6acd9 52%, #9c7ab3) !important;
+    box-shadow: inset 1px 1px #fff, inset -1px -1px #684c79 !important;
+}
+
+.os-window iframe,
+.os-window > div {
+    border: 2px inset #efe8f3 !important;
+    border-radius: 4px !important;
+    background: rgba(248,245,239,.96) !important;
+}
+
+#osTaskbar {
+    height: 48px !important;
+    gap: 6px !important;
+    padding: 5px 8px !important;
+    border-top: 1px solid rgba(255,255,255,.88) !important;
+    background: linear-gradient(180deg, rgba(245,238,250,.68) 0 8%, rgba(132,102,153,.72) 12% 48%, rgba(59,43,74,.9) 100%) !important;
+    box-shadow: inset 0 1px rgba(255,255,255,.68), 0 -4px 18px rgba(44,21,61,.45) !important;
+    backdrop-filter: blur(15px) saturate(1.45);
+}
+
+#osStartButton {
+    width: 112px !important;
+    height: 28px !important;
+    flex: 0 0 112px !important;
+    align-self: center !important;
+    justify-content: flex-start !important;
+    margin: 0 5px 0 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    color: #fff !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+#osStartButton:hover { filter: brightness(1.15); transform: none !important; }
+#osStartButton img { width: 112px; height: 28px; display: block; object-fit: contain; image-rendering: pixelated; }
+
+.os-task-tab {
+    height: 36px !important;
+    border: 1px solid rgba(255,255,255,.55) !important;
+    border-radius: 6px !important;
+    color: #fff !important;
+    background: linear-gradient(180deg, rgba(236,217,248,.38), rgba(87,54,112,.52)) !important;
+    box-shadow: inset 1px 1px rgba(255,255,255,.38), 0 2px 4px rgba(39,18,52,.34) !important;
+    text-shadow: 1px 1px #3d214f;
+}
+
+.os-task-tab.is-active {
+    background: linear-gradient(180deg, rgba(239,185,226,.84), rgba(127,75,159,.9)) !important;
+    box-shadow: inset 0 0 8px rgba(255,255,255,.42), 0 0 10px rgba(235,177,255,.38) !important;
+}
+
+#osSystemTray {
+    border: 1px solid rgba(255,255,255,.46) !important;
+    border-radius: 7px !important;
+    background: rgba(54,34,75,.36) !important;
+    box-shadow: inset 1px 1px rgba(255,255,255,.24) !important;
+}
+
+.taskbar-social { border-radius: 4px !important; background: linear-gradient(rgba(255,255,255,.42), rgba(86,67,100,.5)) !important; }
+
+#osClock, #osTray {
+    color: #fff !important;
+    text-shadow: 1px 1px #3d214f !important;
+}
+
+#osStartMenu {
+    bottom: 50px !important;
+    width: min(430px, calc(100vw - 14px)) !important;
+    padding: 7px 7px 0 !important;
+    overflow: visible !important;
+    border: 1px solid rgba(255,255,255,.88) !important;
+    border-radius: 12px 12px 5px 5px !important;
+    background: linear-gradient(135deg, rgba(124,65,166,.88), rgba(44,25,66,.92)) !important;
+    box-shadow: inset 0 0 0 1px rgba(77,35,108,.78), inset 0 1px rgba(255,255,255,.62), 0 12px 34px rgba(25,11,35,.66), 0 0 24px rgba(210,150,255,.26) !important;
+    backdrop-filter: blur(17px) saturate(1.3) !important;
+}
+
+#osStartMenu button {
+    width: auto !important;
+    margin: 0 !important;
+    border: 1px solid transparent !important;
+    border-radius: 5px !important;
+    font-family: "Segoe UI", Arial, sans-serif !important;
+}
+
+#osStartMenu button:hover {
+    border-color: rgba(255,255,255,.58) !important;
+    background: linear-gradient(90deg, rgba(240,198,235,.56), rgba(190,230,229,.3)) !important;
+}
+
+.start-menu-header { min-height: 59px; display: flex; align-items: center; padding: 3px 12px 5px; }
+#osStartMenu .start-user-card { position: static; display: flex !important; flex-direction: row !important; align-items: center; gap: 11px; padding: 0 !important; border: 0 !important; color: #fff !important; background: transparent !important; box-shadow: none !important; transform: none !important; text-align: left; text-shadow: 1px 1px #3f2452 !important; }
+.start-user-card > span:last-child { display: grid; gap: 1px; }
+.start-user-card small { color: #bfffa8; font: 700 9px "Pixelify Sans",monospace; letter-spacing: .12em; }
+.start-user-card strong { font: 600 16px "Pixelify Sans",monospace; }
+.start-user-card em { color: #eadcf1; font: normal 10px "Segoe UI",Arial,sans-serif; }
+.start-user-icon { width: 48px; height: 48px; display: grid; place-items: center; overflow: hidden; border: 1px solid rgba(255,255,255,.72); border-radius: 6px; background: linear-gradient(145deg,rgba(207,247,241,.72),rgba(102,74,131,.58)); box-shadow: inset 0 0 7px rgba(255,255,255,.52); }
+.start-being-preview { position: relative; width: 49px; height: 49px; display: block; overflow: hidden; }
+.start-being-preview img { position: absolute; inset: -5px; width: 59px; height: 59px; display: none; object-fit: contain; image-rendering: pixelated; transform-origin: center; }
+.start-menu-columns { min-height: 312px; display: grid; grid-template-columns: 59% 41%; overflow: hidden; border: 1px solid rgba(255,255,255,.58); border-radius: 7px 7px 3px 3px; box-shadow: 0 0 0 1px rgba(60,28,82,.64), inset 0 1px rgba(255,255,255,.34); }
+.start-program-pane { display: flex; flex-direction: column; gap: 1px; padding: 9px 7px 6px; color: #fff; background: linear-gradient(145deg,rgba(93,57,127,.82),rgba(48,38,78,.78)); backdrop-filter: blur(15px); }
+.start-pane-label { margin: 0 8px 5px; color: #caffb1; font: 700 10px "Pixelify Sans",monospace; letter-spacing: .13em; text-shadow: 1px 1px #352044; }
+#osStartMenu .start-program { min-height: 46px; display: flex !important; flex-direction: row !important; align-items: center; gap: 10px; padding: 3px 8px !important; border: 1px solid transparent !important; border-radius: 4px !important; color: #fff !important; background: transparent !important; box-shadow: none !important; text-align: left; text-shadow: 1px 1px #2d1b3b !important; }
+#osStartMenu .start-program[hidden] { display: none !important; }
+#osStartMenu .start-program:hover { border-color: rgba(113,194,217,.8) !important; background: linear-gradient(90deg,rgba(200,249,250,.82),rgba(222,188,243,.7)) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,.8), 0 0 9px rgba(132,225,230,.32) !important; }
+.start-program > span:last-child { display: grid; gap: 1px; }
+.start-program strong { font-size: 13px; font-weight: 600; }
+.start-program small { color: #d7c9e3; font-size: 10px; }
+.program-gem { width: 34px; height: 34px; display: grid; flex: 0 0 34px; place-items: center; border: 1px solid #ffffffdd; border-radius: 7px; color: #fff; box-shadow: 0 0 0 1px #6c5775, inset 1px 1px 7px #ffffffcc, 0 2px 5px #493c4c66; font: 700 15px "Pixelify Sans",monospace; text-shadow: 1px 1px #4e3f55; transform: rotate(-2deg); }
+.gem-pink { background: linear-gradient(135deg,#ffbde3,#9958bb); }.gem-blue { background: linear-gradient(135deg,#94eaff,#4183bd); }.gem-green { background: linear-gradient(135deg,#d6fa9f,#64a986); }.gem-gold { background: linear-gradient(135deg,#fff59d,#d78951); }.gem-purple { background: linear-gradient(135deg,#e0c3ff,#7c4caf); }
+.start-search-empty { margin: 20px 10px; color: #766d79; font: 12px "Segoe UI",Arial,sans-serif; text-align: center; }
+.all-programs { margin: auto -1px -1px; padding: 8px 9px 4px; border-top: 1px solid rgba(255,255,255,.2); color: #fff; font: 700 11px "Pixelify Sans",monospace; text-align: right; }
+.all-programs span { margin-left: 5px; color: #74508c; }
+.start-system-pane { display: flex; flex-direction: column; gap: 1px; padding: 14px 8px 8px; border-left: 1px solid rgba(255,255,255,.28); background: linear-gradient(145deg,rgba(103,57,136,.78),rgba(55,35,80,.68)); backdrop-filter: blur(15px); }
+#osStartMenu .start-system-pane button { min-height: 33px; display: flex !important; flex-direction: row !important; align-items: center; padding: 5px 9px !important; border: 1px solid transparent !important; border-radius: 4px !important; color: #fff !important; background: transparent !important; box-shadow: none !important; text-align: left; text-shadow: 1px 1px #392149 !important; }
+#osStartMenu .start-system-pane button:hover { border-color: rgba(255,255,255,.45) !important; background: linear-gradient(90deg,rgba(190,247,239,.3),rgba(224,166,244,.24)) !important; box-shadow: inset 0 0 7px rgba(255,255,255,.2) !important; }
+.system-glyph { width: 22px; height: 22px; display: grid; flex: 0 0 22px; place-items: center; margin-right: 7px; border: 1px solid rgba(255,255,255,.45); border-radius: 50%; color: #d6ffbc; background: rgba(173,116,211,.42); font: 700 11px "Pixelify Sans",monospace; box-shadow: inset 0 0 5px rgba(255,255,255,.24); }
+.start-system-divider { height: 1px; margin: 4px 6px; background: linear-gradient(90deg,transparent,rgba(77,45,93,.55),rgba(255,255,255,.48),transparent); }
+.start-menu-footer { min-height: 49px; display: flex; align-items: center; gap: 9px; padding: 7px 4px 7px; }
+.start-search { min-width: 0; flex: 1; display: flex; align-items: center; overflow: hidden; border: 1px solid rgba(255,255,255,.68); border-radius: 5px; background: rgba(42,25,58,.68); box-shadow: inset 0 1px 4px #21142c, 0 0 0 1px rgba(63,34,80,.65); }
+.start-search input { min-width: 0; width: 100%; height: 27px; padding: 4px 7px; border: 0; outline: 0; color: #fff; background: transparent; font: italic 11px "Segoe UI",Arial,sans-serif; }
+.start-search input::placeholder { color: #d7c5df; }
+.start-search > span:last-child { padding: 0 7px; color: #6f4b84; font: 19px Arial,sans-serif; }
+#osStartMenu .start-power { min-height: 28px; display: flex !important; flex-direction: row !important; align-items: center; gap: 8px; padding: 3px 8px !important; border-color: rgba(255,255,255,.5) !important; color: #fff !important; background: linear-gradient(#ad81c3,#684479) !important; text-shadow: 1px 1px #3f2452 !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+
+#desktopContextMenu {
+    position: fixed;
+    z-index: 40000;
+    width: 218px;
+    display: grid;
+    gap: 1px;
+    margin: 0;
+    padding: 4px;
+    border: 1px solid #6e6873;
+    border-radius: 4px;
+    background: rgba(247,245,248,.96);
+    box-shadow: inset 0 0 0 1px #fff, 4px 5px 15px rgba(25,15,31,.42);
+    font: 13px "Segoe UI", Arial, sans-serif;
+    backdrop-filter: blur(8px);
+}
+#desktopContextMenu[hidden] { display: none; }
+#desktopContextMenu button { min-height: 28px; display: block; padding: 4px 10px 4px 31px; border: 1px solid transparent; border-radius: 2px; color: #242027; background: transparent; font: inherit; text-align: left; }
+#desktopContextMenu button:hover { border-color: #9ac9e9; color: #242027; background: linear-gradient(#e8f5ff,#cfeaff); text-shadow: none; transform: none; }
+.context-divider { height: 1px; margin: 3px 5px; background: #d4d0d6; }
+
+#wallpaperPicker {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 41000;
+    width: min(760px, calc(100vw - 34px));
+    height: min(555px, calc(100dvh - 80px));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.92);
+    border-radius: 10px;
+    color: #27222b;
+    background: linear-gradient(145deg, rgba(221,205,234,.82), rgba(96,71,111,.82));
+    box-shadow: inset 1px 1px rgba(255,255,255,.7), 0 18px 46px rgba(23,13,28,.62);
+    font: 13px "Segoe UI", Arial, sans-serif;
+    transform: translate(-50%,-50%);
+    backdrop-filter: blur(15px) saturate(1.25);
+}
+#wallpaperPicker[hidden] { display: none; }
+.wallpaper-picker-bar { height: 36px; display: flex; align-items: center; justify-content: space-between; padding: 0 7px 0 13px; color: #fff; text-shadow: 1px 1px #3f2c49; }
+.wallpaper-picker-bar button { width: 39px; height: 24px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.75); border-radius: 0 0 5px 5px; color: #fff; background: linear-gradient(#d88e9b,#a83d50); font: 18px/1 Arial,sans-serif; }
+.wallpaper-explorer-toolbar { min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid #fff; border-bottom-color: #b8b4bb; background: linear-gradient(#fbfbfb,#e8e7e9); }
+.wallpaper-explorer-toolbar button { width: 28px; height: 25px; display: grid; place-items: center; border: 1px solid #aaa5ad; border-radius: 4px; color: #555; background: linear-gradient(#fff,#ddd); }
+.wallpaper-explorer-toolbar span { flex: 1; padding: 5px 9px; border: 1px solid #aaa5ad; border-radius: 3px; color: #37333a; background: #fff; }
+.wallpaper-explorer-body { min-height: 0; flex: 1; display: grid; grid-template-columns: 150px 1fr; border-right: 1px solid #fff; border-left: 1px solid #fff; background: #fff; }
+.wallpaper-explorer-body aside { display: flex; flex-direction: column; gap: 7px; padding: 14px 12px; border-right: 1px solid #c9d3dc; color: #3d5367; background: linear-gradient(90deg,#eef5fa,#f8fbfd); }
+.wallpaper-explorer-body aside strong { margin-bottom: 5px; color: #465b6b; }
+.wallpaper-explorer-body aside span { padding: 4px 6px; }
+.wallpaper-browser { min-width: 0; overflow: auto; padding: 15px; }
+.wallpaper-browser > p { margin: 0 0 14px; color: #47404b; font: 16px "Segoe UI",Arial,sans-serif; }
+.wallpaper-grid { display: grid; grid-template-columns: repeat(2,minmax(150px,1fr)); gap: 15px; }
+.wallpaper-grid button { min-width: 0; display: grid; gap: 6px; padding: 8px; border: 1px solid transparent; border-radius: 4px; color: #29252c; background: transparent; font: 12px "Segoe UI",Arial,sans-serif; text-align: center; }
+.wallpaper-grid button:hover { border-color: #9bc9e8; color: #29252c; background: #e9f5fd; text-shadow: none; transform: none; }
+.wallpaper-grid button.is-selected { border-color: #65a7d0; background: linear-gradient(#dff2ff,#cbe9fa); box-shadow: inset 0 0 0 1px #fff; }
+.wallpaper-grid img { width: 100%; aspect-ratio: 16 / 9; display: block; border: 1px solid #9b969d; object-fit: cover; box-shadow: 0 2px 5px #0003; }
+.wallpaper-upload { display:flex; align-items:center; gap:10px; margin:16px 0 0!important; padding:10px; border:1px solid #c9d3dc; background:#f6fbff; color:#3d5367!important; font:13px "Segoe UI",Arial,sans-serif!important; }
+.wallpaper-upload label { font-weight:700; }.wallpaper-upload input { max-width:250px; }
+.wallpaper-picker-footer { min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 9px 12px; border: 1px solid #fff; border-top-color: #c3bec6; background: linear-gradient(#f7f7f7,#dfdde1); }
+.wallpaper-picker-footer label { display: flex; align-items: center; gap: 7px; color: #3b363e; }
+.wallpaper-picker-actions { display: flex; gap: 7px; }
+.wallpaper-picker-actions button { min-width: 94px; min-height: 30px; display: block; border: 1px solid #8e8991; border-radius: 3px; color: #29252c; background: linear-gradient(#fff,#dedcdf); font: 13px "Segoe UI",Arial,sans-serif; }
+.wallpaper-picker-actions .wallpaper-save { border-color: #5b96bb; background: linear-gradient(#fafdff,#cae8f8); box-shadow: inset 0 0 0 1px #fff; }
+
+@media (max-width: 600px) {
+    #osStartMenu { left: 7px !important; }
+    .start-menu-columns { grid-template-columns: 62% 38%; }
+    .start-program small { display: none; }
+    .start-system-pane { padding-right: 4px; padding-left: 4px; }
+    #osStartMenu .start-system-pane button { padding-right: 4px !important; padding-left: 4px !important; font-size: 11px !important; }
+    .start-power { font-size: 0 !important; }
+    .start-power span { font-size: 15px; }
+    .wallpaper-explorer-body { grid-template-columns: 1fr; }
+    .wallpaper-explorer-body aside { display: none; }
+    .wallpaper-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .wallpaper-picker-footer { align-items: stretch; flex-direction: column; }
+    .wallpaper-picker-actions button { flex: 1; }
+}
+
+@media (max-width: 700px) {
+    .desktop {
+        background: linear-gradient(180deg, #8d6eba, #addbe8 45%, #73aa99 68%, #3b2b51) !important;
+    }
+    .hero h1, .hero > p, .nav-buttons::before { display: none !important; }
+    .vine-top { width: 82vw !important; opacity: .64 !important; }
+    .vine-right { opacity: .4 !important; }
+    .os-window { border-radius: 10px 10px 0 0 !important; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .desktop::after { animation: aeroSparkle 7s ease-in-out infinite alternate; }
+    .being-frame { animation: aeroFrameGlow 4.5s ease-in-out infinite alternate; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wallpaper-frame { transition: none; }
+}
+
+@keyframes aeroSparkle { from { opacity: .48; } to { opacity: .84; } }
+@keyframes aeroFrameGlow { from { box-shadow: inset 1px 1px rgba(255,255,255,.45), 0 8px 22px rgba(48,24,64,.36); } to { box-shadow: inset 1px 1px rgba(255,255,255,.65), 0 8px 26px rgba(218,171,255,.34); } }
+@keyframes aeroWindowOpen { from { opacity: 0; transform: scale(.975) translateY(5px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+/* High-gloss Aqua pass: crisp Windows chrome with Y2K bubble shine. */
+.os-window,
+#beingDock,
+#beingHud,
+#osStartMenu,
+#wallpaperPicker {
+    border-color: rgba(255,255,255,.96) !important;
+    box-shadow: inset 0 0 0 1px rgba(91,50,121,.74), inset 0 2px rgba(255,255,255,.78), inset 0 -2px rgba(38,19,56,.58), 0 12px 34px rgba(31,13,46,.56), 0 0 20px rgba(202,155,255,.3) !important;
+}
+
+.os-window-bar,
+.wallpaper-picker-bar {
+    background: linear-gradient(180deg, #f6d9ff 0%, #d89df0 13%, #9a5fc2 47%, #5e347f 52%, #8752a7 78%, #c78bdb 100%) !important;
+    box-shadow: inset 0 2px rgba(255,255,255,.92), inset 0 -2px rgba(47,22,66,.65), 0 2px 4px rgba(31,12,45,.45) !important;
+}
+
+.os-window-bar::after,
+.wallpaper-picker-bar::after {
+    position: absolute;
+    top: 2px;
+    right: 17%;
+    left: 11%;
+    height: 8px;
+    border-radius: 50%;
+    content: "";
+    pointer-events: none;
+    background: rgba(255,255,255,.38);
+    filter: blur(1px);
+}
+
+#osStartMenu {
+    background:
+        radial-gradient(circle at 88% 7%, rgba(199,255,236,.22) 0 7%, transparent 18%),
+        linear-gradient(145deg, rgba(170,105,206,.94), rgba(54,28,79,.95)) !important;
+}
+
+#osStartMenu::before {
+    position: absolute;
+    top: 3px;
+    right: 10px;
+    left: 10px;
+    height: 22px;
+    border-radius: 10px 10px 50% 50%;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(rgba(255,255,255,.34), rgba(255,255,255,0));
+}
+
+.start-menu-columns {
+    background: rgba(44,26,64,.55);
+    box-shadow: inset 0 1px rgba(255,255,255,.7), inset 0 -1px rgba(23,13,35,.52), 0 2px 6px rgba(27,13,40,.4) !important;
+}
+
+.start-program-pane {
+    background:
+        radial-gradient(circle at 12% 10%, rgba(201,255,238,.15), transparent 28%),
+        linear-gradient(145deg, rgba(118,73,151,.9), rgba(53,38,84,.88)) !important;
+}
+
+.start-system-pane {
+    background:
+        radial-gradient(circle at 82% 12%, rgba(255,255,255,.16), transparent 22%),
+        linear-gradient(155deg, rgba(104,60,139,.9), rgba(42,27,66,.9)) !important;
+}
+
+.program-gem,
+.system-glyph {
+    box-shadow: inset 0 2px 5px rgba(255,255,255,.84), inset 0 -3px 4px rgba(49,25,68,.36), 0 2px 5px rgba(28,12,42,.48), 0 0 8px rgba(188,247,234,.2) !important;
+}
+.program-gem img { width: 30px; height: 30px; display: block; object-fit: contain; image-rendering: pixelated; }
+
+#userAvatarPicker { position: absolute; top: 58px; left: 10px; z-index: 6; width: 220px; padding: 8px; border: 2px solid #fff; border-radius: 9px; background: linear-gradient(145deg,rgba(222,170,244,.96),rgba(87,46,122,.97)); box-shadow: inset 0 3px #fff9,inset 0 -3px #402155,0 7px 18px #20102dcc,0 0 14px #bffff088; }
+#userAvatarPicker[hidden] { display: none; }
+#userAvatarPicker p { margin: 0 0 6px; color: #d9ffb7; font: 700 10px "Pixelify Sans",monospace; letter-spacing: .1em; text-shadow: 1px 1px #3d2150; }
+#userAvatarPicker > div { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+#userAvatarPicker button { width: 62px !important; height: 62px; display: grid !important; place-items: center; margin: 0 !important; padding: 4px !important; border: 2px solid #fff !important; border-radius: 9px !important; background: linear-gradient(#fff9,#c994de88 45%,#6d448688 52%,#a971bb88) !important; box-shadow: inset 0 3px #fff8,inset 0 -3px #49305988,0 2px 5px #2a153999 !important; }
+#userAvatarPicker button:hover,#userAvatarPicker button.is-selected { background: linear-gradient(#fff,#caffeb 38%,#75cdbd 48%,#8d55ab) !important; box-shadow: inset 0 3px #fff,0 0 12px #baffef !important; transform: translateY(-1px) !important; }
+#userAvatarPicker img { width: 100%; height: 100%; object-fit: contain; }
+.start-user-icon > img { width: 100%; height: 100%; display: block; object-fit: contain; }
+.start-user-icon > img[hidden], .start-being-preview[hidden] { display: none !important; }
+.saved-being-choice { position: relative; }
+.saved-being-choice .start-being-preview { width: 52px; height: 52px; }
+.saved-being-choice .start-being-preview img { inset: -4px; width: 60px; height: 60px; }
+.avatar-choice-tag { position: absolute; right: 3px; bottom: 2px; z-index: 8; padding: 1px 3px; border-radius: 3px; color: #e0ffb8; background: #4c286dcc; font: 700 7px "Pixelify Sans",monospace; text-shadow: 1px 1px #24102f; }
+
+/* Light lilac Aqua glass pass */
+#osStartMenu {
+    background: radial-gradient(circle at 90% 12%,rgba(255,255,255,.7) 0 3px,rgba(206,255,247,.24) 4px 14px,transparent 16px),linear-gradient(145deg,rgba(230,190,247,.72),rgba(166,112,203,.64) 42%,rgba(91,57,128,.72)) !important;
+    backdrop-filter: blur(22px) saturate(1.55) brightness(1.08) !important;
+}
+.start-program-pane { background: linear-gradient(145deg,rgba(185,132,216,.62),rgba(92,61,129,.66)) !important; }
+.start-system-pane { background: linear-gradient(155deg,rgba(171,115,207,.58),rgba(73,47,105,.7)) !important; }
+.start-menu-footer { background: linear-gradient(180deg,rgba(238,211,249,.28),rgba(95,56,126,.22)); }
+
+#beingDock,#beingHud {
+    background: radial-gradient(circle at 82% 12%,#fff 0 2px,rgba(206,255,247,.38) 3px 11px,transparent 13px),linear-gradient(145deg,rgba(235,218,251,.7),rgba(172,136,211,.58) 45%,rgba(100,76,142,.68)) !important;
+    backdrop-filter: blur(20px) saturate(1.45) !important;
+}
+.being-frame { background: radial-gradient(circle at 78% 14%,#fff 0 3px,transparent 7px),linear-gradient(145deg,rgba(224,255,242,.72),rgba(166,211,214,.58) 48%,rgba(128,108,175,.66)) !important; }
+#beingDock .being-dock-label,.being-frame::before,.being-frame::after { display: none !important; content: none !important; }
+#beingDock { padding-top: 8px !important; }
+
+#osTaskbar { background: linear-gradient(180deg,rgba(255,245,255,.88) 0 8%,rgba(214,174,238,.7) 12% 42%,rgba(143,103,182,.72) 48% 78%,rgba(88,63,122,.82)) !important; backdrop-filter: blur(22px) saturate(1.5) !important; }
+#osSystemTray,.os-task-tab { background: linear-gradient(180deg,rgba(255,255,255,.48),rgba(214,186,235,.28) 44%,rgba(111,77,145,.38) 51%,rgba(180,137,207,.32)) !important; }
+.os-window { background: linear-gradient(145deg,rgba(245,228,255,.7),rgba(184,135,218,.52) 43%,rgba(104,69,139,.64)) !important; backdrop-filter: blur(22px) saturate(1.5) !important; }
+.os-window-bar,.wallpaper-picker-bar { background: linear-gradient(180deg,rgba(255,255,255,.94),rgba(235,197,250,.9) 16%,rgba(174,111,211,.84) 47%,rgba(103,62,139,.88) 53%,rgba(190,132,216,.86)) !important; }
+
+/* Keep the greenery as a quiet desktop frame. These extra pieces previously
+   crossed the wallpaper and competed with the icons and Being dock. */
+.vine-hanging-top,
+.vine-hanging-bottom,
+.vine-new-top-right,
+.vine-new-bottom-left,
+.vine-new-lower-right {
+    display: none !important;
+}
+
+.vine-top {
+    top: 0 !important;
+    left: 0 !important;
+    width: auto !important;
+    height: calc(100vh - 48px) !important;
+    opacity: .85 !important;
+}
+
+.vine-right {
+    top: 0 !important;
+    right: 0 !important;
+    width: auto !important;
+    height: calc(100vh - 48px) !important;
+    opacity: .85 !important;
+    transform: scaleX(-1) !important;
+}
+
+.desktop-wordmark {
+    position: fixed;
+    top: 24px;
+    right: 30px;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 190px;
+    padding: 6px 12px 7px 7px;
+    border: 2px solid;
+    border-color: #fff #3d245b #3d245b #fff;
+    background: linear-gradient(90deg, #39206f 0%, #7543a7 54%, #ba83da 100%);
+    box-shadow: 1px 1px 0 #130c23, inset 1px 1px 0 rgba(255,255,255,.42), 0 4px 14px rgba(47,20,78,.4);
+    color: #fff;
+    font: 700 25px/1 'Pixelify Sans', sans-serif;
+    letter-spacing: .5px;
+    text-shadow: 1px 2px 0 #24123d;
+}
+
+.desktop-wordmark-icon {
+    display: grid;
+    width: 29px;
+    height: 29px;
+    place-items: center;
+    border: 1px solid;
+    border-color: #fff #24133d #24133d #fff;
+    background: linear-gradient(135deg, #9ff4e1 0 48%, #9c58d0 49% 100%);
+    color: #291044;
+    font-size: 20px;
+    text-shadow: 1px 1px #fff;
+}
+
+.twinkle-field { position: fixed; inset: 0; z-index: 7; overflow: hidden; pointer-events: none; }
+.twinkle-field i { position: absolute; top: var(--y); left: var(--x); width: 13px; height: 13px; opacity: 0; transform: scale(var(--s)) rotate(45deg); animation: twinkleTravel 6.2s var(--d) ease-in-out infinite; }
+.twinkle-field i::before,.twinkle-field i::after { position: absolute; inset: 0; border-radius: 50%; content: ""; background: linear-gradient(90deg,transparent 42%,#fff 48% 52%,transparent 58%); filter: drop-shadow(0 0 5px #d8fff6); }
+.twinkle-field i::after { transform: rotate(90deg); }
+@keyframes twinkleTravel { 0% { opacity: 0; translate: -22px 16px; scale: .3; } 18% { opacity: 1; } 45% { opacity: .25; scale: 1.35; } 67% { opacity: 1; } 100% { opacity: 0; translate: 62px -48px; scale: .2; } }
+
+@media (max-width:700px) {
+    .vine-top,
+    .vine-right { height: calc(100vh - 42px) !important; opacity: .7 !important; }
+    .desktop-wordmark { top: 14px; right: 14px; min-width: 0; font-size: 18px; }
+    .desktop-wordmark-icon { width: 23px; height: 23px; font-size: 16px; }
+    .twinkle-field i:nth-child(even) { display: none; }
+}
+
+#beingDock,
+#beingHud {
+    background:
+        radial-gradient(circle at 82% 12%, rgba(255,255,255,.44) 0 2px, transparent 5px),
+        linear-gradient(155deg, rgba(207,185,241,.62), rgba(103,66,139,.68) 48%, rgba(51,36,79,.76)) !important;
+}
+
+#beingDock::before,
+#beingHud::before {
+    position: absolute;
+    top: 3px;
+    right: 9px;
+    left: 9px;
+    height: 21%;
+    border-radius: 12px 12px 50% 50%;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(rgba(255,255,255,.38), transparent);
+}
+
+#osTaskbar {
+    background: linear-gradient(180deg, rgba(246,231,255,.9) 0 5%, rgba(176,128,204,.82) 10% 38%, rgba(91,56,119,.92) 46% 83%, rgba(49,34,69,.96) 100%) !important;
+    box-shadow: inset 0 2px rgba(255,255,255,.76), inset 0 -2px rgba(33,19,48,.7), 0 -4px 18px rgba(44,21,61,.45) !important;
+}
+
+#osStartButton {
+    width: 96px !important;
+    height: 48px !important;
+    flex-basis: 96px !important;
+}
+#osStartButton img { width: 96px !important; height: 48px !important; object-fit: contain !important; }
+
+.os-welcome {
+    background:
+        radial-gradient(circle at 84% 14%, rgba(255,255,255,.82) 0 3px, transparent 7px),
+        radial-gradient(circle at 75% 25%, rgba(191,255,244,.55) 0 7px, transparent 10px),
+        linear-gradient(145deg,#c9f6ef,#b5d7f2 48%,#d5b9ed) !important;
+    box-shadow: inset 0 3px rgba(255,255,255,.72), inset 0 -5px rgba(91,62,123,.18) !important;
+}
+.os-welcome button {
+    border: 1px solid #fff !important;
+    border-radius: 8px !important;
+    background: linear-gradient(#d8ffc9,#8dca86 43%,#4a7c59 50%,#70a779) !important;
+    box-shadow: inset 0 2px #fff9,inset 0 -2px #315b43,0 3px 7px #3b285877,0 0 9px #baffec88 !important;
+}
+
+/* MAXIMUM Y2K GEL — intentionally loud. */
+.desktop::after {
+    opacity: .72 !important;
+    background:
+        radial-gradient(circle at 18% 28%, #fff 0 2px, #d9ffffcc 3px, transparent 6px),
+        radial-gradient(circle at 35% 52%, rgba(255,255,255,.65) 0 8px, rgba(207,250,255,.22) 9px 12px, transparent 14px),
+        radial-gradient(circle at 61% 18%, #fff 0 2px, #c7fff1aa 3px, transparent 7px),
+        radial-gradient(circle at 78% 36%, rgba(255,255,255,.58) 0 13px, rgba(218,245,255,.18) 14px 18px, transparent 20px),
+        radial-gradient(circle at 89% 70%, #fff 0 2px, #f0c8ff99 3px, transparent 7px),
+        linear-gradient(115deg, transparent 0 46%, rgba(255,255,255,.07) 49%, transparent 52%);
+}
+
+#osStartMenu,
+#beingDock,
+#beingHud,
+.os-window {
+    backdrop-filter: blur(18px) saturate(1.75) contrast(1.08) !important;
+}
+
+#osStartMenu {
+    border-width: 2px !important;
+    background:
+        radial-gradient(circle at 91% 13%, rgba(255,255,255,.72) 0 2px, rgba(201,255,243,.33) 3px 12px, transparent 14px),
+        linear-gradient(155deg, rgba(226,166,246,.88) 0%, rgba(155,85,199,.9) 18%, rgba(92,45,130,.92) 48%, rgba(43,24,67,.95) 100%) !important;
+    box-shadow: inset 0 0 0 1px #5b2a77, inset 0 4px rgba(255,255,255,.86), inset 0 -4px rgba(33,15,50,.72), 0 12px 35px #261235aa, 0 0 24px #d894ff88 !important;
+}
+
+.start-menu-header {
+    border-radius: 9px 9px 0 0;
+    background: linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,.08) 42%,rgba(77,35,107,.2) 48%,transparent);
+}
+
+.start-menu-columns { border-width: 2px !important; }
+.start-program-pane {
+    background:
+        radial-gradient(circle at 13% 9%, rgba(210,255,240,.34), transparent 23%),
+        linear-gradient(145deg, rgba(166,104,203,.86), rgba(82,48,116,.9) 48%, rgba(46,35,76,.94)) !important;
+}
+.start-system-pane {
+    background:
+        radial-gradient(circle at 83% 9%, rgba(255,255,255,.3), transparent 20%),
+        linear-gradient(155deg, rgba(141,77,180,.92), rgba(57,32,85,.96)) !important;
+}
+
+#osStartMenu .start-program,
+#osStartMenu .start-system-pane button {
+    border-bottom-color: rgba(255,255,255,.12) !important;
+}
+#osStartMenu .start-program:hover,
+#osStartMenu .start-system-pane button:hover {
+    border-color: #eaffff !important;
+    background: linear-gradient(180deg,rgba(229,255,255,.65),rgba(132,235,220,.34) 45%,rgba(133,72,174,.38) 50%,rgba(214,158,238,.38)) !important;
+    box-shadow: inset 0 2px rgba(255,255,255,.88), inset 0 -2px rgba(66,31,90,.44), 0 0 12px #a9fff2aa !important;
+}
+
+.program-gem,
+.system-glyph,
+.taskbar-social,
+.tray-sparkle {
+    border-color: #fff !important;
+    background: linear-gradient(145deg,#f5e8ff,#c989ea 38%,#74459a 52%,#a96cc0) !important;
+    box-shadow: inset 2px 3px rgba(255,255,255,.82), inset -2px -3px rgba(66,30,91,.5), 0 2px 6px #251334aa, 0 0 9px #bfffee88 !important;
+}
+
+#beingDock,
+#beingHud {
+    border-width: 2px !important;
+    background:
+        radial-gradient(circle at 82% 13%, #fff 0 2px, rgba(211,255,245,.45) 3px 10px, transparent 12px),
+        linear-gradient(145deg,rgba(228,205,255,.82),rgba(154,105,194,.78) 44%,rgba(76,50,113,.9) 50%,rgba(114,78,148,.88)) !important;
+    box-shadow: inset 0 4px rgba(255,255,255,.86), inset 0 -5px rgba(43,24,63,.68), 0 8px 22px #2a163aaa, 0 0 19px #c3fff077 !important;
+}
+
+.being-frame {
+    border: 2px solid #fff !important;
+    background: radial-gradient(circle at 78% 14%,#fff 0 3px,transparent 7px),linear-gradient(145deg,rgba(200,255,231,.82),rgba(138,194,190,.72) 44%,rgba(105,77,145,.86)) !important;
+    box-shadow: inset 0 4px #ffffffbb,inset 0 -5px #49356888,0 3px 9px #321c44aa !important;
+}
+
+#osTaskbar {
+    border-top: 2px solid #fff !important;
+    background: linear-gradient(180deg,#f8eaffee 0 7%,#dba7efdc 10% 35%,#925ab8ed 42% 48%,#5e387ff2 52% 82%,#372348fa 100%) !important;
+    box-shadow: inset 0 4px rgba(255,255,255,.72),inset 0 -3px rgba(31,17,45,.72),0 -3px 14px #d398ff66 !important;
+}
+
+#osSystemTray,
+.os-task-tab {
+    border-color: rgba(255,255,255,.82) !important;
+    background: linear-gradient(180deg,rgba(255,255,255,.48),rgba(206,154,228,.38) 43%,rgba(91,52,119,.55) 50%,rgba(137,84,164,.5)) !important;
+    box-shadow: inset 0 2px rgba(255,255,255,.68),inset 0 -2px rgba(44,24,62,.5),0 1px 5px #2d173e88 !important;
+}
+
+.os-window {
+    border-width: 2px !important;
+    background: linear-gradient(145deg,rgba(241,218,255,.82),rgba(169,105,207,.72) 42%,rgba(77,44,108,.85) 50%,rgba(132,82,163,.78)) !important;
+    box-shadow: inset 0 4px rgba(255,255,255,.9),inset 0 -5px rgba(39,18,58,.72),0 16px 40px #231132bb,0 0 27px #d393ff88 !important;
+}
+
+.os-window-bar { height: 38px !important; border: 2px solid rgba(255,255,255,.86) !important; }
+.os-window-actions button { border-radius: 7px !important; background: linear-gradient(#fff,#e4c8f1 42%,#9a68b5 50%,#c69bd8) !important; box-shadow: inset 0 2px #fff,inset 0 -2px #664477,0 0 7px #dfffee66 !important; }
+
+/* Final performance overrides: keep these at EOF so the visual theme cannot
+   accidentally re-enable the expensive full-surface filters above. */
+#wallpaperRotator,
+.twinkle-field { contain: strict; }
+.wallpaper-frame { will-change: auto; }
+.desktop-vine { filter: none !important; }
+.desktop::after { animation: none !important; }
+.os-window {
+    contain: layout paint;
+    backdrop-filter: none !important;
+    filter: none !important;
+}
+#osStartMenu,
+#beingDock,
+#beingHud {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+/* Start-menu hot path: it sits over a full-screen photo, so even a small live
+   blur forces Chrome to repaint a huge area on every hover. */
+#osStartMenu {
+    contain: layout paint !important;
+    transition: none !important;
+    will-change: auto !important;
+    box-shadow: inset 0 0 0 1px #5b2a77, inset 0 3px #ffffffc7,
+                4px 5px 12px #26123599 !important;
+}
+
+#osStartMenu .start-program-pane,
+#osStartMenu .start-system-pane,
+#osStartMenu .start-menu-header,
+#osStartMenu .start-menu-footer {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+#osStartMenu button,
+#osStartMenu .start-program,
+#osStartMenu .start-system-pane button {
+    transition: none !important;
+}
+
+#osStartMenu .start-program:hover,
+#osStartMenu .start-system-pane button:hover {
+    box-shadow: inset 0 1px #ffffffcc !important;
+}
+
+#osStartMenu .program-gem,
+#osStartMenu .system-glyph,
+#osStartMenu .start-user-icon,
+#osStartMenu .start-user-icon > img {
+    filter: none !important;
+    box-shadow: inset 1px 1px #ffffffaa, 0 1px 2px #25133488 !important;
+}
+
+/* Window interactions keep the glass gradients without live blur. */
+.os-window, #osTaskbar {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+.os-window { transition: none !important; }
+.os-window.is-dragging { box-shadow: 2px 3px 8px #26123577 !important; }
+.os-window.is-dragging iframe { visibility: visible; }
+.is-window-dragging .twinkle-field { visibility: hidden; }
+.is-window-dragging .avatar-character, .is-window-dragging #companion,
+.is-window-dragging .twinkle-field * { animation-play-state: paused !important; }

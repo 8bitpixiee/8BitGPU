@@ -4,15 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>8BitGPU</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="aero.css">
-    <link rel="stylesheet" href="mobile-desktop.css">
+    <link rel="stylesheet" href="client/desktop/style.css">
+    <link rel="stylesheet" href="client/desktop/aero.css">
+    <link rel="stylesheet" href="client/desktop/mobile-desktop.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="retro-windows.css"></head>
+<link rel="stylesheet" href="client/shared/retro-windows.css"></head>
 
 <body>
     <div id="osBootScreen" aria-label="8BitGPU is starting">
@@ -28,12 +28,12 @@
         <span class="wallpaper-frame is-visible"></span>
         <span class="wallpaper-frame"></span>
     </div>
-    <img class="desktop-vine vine-right" src="clustervines.png" alt="">
-    <img class="desktop-vine vine-top" src="clustervines.png" alt="">
-    <img class="desktop-vine vine-hanging-top" src="hangingvine.png" alt="">
+    <img class="desktop-vine vine-right" src="assets/decor/clustervines.png" alt="">
+    <img class="desktop-vine vine-top" src="assets/decor/clustervines.png" alt="">
+    <img class="desktop-vine vine-hanging-top" src="assets/decor/hangingvine.png" alt="">
     <img class="desktop-vine vine-hanging-bottom" src="hangingvine2.png" alt="">
-    <img class="desktop-vine vine-new-top-right" src="hangingvine.png" alt="">
-    <img class="desktop-vine vine-new-bottom-left" src="clustervines.png" alt="">
+    <img class="desktop-vine vine-new-top-right" src="assets/decor/hangingvine.png" alt="">
+    <img class="desktop-vine vine-new-bottom-left" src="assets/decor/clustervines.png" alt="">
     <img class="desktop-vine vine-new-lower-right" src="hangingvine2.png" alt="">
     <div class="desktop-wordmark" aria-label="8 Bit GPU">
         <span class="desktop-wordmark-icon" aria-hidden="true">8</span>
@@ -48,7 +48,7 @@
     </div>
     <div class="container">
     <header class="hero">
-        <img src="pixilart pixie.png" class="pixie">
+        <img src="assets/media/pixilart pixie.png" class="pixie">
     <h1>8BitGPU</h1>
 
     <p>
@@ -57,36 +57,36 @@
         
 <div class="nav-buttons">
     <button onclick="openApp('coaching')">
-        <img src="coaching.png" class="desktop-icon">
+        <img src="assets/media/coaching.png" class="desktop-icon">
         <span>1:1 Coaching</span>
 </button>
 
 <button onclick="openApp('mealPlanning')">
-     <img src="mealplan.png" class="desktop-icon">
+     <img src="assets/media/mealplan.png" class="desktop-icon">
         <span>Meal Planning</span>
 </button>
 
 <button onclick="openApp('twitch')">
-     <img src="twitch.png" class="desktop-icon">
+     <img src="assets/media/twitch.png" class="desktop-icon">
         <span>Watch Us Live</span>
 </button>
 
 <button onclick="openApp('discord')">
-     <img src="discord.png" class="desktop-icon">
+     <img src="assets/media/discord.png" class="desktop-icon">
         <span>Join the Community</span>
 </button>
     
 <button onclick="openApp('storefront')">
-    <img src="moneystack.png" class="desktop-icon">
+    <img src="assets/media/moneystack.png" class="desktop-icon">
     <span>Storefront</span>
 </button>
 
     <button onclick="openApp('important')">
-     <img src="disc.png" class="desktop-icon">
+     <img src="assets/media/disc.png" class="desktop-icon">
         <span>IMPOTRANT</span>
 </button>
      <button onclick="openApp('sonic')">
-     <img src="sega.png" class="desktop-icon">
+     <img src="assets/media/sega.png" class="desktop-icon">
         <span>Sonic.exe</span>
 </button>
     
@@ -100,12 +100,12 @@
         <div class="being-frame">
             <div id="companion">
                 <img id="extraLayer" class="avatar-layer">
-                <img src="body_base_fem_idle_front_v1.png" id="bodyLayer" class="avatar-layer">
+                <img src="assets/avatar/legacy/body_base_fem_idle_front_v1.png" id="bodyLayer" class="avatar-layer">
                 <img id="earsLayer" class="avatar-layer">
                 <img id="headLayer" class="avatar-layer">
                 <img id="chestLayer" class="avatar-layer">
                 <img id="eyesLayer" class="avatar-layer">
-                <img src="volume_hair_fem_idle_front_v1.png" id="hairLayer" class="avatar-layer">
+                <img src="assets/avatar/legacy/volume_hair_fem_idle_front_v1.png" id="hairLayer" class="avatar-layer">
                 <img id="fitLayer" class="avatar-layer">
             </div>
             <p id="beingEmptyState">MAKE A BEING<br>IN AVATAR LAB</p>
@@ -136,7 +136,7 @@
         <header class="start-menu-header">
             <button class="start-user-card" type="button" data-toggle-user-avatar aria-expanded="false">
                 <span class="start-user-icon">
-                    <img id="startUserAvatar" src="user-avatar-2.png" alt="Selected user picture">
+                    <img id="startUserAvatar" src="assets/ui/user-pictures/user-avatar-2.png" alt="Selected user picture">
                     <span id="startUserBeing" class="start-being-preview" aria-label="Saved Being">
                         <img data-avatar-layer="extraLayer" alt="">
                         <img data-avatar-layer="bodyLayer" alt="">
@@ -153,12 +153,12 @@
             <div id="userAvatarPicker" aria-label="Choose a user picture" hidden>
                 <p>CHOOSE YOUR ICON</p>
                 <div>
-                    <button type="button" data-user-avatar="user-avatar-1.png"><img src="user-avatar-1.png" alt="Purple leopard kiss"></button>
-                    <button type="button" data-user-avatar="user-avatar-2.png"><img src="user-avatar-2.png" alt="Pink aqua gel person"></button>
-                    <button type="button" data-user-avatar="user-avatar-3.png"><img src="user-avatar-3.png" alt="Deep purple gel person"></button>
-                    <button type="button" data-user-avatar="user-avatar-4.png"><img src="user-avatar-4.png" alt="Blue cartoon eyes"></button>
-                    <button type="button" data-user-avatar="user-avatar-5.png"><img src="user-avatar-5.png" alt="Lavender hibiscus"></button>
-                    <button type="button" data-user-avatar="user-avatar-6.png"><img src="user-avatar-6.png" alt="Sunset gel person"></button>
+                    <button type="button" data-user-avatar="assets/ui/user-pictures/user-avatar-1.png"><img src="assets/ui/user-pictures/user-avatar-1.png" alt="Purple leopard kiss"></button>
+                    <button type="button" data-user-avatar="assets/ui/user-pictures/user-avatar-2.png"><img src="assets/ui/user-pictures/user-avatar-2.png" alt="Pink aqua gel person"></button>
+                    <button type="button" data-user-avatar="assets/ui/user-pictures/user-avatar-3.png"><img src="assets/ui/user-pictures/user-avatar-3.png" alt="Deep purple gel person"></button>
+                    <button type="button" data-user-avatar="assets/ui/user-pictures/user-avatar-4.png"><img src="assets/ui/user-pictures/user-avatar-4.png" alt="Blue cartoon eyes"></button>
+                    <button type="button" data-user-avatar="assets/ui/user-pictures/user-avatar-5.png"><img src="assets/ui/user-pictures/user-avatar-5.png" alt="Lavender hibiscus"></button>
+                    <button type="button" data-user-avatar="assets/ui/user-pictures/user-avatar-6.png"><img src="assets/ui/user-pictures/user-avatar-6.png" alt="Sunset gel person"></button>
                     <button class="saved-being-choice" type="button" data-user-avatar="saved-being" aria-label="Use my saved Being">
                         <span class="start-being-preview">
                             <img data-avatar-layer="extraLayer" alt="">
@@ -178,9 +178,9 @@
         <div class="start-menu-columns">
             <div class="start-program-pane">
                 <p class="start-pane-label">FAVORITE PROGRAMS</p>
-                <button class="start-program" data-start-program type="button" onclick="openApp('avatarLab')"><span class="program-gem"><img src="start-icon-wings.png" alt=""></span><span><strong>Avatar Lab</strong><small>Create your Being</small></span></button>
-                <button class="start-program" data-start-program type="button" onclick="openApp('arcade')"><span class="program-gem"><img src="start-icon-disc.png" alt=""></span><span><strong>Arcade Lounge</strong><small>Walk, meet &amp; chat</small></span></button>
-                <button class="start-program" data-start-program type="button" onclick="openApp('twitch')"><span class="program-gem"><img src="start-icon-music.png" alt=""></span><span><strong>Watch Us Live</strong><small>Open the stream</small></span></button>
+                <button class="start-program" data-start-program type="button" onclick="openApp('avatarLab')"><span class="program-gem"><img src="assets/ui/start-icon-wings.png" alt=""></span><span><strong>Avatar Lab</strong><small>Create your Being</small></span></button>
+                <button class="start-program" data-start-program type="button" onclick="openApp('arcade')"><span class="program-gem"><img src="assets/ui/start-icon-disc.png" alt=""></span><span><strong>Arcade Lounge</strong><small>Walk, meet &amp; chat</small></span></button>
+                <button class="start-program" data-start-program type="button" onclick="openApp('twitch')"><span class="program-gem"><img src="assets/ui/start-icon-music.png" alt=""></span><span><strong>Watch Us Live</strong><small>Open the stream</small></span></button>
             </div>
             <aside class="start-system-pane" aria-label="Places and settings">
                 <button type="button" onclick="openApp('account')"><span class="system-glyph">⚙</span>Account</button>
@@ -221,10 +221,10 @@
             <div class="wallpaper-browser">
                 <p>Choose your desktop background</p>
                 <div class="wallpaper-grid">
-                    <button type="button" data-wallpaper-index="0"><img src="wallpaper-1-purple.png" alt="Lavender ocean and clouds"><span>Lavender Horizon</span></button>
-                    <button type="button" data-wallpaper-index="1"><img src="wallpaper-2-purple.png" alt="Purple infinity pool and palm trees"><span>Amethyst Palmwater</span></button>
-                    <button type="button" data-wallpaper-index="2"><img src="wallpaper-3-purple.png" alt="Purple tropical palm island"><span>Violet Island</span></button>
-                    <button type="button" data-wallpaper-index="3"><img src="wallpaper-4-purple.png" alt="Moon over purple water and islands"><span>Moonlit Paradise</span></button>
+                    <button type="button" data-wallpaper-index="0"><img src="assets/backgrounds/wallpaper-1-purple.png" alt="Lavender ocean and clouds"><span>Lavender Horizon</span></button>
+                    <button type="button" data-wallpaper-index="1"><img src="assets/backgrounds/wallpaper-2-purple.png" alt="Purple infinity pool and palm trees"><span>Amethyst Palmwater</span></button>
+                    <button type="button" data-wallpaper-index="2"><img src="assets/backgrounds/wallpaper-3-purple.png" alt="Purple tropical palm island"><span>Violet Island</span></button>
+                    <button type="button" data-wallpaper-index="3"><img src="assets/backgrounds/wallpaper-4-purple.png" alt="Moon over purple water and islands"><span>Moonlit Paradise</span></button>
                 </div>
                 <p class="wallpaper-upload"><label for="desktopWallpaperUpload">Add your own background</label><input id="desktopWallpaperUpload" type="file" accept="image/png,image/jpeg,image/webp"></p>
             </div>
@@ -263,12 +263,12 @@
     </nav>
 
     <nav id="osTaskbar" aria-label="8BitGPU taskbar">
-        <button id="osStartButton" type="button" onclick="toggleStartMenu()" aria-label="Open Start menu"><img src="purplestartwindows.png" alt=""></button>
+        <button id="osStartButton" type="button" onclick="toggleStartMenu()" aria-label="Open Start menu"><img src="assets/ui/purplestartwindows.png" alt=""></button>
         <div id="osTaskTabs"></div>
         <div id="osSystemTray">
             <div class="taskbar-socials" aria-label="Social links">
-                <button class="taskbar-social" type="button" onclick="openApp('twitch')" aria-label="Open Twitch"><img src="twitch.png" alt=""></button>
-                <button class="taskbar-social" type="button" onclick="openApp('discord')" aria-label="Open Discord"><img src="discord.png" alt=""></button>
+                <button class="taskbar-social" type="button" onclick="openApp('twitch')" aria-label="Open Twitch"><img src="assets/media/twitch.png" alt=""></button>
+                <button class="taskbar-social" type="button" onclick="openApp('discord')" aria-label="Open Discord"><img src="assets/media/discord.png" alt=""></button>
                 <span class="taskbar-social taskbar-instagram-slot" title="Instagram icon coming soon">IG</span>
             </div>
             <span class="tray-sparkle" aria-hidden="true">8</span>
@@ -276,9 +276,9 @@
             <button id="osTray" type="button" onclick="cycleAngelTime()" aria-label="Change angel time message"></button>
         </div>
     </nav>
-<script src="script.js"></script>
+<script src="client/desktop/script.js"></script>
 
-<script src="window-theme.js"></script><script src="desktop-social.js"></script></body>
+<script src="client/shared/window-theme.js"></script><script src="client/desktop/desktop-social.js"></script></body>
 </html>
 
 

@@ -1,0 +1,26 @@
+export function portrait(avatarJson) {
+ let a;try{a=JSON.parse(avatarJson);}catch{return null;}if(!a||typeof a!=='object')return null;
+ let head,body;
+ if(typeof a.bodyAsset==='string'&&/^[a-zA-Z0-9_ .-]+\.png$/.test(a.bodyAsset))body=`assets/avatar/${a.bodyAsset}`;
+ else if(a.species==='Pixie') {const v={Nutmeg:1,Peachy:2,Creme:3}[a.skinTone]||1;const prefix=a.build==='Masc'?'head_masc':a.build==='Chunky Masc'?'head_chunky_masc':'head_fem';head=`assets/avatar/${prefix}_v${v}.png`;}
+ else if(a.species==='Deerbra')head=`assets/avatar/head_fem_deerbra_v${{Wood:1,Copper:2,Pedal:3}[a.skinTone]||1}.png`;
+ else if(a.species==='Bovadill')head='assets/avatar/bovidil_head_fem_v1.png';
+ else if(a.species==='Thixie')head=`assets/avatar/thixie_head_v${{Nutmeg:1,Creme:2,Peachy:3}[a.skinTone]||1}.png`;
+ else if(!body)return null;
+ const result={head};if(body)result.body=body;for(const key of ['ears','eyes','hair']){const value=a.layers?.[key];if(typeof value==='string'&&/^(?:assets\/)?avatar\/[a-zA-Z0-9_ .-]+\.png$/.test(value)&&!value.includes('..'))result[key]=value;}return result;
+}
+
+export function roomAvatar(json) {
+ let a;try{a=JSON.parse(json);}catch{a=null;}
+ if(!a||!portrait(json))a={species:'Pixie',skinTone:'Nutmeg',build:'Fae',layers:{ears:'assets/avatar/ears_fem_v1.png',eyes:'assets/avatar/eyes_fem_v1.png',hair:'assets/avatar/volume_hair_fem_idle_front_v1.png',fit:'assets/avatar/fit_fem_v1.png',extra:'assets/avatar/wings_v1.png'}};
+ const face=portrait(JSON.stringify(a));
+ let body=face.body||face.head.replace('head','body');
+ if(a.species==='Bovadill')body=`assets/avatar/bovidil_body_fem_v${{Cocoa:1,Peachy:2,Milky:3}[a.skinTone]||1}.${{Highland:1,Holstein:2,Dexter:3}[a.build]||1}.png`;
+ const layers={body,...face};
+ for(const key of ['extra','chest','fit']){const value=a.layers?.[key];if(typeof value==='string'&&/^(?:assets\/)?avatar\/[a-zA-Z0-9_ .-]+\.png$/.test(value)&&!value.includes('..'))layers[key]=value;}
+ const adjustments={};for(const key of ['ears','chest','eyes','hair','fit','extra']){const v=a.adjustments?.[key]||{};adjustments[key]={x:Math.max(-20,Math.min(20,Number(v.x)||0)),y:Math.max(-20,Math.min(20,Number(v.y)||0)),scale:Math.max(.7,Math.min(1.3,Number(v.scale)||1))};}
+ const color=a.skinColor||{};const value=(key,fallback)=>Number.isFinite(Number(color[key]))?Number(color[key]):fallback;
+ const skinColor={hue:Math.max(-180,Math.min(180,value('hue',0))),saturation:Math.max(0,Math.min(200,value('saturation',100))),lightness:Math.max(60,Math.min(140,value('lightness',100)))};
+ return {layers,adjustments,skinColor,bodyAsset:a.bodyAsset||'',selection:a.selection||{},itemColors:a.itemColors||{}};
+}
+

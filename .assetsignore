@@ -1,8 +1,10 @@
 .git
 .git/**
 mode_modules/**
-src/**
+server/**
 tests/**
 releases/**
 backups/**
 *.zip
+art/**
+**/*.aseprite
