@@ -15,11 +15,12 @@
             <div class="player-heading"><span class="live-dot"></span><strong>8BIT PIXIEE TV</strong><span>LIVE TRANSMISSION</span></div>
             <div class="twitch-screen">
                 <iframe
-                    src="https://player.twitch.tv/?channel=8bit_pixiee&parent=8bitgpu.villainerafit.workers.dev&muted=false"
+                    id="twitch-player"
                     allowfullscreen="true"
                     allow="autoplay; fullscreen"
                     title="8Bit Pixiee Twitch stream"></iframe>
             </div>
+            <p id="twitch-embed-status" role="status" hidden></p>
             <div class="player-controls">
                 <span>◀◀</span><span>▶</span><span>▶▶</span>
                 <div class="signal-meter"><i></i><i></i><i></i><i></i><i></i></div>
@@ -32,7 +33,7 @@
             <div class="buddy-bar">Community chat now has its own window: <a href="chat.html">Chat.exe ↗</a></div>
             <div class="chat-wrap">
                 <iframe
-                    src="https://www.twitch.tv/embed/8bit_pixiee/chat?parent=8bitgpu.villainerafit.workers.dev&darkpopout"
+                    id="twitch-chat"
                     title="8Bit Pixiee Twitch chat"></iframe>
 
             </div>
@@ -40,6 +41,7 @@
         </aside>
     </main>
 
+<script src="client/media/twitch-embed.js"></script>
 <script src="client/shared/window-theme.js"></script></body>
 </html>
 
