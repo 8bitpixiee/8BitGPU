@@ -930,7 +930,7 @@ button, a, [role="button"], input, label { cursor: pointer !important; }
 #osStartMenu .program-gem,
 #osStartMenu .system-glyph,
 #osStartMenu .start-user-icon,
-#osStartMenu .start-user-icon img {
+#osStartMenu .start-user-icon > img {
     filter: none !important;
     box-shadow: inset 1px 1px #ffffffaa, 0 1px 2px #25133488 !important;
 }
