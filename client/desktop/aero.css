@@ -978,3 +978,103 @@ button, a, [role="button"], input, label { cursor: pointer !important; }
     color: #000 !important;
     text-shadow: none !important;
 }
+#osStartMenu {
+    --desktop-accent: #7651a0;
+    width: 250px !important;
+    max-width: calc(100vw - 12px) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 3px !important;
+    overflow: visible !important;
+    background: #c0c0c0 !important;
+    border: 2px outset #fff !important;
+    border-radius: 0 !important;
+    box-shadow: 1px 1px #000 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#osStartMenu.is-open {
+    display: flex !important;
+    align-items: stretch;
+}
+
+#osStartMenu .classic-brand {
+    flex: 0 0 28px;
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    background: var(--desktop-accent);
+    color: #fff;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font: bold 20px Arial, sans-serif;
+}
+
+#osStartMenu .classic-menu {
+    flex: 1;
+    min-width: 0;
+    padding-left: 3px;
+}
+
+#osStartMenu .classic-menu button {
+    display: flex !important;
+    align-items: center;
+    gap: 9px;
+    width: 100% !important;
+    min-height: 32px !important;
+    margin: 0 !important;
+    padding: 5px 8px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #c0c0c0 !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    transform: none !important;
+    font: 13px Tahoma, Arial, sans-serif !important;
+    text-align: left;
+    cursor: default;
+}
+
+#osStartMenu .classic-menu button:hover,
+#osStartMenu .classic-menu button:focus-visible,
+#osStartMenu .classic-group:hover > button,
+#osStartMenu .classic-group:focus-within > button {
+    background: var(--desktop-accent) !important;
+    color: #fff !important;
+}
+
+#osStartMenu .classic-arrow {
+    margin-left: auto;
+    font-size: 9px;
+}
+
+#osStartMenu .classic-group {
+    position: relative;
+}
+
+#osStartMenu .classic-submenu {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: -2px;
+    z-index: 10;
+    width: 180px;
+    padding: 3px;
+    background: #c0c0c0;
+    border: 2px outset #fff;
+    box-shadow: 1px 1px #000;
+}
+
+#osStartMenu .classic-group:hover > .classic-submenu,
+#osStartMenu .classic-group:focus-within > .classic-submenu {
+    display: block;
+}
+
+#osStartMenu hr {
+    margin: 4px 2px;
+    border: 0;
+    border-top: 1px solid #808080;
+    border-bottom: 1px solid #fff;
+}

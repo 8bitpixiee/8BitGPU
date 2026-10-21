@@ -131,21 +131,56 @@
             <button id="inventoryButton" type="button" onclick="openApp('inventory')">INVENTORY</button>
         </div>
     </aside>
+<section id="osStartMenu" aria-label="Start menu" aria-hidden="true">
+    <div class="classic-brand">8BitGPU</div>
 
-    <section id="osStartMenu" aria-label="Start menu" aria-hidden="true">
-        <header class="start-menu-header">
-            <button class="start-user-card" type="button" data-toggle-user-avatar aria-expanded="false">
-                <span class="start-user-icon">
-                    <img id="startUserAvatar" src="assets/ui/user-pictures/user-avatar-2.png" alt="Selected user picture">
-                    <span id="startUserBeing" class="start-being-preview" aria-label="Saved Being">
-                        <img data-avatar-layer="extraLayer" alt="">
-                        <img data-avatar-layer="bodyLayer" alt="">
-                        <img data-avatar-layer="earsLayer" alt="">
-                        <img data-avatar-layer="headLayer" alt="">
-                        <img data-avatar-layer="chestLayer" alt="">
-                        <img data-avatar-layer="eyesLayer" alt="">
-                        <img data-avatar-layer="hairLayer" alt="">
-                        <img data-avatar-layer="fitLayer" alt="">
+    <div class="classic-menu">
+        <button type="button" onclick="openApp('profile')">
+            <span>▣</span> MyPixel
+        </button>
+
+        <div class="classic-group">
+            <button type="button">
+                <span>▤</span> Programs
+                <span class="classic-arrow">▶</span>
+            </button>
+            <div class="classic-submenu">
+                <button type="button" onclick="openApp('avatarLab')">Avatar Lab</button>
+                <button type="button" onclick="openApp('arcade')">Arcade Lounge</button>
+                <button type="button" onclick="openApp('inventory')">Inventory</button>
+                <button type="button" onclick="openApp('storefront')">Storefront</button>
+                <button type="button" onclick="openApp('twitch')">Watch Us Live</button>
+                <button type="button" onclick="openApp('chat')">Chat.exe</button>
+            </div>
+        </div>
+
+        <button type="button" data-open-wallpapers>
+            <span>▧</span> Pictures
+        </button>
+
+        <div class="classic-group">
+            <button type="button">
+                <span>⚙</span> Settings
+                <span class="classic-arrow">▶</span>
+            </button>
+            <div class="classic-submenu">
+                <button type="button" onclick="openApp('account')">Account</button>
+                <button type="button" data-open-wallpapers>Appearance</button>
+            </div>
+        </div>
+
+        <button type="button" onclick="openApp('important')">
+            <span>?</span> Help &amp; Important
+        </button>
+
+        <hr>
+
+        <button type="button" onclick="openApp('login')">
+            <span>⚿</span> Log In
+        </button>
+    </div>
+</section>
+   
                     </span>
                 </span>
                 <span><small id="startAccountStatus">8BIT DESKTOP</small><strong id="startMenuName">Guest Pixie</strong><em>Ready to play ✦</em></span>
