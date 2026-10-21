@@ -946,3 +946,35 @@ button, a, [role="button"], input, label { cursor: pointer !important; }
 .is-window-dragging .twinkle-field { visibility: hidden; }
 .is-window-dragging .avatar-character, .is-window-dragging #companion,
 .is-window-dragging .twinkle-field * { animation-play-state: paused !important; }
+#osStartMenu,
+#osStartMenu .start-menu-header,
+#osStartMenu .start-menu-columns,
+#osStartMenu .start-program-pane,
+#osStartMenu .start-system-pane,
+#osStartMenu .start-menu-footer {
+    background: #c0c0c0 !important;
+    color: #000 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+#osStartMenu {
+    border: 2px outset #fff !important;
+}
+
+#osStartMenu::before,
+#osStartMenu::after {
+    display: none !important;
+}
+
+#osStartMenu button,
+#osStartMenu strong,
+#osStartMenu small,
+#osStartMenu em,
+#osStartMenu .start-pane-label {
+    color: #000 !important;
+    text-shadow: none !important;
+}
