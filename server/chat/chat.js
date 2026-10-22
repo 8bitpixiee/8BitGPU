@@ -1,8 +1,9 @@
+import { once } from "../once.js";
 import { portrait, roomAvatar } from "./chat-avatar.js";
 const reply = (body, status = 200) => Response.json(body, {status, headers: {'cache-control':'no-store'}});
 const ids = value => String(value || '').split(',').map(x => x.trim()).filter(Boolean);
 
-export async function ensureChatSchema(db) {
+export const ensureChatSchema = once(async db => {
   await db.exec(`CREATE TABLE IF NOT EXISTS chat_access (user_id TEXT PRIMARY KEY, allowed INTEGER NOT NULL, granted_by TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS chat_presence (user_id TEXT PRIMARY KEY, x REAL NOT NULL, y REAL NOT NULL, updated_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS chat_emotes (user_id TEXT PRIMARY KEY, emote TEXT NOT NULL, expires_at INTEGER NOT NULL);
@@ -17,7 +18,7 @@ CREATE TABLE IF NOT EXISTS chat_reports (message_id INTEGER NOT NULL, reporter_i
     "ALTER TABLE chat_presence ADD COLUMN facing TEXT NOT NULL DEFAULT 'down'",
     "ALTER TABLE chat_presence ADD COLUMN flying INTEGER NOT NULL DEFAULT 0"
   ]) { try { await db.exec(sql); } catch { /* The column already exists. */ } }
-}
+});
 
 export async function handleChat(request, env, user, readBody) {
   if (!user) return reply({error:'Sign in to enter Chat.exe.'},401);

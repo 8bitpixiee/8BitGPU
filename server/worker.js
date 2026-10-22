@@ -1,5 +1,6 @@
 import { handleSocial } from "./social/social.js";
 import { handleChat } from "./chat/chat.js";
+import { once } from "./once.js";
 import { STORE_PRODUCTS } from "./store/store-catalog.js";
 
 const SESSION_LENGTH_SECONDS = 60 * 60 * 24 * 30;
@@ -86,7 +87,7 @@ async function readBody(request) {
   } catch { return null; }
 }
 
-async function ensureSchema(database) {
+const ensureSchema = once(async (database) => {
   await database.exec("CREATE TABLE IF NOT EXISTS profile_images (user_id TEXT NOT NULL, slot TEXT NOT NULL, image_base64 TEXT NOT NULL, mime TEXT NOT NULL, updated_at INTEGER NOT NULL, PRIMARY KEY(user_id, slot));");
   await database.exec("CREATE TABLE IF NOT EXISTS recovery_keys (user_id TEXT PRIMARY KEY, token_hash TEXT NOT NULL UNIQUE);");
   await database.exec("CREATE TABLE IF NOT EXISTS auth_limits (bucket TEXT PRIMARY KEY, attempts INTEGER NOT NULL, expires_at INTEGER NOT NULL);");
@@ -97,7 +98,7 @@ async function ensureSchema(database) {
   await database.exec("CREATE TABLE IF NOT EXISTS player_profile_styles (user_id TEXT PRIMARY KEY, background_color TEXT, paper_color TEXT, panel_color TEXT, edge_color TEXT, accent_color TEXT, ink_color TEXT, wallpaper_url TEXT NOT NULL DEFAULT '', updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));");
   await database.exec("CREATE TABLE IF NOT EXISTS player_friends (user_id TEXT NOT NULL, friend_id TEXT NOT NULL, created_at INTEGER NOT NULL, PRIMARY KEY(user_id, friend_id), FOREIGN KEY (user_id) REFERENCES users(id), FOREIGN KEY (friend_id) REFERENCES users(id));");
   await database.exec("CREATE TABLE IF NOT EXISTS store_orders (paypal_order_id TEXT PRIMARY KEY, status TEXT NOT NULL, amount TEXT NOT NULL, cart_json TEXT NOT NULL, payer_email TEXT, capture_id TEXT, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL);");
-}
+});
 
 async function sha256(value) {
   const digest = await crypto.subtle.digest("SHA-256", encoder.encode(value));
@@ -109,7 +110,7 @@ async function currentUser(request, database) {
   if (!sessionToken) return null;
   const tokenHash = await sha256(sessionToken);
   const now = Date.now();
-  await database.prepare("DELETE FROM sessions WHERE expires_at <= ?").bind(now).run();
+  if (Math.random() < 0.05) await database.prepare("DELETE FROM sessions WHERE expires_at <= ?").bind(now).run();
   return database.prepare(`
     SELECT users.id, users.username, player_data.avatar_json AS avatar
     FROM sessions

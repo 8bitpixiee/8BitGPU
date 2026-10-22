@@ -1,5 +1,6 @@
+import { once } from "../once.js";
 const reply = (body, status = 200) => Response.json(body, {status, headers: {'cache-control':'no-store'}});
-export async function handleSocial(request, db, user, readBody) {
+const ensureSocialSchema = once(async db => {
   await db.exec(`CREATE TABLE IF NOT EXISTS social_pairs (a TEXT NOT NULL,b TEXT NOT NULL,sender TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'pending',PRIMARY KEY(a,b));
 CREATE TABLE IF NOT EXISTS social_events (id INTEGER PRIMARY KEY AUTOINCREMENT,recipient TEXT NOT NULL,sender TEXT NOT NULL,kind TEXT NOT NULL,body TEXT NOT NULL DEFAULT '',seen INTEGER NOT NULL DEFAULT 0,created_at INTEGER NOT NULL);
 CREATE INDEX IF NOT EXISTS social_inbox ON social_events(recipient,id);
@@ -14,6 +15,10 @@ CREATE TABLE IF NOT EXISTS social_presence (user_id TEXT PRIMARY KEY,updated_at 
       db.prepare("INSERT OR IGNORE INTO social_migrations VALUES('legacy-friends')")
     ]);
   }
+});
+
+export async function handleSocial(request, db, user, readBody) {
+  await ensureSocialSchema(db);
   const url = new URL(request.url), path = url.pathname, method = request.method;
   const rows = async (sql,...args) => (await db.prepare(sql).bind(...args).all()).results;
   const pair = (id) => [user.id,id].sort();
