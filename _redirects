@@ -235,5 +235,4 @@
 /storefront.js /client/store/storefront.js 200
 /storefront.css /client/store/storefront.css 200
 /media-player.css /client/media/media-player.css 200
-/avatar/avatar-studio.js /client/legacy/avatar/avatar-studio.js 200
-/avatar/avatar-studio.css /client/legacy/avatar/avatar-studio.css 200
+/avatar/avatar-studio.html /avatar-studio.html 301
