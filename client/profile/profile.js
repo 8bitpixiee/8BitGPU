@@ -75,10 +75,7 @@ function renderAvatar(avatar) {
   layers.forEach((name) => setLayer(name, base[name] || saved[name] || ""));
   layers.forEach((name) => {
     const image = byId(name + "Layer");
-    const isBody = name === "body" || name === "head";
-    const color = isBody ? avatar?.skinColor : avatar?.itemColors?.[avatar?.selection?.[name]];
-    if (image)
-      image.style.filter = avatar?.bodyAsset && isBody ? whiteSpriteFilter(color) : skinFilter(color);
+    AvatarColors.applyLayer(image, avatar, name, byId("bodyLayer"));
   });
   layers.forEach((name) => {
     const image = byId(name + "Layer");

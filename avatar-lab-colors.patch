@@ -1,0 +1,546 @@
+diff --git a/client/avatar/avatar-studio.js b/client/avatar/avatar-studio.js
+--- a/client/avatar/avatar-studio.js
++++ b/client/avatar/avatar-studio.js
+@@ -347,6 +347,7 @@ function normalizeSkinColor(value) {
+     hue: Math.max(-180, Math.min(180, number("hue", 0))),
+     saturation: Math.max(0, Math.min(200, number("saturation", 100))),
+     lightness: Math.max(60, Math.min(140, number("lightness", 100))),
++    ...(AvatarColors.validHex(value?.hex) ? { hex: value.hex.toLowerCase() } : {}),
+   };
+ }
+ function skinFilter(color = settings.skinColor) {
+@@ -376,17 +377,11 @@ function whiteSpriteFilter(color = settings.skinColor) {
+   );
+ }
+ function applySkinColor() {
+-  ["body", "head"].forEach((layer) => {
+-    const image = document.getElementById(layer + "Layer");
+-    if (image)
+-      image.style.filter = settings.bodyAsset
+-        ? whiteSpriteFilter(settings.skinColor)
+-        : skinFilter(settings.skinColor);
+-  });
+-  adjustableCategories.forEach((category) => {
+-    const image = document.getElementById(category + "Layer");
+-    const selected = selectedOption(category);
+-    if (image) image.style.filter = skinFilter(settings.itemColors[selected.id] || neutralColor());
++  const base = baseFiles();
++  const avatar = { ...settings, selection, layers: { body: base.body } };
++  const body = document.getElementById("bodyLayer");
++  ["body", "head", ...adjustableCategories].forEach(key => {
++    AvatarColors.applyLayer(document.getElementById(key + "Layer"), avatar, key, body);
+   });
+ }
+ function renderSkinSliders() {
+@@ -869,15 +864,10 @@ document.getElementById("cameraButton").addEventListener("click", async () => {
+     await Promise.all(images.map((image) => image.decode?.().catch(() => {})));
+     for (const image of images) {
+       const key = image.id.replace("Layer", "");
+-      const color =
+-        key === "body" || key === "head"
+-          ? settings.skinColor
+-          : settings.itemColors[selectedOption(key)?.id] || neutralColor();
+-      context.filter =
+-        settings.bodyAsset && (key === "body" || key === "head")
+-          ? whiteSpriteFilter(color)
+-          : skinFilter(color);
+-      context.drawImage(image, 0, 0, 700, 700);
++      const avatar = { ...settings, selection, layers: { body: baseFiles().body } };
++      const tinted = await AvatarColors.snapshotLayer(image, avatar, key, document.getElementById("bodyLayer"));
++      context.filter = "none";
++      context.drawImage(tinted, 0, 0, 700, 700);
+     }
+     context.filter = "none";
+     const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/webp", 0.88));
+@@ -913,155 +903,3 @@ document.getElementById("avatarPreview").addEventListener("keydown", (event) =>
+ 
+ renderAll();
+ setStep("species");
+-(() => {
+-    const oldGrid = document.getElementById("speciesGrid");
+-    const browser = document.createElement("section");
+-    browser.id = "bodyBrowser";
+-    browser.setAttribute("aria-label", "Browse body bases");
+-
+-    browser.innerHTML = `
+-        <div class="body-browser-row">
+-            <button type="button" id="previousBody"
+-                aria-label="Previous body">◀</button>
+-
+-            <div id="browsedBodyPreview"
+-                class="body-base-preview" aria-hidden="true"></div>
+-
+-            <button type="button" id="nextBody"
+-                aria-label="Next body">▶</button>
+-        </div>
+-
+-        <p id="bodyBrowserName" aria-live="polite"></p>
+-
+-        <button type="button" id="useBrowsedBody">
+-            Use this body
+-        </button>
+-
+-        <details>
+-            <summary>Browse all bodies…</summary>
+-            <div class="body-browser-gallery"></div>
+-        </details>
+-    `;
+-
+-    oldGrid.before(browser);
+-
+-    let browseIndex = 0;
+-
+-    // Legacy bases have separate body and head images.
+-    const legacyBases = {
+-        "Pixie:Fae": ["body_fem_v1.png", "head_fem_v1.png"],
+-        "Pixie:Masc": ["body_masc_v1.png", "head_masc_v1.png"],
+-        "Pixie:Chunky Masc": [
+-            "body_chunky_masc_v1.png", "head_chunky_masc_v1.png"
+-        ],
+-        "Deerbra:Fae": [
+-            "body_fem_deerbra_v1.png", "head_fem_deerbra_v1.png"
+-        ],
+-        "Bovadill:Highland": [
+-            "bovidil_body_fem_v1.1.png", "bovidil_head_fem_v1.png"
+-        ],
+-        "Thixie:Fae": ["thixie_body_v1.png", "thixie_head_v1.png"]
+-    };
+-
+-    function makePreview(choice) {
+-        const preview = document.createElement("div");
+-        preview.className = "body-base-preview";
+-        preview.setAttribute("aria-hidden", "true");
+-
+-        const files = choice.bodyAsset
+-            ? [choice.bodyAsset]
+-            : legacyBases[choice.species + ":" + choice.build] || [];
+-
+-        const bodySource = files[0] ? asset(files[0]) : "";
+-
+-        files.forEach((file, index) => {
+-            const image = document.createElement("img");
+-            const category = index === 0 ? "body" : "head";
+-            const source = asset(file);
+-
+-            image.alt = "";
+-            image.loading = "lazy";
+-            image.src = source;
+-
+-            AvatarLayout.ready.then(() => {
+-                AvatarLayout.apply(image, bodySource, category, source);
+-            });
+-
+-            preview.appendChild(image);
+-        });
+-
+-        return preview;
+-    }
+-
+-    const gallery = browser.querySelector(".body-browser-gallery");
+-
+-    beingChoices.forEach((choice, index) => {
+-        const button = document.createElement("button");
+-        button.type = "button";
+-        button.append(makePreview(choice), choice.name);
+-
+-        button.addEventListener("click", () => {
+-            browseIndex = index;
+-            renderBrowser();
+-        });
+-
+-        gallery.appendChild(button);
+-    });
+-
+-    function renderBrowser() {
+-        const choice = beingChoices[browseIndex];
+-        const selected =
+-            settings.species === choice.species &&
+-            settings.build === choice.build;
+-
+-        document.getElementById("browsedBodyPreview")
+-            .replaceChildren(...makePreview(choice).children);
+-
+-        document.getElementById("bodyBrowserName").textContent =
+-            choice.name + " · " +
+-            (browseIndex + 1) + " of " + beingChoices.length;
+-
+-        const useButton = document.getElementById("useBrowsedBody");
+-        useButton.textContent = selected ? "Selected ✓" : "Use this body";
+-        useButton.disabled = selected;
+-
+-        gallery.querySelectorAll("button").forEach((button, index) => {
+-            button.setAttribute(
+-                "aria-pressed",
+-                String(index === browseIndex)
+-            );
+-        });
+-    }
+-
+-    document.getElementById("previousBody").onclick = () => {
+-        browseIndex =
+-            (browseIndex - 1 + beingChoices.length) % beingChoices.length;
+-        renderBrowser();
+-    };
+-
+-    document.getElementById("nextBody").onclick = () => {
+-        browseIndex = (browseIndex + 1) % beingChoices.length;
+-        renderBrowser();
+-    };
+-
+-    document.getElementById("useBrowsedBody").onclick = () => {
+-        // Reuse the existing body-selection behavior.
+-        oldGrid.querySelectorAll("button[data-species]")[browseIndex]?.click();
+-    };
+-
+-    function syncSelectedBody() {
+-        const index = beingChoices.findIndex(choice =>
+-            choice.species === settings.species &&
+-            choice.build === settings.build
+-        );
+-
+-        browseIndex = index >= 0 ? index : 0;
+-        renderBrowser();
+-    }
+-
+-    new MutationObserver(syncSelectedBody).observe(oldGrid, {
+-        childList: true
+-    });
+-
+-    syncSelectedBody();
+-})();
+\ No newline at end of file
+diff --git a/client/desktop/script.js b/client/desktop/script.js
+--- a/client/desktop/script.js
++++ b/client/desktop/script.js
+@@ -30,21 +30,10 @@ function loadSavedOutfit() {
+     });
+   };
+   const applySkinColor = (saved) => {
+-    const filterFor = (color, tintWhite = false) => {
+-      const value = (key, fallback) =>
+-        Number.isFinite(Number(color?.[key])) ? Number(color[key]) : fallback;
+-      const hue = Math.max(-180, Math.min(180, value("hue", 0))),
+-        saturation = Math.max(0, Math.min(200, value("saturation", 100))),
+-        lightness = Math.max(60, Math.min(140, value("lightness", 100)));
+-      if (tintWhite && (hue !== 0 || saturation !== 100 || lightness !== 100))
+-        return `sepia(100%) saturate(${Math.max(100, saturation * 4)}%) hue-rotate(${hue - 28}deg) brightness(${lightness}%)`;
+-      return tintWhite ? "none" : `hue-rotate(${hue}deg) saturate(${saturation}%) brightness(${lightness}%)`;
+-    };
+-    document.querySelectorAll("#companion .avatar-layer, [data-avatar-layer]").forEach((layer) => {
++    const body = document.getElementById("bodyLayer");
++    document.querySelectorAll("#companion .avatar-layer, [data-avatar-layer]").forEach(layer => {
+       const key = (layer.id || layer.dataset.avatarLayer || "").replace("Layer", "");
+-      const isBody = key === "body" || key === "head";
+-      const color = isBody ? saved.skinColor : saved.itemColors?.[saved.selection?.[key]];
+-      layer.style.filter = filterFor(color, Boolean(saved.bodyAsset && isBody));
++      AvatarColors.applyLayer(layer, saved, key, body);
+     });
+   };
+ 
+diff --git a/client/profile/profile.js b/client/profile/profile.js
+--- a/client/profile/profile.js
++++ b/client/profile/profile.js
+@@ -74,10 +74,7 @@ function renderAvatar(avatar) {
+   layers.forEach((name) => setLayer(name, base[name] || saved[name] || ""));
+   layers.forEach((name) => {
+     const image = byId(name + "Layer");
+-    const isBody = name === "body" || name === "head";
+-    const color = isBody ? avatar?.skinColor : avatar?.itemColors?.[avatar?.selection?.[name]];
+-    if (image)
+-      image.style.filter = avatar?.bodyAsset && isBody ? whiteSpriteFilter(color) : skinFilter(color);
++    AvatarColors.applyLayer(image, avatar, name, byId("bodyLayer"));
+   });
+   layers.forEach((name) => {
+     const image = byId(name + "Layer");
+diff --git a/client/arcade/arcade.js b/client/arcade/arcade.js
+--- a/client/arcade/arcade.js
++++ b/client/arcade/arcade.js
+@@ -124,11 +124,9 @@ function renderMembers(members) {
+         const adjustment = m.avatar.adjustments[key];
+         if (adjustment)
+           img.style.transform = `translate(${adjustment.x}%,${adjustment.y}%) scale(${adjustment.scale})`;
+-        const isBody = key === "body" || key === "head";
+-        const color = isBody ? m.avatar.skinColor : m.avatar.itemColors?.[m.avatar.selection?.[key]];
+-        img.style.filter = isBody && m.avatar.bodyAsset ? whiteBodyFilter(color) : skinFilter(color);
++        AvatarColors.applyLayer(img, m.avatar, key, motion.querySelector('[data-avatar-color-layer="body"]'))
++          .then(() => window.AvatarAnimations?.attach(node, img, source));
+         motion.append(img);
+-        window.AvatarAnimations?.attach(node, img, source);
+       }
+       node.dataset.avatar = signature;
+     }
+@@ -516,7 +514,10 @@ async function roomSnapshot() {
+     for (const image of node.querySelectorAll("img,canvas")) {
+       try {
+         await image.decode?.();
+-        context.drawImage(image, left, top, width, height);
++        const avatar = JSON.parse(node.dataset.avatar || "{}");
++        const key = image.dataset.avatarColorLayer;
++        const tinted = key ? await AvatarColors.snapshotLayer(image, avatar, key, node.querySelector('[data-avatar-color-layer="body"]')) : image;
++        context.drawImage(tinted, left, top, width, height);
+       } catch {
+         /* Skip a still-loading layer. */
+       }
+diff --git a/client/arcade/avatar-animations.js b/client/arcade/avatar-animations.js
+--- a/client/arcade/avatar-animations.js
++++ b/client/arcade/avatar-animations.js
+@@ -54,6 +54,8 @@
+         canvas.width = info.width;
+         canvas.height = info.height;
+         canvas.style.cssText = image.style.cssText;
++        canvas.dataset.avatarColorLayer = image.dataset.avatarColorLayer || "";
++        canvas.dataset.avatarSource = source;
+         canvas.setAttribute("aria-hidden", "true");
+         const context = canvas.getContext("2d");
+         context.imageSmoothingEnabled = false;
+diff --git a/server/chat/chat-avatar.js b/server/chat/chat-avatar.js
+--- a/server/chat/chat-avatar.js
++++ b/server/chat/chat-avatar.js
+@@ -83,6 +83,7 @@ export function roomAvatar(json) {
+     hue: Math.max(-180, Math.min(180, value("hue", 0))),
+     saturation: Math.max(0, Math.min(200, value("saturation", 100))),
+     lightness: Math.max(60, Math.min(140, value("lightness", 100))),
++    ...(typeof color.hex === "string" && /^#[0-9a-f]{6}$/i.test(color.hex) ? { hex: color.hex.toLowerCase() } : {}),
+   };
+   return {
+     layers,
+diff --git a/avatar-studio.html b/avatar-studio.html
+--- a/avatar-studio.html
++++ b/avatar-studio.html
+@@ -9,7 +9,9 @@
+     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="client/avatar/avatar-studio.css">
+ <link rel="stylesheet" href="client/shared/retro-windows.css">
++
+ <link rel="stylesheet" href="client/avatar/avatar-paint.css">
++<link rel="stylesheet" href="client/avatar/avatar-color-picker.css">
+ </head>
+ <body>
+     <main class="lab-window">
+@@ -126,10 +128,10 @@
+             </section>
+         </div>
+     </main>
+-    <script src="client/avatar/avatar-studio.js"></script>
+-<script src="client/shared/window-theme.js"></script></body>
++<script src="client/shared/avatar-colors.js"></script>
+ <script src="client/avatar/avatar-studio.js"></script>
+ <script src="client/shared/window-theme.js"></script>
+ <script src="client/avatar/avatar-paint.js"></script>
++<script src="client/avatar/avatar-color-picker.js"></script>
+ </body>
+ </html>
+diff --git a/index.html b/index.html
+--- a/index.html
++++ b/index.html
+@@ -271,6 +271,7 @@
+             <button id="osTray" type="button" onclick="cycleAngelTime()" aria-label="Change angel time message"></button>
+         </div>
+     </nav>
++<script src="client/shared/avatar-colors.js"></script>
+ <script src="client/desktop/script.js"></script>
+ 
+ <script src="client/shared/window-theme.js"></script><script src="client/desktop/desktop-social.js"></script></body>
+diff --git a/profile.html b/profile.html
+--- a/profile.html
++++ b/profile.html
+@@ -101,7 +101,8 @@
+             </form>
+         </section>
+     </main>
+-    <script src="client/profile/profile.js"></script><script src="client/profile/profile-layout.js"></script><script src="client/profile/profile-social.js"></script>
++    <script src="client/shared/avatar-colors.js"></script>
++<script src="client/profile/profile.js"></script><script src="client/profile/profile-layout.js"></script><script src="client/profile/profile-social.js"></script>
+ <script src="client/shared/window-theme.js"></script></body>
+ </html>
+ 
+diff --git a/arcade.html b/arcade.html
+--- a/arcade.html
++++ b/arcade.html
+@@ -7,5 +7,6 @@
+ <div class="room-layout"><section id="arcadeMap" aria-label="Arcade room"><div id="mapStage" tabindex="0" role="application" aria-label="Use arrows or WASD to walk. Click the floor to move."><div class="room-sign">PIXIE LAUNCHPAD<small>Make yourself at home ✦</small></div><div id="players"></div><div id="walkMarker" hidden></div></div><p class="movement-hint">CLICK / TAP TO WALK · WASD / ARROWS</p></section>
+ <aside class="room-chat"><div class="chat-heading">ROOM CHAT <a href="chat.html">Moderation &amp; blocks ↗</a></div><div class="emote-bar" aria-label="Avatar emotes"><button type="button" data-emote="dance">Dance</button><button type="button" data-emote="twerk">Twerk</button><button type="button" data-emote="smoke">Smoke</button><button type="button" data-emote="drink">Drink</button><button type="button" data-emote="shroom">Shroom</button><button type="button" data-emote="laugh">LOL</button><button type="button" data-emote="spin">Spin</button><button type="button" data-emote="wave">Wave</button><button type="button" data-emote="crashout">Crashout</button><button type="button" data-emote="fly" aria-pressed="false">Fly</button></div><div class="activity-bar"><button type="button" id="activitiesToggle" aria-expanded="false">✦ Lounge activities</button></div><section id="loungeActivities" hidden aria-label="Lounge activities"><div class="activity-tabs"><button type="button" data-activity-tab="grow">Grow</button><button type="button" data-activity-tab="roll">Roll</button><button type="button" data-activity-tab="mix">Mix</button></div><div id="activityContent"></div><p id="moodletStatus" aria-live="polite"></p></section><div id="roomMessages" role="log" aria-label="Room messages" aria-live="polite"></div><form id="roomComposer"><label for="roomMessage">Say something · Shift+Enter for a new line</label><textarea id="roomMessage" maxlength="500" rows="2" placeholder="Say hello..." required disabled></textarea><button id="sendMessage" disabled>Send ✦</button></form></aside></div>
+ <footer><span id="identity">Sign in with your own Being</span><span>Private preview</span></footer>
+-</main><link rel="stylesheet" href="client/arcade/arcade-profile.css"><link rel="stylesheet" href="client/arcade/arcade-mobile.css"><script src="client/arcade/avatar-animations.js"></script><script src="client/arcade/arcade.js"></script><script src="client/arcade/arcade-profile.js"></script><script src="client/shared/window-theme.js"></script></body></html>
++</main><link rel="stylesheet" href="client/arcade/arcade-profile.css"><link rel="stylesheet" href="client/arcade/arcade-mobile.css"><script src="client/arcade/avatar-animations.js"></script><script src="client/shared/avatar-colors.js"></script>
++<script src="client/arcade/arcade.js"></script><script src="client/arcade/arcade-profile.js"></script><script src="client/shared/window-theme.js"></script></body></html>
+ 
+diff --git a/client/shared/avatar-colors.js b/client/shared/avatar-colors.js
+new file mode 100644
+--- /dev/null
++++ b/client/shared/avatar-colors.js
+@@ -0,0 +1,86 @@
++/* Shared avatar tinting. Original saves remain valid; new colors use #RRGGBB. */
++(() => {
++  const validHex = value => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
++  const clamp = (value,min,max,fallback) => Number.isFinite(Number(value)) ? Math.max(min,Math.min(max,Number(value))) : fallback;
++  const references = new Map();
++  const revisions = new WeakMap();
++  const matrices = new Map();
++  const luminance = rgb => .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2];
++  const rgbHex = rgb => '#'+rgb.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
++  const hexRgb = hex => hex.slice(1).match(/../g).map(v=>parseInt(v,16));
++  function legacy(color,white=false) {
++    const h=clamp(color?.hue,-180,180,0),s=clamp(color?.saturation,0,200,100),l=clamp(color?.lightness,60,140,100);
++    if(white) return h===0&&s===100&&l===100 ? 'none' : `sepia(100%) saturate(${Math.max(100,s*4)}%) hue-rotate(${h-28}deg) brightness(${l}%)`;
++    return `hue-rotate(${h}deg) saturate(${s}%) brightness(${l}%)`;
++  }
++  function reference(source) {
++    if(!source)return Promise.resolve([200,180,210]);
++    const url=new URL(source,location.href).href;
++    if(!references.has(url)) references.set(url,(async()=>{
++      const image=new Image();image.src=url;await image.decode();
++      const canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
++      const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(image,0,0);
++      const {data}=ctx.getImageData(0,0,canvas.width,canvas.height),counts=new Map();
++      let best=0,winner=[200,180,210];
++      for(let i=0;i<data.length;i+=4){
++        if(data[i+3]<220||luminance([data[i],data[i+1],data[i+2]])<30)continue;
++        const key=(data[i]<<16)|(data[i+1]<<8)|data[i+2],count=(counts.get(key)||0)+1;counts.set(key,count);
++        if(count>best){best=count;winner=[data[i],data[i+1],data[i+2]];}
++      }
++      return winner;
++    })().catch(()=>[200,180,210]));
++    return references.get(url);
++  }
++  function matrix(hex,base) {
++    const level=Math.max(1,luminance(base)),key=hex.toLowerCase()+':'+level.toFixed(3);
++    if(matrices.has(key))return matrices.get(key);
++    let svg=document.getElementById('avatarColorFilters');
++    const ns='http://www.w3.org/2000/svg';
++    if(!svg){svg=document.createElementNS(ns,'svg');svg.id='avatarColorFilters';svg.setAttribute('aria-hidden','true');svg.style.cssText='position:absolute;width:0;height:0;overflow:hidden;pointer-events:none';document.body.append(svg);}
++    const id='avatarTint'+matrices.size,filter=document.createElementNS(ns,'filter'),colorMatrix=document.createElementNS(ns,'feColorMatrix');
++    filter.id=id;filter.setAttribute('color-interpolation-filters','sRGB');filter.setAttribute('x','0%');filter.setAttribute('y','0%');filter.setAttribute('width','100%');filter.setAttribute('height','100%');
++    const values=hexRgb(hex).flatMap(channel=>[channel/level*.2126,channel/level*.7152,channel/level*.0722,0,0]);
++    values.push(0,0,0,1,0);colorMatrix.setAttribute('type','matrix');colorMatrix.setAttribute('values',values.join(' '));filter.append(colorMatrix);svg.append(filter);
++    const result=`url("#${id}")`;matrices.set(key,result);return result;
++  }
++  async function resolve(avatar,key,bodyImage) {
++    const skin=['body','head','chest'].includes(key);
++    const color=skin ? avatar?.skinColor : avatar?.itemColors?.[avatar?.selection?.[key]];
++    const white=Boolean(avatar?.bodyAsset&&skin);
++    if(validHex(color?.hex))return {hex:color.hex};
++    if(key==='chest'){
++      const source=bodyImage?.getAttribute('src')||bodyImage?.dataset.avatarSource||avatar?.layers?.body;
++      if(source){
++        const rgb=await reference(source),canvas=document.createElement('canvas');canvas.width=canvas.height=1;
++        const ctx=canvas.getContext('2d');ctx.filter=legacy(color,white);ctx.fillStyle=rgbHex(rgb);ctx.fillRect(0,0,1,1);
++        return {hex:rgbHex([...ctx.getImageData(0,0,1,1).data].slice(0,3))};
++      }
++    }
++    return {filter:legacy(color,white)};
++  }
++  async function applyLayer(image,avatar,key,bodyImage) {
++    if(!image)return;
++    const revision=(revisions.get(image)||0)+1;revisions.set(image,revision);
++    const source=image.getAttribute('src');
++    image.dataset.avatarColorLayer=key;
++    if(!source){image.style.filter='none';return;}
++    const result=await resolve(avatar,key,bodyImage);
++    const base=result.hex ? await reference(source) : null;
++    if(revisions.get(image)!==revision||image.getAttribute('src')!==source)return;
++    image.style.filter=result.hex ? matrix(result.hex,base) : result.filter;
++  }
++  async function snapshotLayer(image,avatar,key,bodyImage) {
++    await image.decode?.();
++    const canvas=document.createElement('canvas');canvas.width=image.naturalWidth||image.width;canvas.height=image.naturalHeight||image.height;
++    const ctx=canvas.getContext('2d',{willReadFrequently:true});
++    const result=await resolve(avatar,key,bodyImage);
++    ctx.filter=result.hex ? 'none' : result.filter;ctx.drawImage(image,0,0);
++    if(result.hex){
++      const level=Math.max(1,luminance(await reference(image.src||image.dataset.avatarSource))),rgb=hexRgb(result.hex),pixels=ctx.getImageData(0,0,canvas.width,canvas.height);
++      for(let i=0;i<pixels.data.length;i+=4){if(!pixels.data[i+3])continue;const factor=luminance([pixels.data[i],pixels.data[i+1],pixels.data[i+2]])/level;for(let j=0;j<3;j++)pixels.data[i+j]=Math.min(255,Math.round(rgb[j]*factor));}
++      ctx.putImageData(pixels,0,0);
++    }
++    return canvas;
++  }
++  window.AvatarColors={validHex,legacy,reference,applyLayer,snapshotLayer};
++})();
+diff --git a/client/avatar/avatar-color-picker.js b/client/avatar/avatar-color-picker.js
+new file mode 100644
+--- /dev/null
++++ b/client/avatar/avatar-color-picker.js
+@@ -0,0 +1,65 @@
++// Load after avatar-studio.js and avatar-paint.js.
++(() => {
++  const defaults={skin:'#c5a2c9',item:'#b998dd'};
++  const neutral=()=>({hue:0,saturation:100,lightness:100});
++  function hsl(hex){
++    const [r,g,b]=hex.slice(1).match(/../g).map(v=>parseInt(v,16)/255),max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min,l=(max+min)/2;
++    let h=0;if(d)h=max===r?((g-b)/d+6)%6:max===g?(b-r)/d+2:(r-g)/d+4;
++    return {h:Math.round(h*60),s:Math.round(d?d/(1-Math.abs(2*l-1))*100:0),l:Math.round(l*100)};
++  }
++  function hex(h,s,l){
++    s/=100;l/=100;const c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2;
++    const rgb=h<60?[c,x,0]:h<120?[x,c,0]:h<180?[0,c,x]:h<240?[0,x,c]:h<300?[x,0,c]:[c,0,x];
++    return '#'+rgb.map(v=>Math.round((v+m)*255).toString(16).padStart(2,'0')).join('');
++  }
++  const controls=[];
++  function build(id,kind){
++    const field=document.getElementById(id);field.classList.add('avatar-color-part');field.replaceChildren();
++    const legend=document.createElement('legend');field.append(legend);
++    const heading=document.createElement('div');heading.className='avatar-color-heading';
++    const well=document.createElement('input');well.type='color';well.setAttribute('aria-label',kind==='skin'?'Skin full spectrum color':'Selected item full spectrum color');
++    const text=document.createElement('input');text.type='text';text.maxLength=7;text.pattern='#[0-9A-Fa-f]{6}';text.setAttribute('aria-label','Hex color, for example #b998dd');text.spellcheck=false;
++    heading.append(well,text);field.append(heading);
++    const channels={};let draftHex=null,draftHsl=null;
++    for(const [key,name,max] of [['h','Hue',360],['s','Saturation',100],['l','Lightness',100]]){
++      const row=document.createElement('label'),output=document.createElement('output'),range=document.createElement('input');
++      row.textContent=name+' ';row.append(output);range.type='range';range.min=0;range.max=max;range.step=1;range.setAttribute('aria-label',(kind==='skin'?'Skin ': 'Item ')+name);
++      field.append(row,range);channels[key]={range,output};
++      range.oninput=()=>{const values={h:+channels.h.range.value,s:+channels.s.range.value,l:+channels.l.range.value};commit(hex(values.h,values.s,values.l),values);};
++    }
++    const reset=document.createElement('button');reset.type='button';reset.textContent='Original palette';field.append(reset);
++    const hint=document.createElement('p');hint.className='avatar-color-hint';field.append(hint);
++    function linked(){return kind==='skin'||activePickerCategory==='chest';}
++    function color(){return linked()?settings.skinColor:settings.itemColors[selectedOption(activePickerCategory).id];}
++    function commit(value,values=null){
++      if(!AvatarColors.validHex(value))return;
++      const next={...neutral(),hex:value.toLowerCase()};
++      draftHex=next.hex;draftHsl=values;
++      if(linked())settings.skinColor=next;else settings.itemColors[selectedOption(activePickerCategory).id]=next;
++      update();applySkinColor();
++    }
++    function update(){
++      const value=color(),custom=AvatarColors.validHex(value?.hex),current=custom?value.hex:defaults[kind];
++      const values=draftHex===current&&draftHsl?draftHsl:hsl(current),selected=kind==='item'?selectedOption(activePickerCategory):null;
++      const enabled=kind==='skin'||Boolean(selected?.src);
++      legend.textContent=kind==='skin'?'Skin color':activePickerCategory==='chest'?'Chest — linked to skin':'Color '+selected.name;
++      well.value=current;text.value=custom?current:'';text.placeholder=current;
++      Object.entries(channels).forEach(([key,{range,output}])=>{range.value=values[key];output.textContent=values[key]+(key==='h'?'°':'%');range.disabled=!enabled;});
++      well.disabled=text.disabled=reset.disabled=!enabled;
++      channels.h.range.style.background='linear-gradient(90deg,red,#ff0,#0f0,#0ff,#00f,#f0f,red)';
++      channels.s.range.style.background=`linear-gradient(90deg,${hex(values.h,0,values.l)},${hex(values.h,100,values.l)})`;
++      channels.l.range.style.background=`linear-gradient(90deg,#000,${hex(values.h,values.s,50)},#fff)`;
++      hint.textContent=!enabled?'Choose an item first.':activePickerCategory==='chest'&&kind==='item'?'Changing this color also changes the body and head.':custom?'Full-spectrum tint. Black outlines and shading are preserved.':'Original palette active. Pick a color to start a full-spectrum tint.';
++    }
++    well.oninput=()=>commit(well.value);
++    text.oninput=()=>{text.setCustomValidity(text.value&&!AvatarColors.validHex(text.value)?'Enter a color such as #b998dd.':'');if(AvatarColors.validHex(text.value))commit(text.value);};
++    text.onchange=()=>{if(!AvatarColors.validHex(text.value))update();};
++    reset.onclick=()=>{draftHex=draftHsl=null;if(linked())settings.skinColor=neutral();else delete settings.itemColors[selectedOption(activePickerCategory).id];update();applySkinColor();};
++    controls.push(update);return update;
++  }
++  const skin=build('skinSliderControls','skin'),item=build('itemColorControls','item');
++  renderSkinSliders=skin;
++  renderItemSliders=item;
++  controls.forEach(update=>update());
++  applySkinColor();
++})();
+diff --git a/client/avatar/avatar-color-picker.css b/client/avatar/avatar-color-picker.css
+new file mode 100644
+--- /dev/null
++++ b/client/avatar/avatar-color-picker.css
+@@ -0,0 +1,13 @@
++.avatar-color-part {display:grid!important;grid-template-columns:1fr!important;gap:6px!important;margin:12px 0!important;padding:10px!important;border:2px groove var(--panel)!important;color:var(--ink)!important;}
++.avatar-color-part legend {font-weight:bold;font-size:12px!important;padding:0 5px;}
++.avatar-color-heading {display:grid;grid-template-columns:48px minmax(0,1fr);gap:8px;align-items:center;}
++.avatar-color-part .avatar-color-heading input[type=color] {box-sizing:border-box;width:48px;height:38px;padding:2px;border:2px inset var(--panel);cursor:pointer;}
++.avatar-color-part .avatar-color-heading input[type=text] {box-sizing:border-box;width:100%;min-width:0;padding:7px;border:2px inset var(--panel);background:var(--paper);color:var(--ink);font-size:13px;}
++.avatar-color-part label {display:flex;align-items:center;justify-content:space-between;font-size:12px!important;}
++.avatar-color-part output {color:var(--ink)!important;font-size:12px!important;}
++.avatar-color-part input[type=range] {appearance:none;box-sizing:border-box;width:100%;height:12px;border:1px inset var(--panel);border-radius:0;cursor:pointer;}
++.avatar-color-part input[type=range]::-webkit-slider-thumb {appearance:none;width:12px;height:20px;border:2px outset var(--panel);border-radius:0;background:var(--panel);}
++.avatar-color-part input[type=range]::-moz-range-thumb {width:10px;height:18px;border:2px outset var(--panel);border-radius:0;background:var(--panel);}
++.avatar-color-part button {justify-self:start;padding:6px 9px;border:2px outset var(--panel);border-radius:0;background:var(--panel);color:var(--control-ink);font-size:12px!important;cursor:pointer;}
++.avatar-color-part .avatar-color-hint {font-size:11px!important;line-height:1.5;margin:3px 0;color:var(--ink);}
++.avatar-color-part input:disabled,.avatar-color-part button:disabled {opacity:.45;cursor:default;}

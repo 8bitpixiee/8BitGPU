@@ -122,12 +122,20 @@ function renderMembers(members) {
         img.alt = "";
         img.onerror = () => img.remove();
         AvatarLayout.apply(img, m.avatar.layers.body, key, source);
-        if (m.avatar.adjustments[key]) img.style.transform = AvatarLayout.transform(m.avatar, key);
-        const isBody = key === "body" || key === "head";
-        const color = isBody ? m.avatar.skinColor : m.avatar.itemColors?.[m.avatar.selection?.[key]];
-        img.style.filter = isBody && m.avatar.bodyAsset ? whiteBodyFilter(color) : skinFilter(color);
+
+        if (m.avatar.adjustments[key]) {
+          img.style.transform = AvatarLayout.transform(m.avatar, key);
+        }
+
+        AvatarColors.applyLayer(
+          img,
+          m.avatar,
+          key,
+          motion.querySelector('[data-avatar-color-layer="body"]')
+        ).then(() => {
+          window.AvatarAnimations?.attach(node, img, source);
+        });
         motion.append(img);
-        window.AvatarAnimations?.attach(node, img, source);
       }
       node.dataset.avatar = signature;
     }
@@ -518,7 +526,10 @@ async function roomSnapshot() {
         height = (box.height / bounds.height) * size;
       try {
         await image.decode?.();
-        context.drawImage(image, left, top, width, height);
+        const avatar = JSON.parse(node.dataset.avatar || "{}");
+        const key = image.dataset.avatarColorLayer;
+        const tinted = key ? await AvatarColors.snapshotLayer(image, avatar, key, node.querySelector('[data-avatar-color-layer="body"]')) : image;
+        context.drawImage(tinted, left, top, width, height);
       } catch {
         /* Skip a still-loading layer. */
       }

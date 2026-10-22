@@ -83,6 +83,7 @@ export function roomAvatar(json) {
     hue: Math.max(-180, Math.min(180, value("hue", 0))),
     saturation: Math.max(0, Math.min(200, value("saturation", 100))),
     lightness: Math.max(60, Math.min(140, value("lightness", 100))),
+    ...(typeof color.hex === "string" && /^#[0-9a-f]{6}$/i.test(color.hex) ? { hex: color.hex.toLowerCase() } : {}),
   };
   return {
     layers,
