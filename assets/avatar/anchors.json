@@ -1,0 +1,418 @@
+{
+  "version": 2,
+  "stage": 50,
+  "canvas": {
+    "standard": {
+      "w": 48,
+      "h": 43,
+      "x": 1,
+      "y": 9
+    },
+    "wide": {
+      "w": 50,
+      "h": 50,
+      "x": 0,
+      "y": 0
+    }
+  },
+  "wide": [
+    "Boob_1.png",
+    "Clanker_F.png",
+    "Clanker_M.png",
+    "Maxie_F.png",
+    "Maxie_M.png",
+    "Null.png",
+    "anthro_m.png",
+    "antrho_f.png",
+    "femme.png",
+    "macho.png",
+    "mermaid_f.png",
+    "mermaid_m.png",
+    "voidling_f.png",
+    "voidling_m.png"
+  ],
+  "rigs": {
+    "body_fem_v": {
+      "chest": {
+        "x": -1,
+        "y": 8
+      }
+    },
+    "body_masc_v": {
+      "eyes": {
+        "x": 0,
+        "y": 2
+      },
+      "chest": {
+        "x": -1,
+        "y": 8
+      }
+    },
+    "body_chunky_masc_v": {
+      "eyes": {
+        "x": 0,
+        "y": 3
+      },
+      "chest": {
+        "x": -1,
+        "y": 8
+      }
+    },
+    "body_fem_deerbra_v": {
+      "chest": {
+        "x": -1,
+        "y": 8
+      }
+    },
+    "bovidil_body_fem_": {
+      "chest": {
+        "x": -1,
+        "y": 8
+      }
+    },
+    "thixie_body_v": {
+      "chest": {
+        "x": -1,
+        "y": 8
+      }
+    },
+    "Null.png": {
+      "ears": {
+        "x": 2,
+        "y": -12
+      },
+      "eyes": {
+        "x": 2,
+        "y": -12
+      },
+      "hair": {
+        "x": 2,
+        "y": -12
+      },
+      "fit": {
+        "x": 2,
+        "y": -11
+      },
+      "extra": {
+        "x": 2,
+        "y": -11
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "femme.png": {
+      "ears": {
+        "x": 2,
+        "y": -12
+      },
+      "eyes": {
+        "x": 2,
+        "y": -12
+      },
+      "hair": {
+        "x": 2,
+        "y": -12
+      },
+      "fit": {
+        "x": 2,
+        "y": -10
+      },
+      "extra": {
+        "x": 2,
+        "y": -10
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "macho.png": {
+      "ears": {
+        "x": 2,
+        "y": -13
+      },
+      "eyes": {
+        "x": 2,
+        "y": -13
+      },
+      "hair": {
+        "x": 2,
+        "y": -13
+      },
+      "fit": {
+        "x": 2,
+        "y": -11
+      },
+      "extra": {
+        "x": 2,
+        "y": -11
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "Maxie_F.png": {
+      "ears": {
+        "x": 2,
+        "y": -12
+      },
+      "eyes": {
+        "x": 2,
+        "y": -12
+      },
+      "hair": {
+        "x": 2,
+        "y": -12
+      },
+      "fit": {
+        "x": 2,
+        "y": -11
+      },
+      "extra": {
+        "x": 2,
+        "y": -11
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "Maxie_M.png": {
+      "ears": {
+        "x": 2,
+        "y": -12
+      },
+      "eyes": {
+        "x": 2,
+        "y": -12
+      },
+      "hair": {
+        "x": 2,
+        "y": -12
+      },
+      "fit": {
+        "x": 2,
+        "y": -11
+      },
+      "extra": {
+        "x": 2,
+        "y": -11
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "antrho_f.png": {
+      "ears": {
+        "x": 3,
+        "y": -12
+      },
+      "eyes": {
+        "x": 3,
+        "y": -12
+      },
+      "hair": {
+        "x": 3,
+        "y": -12
+      },
+      "fit": {
+        "x": 3,
+        "y": -10
+      },
+      "extra": {
+        "x": 3,
+        "y": -10
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "anthro_m.png": {
+      "ears": {
+        "x": 5,
+        "y": -12
+      },
+      "eyes": {
+        "x": 5,
+        "y": -12
+      },
+      "hair": {
+        "x": 5,
+        "y": -12
+      },
+      "fit": {
+        "x": 5,
+        "y": -10
+      },
+      "extra": {
+        "x": 5,
+        "y": -10
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "Clanker_F.png": {
+      "ears": {
+        "x": 1,
+        "y": -11
+      },
+      "eyes": {
+        "x": 1,
+        "y": -11
+      },
+      "hair": {
+        "x": 1,
+        "y": -11
+      },
+      "fit": {
+        "x": 1,
+        "y": -11
+      },
+      "extra": {
+        "x": 1,
+        "y": -11
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "Clanker_M.png": {
+      "ears": {
+        "x": 2,
+        "y": -14
+      },
+      "eyes": {
+        "x": 2,
+        "y": -14
+      },
+      "hair": {
+        "x": 2,
+        "y": -14
+      },
+      "fit": {
+        "x": 2,
+        "y": -13
+      },
+      "extra": {
+        "x": 2,
+        "y": -13
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "mermaid_f.png": {
+      "ears": {
+        "x": 2,
+        "y": -12
+      },
+      "eyes": {
+        "x": 2,
+        "y": -12
+      },
+      "hair": {
+        "x": 2,
+        "y": -12
+      },
+      "fit": {
+        "x": 2,
+        "y": -10
+      },
+      "extra": {
+        "x": 2,
+        "y": -10
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "mermaid_m.png": {
+      "ears": {
+        "x": 0,
+        "y": -14
+      },
+      "eyes": {
+        "x": 0,
+        "y": -14
+      },
+      "hair": {
+        "x": 0,
+        "y": -14
+      },
+      "fit": {
+        "x": 0,
+        "y": -11
+      },
+      "extra": {
+        "x": 0,
+        "y": -11
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "voidling_f.png": {
+      "ears": {
+        "x": 2,
+        "y": -12
+      },
+      "eyes": {
+        "x": 2,
+        "y": -12
+      },
+      "hair": {
+        "x": 2,
+        "y": -12
+      },
+      "fit": {
+        "x": 2,
+        "y": -11
+      },
+      "extra": {
+        "x": 2,
+        "y": -11
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "voidling_m.png": {
+      "ears": {
+        "x": 2,
+        "y": -12
+      },
+      "eyes": {
+        "x": 2,
+        "y": -12
+      },
+      "hair": {
+        "x": 2,
+        "y": -12
+      },
+      "fit": {
+        "x": 2,
+        "y": -11
+      },
+      "extra": {
+        "x": 2,
+        "y": -11
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  }
+}
