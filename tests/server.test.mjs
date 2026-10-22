@@ -56,3 +56,20 @@ test("roomAvatar only trusts the new layout flag when it is really there", () =>
     2,
   );
 });
+
+test("cleanPicks only takes real badges, five at most, no repeats", async () => {
+  const { cleanPicks } = await import("../server/badges.js");
+  assert.deepEqual(cleanPicks(["gamer", "cozy"]), ["gamer", "cozy"]);
+  assert.equal(cleanPicks(["gamer", "gamer"]), null);
+  assert.equal(cleanPicks(["pixiee-pal"]), null);
+  assert.equal(cleanPicks(["gamer", "cozy", "artist", "dancer", "builder", "streamer"]), null);
+  assert.equal(cleanPicks("gamer"), null);
+});
+
+test("friends of the devs earn their badge, case doesn't matter", async () => {
+  const { earnedBadges } = await import("../server/badges.js");
+  assert.deepEqual(earnedBadges("someone", ["8Bit_Pixiee.dev", "bob"]), ["pixiee-pal"]);
+  assert.deepEqual(earnedBadges("someone", ["PICKLE", "8bit_pixiee.dev"]), ["pickle-pal", "pixiee-pal"]);
+  assert.deepEqual(earnedBadges("someone", ["bob"]), []);
+  assert.deepEqual(earnedBadges("Pickle", []), ["crew"]);
+});
