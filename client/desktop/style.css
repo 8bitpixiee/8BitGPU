@@ -279,11 +279,17 @@ h1, h2, .window-bar, .desktop-icon span {
 .being-frame::after { right: 9px; bottom: 7px; color: #f0c7ff; }
 #beingDock #companion {
     position: absolute;
-    bottom: -33px;
+    bottom: -6px;
     left: -18px;
     width: 254px;
     height: 254px;
     z-index: 2;
+}
+#beingDock #companion.is-wide {
+    bottom: -4px;
+    left: 16px;
+    width: 182px;
+    height: 182px;
 }
 #beingEmptyState {
     position: absolute;

@@ -48,3 +48,11 @@ test("roomAvatar drops layer paths that try to climb out", () => {
   assert.equal(avatar.layers.hair, undefined);
   assert.equal(avatar.layers.eyes, "assets/avatar/eyes_fem_v1.png");
 });
+
+test("roomAvatar only trusts the new layout flag when it is really there", () => {
+  assert.equal(roomAvatar(JSON.stringify({ species: "Pixie", skinTone: "Nutmeg", build: "Fae" })).layout, 1);
+  assert.equal(
+    roomAvatar(JSON.stringify({ species: "Pixie", skinTone: "Nutmeg", build: "Fae", layout: 2 })).layout,
+    2,
+  );
+});
