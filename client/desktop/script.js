@@ -263,7 +263,7 @@ const desktopApps = {
     coaching: { title: "1:1 Coaching.exe", external: "https://forms.gle/18ea3aWxwWu9c1rj9", description: "Book a one-on-one coaching session with 8Bit Pixiee.", width: 430, height: 290, left: 210, top: 145 },
     mealPlanning: { title: "Meal Planning.exe", external: "https://forms.gle/uD31jM6uUzGe3tUa7", description: "Open the meal-planning sign-up portal.", width: 430, height: 290, left: 245, top: 170 },
     twitch: { title: "8Bit Media Player.exe", src: "media-player.html", width: 920, height: 570, left: 185, top: 75 },
-    arcade: { title: "Arcade Lounge.exe", src: "arcade.html", width: 900, height: 650, left: 125, top: 50 },
+    arcade: { title: "PillowRoom.exe", src: "arcade.html", width: 900, height: 650, left: 125, top: 50 },
     inventory: { title: "INVENTORY.exe", width: 440, height: 400, left: 435, top: 140, content: () => {
         const inventory = getGameState().inventory || [];
         const items = inventory.length ? inventory.map((item) => `<li>✦ ${item}</li>`).join("") : "<li>Nothing collected yet. Visit Arcade 01!</li>";
@@ -272,7 +272,15 @@ const desktopApps = {
     discord: { title: "Community.exe", external: "https://discord.gg/RbqP4BAmH", description: "Join the 8BitGPU Discord community and show us your creature build.", width: 440, height: 305, left: 315, top: 150 },
     important: { title: "IMPORTANT.exe", src: "nick.html", width: 550, height: 450, left: 330, top: 105 },
     sonic: { title: "Sonic.exe", src: "sonic.html", width: 550, height: 450, left: 365, top: 130 },
-    profile: { title: "MyPixel.exe", src: "profile.html", width: 900, height: 650, left: 125, top: 50 }
+    profile: { title: "MyPixel.exe", src: "profile.html", width: 900, height: 650, left: 125, top: 50 },
+    appearance: {
+    title: "Appearance",
+    src: "appearance.html",
+    width: 480,
+    height: 420,
+    left: 250,
+    top: 100
+},
 };
 
 function toggleStartMenu() {
@@ -280,6 +288,9 @@ function toggleStartMenu() {
     if (!menu) return;
     const isOpen = menu.classList.toggle("is-open");
     menu.setAttribute("aria-hidden", String(!isOpen));
+    menu.querySelectorAll("details[open]").forEach(group => {
+        group.open = false;
+    });
 }
 
 function closeStartMenu() {
@@ -755,6 +766,26 @@ showWallpaper(currentWallpaperIndex, true);
 setWallpaperShuffle(wallpaperShuffleEnabled);
 loadSavedDesktopBackgrounds();
 
+document.querySelectorAll("#osStartMenu details").forEach(group => {
+    group.addEventListener("toggle", () => {
+        if (!group.open) return;
+
+        document.querySelectorAll("#osStartMenu details").forEach(other => {
+            if (other !== group) other.open = false;
+        });
+    });
+});
+
+// Dismiss Start when clicking elsewhere or pressing Escape.
+document.addEventListener("pointerdown", event => {
+    if (!event.target.closest("#osStartMenu, #osStartButton")) {
+        closeStartMenu();
+    }
+});
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeStartMenu();
+});
 
 
 

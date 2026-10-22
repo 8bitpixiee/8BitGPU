@@ -978,18 +978,19 @@ button, a, [role="button"], input, label { cursor: pointer !important; }
     color: #000 !important;
     text-shadow: none !important;
 }
+/* Windows 98 structure, with the player's chosen palette. */
 #osStartMenu {
-    --desktop-accent: #7651a0;
-    width: 250px !important;
+    width: 252px !important;
     max-width: calc(100vw - 12px) !important;
     height: auto !important;
     min-height: 0 !important;
     padding: 3px !important;
+    contain: none !important;
     overflow: visible !important;
-    background: #c0c0c0 !important;
-    border: 2px outset #fff !important;
+    background: var(--panel, #e4d5ee) !important;
+    border: 2px outset var(--panel, #e4d5ee) !important;
     border-radius: 0 !important;
-    box-shadow: 1px 1px #000 !important;
+    box-shadow: 2px 2px 0 #24162d !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 }
@@ -1000,54 +1001,81 @@ button, a, [role="button"], input, label { cursor: pointer !important; }
 }
 
 #osStartMenu .classic-brand {
-    flex: 0 0 28px;
     display: flex;
+    flex: 0 0 30px;
     align-items: center;
-    padding: 8px 0;
-    background: var(--desktop-accent);
-    color: #fff;
+    padding: 10px 0;
+    background: linear-gradient(
+        0deg,
+        var(--edge, #724a91),
+        var(--accent, #b95fd4)
+    );
+    color: var(--title-ink, white);
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    font: bold 20px Arial, sans-serif;
+    font: bold 21px var(--ui-font, Tahoma, sans-serif);
+    letter-spacing: 1px;
 }
 
 #osStartMenu .classic-menu {
     flex: 1;
     min-width: 0;
-    padding-left: 3px;
+    padding-left: 4px;
 }
 
-#osStartMenu .classic-menu button {
+#osStartMenu .classic-menu button,
+#osStartMenu .classic-menu summary {
     display: flex !important;
     align-items: center;
-    gap: 9px;
+    gap: 10px;
+    box-sizing: border-box;
     width: 100% !important;
-    min-height: 32px !important;
+    min-height: 39px !important;
     margin: 0 !important;
-    padding: 5px 8px !important;
-    border: 0 !important;
+    padding: 7px 9px !important;
+    border: 1px solid transparent !important;
     border-radius: 0 !important;
-    background: #c0c0c0 !important;
-    color: #000 !important;
+    background: var(--panel, #e4d5ee) !important;
+    color: var(--control-ink, #321c48) !important;
     box-shadow: none !important;
     text-shadow: none !important;
     transform: none !important;
-    font: 13px Tahoma, Arial, sans-serif !important;
+    font: 13px var(--ui-font, Tahoma, sans-serif) !important;
     text-align: left;
-    cursor: default;
+    cursor: pointer;
+    list-style: none;
+}
+
+#osStartMenu summary::-webkit-details-marker {
+    display: none;
 }
 
 #osStartMenu .classic-menu button:hover,
 #osStartMenu .classic-menu button:focus-visible,
-#osStartMenu .classic-group:hover > button,
-#osStartMenu .classic-group:focus-within > button {
-    background: var(--desktop-accent) !important;
-    color: #fff !important;
+#osStartMenu summary:hover,
+#osStartMenu summary:focus-visible,
+#osStartMenu details[open] > summary {
+    background: var(--edge, #724a91) !important;
+    color: var(--title-ink, white) !important;
+    border-color: var(--accent, #b95fd4) !important;
+}
+
+#osStartMenu :focus-visible {
+    outline: 1px dotted currentColor;
+    outline-offset: -4px;
+}
+
+#osStartMenu .menu-icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 25px;
+    font-size: 21px;
 }
 
 #osStartMenu .classic-arrow {
     margin-left: auto;
-    font-size: 9px;
+    font-size: 10px;
 }
 
 #osStartMenu .classic-group {
@@ -1060,21 +1088,30 @@ button, a, [role="button"], input, label { cursor: pointer !important; }
     left: 100%;
     top: -2px;
     z-index: 10;
-    width: 180px;
+    width: 205px;
     padding: 3px;
-    background: #c0c0c0;
-    border: 2px outset #fff;
-    box-shadow: 1px 1px #000;
+    background: var(--panel, #e4d5ee);
+    border: 2px outset var(--panel, #e4d5ee);
+    box-shadow: 2px 2px 0 #24162d;
 }
 
-#osStartMenu .classic-group:hover > .classic-submenu,
-#osStartMenu .classic-group:focus-within > .classic-submenu {
+#osStartMenu details[open] > .classic-submenu {
     display: block;
 }
 
 #osStartMenu hr {
-    margin: 4px 2px;
+    margin: 5px 4px;
     border: 0;
-    border-top: 1px solid #808080;
-    border-bottom: 1px solid #fff;
+    border-top: 1px solid #95849e;
+    border-bottom: 1px solid white;
+}
+
+/* Stack the flyout when there isn't room beside the menu. */
+@media (max-width: 520px) {
+    #osStartMenu .classic-submenu {
+        position: static;
+        box-sizing: border-box;
+        width: 100%;
+        box-shadow: none;
+    }
 }

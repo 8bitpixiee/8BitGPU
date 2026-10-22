@@ -135,102 +135,62 @@
     <div class="classic-brand">8BitGPU</div>
 
     <div class="classic-menu">
-        <button type="button" onclick="openApp('profile')">
-            <span>▣</span> MyPixel
-        </button>
-
-        <div class="classic-group">
-            <button type="button">
-                <span>▤</span> Programs
+        <details class="classic-group">
+            <summary>
+                <span class="menu-icon">▤</span>
+                Programs
                 <span class="classic-arrow">▶</span>
-            </button>
+            </summary>
+
             <div class="classic-submenu">
-                <button type="button" onclick="openApp('avatarLab')">Avatar Lab</button>
-                <button type="button" onclick="openApp('arcade')">Arcade Lounge</button>
-                <button type="button" onclick="openApp('inventory')">Inventory</button>
-                <button type="button" onclick="openApp('storefront')">Storefront</button>
-                <button type="button" onclick="openApp('twitch')">Watch Us Live</button>
-                <button type="button" onclick="openApp('chat')">Chat.exe</button>
+                <button type="button" onclick="openApp('avatarLab')">
+                    <span class="menu-icon">✦</span> Avatar Lab
+                </button>
+                <button type="button" onclick="openApp('arcade')">
+                    <span class="menu-icon">☾</span> The Pillow Room
+                </button>
+                <button type="button" onclick="openApp('profile')">
+                    <span class="menu-icon">▣</span> MyPixel
+                </button>
             </div>
-        </div>
+        </details>
+
+        <button type="button" onclick="openApp('account')">
+            <span class="menu-icon">⚙</span> Account
+        </button>
 
         <button type="button" data-open-wallpapers>
-            <span>▧</span> Pictures
+            <span class="menu-icon">▧</span> Pictures
         </button>
 
-        <div class="classic-group">
-            <button type="button">
-                <span>⚙</span> Settings
+        <details class="classic-group">
+            <summary>
+                <span class="menu-icon">✿</span>
+                Settings
                 <span class="classic-arrow">▶</span>
-            </button>
+            </summary>
+
             <div class="classic-submenu">
-                <button type="button" onclick="openApp('account')">Account</button>
-                <button type="button" data-open-wallpapers>Appearance</button>
+                <button type="button" onclick="openApp('appearance')">
+                    <span class="menu-icon">Aa</span> Fonts &amp; Appearance
+                </button>
+                <button type="button" data-open-wallpapers>
+                    <span class="menu-icon">▧</span> Wallpaper
+                </button>
             </div>
-        </div>
+        </details>
 
         <button type="button" onclick="openApp('important')">
-            <span>?</span> Help &amp; Important
+            <span class="menu-icon">?</span> Help &amp; Important
         </button>
 
         <hr>
 
         <button type="button" onclick="openApp('login')">
-            <span>⚿</span> Log In
+            <span class="menu-icon">⚿</span> Log In
         </button>
     </div>
 </section>
-   
-                    </span>
-                </span>
-                <span><small id="startAccountStatus">8BIT DESKTOP</small><strong id="startMenuName">Guest Pixie</strong><em>Ready to play ✦</em></span>
-            </button>
-            <div id="userAvatarPicker" aria-label="Choose a user picture" hidden>
-                <p>CHOOSE YOUR ICON</p>
-                <div>
-                    <button type="button" data-user-avatar="assets/ui/user-pictures/user-avatar-1.png"><img src="assets/ui/user-pictures/user-avatar-1.png" alt="Purple leopard kiss"></button>
-                    <button type="button" data-user-avatar="assets/ui/user-pictures/user-avatar-2.png"><img src="assets/ui/user-pictures/user-avatar-2.png" alt="Pink aqua gel person"></button>
-                    <button type="button" data-user-avatar="assets/ui/user-pictures/user-avatar-3.png"><img src="assets/ui/user-pictures/user-avatar-3.png" alt="Deep purple gel person"></button>
-                    <button type="button" data-user-avatar="assets/ui/user-pictures/user-avatar-4.png"><img src="assets/ui/user-pictures/user-avatar-4.png" alt="Blue cartoon eyes"></button>
-                    <button type="button" data-user-avatar="assets/ui/user-pictures/user-avatar-5.png"><img src="assets/ui/user-pictures/user-avatar-5.png" alt="Lavender hibiscus"></button>
-                    <button type="button" data-user-avatar="assets/ui/user-pictures/user-avatar-6.png"><img src="assets/ui/user-pictures/user-avatar-6.png" alt="Sunset gel person"></button>
-                    <button class="saved-being-choice" type="button" data-user-avatar="saved-being" aria-label="Use my saved Being">
-                        <span class="start-being-preview">
-                            <img data-avatar-layer="extraLayer" alt="">
-                            <img data-avatar-layer="bodyLayer" alt="">
-                            <img data-avatar-layer="earsLayer" alt="">
-                            <img data-avatar-layer="headLayer" alt="">
-                            <img data-avatar-layer="chestLayer" alt="">
-                            <img data-avatar-layer="eyesLayer" alt="">
-                            <img data-avatar-layer="hairLayer" alt="">
-                            <img data-avatar-layer="fitLayer" alt="">
-                        </span>
-                        <span class="avatar-choice-tag">BEING</span>
-                    </button>
-                </div>
-            </div>
-        </header>
-        <div class="start-menu-columns">
-            <div class="start-program-pane">
-                <p class="start-pane-label">FAVORITE PROGRAMS</p>
-                <button class="start-program" data-start-program type="button" onclick="openApp('avatarLab')"><span class="program-gem"><img src="assets/ui/start-icon-wings.png" alt=""></span><span><strong>Avatar Lab</strong><small>Create your Being</small></span></button>
-                <button class="start-program" data-start-program type="button" onclick="openApp('arcade')"><span class="program-gem"><img src="assets/ui/start-icon-disc.png" alt=""></span><span><strong>Arcade Lounge</strong><small>Walk, meet &amp; chat</small></span></button>
-                <button class="start-program" data-start-program type="button" onclick="openApp('twitch')"><span class="program-gem"><img src="assets/ui/start-icon-music.png" alt=""></span><span><strong>Watch Us Live</strong><small>Open the stream</small></span></button>
-            </div>
-            <aside class="start-system-pane" aria-label="Places and settings">
-                <button type="button" onclick="openApp('account')"><span class="system-glyph">⚙</span>Account</button>
-                <button type="button" onclick="openApp('profile')"><span class="system-glyph">✦</span><strong>MyPixel</strong></button>
-                <button type="button" data-open-wallpapers><span class="system-glyph">▣</span>Pictures</button>
-                <span class="start-system-divider"></span>
-                <button type="button" onclick="openApp('login')"><span class="system-glyph">☁</span>Log In</button>
-                <button type="button" onclick="openApp('important')"><span class="system-glyph">?</span>Help &amp; Important</button>
-                <span class="start-system-divider"></span>
-            </aside>
-        </div>
-        <footer class="start-menu-footer">
-        </footer>
-    </section>
-
     <menu id="desktopContextMenu" aria-label="Desktop menu" hidden>
         <button type="button" data-context-action="change-wallpaper">Change wallpaper...</button>
         <button type="button" data-context-action="next-wallpaper">Next image</button>

@@ -9,3 +9,20 @@
 .lab-window,.media-player{color:var(--ink)}.studio-toolbar,.player-heading{font-family:'Courier New',monospace!important}.preview-panel,.creator-panel,.player-side,.chat-side{border-radius:0!important;border:2px inset var(--panel)!important}
 #socialLauncher{pointer-events:auto;padding:5px 12px;border:2px outset var(--panel);background:var(--panel);color:var(--control-ink);font:bold 13px 'Courier New',monospace;cursor:pointer}
 @media(max-width:700px){.os-window .os-window-actions button{width:28px!important;height:28px!important}.os-window .os-window-bar{height:34px!important}}
+body,
+body button,
+body input,
+body select,
+body textarea,
+body h1,
+body h2,
+body h3,
+body p,
+body label,
+body a,
+body span,
+body strong,
+body small,
+body summary {
+    font-family: var(--ui-font, Tahoma, Arial, sans-serif) !important;
+}

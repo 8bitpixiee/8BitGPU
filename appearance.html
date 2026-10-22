@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Appearance</title>
+    <link rel="stylesheet" href="client/shared/retro-windows.css">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 18px;
+            background: var(--panel);
+            color: var(--ink);
+            font-size: 13px;
+        }
+        h1 { margin: 0 0 18px; font-size: 19px; }
+        label { display: block; margin-bottom: 6px; }
+        select, button {
+            padding: 7px;
+            background: var(--paper);
+            color: var(--ink);
+            border: 2px inset var(--panel);
+        }
+        select { width: 100%; }
+        .sample {
+            margin: 18px 0;
+            padding: 16px;
+            background: var(--paper);
+            border: 2px inset var(--panel);
+        }
+        .sample p { line-height: 1.6; }
+        button {
+            background: var(--panel);
+            border-style: outset;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Make yourself at home.</h1>
+
+    <label for="fontChoice">Desktop font</label>
+    <select id="fontChoice">
+        <option value="windows">Windows Classic — Tahoma</option>
+        <option value="verdana">Soft &amp; readable — Verdana</option>
+        <option value="mono">Terminal — Courier New</option>
+        <option value="book">Storybook — Georgia</option>
+    </select>
+
+    <div class="sample">
+        <strong>Your little corner of the internet.</strong>
+        <p>Avatar Lab · The Pillow Room · MyPixel</p>
+        <small>ABCDEFGHIJKLMNOPQRSTUVWXYZ · 0123456789</small>
+    </div>
+
+    <button id="resetFont" type="button">Restore classic font</button>
+    <p role="status">Changes save automatically in this browser.</p>
+
+    <script src="client/shared/window-theme.js"></script>
+    <script>
+        const choice = document.getElementById("fontChoice");
+        choice.value = window.getDesktopFont();
+
+        choice.addEventListener("change", () => {
+            window.setDesktopFont(choice.value);
+        });
+
+        document.getElementById("resetFont").addEventListener("click", () => {
+            choice.value = "windows";
+            window.setDesktopFont("windows");
+        });
+    </script>
+</body>
+</html>

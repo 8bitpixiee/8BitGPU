@@ -10,3 +10,60 @@
  const pulse=()=>{if(!document.hidden)fetch('/api/social/presence',{method:'POST',headers:{'content-type':'application/json'},body:'{}'}).catch(()=>{});};
  pulse();setInterval(pulse,30000);document.addEventListener('visibilitychange',pulse);
 })();
+
+(() => {
+    const key = "8bitgpu-font";
+    const fonts = {
+        windows: "Tahoma, Arial, sans-serif",
+        verdana: "Verdana, sans-serif",
+        mono: "'Courier New', monospace",
+        book: "Georgia, serif"
+    };
+
+    function readFont() {
+        try {
+            return localStorage.getItem(key) || "windows";
+        } catch {
+            return "windows";
+        }
+    }
+
+    function applyFont(value) {
+        document.documentElement.style.setProperty(
+            "--ui-font",
+            fonts[value] || fonts.windows
+        );
+    }
+
+    window.setDesktopFont = value => {
+        if (!Object.hasOwn(fonts, value)) return;
+        localStorage.setItem(key, value);
+        applyFont(value);
+
+        if (parent !== window) {
+            parent.postMessage(
+                { type: "8bitgpu-font-changed" },
+                location.origin
+            );
+        }
+    };
+
+    window.getDesktopFont = readFont;
+
+    window.addEventListener("storage", event => {
+        if (event.key === key || event.key === null) {
+            applyFont(readFont());
+        }
+    });
+
+    window.addEventListener("message", event => {
+        if (
+            event.origin === location.origin &&
+            event.data?.type === "8bitgpu-font-changed"
+        ) {
+            applyFont(readFont());
+        }
+    });
+
+    applyFont(readFont());
+})();
