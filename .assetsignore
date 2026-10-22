@@ -10,3 +10,4 @@ art/**
 **/*.aseprite
 .wrangler/**
 package.json
+AGENTS.md
