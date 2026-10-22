@@ -231,8 +231,6 @@ function defaultAdjustments() {
   const profile = Object.fromEntries(
     adjustableCategories.map((category) => [category, { x: 0, y: 0, scale: 1 }]),
   );
-  if (settings.build === "Masc") profile.eyes.y = 4;
-  if (settings.build === "Chunky Masc") profile.eyes.y = 6;
   return profile;
 }
 function activeAdjustments() {
@@ -465,9 +463,18 @@ function renderAvatar() {
   ["ears", "chest", "hair", "eyes", "fit", "extra"].forEach((category) =>
     setLayer(category, selectedOption(category).src),
   );
+  placeLayers(base.body);
   adjustableCategories.forEach(applyLayerAdjustment);
   applySkinColor();
 }
+function placeLayers(bodySource) {
+  ["body", "head", "ears", "chest", "hair", "eyes", "fit", "extra"].forEach((category) => {
+    const layer = document.getElementById(category + "Layer");
+    const source = layer && layer.getAttribute("src");
+    if (source) AvatarLayout.apply(layer, bodySource, category, source);
+  });
+}
+AvatarLayout.ready.then(() => renderAvatar());
 function renderPreviewLabel() {
   const username = localStorage.getItem("8bitgpu-player-name");
   document.getElementById("previewLabel").textContent = username
@@ -614,7 +621,10 @@ function tileMarkup(choice, className, selected) {
   // If a PNG was not uploaded yet, remove its tile rather than showing the
   // browser's broken-image icon. It automatically comes back when that PNG
   // exists in /avatar/.
-  const image = '<img loading="lazy" decoding="async" src="' + choice.src + '" alt="" onerror="this.closest(\'button\').remove()">';
+  const image =
+    '<img loading="lazy" decoding="async" src="' +
+    choice.src +
+    '" alt="" onerror="this.closest(\'button\').remove()">';
   return (
     '<button type="button" class="' +
     className +
@@ -729,7 +739,7 @@ try {
       if (saved.selection && options[category].some((choice) => choice.id === saved.selection[category]))
         selection[category] = saved.selection[category];
     });
-    if (saved.adjustments) {
+    if (saved.adjustments && saved.layout >= AvatarLayout.LAYOUT_VERSION) {
       adjustmentProfiles[profileKey()] = defaultAdjustments();
       adjustableCategories.forEach((category) => {
         if (saved.adjustments[category])
@@ -816,6 +826,7 @@ document.getElementById("saveButton").addEventListener("click", async () => {
   const bodyAsset = settings.bodyAsset || customBodyAssets[settings.build] || "";
   const outfit = {
     version: 3,
+    layout: AvatarLayout.LAYOUT_VERSION,
     ...settings,
     bodyAsset,
     skinColor: normalizeSkinColor(settings.skinColor),

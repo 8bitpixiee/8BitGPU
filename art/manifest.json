@@ -508,8 +508,8 @@
       "original": "avatar/eyes_mac_v4.png",
       "runtime": "assets/avatar/eyes_mac_v4.png",
       "source": "art/source/avatar/eyes_mac_v4.aseprite",
-      "sha256": "2e72693f6d3f554ba18e85d94b8c94423fa2f65e08ad261ddc1d11b90d44f257",
-      "source_sha256": "17095c4e0e65a45378cfaa6a2b9567f328cd899d9a14c16f2266bcdaaf6295d9"
+      "sha256": "000e025b605b0680a6c2291018a9676390345c0a7601258c0b2146d50d4b83af",
+      "source_sha256": "da51a5fd9c2f79e554cf29218507a0ea7ca15db69d651ef5ff42d75eb7823808"
     },
     {
       "original": "avatar/femme.png",
@@ -1412,7 +1412,7 @@
       "runtime": "assets/avatar/animations/antrho_f.png",
       "source": "art/source/avatar/animated/antrho_f.aseprite",
       "sha256": "85be1cc669d89b8f2775975d2399a334e4d5275a67a1a78b7253ea8c0a2471bf",
-      "source_sha256": "163dbd734f58f7e810a5efbfceff07b70b8aedbda619c3c0549db2c3ee29fbdf"
+      "source_sha256": "268299652744689f6111010ec7e74c883fc866f437d4fa0cf8fbd6b6a14e2174"
     },
     {
       "original": "assets/avatar/body_base_fem_idle_front_v1.png",
@@ -1817,8 +1817,8 @@
       "original": "assets/avatar/eyes_mac_v4.png",
       "runtime": "assets/avatar/animations/eyes_mac_v4.png",
       "source": "art/source/avatar/animated/eyes_mac_v4.aseprite",
-      "sha256": "e106e38cecf7c09aad9c2592fbbec360de8a51ac1a851c20e9b10326187a8f76",
-      "source_sha256": "08c10f078b70255b3964b9ab83bc5a60d77107c1b7e1203e583a503abe8bbc12"
+      "sha256": "744fe57f1e06b023c8b8ede623b0b822e84e5f2b1ba63bc859ba5d61ce3970a1",
+      "source_sha256": "f3c113aba10006fea0594e84dad62a65fe77da8852a617e05e0b47f902ec1717"
     },
     {
       "original": "assets/avatar/femme.png",
