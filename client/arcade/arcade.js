@@ -16,7 +16,15 @@ let x = 48,
   movingFrame = 0,
   lastFrame = 0,
   facing = "down",
-  flying = false;
+  flying = false,
+  socket = null,
+  socketOpen = false,
+  leaving = false,
+  giveUp = false,
+  pingTimer = null,
+  lastMembers = [],
+  lastSent = "",
+  blocked = new Set();
 const beings = new Map();
 const skinFilter = (color) => {
   const value = (key, fallback) => (Number.isFinite(Number(color?.[key])) ? Number(color[key]) : fallback);
@@ -155,6 +163,7 @@ function renderBubbles() {
 }
 function renderLog(data) {
   messages = data.messages;
+  blocked = new Set((data.blocks || []).map((b) => b.id));
   if (!myId) {
     const seed = [...data.user.id].reduce((n, c) => n + c.charCodeAt(0), 0);
     x = 36 + (seed % 19);
@@ -184,6 +193,63 @@ function renderLog(data) {
   }
   renderBubbles();
 }
+const visibleMembers = () => lastMembers.filter((m) => m.id === myId || !blocked.has(m.id));
+function sendPos(force) {
+  if (!socketOpen) return;
+  const frame = JSON.stringify({
+    t: "pos",
+    x: Math.round(x * 10) / 10,
+    y: Math.round(y * 10) / 10,
+    facing,
+    flying,
+  });
+  if (!force && frame === lastSent) return;
+  lastSent = frame;
+  socket.send(frame);
+}
+async function refreshMessages() {
+  try {
+    renderLog(await api("messages"));
+  } catch {}
+}
+function connectSocket() {
+  if (socket || giveUp) return;
+  const ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/api/chat/ws");
+  socket = ws;
+  ws.onopen = () => {
+    socketOpen = true;
+    sendPos(true);
+    pingTimer = setInterval(() => ws.send("ping"), 25000);
+  };
+  ws.onmessage = (event) => {
+    if (event.data === "pong") return;
+    let msg;
+    try {
+      msg = JSON.parse(event.data);
+    } catch {
+      return;
+    }
+    if (msg.t === "members") {
+      lastMembers = msg.members;
+      renderMembers(visibleMembers());
+    } else if (msg.t === "chat") refreshMessages();
+  };
+  ws.onclose = (event) => {
+    clearInterval(pingTimer);
+    socket = null;
+    socketOpen = false;
+    if (leaving) return;
+    if (event.code === 4000) {
+      giveUp = true;
+      status("The lounge is open in another tab.");
+      return;
+    }
+    delay = event.code === 4003 ? 0 : 3000;
+    if (event.code === 4003) sync();
+    else if (!document.hidden) timer = setTimeout(sync, delay);
+  };
+}
+setInterval(() => sendPos(false), 120);
 async function sync() {
   if (inflight || document.hidden) return;
   inflight = true;
@@ -191,12 +257,11 @@ async function sync() {
   try {
     const data = await api("messages");
     renderLog(data);
-    const room = await api("presence", { x, y, facing, flying });
     joined = true;
     loadActivities();
     el("roomGate").hidden = true;
-    renderMembers(room.members);
-    delay = 1500;
+    connectSocket();
+    delay = socket ? 0 : 1500;
     status(muted ? "You are temporarily muted. You can still walk around." : "");
   } catch (e) {
     joined = false;
@@ -239,7 +304,7 @@ el("roomComposer").onsubmit = async (e) => {
   try {
     await api("messages", { message: el("roomMessage").value });
     el("roomMessage").value = "";
-    await sync();
+    if (!socketOpen) await sync();
   } catch (error) {
     status(error.message);
   } finally {
@@ -257,14 +322,12 @@ async function playEmote(emote) {
     status("Enter the room before using an emote.");
     return false;
   }
-  try {
-    await api("emote", { emote });
-    await sync();
-    return true;
-  } catch (error) {
-    status(error.message);
+  if (!socketOpen) {
+    status("Still connecting to the room.");
     return false;
   }
+  socket.send(JSON.stringify({ t: "emote", emote }));
+  return true;
 }
 document.querySelectorAll("[data-emote]").forEach((button) =>
   button.addEventListener("click", async () => {
@@ -274,7 +337,7 @@ document.querySelectorAll("[data-emote]").forEach((button) =>
       button.setAttribute("aria-pressed", String(flying));
       button.textContent = flying ? "Land" : "Fly";
       positionSelf();
-      await sync();
+      sendPos(true);
       return;
     }
     button.disabled = true;
@@ -550,11 +613,13 @@ function leave() {
   keys.clear();
   target = null;
   clearTimeout(timer);
-  if (joined) fetch("/api/chat/presence", { method: "DELETE", keepalive: true }).catch(() => {});
+  leaving = true;
+  socket?.close(1000);
 }
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) leave();
   else {
+    leaving = false;
     delay = 1500;
     sync();
   }
