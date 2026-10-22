@@ -93,6 +93,7 @@
     transform,
     rigFor,
     fileOf,
+    isWide: (src) => Boolean(data && data.wide.includes(fileOf(src))),
     setData: (json) => (data = json),
     isReady: () => Boolean(data),
     LAYOUT_VERSION: 2,
