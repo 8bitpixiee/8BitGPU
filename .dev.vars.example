@@ -1,0 +1,10 @@
+# Copy to .dev.vars for local work. .dev.vars is gitignored, so real values never go in the repo.
+# On the deployed worker, set each one as a secret instead:
+#   npx wrangler secret put GOOGLE_CLIENT_ID
+#   npx wrangler secret put GOOGLE_CLIENT_SECRET
+# Google Cloud console > APIs & Services > Credentials > OAuth client ID (Web application).
+# Authorized redirect URI: https://<your-domain>/api/auth/google/callback
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-client-secret
+# optional, defaults to <origin>/api/auth/google/callback
+# GOOGLE_REDIRECT_URI=

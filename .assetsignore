@@ -11,3 +11,5 @@ art/**
 .wrangler/**
 package.json
 AGENTS.md
+.dev.vars
+.dev.vars.example

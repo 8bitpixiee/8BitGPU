@@ -1,4 +1,5 @@
 import { badgesFor, cleanPicks, savePicks } from "./badges.js";
+import { handleGoogle } from "./google.js";
 import { handleSocial } from "./social/social.js";
 import { handleChat, loungeCall } from "./chat/chat.js";
 import { mayUseBody, roomAvatar } from "./chat/chat-avatar.js";
@@ -622,6 +623,9 @@ async function handleApi(request, env, url) {
       "set-cookie": "eightbit_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
     });
   }
+  if (path.startsWith("/api/auth/google/"))
+    return handleGoogle(request, env, url, { db: env.DB, createSession, readCookies, json });
+
   if (path === "/api/auth/me" && request.method === "GET") {
     const user = await currentUser(request, env.DB);
     return json({ user: user ? publicUser(user) : null });
