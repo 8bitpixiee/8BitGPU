@@ -35,7 +35,60 @@
             border-style: outset;
             cursor: pointer;
         }
-    </style>
+   body {
+    padding: 22px;
+    border: 3px outset var(--panel);
+}
+
+h1 {
+    padding-bottom: 12px;
+    border-bottom: 2px groove var(--panel);
+    color: var(--ink);
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 9px;
+}
+
+select {
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 2px inset var(--panel);
+    border-radius: 0;
+    background: var(--paper);
+    font-size: 15px;
+}
+
+select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.sample {
+    border: 3px inset var(--panel);
+    padding: 18px;
+    box-shadow: inset 1px 1px #00000018;
+}
+
+.sample strong {
+    display: block;
+    font-size: 21px;
+    line-height: 1.4;
+}
+
+button {
+    min-height: 34px;
+    padding: 7px 12px;
+    border: 2px outset var(--panel);
+    box-shadow: 1px 1px #49364f;
+}
+
+button:active {
+    border-style: inset;
+    box-shadow: none;
+}
+   </style>
 </head>
 <body>
     <h1>Make yourself at home.</h1>
@@ -46,6 +99,9 @@
         <option value="verdana">Soft &amp; readable — Verdana</option>
         <option value="mono">Terminal — Courier New</option>
         <option value="book">Storybook — Georgia</option>
+        <option value="delius">♡ Sweet handwriting — Delius</option>
+        <option value="cherry">☁ Bubblegum — Cherry Bomb One</option>
+        <option value="pixel">✦ Pixie computer — Pixelify Sans</option>  
     </select>
 
     <div class="sample">
@@ -60,6 +116,14 @@
     <script src="client/shared/window-theme.js"></script>
     <script>
         const choice = document.getElementById("fontChoice");
+        choice.replaceChildren();
+
+Object.entries(window.desktopFonts).forEach(([key, stack]) => {
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = stack.split(",")[0].replace(/'/g, "");
+    choice.appendChild(option);
+});
         choice.value = window.getDesktopFont();
 
         choice.addEventListener("change", () => {
