@@ -67,6 +67,13 @@ const speciesData = {
   },
 };
 
+// pickle's own body only shows up on pickle's account
+if ((localStorage.getItem("8bitgpu-player-name") || "").toLowerCase() === "pickle") {
+  beingChoices.push({ name: "Pickle", species: "Custom", build: "Pickle", bodyAsset: "pickle.png" });
+  speciesData.Custom.builds.push("Pickle");
+  customBodyAssets.Pickle = "pickle.png";
+}
+
 // These filenames are referenced by the catalogue but have not been uploaded
 // to /avatar yet. Hide them from both the buttons and Randomize until the art
 // arrives, instead of allowing a selection that produces a broken image.

@@ -1,3 +1,11 @@
+// bodies that belong to one account
+export const RESERVED_BODIES = { "pickle.png": "pickle" };
+
+export function mayUseBody(username, bodyAsset) {
+  const owner = RESERVED_BODIES[bodyAsset];
+  return !owner || String(username).toLowerCase() === owner;
+}
+
 export function portrait(avatarJson) {
   let a;
   try {

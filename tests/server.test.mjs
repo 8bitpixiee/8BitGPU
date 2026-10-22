@@ -73,3 +73,11 @@ test("friends of the devs earn their badge, case doesn't matter", async () => {
   assert.deepEqual(earnedBadges("someone", ["bob"]), []);
   assert.deepEqual(earnedBadges("Pickle", []), ["crew"]);
 });
+
+test("pickle's body stays on pickle's account", async () => {
+  const { mayUseBody } = await import("../server/chat/chat-avatar.js");
+  assert.equal(mayUseBody("Pickle", "pickle.png"), true);
+  assert.equal(mayUseBody("someone", "pickle.png"), false);
+  assert.equal(mayUseBody("someone", "Null.png"), true);
+  assert.equal(mayUseBody("someone", undefined), true);
+});

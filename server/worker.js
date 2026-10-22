@@ -1,7 +1,7 @@
 import { badgesFor, cleanPicks, savePicks } from "./badges.js";
 import { handleSocial } from "./social/social.js";
 import { handleChat, loungeCall } from "./chat/chat.js";
-import { roomAvatar } from "./chat/chat-avatar.js";
+import { mayUseBody, roomAvatar } from "./chat/chat-avatar.js";
 import { once } from "./once.js";
 import { STORE_PRODUCTS } from "./store/store-catalog.js";
 
@@ -787,6 +787,8 @@ async function handleApi(request, env, url) {
       JSON.stringify(avatar).length > 12000
     )
       return json({ error: "That outfit data is not valid." }, 400);
+    if (!mayUseBody(user.username, avatar.bodyAsset))
+      return json({ error: "That body belongs to someone else." }, 403);
     await env.DB.prepare(
       `
       INSERT INTO player_data (user_id, avatar_json, updated_at) VALUES (?, ?, ?)
