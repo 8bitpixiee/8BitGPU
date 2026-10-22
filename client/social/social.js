@@ -1,20 +1,293 @@
-let friends=[],events=[],activeFriend=null,refreshing=false;
-const el=id=>document.getElementById(id),dm=new URLSearchParams(location.search).get('dm'),dmName=new URLSearchParams(location.search).get('name')||'Friend';
-async function api(path,method='GET',body){const r=await fetch(path,{method,cache:'no-store',headers:body?{'content-type':'application/json'}:{},body:body?JSON.stringify(body):undefined});const d=await r.json();if(!r.ok)throw Error(d.error||'Unable to connect.');return d;}
-const status=message=>el('status').textContent=message;
-function emit(type,data){if(parent!==window)parent.postMessage({type,...data},location.origin);}
-function selfie(friend){const node=document.createElement('span');node.className='selfie';if(friend.selfie){const img=document.createElement('img');img.src=friend.selfie;img.alt='';node.append(img);}else node.textContent='✦';const dot=document.createElement('i');dot.className='dot '+(friend.online?'online':'');node.append(dot);return node;}
-function smallButton(text,action){const b=document.createElement('button');b.type='button';b.textContent=text;b.onclick=async()=>{b.disabled=true;try{await action();}catch(e){status(e.message);}finally{b.disabled=false;}};return b;}
-function openDm(friend){emit('8bitgpu-open-social-dm',{friend});if(parent===window)location.href='social.html?dm='+encodeURIComponent(friend.id)+'&name='+encodeURIComponent(friend.username);}
-function invite(friend){return async()=>{const room=confirm('Invite '+friend.username+' to Arcade Lounge? Choose Cancel for Chat.exe.')?'arcade':'chat';await api('/api/social/send','POST',{friend:friend.id,kind:'invite',body:room});status('Invitation sent. Existing room access rules still apply.');};}
-function friendRow(friend,preview=''){const row=document.createElement('div');row.className='entry';const identity=document.createElement('button');identity.className='identity';identity.type='button';const text=document.createElement('span'),name=document.createElement('strong');name.textContent=friend.username;text.append(name);if(preview){const info=document.createElement('small');info.textContent=preview;text.append(info);}identity.append(selfie(friend),text);identity.onclick=()=>emit('8bitgpu-open-profile',{username:friend.username});row.append(identity);return row;}
-async function loadHome(){const data=await api('/api/friends'),eventData=await api('/api/social/events');friends=data.friends;events=eventData.events;el('unread').textContent=eventData.unread||'';
- const friendBox=el('friends');friendBox.replaceChildren();if(!friends.length)friendBox.append(Object.assign(document.createElement('div'),{className:'entry empty',textContent:'No accepted friends yet.'}));for(const f of friends){const row=friendRow(f,f.online?'Online now':'Offline'),actions=Object.assign(document.createElement('span'),{className:'actions'});actions.append(smallButton('DM',()=>openDm(f)),smallButton('Invite',invite(f)));row.append(actions);friendBox.append(row);}
- const requestBox=el('requests');requestBox.replaceChildren();const pending=data.requests.filter(r=>r.incoming);if(pending.length){requestBox.append(Object.assign(document.createElement('div'),{className:'request-title',textContent:'FRIEND REQUESTS'}));for(const r of pending){const row=friendRow(r,'Wants to be friends'),actions=Object.assign(document.createElement('span'),{className:'actions'});actions.append(smallButton('Accept',async()=>{await api('/api/friends/'+r.id,'PUT',{});await loadHome();}),smallButton('Decline',async()=>{await api('/api/friends/'+r.id,'DELETE');await loadHome();}));row.append(actions);requestBox.append(row);}}
- const conversations=el('conversations');conversations.replaceChildren();const latest=new Map();for(const e of events.filter(e=>e.kind==='message'))if(!latest.has(e.sender))latest.set(e.sender,e);if(!latest.size)conversations.append(Object.assign(document.createElement('div'),{className:'entry empty',textContent:'No messages yet.'}));for(const e of [...latest.values()].sort((a,b)=>Number(a.seen)-Number(b.seen)||b.id-a.id)){const f=friends.find(f=>f.id===e.sender);if(!f)continue;const row=friendRow(f,e.body);row.onclick=()=>openDm(f);conversations.append(row);}
- const notifications=el('notifications');notifications.replaceChildren();const notices=events.filter(e=>e.kind!=='message');if(!notices.length)notifications.append(Object.assign(document.createElement('div'),{className:'entry empty',textContent:'You are all caught up.'}));for(const e of notices.slice(0,20)){const row=document.createElement('div');row.className='entry notice';const p=document.createElement('p');p.textContent=e.kind==='request'?e.username+' sent a friend request.':e.kind==='accepted'?e.username+' accepted your friend request.':e.username+' invited you to '+(e.body==='arcade'?'Arcade Lounge.':'Chat.exe.');row.append(p);const actions=Object.assign(document.createElement('span'),{className:'actions'});if(e.kind==='invite')actions.append(smallButton('Open',()=>emit('8bitgpu-open-app',{app:e.body})));row.append(actions);notifications.append(row);}}
-async function loadTop(){const d=await api('/api/social/top'),slots=el('slots');slots.replaceChildren();for(let i=0;i<8;i++){const label=document.createElement('label'),select=document.createElement('select');label.append((i+1)+'. ',select);select.add(new Option('Empty',''));for(const f of friends)select.add(new Option(f.username,f.id));select.value=d.friends[i]?.id||'';slots.append(label);}}
-async function loadDm(){activeFriend=friends.find(f=>f.id===dm)||{id:dm,username:dmName,online:false};el('dmName').textContent=activeFriend.username;el('dmState').textContent=activeFriend.online?'Online now':'Offline';const profile=el('dmProfile');profile.replaceChildren(...selfie(activeFriend).childNodes);profile.onclick=()=>emit('8bitgpu-open-profile',{username:activeFriend.username});const d=await api('/api/social/messages?friend='+encodeURIComponent(dm)),box=el('messages');box.replaceChildren();for(const m of d.messages){const bubble=document.createElement('p');bubble.className='bubble '+(m.sender===dm?'':'mine');const who=document.createElement('small');who.textContent=m.username;bubble.append(who,document.createTextNode(m.body));box.append(bubble);}box.scrollTop=box.scrollHeight;await api('/api/social/read','POST',{friend:dm});}
-function send(){const text=el('message').value.trim();if(!text)return;return api('/api/social/send','POST',{friend:dm,kind:'message',body:text}).then(()=>{el('message').value='';return loadDm();});}
-el('add').onsubmit=async e=>{e.preventDefault();try{await api('/api/friends','POST',{username:el('name').value.trim()});el('name').value='';await loadHome();status('Friend request sent.');}catch(e){status(e.message);}};el('openTop').onclick=async()=>{el('socialHome').hidden=true;el('topEditor').hidden=false;await loadTop();};el('closeTop').onclick=()=>{el('topEditor').hidden=true;el('socialHome').hidden=false;};el('saveTop').onclick=async()=>{try{await api('/api/social/top','PUT',{ids:[...el('slots').querySelectorAll('select')].map(s=>s.value).filter(Boolean)});status('Top 8 saved.');el('topEditor').hidden=true;el('socialHome').hidden=false;}catch(e){status(e.message);}};el('send').onsubmit=e=>{e.preventDefault();send().catch(e=>status(e.message));};el('message').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send().catch(x=>status(x.message));}});el('dmInvite').onclick=()=>invite(activeFriend)().catch(e=>status(e.message));
-async function refresh(){if(document.hidden||refreshing)return;refreshing=true;try{if(dm){await loadHome();await loadDm();}else await loadHome();}catch(e){status(e.message);}finally{refreshing=false;}}if(dm){el('socialHome').hidden=true;el('dmWindow').hidden=false;}refresh();setInterval(refresh,6000);document.addEventListener('visibilitychange',refresh);
+let friends = [],
+  events = [],
+  activeFriend = null,
+  refreshing = false;
+const el = (id) => document.getElementById(id),
+  dm = new URLSearchParams(location.search).get("dm"),
+  dmName = new URLSearchParams(location.search).get("name") || "Friend";
+async function api(path, method = "GET", body) {
+  const r = await fetch(path, {
+    method,
+    cache: "no-store",
+    headers: body ? { "content-type": "application/json" } : {},
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const d = await r.json();
+  if (!r.ok) throw Error(d.error || "Unable to connect.");
+  return d;
+}
+const status = (message) => (el("status").textContent = message);
+function emit(type, data) {
+  if (parent !== window) parent.postMessage({ type, ...data }, location.origin);
+}
+function selfie(friend) {
+  const node = document.createElement("span");
+  node.className = "selfie";
+  if (friend.selfie) {
+    const img = document.createElement("img");
+    img.src = friend.selfie;
+    img.alt = "";
+    node.append(img);
+  } else node.textContent = "✦";
+  const dot = document.createElement("i");
+  dot.className = "dot " + (friend.online ? "online" : "");
+  node.append(dot);
+  return node;
+}
+function smallButton(text, action) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = text;
+  b.onclick = async () => {
+    b.disabled = true;
+    try {
+      await action();
+    } catch (e) {
+      status(e.message);
+    } finally {
+      b.disabled = false;
+    }
+  };
+  return b;
+}
+function openDm(friend) {
+  emit("8bitgpu-open-social-dm", { friend });
+  if (parent === window)
+    location.href =
+      "social.html?dm=" + encodeURIComponent(friend.id) + "&name=" + encodeURIComponent(friend.username);
+}
+function invite(friend) {
+  return async () => {
+    const room = confirm("Invite " + friend.username + " to Arcade Lounge? Choose Cancel for Chat.exe.")
+      ? "arcade"
+      : "chat";
+    await api("/api/social/send", "POST", { friend: friend.id, kind: "invite", body: room });
+    status("Invitation sent. Existing room access rules still apply.");
+  };
+}
+function friendRow(friend, preview = "") {
+  const row = document.createElement("div");
+  row.className = "entry";
+  const identity = document.createElement("button");
+  identity.className = "identity";
+  identity.type = "button";
+  const text = document.createElement("span"),
+    name = document.createElement("strong");
+  name.textContent = friend.username;
+  text.append(name);
+  if (preview) {
+    const info = document.createElement("small");
+    info.textContent = preview;
+    text.append(info);
+  }
+  identity.append(selfie(friend), text);
+  identity.onclick = () => emit("8bitgpu-open-profile", { username: friend.username });
+  row.append(identity);
+  return row;
+}
+async function loadHome() {
+  const data = await api("/api/friends"),
+    eventData = await api("/api/social/events");
+  friends = data.friends;
+  events = eventData.events;
+  el("unread").textContent = eventData.unread || "";
+  const friendBox = el("friends");
+  friendBox.replaceChildren();
+  if (!friends.length)
+    friendBox.append(
+      Object.assign(document.createElement("div"), {
+        className: "entry empty",
+        textContent: "No accepted friends yet.",
+      }),
+    );
+  for (const f of friends) {
+    const row = friendRow(f, f.online ? "Online now" : "Offline"),
+      actions = Object.assign(document.createElement("span"), { className: "actions" });
+    actions.append(
+      smallButton("DM", () => openDm(f)),
+      smallButton("Invite", invite(f)),
+    );
+    row.append(actions);
+    friendBox.append(row);
+  }
+  const requestBox = el("requests");
+  requestBox.replaceChildren();
+  const pending = data.requests.filter((r) => r.incoming);
+  if (pending.length) {
+    requestBox.append(
+      Object.assign(document.createElement("div"), {
+        className: "request-title",
+        textContent: "FRIEND REQUESTS",
+      }),
+    );
+    for (const r of pending) {
+      const row = friendRow(r, "Wants to be friends"),
+        actions = Object.assign(document.createElement("span"), { className: "actions" });
+      actions.append(
+        smallButton("Accept", async () => {
+          await api("/api/friends/" + r.id, "PUT", {});
+          await loadHome();
+        }),
+        smallButton("Decline", async () => {
+          await api("/api/friends/" + r.id, "DELETE");
+          await loadHome();
+        }),
+      );
+      row.append(actions);
+      requestBox.append(row);
+    }
+  }
+  const conversations = el("conversations");
+  conversations.replaceChildren();
+  const latest = new Map();
+  for (const e of events.filter((e) => e.kind === "message"))
+    if (!latest.has(e.sender)) latest.set(e.sender, e);
+  if (!latest.size)
+    conversations.append(
+      Object.assign(document.createElement("div"), {
+        className: "entry empty",
+        textContent: "No messages yet.",
+      }),
+    );
+  for (const e of [...latest.values()].sort((a, b) => Number(a.seen) - Number(b.seen) || b.id - a.id)) {
+    const f = friends.find((f) => f.id === e.sender);
+    if (!f) continue;
+    const row = friendRow(f, e.body);
+    row.onclick = () => openDm(f);
+    conversations.append(row);
+  }
+  const notifications = el("notifications");
+  notifications.replaceChildren();
+  const notices = events.filter((e) => e.kind !== "message");
+  if (!notices.length)
+    notifications.append(
+      Object.assign(document.createElement("div"), {
+        className: "entry empty",
+        textContent: "You are all caught up.",
+      }),
+    );
+  for (const e of notices.slice(0, 20)) {
+    const row = document.createElement("div");
+    row.className = "entry notice";
+    const p = document.createElement("p");
+    p.textContent =
+      e.kind === "request"
+        ? e.username + " sent a friend request."
+        : e.kind === "accepted"
+          ? e.username + " accepted your friend request."
+          : e.username + " invited you to " + (e.body === "arcade" ? "Arcade Lounge." : "Chat.exe.");
+    row.append(p);
+    const actions = Object.assign(document.createElement("span"), { className: "actions" });
+    if (e.kind === "invite")
+      actions.append(smallButton("Open", () => emit("8bitgpu-open-app", { app: e.body })));
+    row.append(actions);
+    notifications.append(row);
+  }
+}
+async function loadTop() {
+  const d = await api("/api/social/top"),
+    slots = el("slots");
+  slots.replaceChildren();
+  for (let i = 0; i < 8; i++) {
+    const label = document.createElement("label"),
+      select = document.createElement("select");
+    label.append(i + 1 + ". ", select);
+    select.add(new Option("Empty", ""));
+    for (const f of friends) select.add(new Option(f.username, f.id));
+    select.value = d.friends[i]?.id || "";
+    slots.append(label);
+  }
+}
+async function loadDm() {
+  activeFriend = friends.find((f) => f.id === dm) || { id: dm, username: dmName, online: false };
+  el("dmName").textContent = activeFriend.username;
+  el("dmState").textContent = activeFriend.online ? "Online now" : "Offline";
+  const profile = el("dmProfile");
+  profile.replaceChildren(...selfie(activeFriend).childNodes);
+  profile.onclick = () => emit("8bitgpu-open-profile", { username: activeFriend.username });
+  const d = await api("/api/social/messages?friend=" + encodeURIComponent(dm)),
+    box = el("messages");
+  box.replaceChildren();
+  for (const m of d.messages) {
+    const bubble = document.createElement("p");
+    bubble.className = "bubble " + (m.sender === dm ? "" : "mine");
+    const who = document.createElement("small");
+    who.textContent = m.username;
+    bubble.append(who, document.createTextNode(m.body));
+    box.append(bubble);
+  }
+  box.scrollTop = box.scrollHeight;
+  await api("/api/social/read", "POST", { friend: dm });
+}
+function send() {
+  const text = el("message").value.trim();
+  if (!text) return;
+  return api("/api/social/send", "POST", { friend: dm, kind: "message", body: text }).then(() => {
+    el("message").value = "";
+    return loadDm();
+  });
+}
+el("add").onsubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await api("/api/friends", "POST", { username: el("name").value.trim() });
+    el("name").value = "";
+    await loadHome();
+    status("Friend request sent.");
+  } catch (e) {
+    status(e.message);
+  }
+};
+el("openTop").onclick = async () => {
+  el("socialHome").hidden = true;
+  el("topEditor").hidden = false;
+  await loadTop();
+};
+el("closeTop").onclick = () => {
+  el("topEditor").hidden = true;
+  el("socialHome").hidden = false;
+};
+el("saveTop").onclick = async () => {
+  try {
+    await api("/api/social/top", "PUT", {
+      ids: [...el("slots").querySelectorAll("select")].map((s) => s.value).filter(Boolean),
+    });
+    status("Top 8 saved.");
+    el("topEditor").hidden = true;
+    el("socialHome").hidden = false;
+  } catch (e) {
+    status(e.message);
+  }
+};
+el("send").onsubmit = (e) => {
+  e.preventDefault();
+  send().catch((e) => status(e.message));
+};
+el("message").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    send().catch((x) => status(x.message));
+  }
+});
+el("dmInvite").onclick = () => invite(activeFriend)().catch((e) => status(e.message));
+async function refresh() {
+  if (document.hidden || refreshing) return;
+  refreshing = true;
+  try {
+    if (dm) {
+      await loadHome();
+      await loadDm();
+    } else await loadHome();
+  } catch (e) {
+    status(e.message);
+  } finally {
+    refreshing = false;
+  }
+}
+if (dm) {
+  el("socialHome").hidden = true;
+  el("dmWindow").hidden = false;
+}
+refresh();
+setInterval(refresh, 6000);
+document.addEventListener("visibilitychange", refresh);
