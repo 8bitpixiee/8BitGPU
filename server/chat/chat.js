@@ -2,6 +2,10 @@ import { once } from "../once.js";
 import { portrait, roomAvatar } from "./chat-avatar.js";
 const reply = (body, status = 200) =>
   Response.json(body, { status, headers: { "cache-control": "no-store" } });
+export const loungeCall = (env, path, body) =>
+  env.LOUNGE?.get(env.LOUNGE.idFromName("lounge"))
+    .fetch("https://lounge" + path, { method: "POST", body: JSON.stringify(body || {}) })
+    .catch(() => {});
 const ids = (value) =>
   String(value || "")
     .split(",")
@@ -10,25 +14,12 @@ const ids = (value) =>
 
 export const ensureChatSchema = once(async (db) => {
   await db.exec(`CREATE TABLE IF NOT EXISTS chat_access (user_id TEXT PRIMARY KEY, allowed INTEGER NOT NULL, granted_by TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS chat_presence (user_id TEXT PRIMARY KEY, x REAL NOT NULL, y REAL NOT NULL, updated_at INTEGER NOT NULL);
-CREATE TABLE IF NOT EXISTS chat_emotes (user_id TEXT PRIMARY KEY, emote TEXT NOT NULL, expires_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS chat_activities (user_id TEXT PRIMARY KEY, state_json TEXT NOT NULL, updated_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS chat_members (user_id TEXT PRIMARY KEY, adult_at INTEGER NOT NULL, muted_until INTEGER NOT NULL DEFAULT 0, banned INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS chat_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, body TEXT NOT NULL, created_at INTEGER NOT NULL, deleted INTEGER NOT NULL DEFAULT 0);
 CREATE INDEX IF NOT EXISTS chat_messages_user_time ON chat_messages(user_id, created_at);
 CREATE TABLE IF NOT EXISTS chat_blocks (user_id TEXT NOT NULL, blocked_id TEXT NOT NULL, PRIMARY KEY(user_id, blocked_id));
 CREATE TABLE IF NOT EXISTS chat_reports (message_id INTEGER NOT NULL, reporter_id TEXT NOT NULL, reason TEXT NOT NULL, created_at INTEGER NOT NULL, resolved INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(message_id, reporter_id));`);
-  // These columns are added separately so existing lounge databases upgrade in place.
-  for (const sql of [
-    "ALTER TABLE chat_presence ADD COLUMN facing TEXT NOT NULL DEFAULT 'down'",
-    "ALTER TABLE chat_presence ADD COLUMN flying INTEGER NOT NULL DEFAULT 0",
-  ]) {
-    try {
-      await db.exec(sql);
-    } catch {
-      /* The column already exists. */
-    }
-  }
 });
 
 export async function handleChat(request, env, user, readBody) {
@@ -79,7 +70,7 @@ export async function handleChat(request, env, user, readBody) {
         )
         .bind(target.id, body.allowed ? 1 : 0, user.id)
         .run();
-      if (!body.allowed) await db.prepare("DELETE FROM chat_presence WHERE user_id=?").bind(target.id).run();
+      if (!body.allowed) await loungeCall(env, "/kick", { userId: target.id });
       return reply({ ok: true, username: target.username });
     }
     return reply({ error: "Method not supported." }, 405);
@@ -101,6 +92,19 @@ export async function handleChat(request, env, user, readBody) {
       { error: "This community is for adults 18+. Please accept the room rules.", code: "join_required" },
       403,
     );
+  if (path === "/api/chat/ws") {
+    if (request.headers.get("Upgrade") !== "websocket") return reply({ error: "Open the room from the lounge page." }, 426);
+    if (request.headers.get("Origin") !== new URL(request.url).origin)
+      return reply({ error: "Use this website to join the room." }, 403);
+    if (!env.LOUNGE) return reply({ error: "The room is not available right now." }, 503);
+    const row = await db.prepare("SELECT avatar_json AS avatar FROM player_data WHERE user_id=?").bind(user.id).first();
+    const who = { id: user.id, username: user.username, owner, avatar: roomAvatar(row?.avatar) };
+    return env.LOUNGE.get(env.LOUNGE.idFromName("lounge")).fetch(
+      new Request("https://lounge/connect", {
+        headers: { Upgrade: "websocket", "x-lounge-user": encodeURIComponent(JSON.stringify(who)) },
+      }),
+    );
+  }
   if (path === "/api/chat/activities") {
     if (request.method === "GET") {
       const row = await db
@@ -127,78 +131,6 @@ export async function handleChat(request, env, user, readBody) {
       return reply({ ok: true });
     }
     return reply({ error: "Method not supported." }, 405);
-  }
-  if (path === "/api/chat/emote" && request.method === "POST") {
-    const body = await readBody(request);
-    const allowed = new Set([
-      "dance",
-      "twerk",
-      "smoke",
-      "drink",
-      "shroom",
-      "laugh",
-      "spin",
-      "wave",
-      "crashout",
-    ]);
-    if (!allowed.has(body?.emote)) return reply({ error: "Choose an available emote." }, 400);
-    const expiresAt = Date.now() + 8000;
-    await db
-      .prepare(
-        "INSERT INTO chat_emotes (user_id,emote,expires_at) VALUES (?,?,?) ON CONFLICT(user_id) DO UPDATE SET emote=excluded.emote,expires_at=excluded.expires_at",
-      )
-      .bind(user.id, body.emote, expiresAt)
-      .run();
-    return reply({ ok: true, emote: body.emote, expiresAt });
-  }
-  if (path === "/api/chat/presence") {
-    if (request.method === "DELETE") {
-      await db.prepare("DELETE FROM chat_presence WHERE user_id=?").bind(user.id).run();
-      return reply({ ok: true });
-    }
-    if (request.method !== "POST") return reply({ error: "Method not supported." }, 405);
-    const body = await readBody(request);
-    if (
-      typeof body?.x !== "number" ||
-      typeof body?.y !== "number" ||
-      !Number.isFinite(body.x) ||
-      !Number.isFinite(body.y)
-    )
-      return reply({ error: "Invalid position." }, 400);
-    const facing = ["up", "down", "left", "right"].includes(body?.facing) ? body.facing : "down";
-    const flying = body?.flying === true ? 1 : 0;
-    const now = Date.now();
-    const x = Math.max(6, Math.min(94, body.x)),
-      y = Math.max(12, Math.min(94, body.y));
-    await db
-      .prepare(
-        "INSERT INTO chat_presence (user_id,x,y,updated_at,facing,flying) VALUES (?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET x=excluded.x,y=excluded.y,updated_at=excluded.updated_at,facing=excluded.facing,flying=excluded.flying WHERE chat_presence.updated_at<=?",
-      )
-      .bind(user.id, x, y, now, facing, flying, now - 800)
-      .run();
-    await db
-      .prepare("DELETE FROM chat_presence WHERE updated_at<?")
-      .bind(now - 20000)
-      .run();
-    await db.prepare("DELETE FROM chat_emotes WHERE expires_at<=?").bind(now).run();
-    const rows = await db
-      .prepare(
-        `SELECT p.user_id AS id,u.username,p.x,p.y,p.facing,p.flying,d.avatar_json AS avatar,a.allowed,e.emote,e.expires_at AS emoteUntil
-      FROM chat_presence p JOIN users u ON u.id=p.user_id JOIN chat_members m ON m.user_id=u.id
-      LEFT JOIN player_data d ON d.user_id=u.id LEFT JOIN chat_access a ON a.user_id=u.id LEFT JOIN chat_emotes e ON e.user_id=u.id
-      WHERE p.updated_at>? AND m.banned=0 AND NOT EXISTS (SELECT 1 FROM chat_blocks b WHERE b.user_id=? AND b.blocked_id=p.user_id)
-      ORDER BY p.updated_at DESC LIMIT 50`,
-      )
-      .bind(now - 20000, user.id)
-      .all();
-    const members = rows.results
-      .filter(
-        (p) =>
-          ids(env.CHAT_OWNER_IDS).includes(p.id) ||
-          (p.allowed === null ? ids(env.CHAT_TEST_USER_IDS).includes(p.id) : p.allowed === 1),
-      )
-      .map(({ avatar, allowed, ...p }) => ({ ...p, avatar: roomAvatar(avatar) }));
-    return reply({ members, userId: user.id, owner });
   }
   if (path === "/api/chat/messages" && request.method === "GET") {
     const rows = await db
@@ -244,6 +176,7 @@ export async function handleChat(request, env, user, readBody) {
       .run();
     if (!result.meta.changes)
       return reply({ error: "Wait a few seconds before sending another message." }, 429);
+    await loungeCall(env, "/poke");
     return reply({ ok: true }, 201);
   }
   if (path === "/api/chat/block" && request.method === "POST") {
@@ -322,7 +255,9 @@ export async function handleChat(request, env, user, readBody) {
             .prepare("UPDATE chat_members SET banned=? WHERE user_id=?")
             .bind(body.action === "ban" ? 1 : 0, body.userId)
             .run();
+        if (body.action === "ban") await loungeCall(env, "/kick", { userId: body.userId });
       } else return reply({ error: "Unknown moderation action." }, 400);
+      await loungeCall(env, "/poke");
       return reply({ ok: true });
     }
   }

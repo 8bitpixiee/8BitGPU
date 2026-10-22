@@ -1,5 +1,6 @@
 import { handleSocial } from "./social/social.js";
-import { handleChat } from "./chat/chat.js";
+import { handleChat, loungeCall } from "./chat/chat.js";
+import { roomAvatar } from "./chat/chat-avatar.js";
 import { once } from "./once.js";
 import { STORE_PRODUCTS } from "./store/store-catalog.js";
 
@@ -785,11 +786,14 @@ async function handleApi(request, env, url) {
     )
       .bind(user.id, JSON.stringify(avatar), Date.now())
       .run();
+    await loungeCall(env, "/avatar", { userId: user.id, avatar: roomAvatar(JSON.stringify(avatar)) });
     return json({ ok: true });
   }
 
   return json({ error: "That 8BitGPU API path does not exist." }, 404);
 }
+
+export { LoungeRoom } from "./chat/lounge.js";
 
 export default {
   async fetch(request, env) {
