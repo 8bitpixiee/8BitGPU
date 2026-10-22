@@ -197,4 +197,88 @@ body { background:#76578f!important; }
 .skin-slider-controls input { width:100%; accent-color:#8b55af; }
 .skin-slider-controls button { grid-column:1 / -1; justify-self:start; padding:5px 9px; }
 @media (max-width:730px) { .skin-slider-controls { grid-template-columns:1fr; gap:4px; } .skin-slider-controls label { margin-top:4px; } }
+/* The new browser replaces the old wall of buttons. */
+#speciesGrid {
+    display: none !important;
+}
 
+#bodyBrowser {
+    min-width: 0;
+}
+
+.body-browser-row {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) 36px;
+    align-items: center;
+    gap: 8px;
+}
+
+.body-browser-row > button {
+    min-width: 0;
+    min-height: 42px;
+    padding: 4px;
+    font-size: 20px !important;
+}
+
+.body-base-preview {
+    position: relative;
+    width: 100%;
+    max-width: 170px;
+    aspect-ratio: 1;
+    margin: auto;
+    overflow: hidden;
+    background: var(--paper, #fffdf8);
+    border: 3px inset var(--panel, #e4d5ee);
+}
+
+.body-base-preview img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: brightness(0) invert(.65);
+    pointer-events: none;
+}
+
+#bodyBrowserName {
+    margin: 10px 0;
+    text-align: center;
+    font-size: 15px !important;
+    line-height: 1.4;
+}
+
+#useBrowsedBody {
+    display: block;
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 9px;
+}
+
+#bodyBrowser summary {
+    padding: 8px;
+    cursor: pointer;
+    border: 2px outset var(--panel);
+}
+
+.body-browser-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 8px 2px;
+}
+
+.body-browser-gallery button {
+    min-width: 0;
+    padding: 6px;
+    white-space: normal;
+    font-size: 12px !important;
+}
+
+.body-browser-gallery button[aria-pressed="true"] {
+    outline: 2px solid var(--edge);
+    outline-offset: -3px;
+}
