@@ -913,3 +913,156 @@ document.getElementById("avatarPreview").addEventListener("keydown", (event) => 
 
 renderAll();
 setStep("species");
+// Body browser: browsing is separate from choosing.
+(() => {
+    const oldGrid = document.getElementById("speciesGrid");
+    const browser = document.createElement("section");
+    browser.id = "bodyBrowser";
+    browser.setAttribute("aria-label", "Browse body bases");
+
+    browser.innerHTML = `
+        <div class="body-browser-row">
+            <button type="button" id="previousBody"
+                aria-label="Previous body">◀</button>
+
+            <div id="browsedBodyPreview"
+                class="body-base-preview" aria-hidden="true"></div>
+
+            <button type="button" id="nextBody"
+                aria-label="Next body">▶</button>
+        </div>
+
+        <p id="bodyBrowserName" aria-live="polite"></p>
+
+        <button type="button" id="useBrowsedBody">
+            Use this body
+        </button>
+
+        <details>
+            <summary>Browse all bodies…</summary>
+            <div class="body-browser-gallery"></div>
+        </details>
+    `;
+
+    oldGrid.before(browser);
+
+    let browseIndex = 0;
+
+    // Legacy bases have separate body and head images.
+    const legacyBases = {
+        "Pixie:Fae": ["body_fem_v1.png", "head_fem_v1.png"],
+        "Pixie:Masc": ["body_masc_v1.png", "head_masc_v1.png"],
+        "Pixie:Chunky Masc": [
+            "body_chunky_masc_v1.png", "head_chunky_masc_v1.png"
+        ],
+        "Deerbra:Fae": [
+            "body_fem_deerbra_v1.png", "head_fem_deerbra_v1.png"
+        ],
+        "Bovadill:Highland": [
+            "bovidil_body_fem_v1.1.png", "bovidil_head_fem_v1.png"
+        ],
+        "Thixie:Fae": ["thixie_body_v1.png", "thixie_head_v1.png"]
+    };
+
+    function makePreview(choice) {
+        const preview = document.createElement("div");
+        preview.className = "body-base-preview";
+        preview.setAttribute("aria-hidden", "true");
+
+        const files = choice.bodyAsset
+            ? [choice.bodyAsset]
+            : legacyBases[choice.species + ":" + choice.build] || [];
+
+        const bodySource = files[0] ? asset(files[0]) : "";
+
+        files.forEach((file, index) => {
+            const image = document.createElement("img");
+            const category = index === 0 ? "body" : "head";
+            const source = asset(file);
+
+            image.alt = "";
+            image.loading = "lazy";
+            image.src = source;
+
+            AvatarLayout.ready.then(() => {
+                AvatarLayout.apply(image, bodySource, category, source);
+            });
+
+            preview.appendChild(image);
+        });
+
+        return preview;
+    }
+
+    const gallery = browser.querySelector(".body-browser-gallery");
+
+    beingChoices.forEach((choice, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.append(makePreview(choice), choice.name);
+
+        button.addEventListener("click", () => {
+            browseIndex = index;
+            renderBrowser();
+        });
+
+        gallery.appendChild(button);
+    });
+
+    function renderBrowser() {
+        const choice = beingChoices[browseIndex];
+        const selected =
+            settings.species === choice.species &&
+            settings.build === choice.build;
+
+        document.getElementById("browsedBodyPreview")
+            .replaceChildren(...makePreview(choice).children);
+
+        document.getElementById("bodyBrowserName").textContent =
+            choice.name + " · " +
+            (browseIndex + 1) + " of " + beingChoices.length;
+
+        const useButton = document.getElementById("useBrowsedBody");
+        useButton.textContent = selected ? "Selected ✓" : "Use this body";
+        useButton.disabled = selected;
+
+        gallery.querySelectorAll("button").forEach((button, index) => {
+            button.setAttribute(
+                "aria-pressed",
+                String(index === browseIndex)
+            );
+        });
+    }
+
+    document.getElementById("previousBody").onclick = () => {
+        browseIndex =
+            (browseIndex - 1 + beingChoices.length) % beingChoices.length;
+        renderBrowser();
+    };
+
+    document.getElementById("nextBody").onclick = () => {
+        browseIndex = (browseIndex + 1) % beingChoices.length;
+        renderBrowser();
+    };
+
+    document.getElementById("useBrowsedBody").onclick = () => {
+        // Reuse the existing body-selection behavior.
+        oldGrid.querySelectorAll("button[data-species]")[browseIndex]?.click();
+    };
+
+    function syncSelectedBody() {
+        const index = beingChoices.findIndex(choice =>
+            choice.species === settings.species &&
+            choice.build === settings.build
+        );
+
+        browseIndex = index >= 0 ? index : 0;
+        renderBrowser();
+    }
+
+    new MutationObserver(syncSelectedBody).observe(oldGrid, {
+        childList: true
+    });
+
+    syncSelectedBody();
+})();
