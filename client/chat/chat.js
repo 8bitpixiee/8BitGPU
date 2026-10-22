@@ -63,13 +63,20 @@ function render(data) {
         const face = document.createElement("span");
         face.className = "portrait";
         face.setAttribute("aria-hidden", "true");
-        for (const source of Object.values(message.portrait)) {
+        const stage = document.createElement("span");
+        stage.className = "portrait-stage";
+        const bodySource = message.portrait.body || (message.portrait.head || "").replace("head", "body");
+        for (const [category, source] of Object.entries(message.portrait)) {
           const img = document.createElement("img");
           img.src = source;
           img.alt = "";
+          img.dataset.category = category;
+          img.dataset.body = bodySource;
           img.onerror = () => img.remove();
-          face.append(img);
+          AvatarLayout.apply(img, bodySource, category, source);
+          stage.append(img);
         }
+        face.append(stage);
         row.append(face);
       }
       row.append(name, time, text);
@@ -238,3 +245,8 @@ document.addEventListener("visibilitychange", () => {
 });
 window.addEventListener("pagehide", () => clearTimeout(timer));
 refresh();
+
+AvatarLayout.ready.then(() => {
+  for (const img of document.querySelectorAll(".portrait-stage img"))
+    AvatarLayout.apply(img, img.dataset.body, img.dataset.category, img.getAttribute("src"));
+});

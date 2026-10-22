@@ -81,17 +81,16 @@ function loadSavedOutfit() {
     setLayer("fitLayer", layers.fit);
     setLayer("extraLayer", layers.extra);
     applySkinColor(savedOutfit);
-    const adjustments = savedOutfit.adjustments || {};
-    ["ears", "chest", "hair", "eyes", "fit", "extra"].forEach((category) => {
+    if (companion) companion.classList.toggle("is-wide", AvatarLayout.isWide(body));
+    ["body", "head", "ears", "chest", "hair", "eyes", "fit", "extra"].forEach((category) => {
       const layer = document.getElementById(category + "Layer");
-      if (!layer) return;
-      const value = adjustments[category] || { x: 0, y: 0, scale: 1 };
-      const x = Math.max(-20, Math.min(20, Number(value.x) || 0));
-      const y = Math.max(-20, Math.min(20, Number(value.y) || 0));
-      const scale = Math.max(0.7, Math.min(1.3, Number(value.scale) || 1));
-      layer.style.transform = `translate(${x}%, ${y}%) scale(${scale})`;
+      const source = layer && layer.getAttribute("src");
+      if (source) AvatarLayout.apply(layer, avatarPath + body, category, source);
+      if (!layer || category === "body" || category === "head") return;
+      const transform = AvatarLayout.transform(savedOutfit, category);
+      layer.style.transform = transform;
       document.querySelectorAll(`[data-avatar-layer="${category}Layer"]`).forEach((previewLayer) => {
-        previewLayer.style.transform = `translate(${x}%, ${y}%) scale(${scale})`;
+        previewLayer.style.transform = transform;
       });
     });
     return;
@@ -193,6 +192,7 @@ function loadSavedOutfit() {
 
 loadSavedOutfit();
 window.refreshDesktopAvatar = loadSavedOutfit;
+AvatarLayout.ready.then(loadSavedOutfit);
 window.addEventListener("storage", (event) => {
   if (event.key === "8bitgpu-avatar-outfit") loadSavedOutfit();
 });

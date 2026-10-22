@@ -110,7 +110,7 @@ function renderMembers(members) {
       el("players").append(node);
       beings.set(m.id, node);
     }
-    const signature = JSON.stringify(m.avatar);
+    const signature = JSON.stringify(m.avatar) + AvatarLayout.isReady();
     if (node.dataset.avatar !== signature) {
       const motion = node.querySelector(".avatar-motion");
       motion.replaceChildren();
@@ -121,11 +121,20 @@ function renderMembers(members) {
         img.src = source;
         img.alt = "";
         img.onerror = () => img.remove();
-        const adjustment = m.avatar.adjustments[key];
-        if (adjustment)
-          img.style.transform = `translate(${adjustment.x}%,${adjustment.y}%) scale(${adjustment.scale})`;
-        AvatarColors.applyLayer(img, m.avatar, key, motion.querySelector('[data-avatar-color-layer="body"]'))
-          .then(() => window.AvatarAnimations?.attach(node, img, source));
+        AvatarLayout.apply(img, m.avatar.layers.body, key, source);
+
+        if (m.avatar.adjustments[key]) {
+          img.style.transform = AvatarLayout.transform(m.avatar, key);
+        }
+
+        AvatarColors.applyLayer(
+          img,
+          m.avatar,
+          key,
+          motion.querySelector('[data-avatar-color-layer="body"]')
+        ).then(() => {
+          window.AvatarAnimations?.attach(node, img, source);
+        });
         motion.append(img);
       }
       node.dataset.avatar = signature;
@@ -212,7 +221,9 @@ async function refreshMessages() {
 }
 function connectSocket() {
   if (socket || giveUp) return;
-  const ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/api/chat/ws");
+  const ws = new WebSocket(
+    (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/api/chat/ws",
+  );
   socket = ws;
   ws.onopen = () => {
     socketOpen = true;
@@ -287,6 +298,7 @@ async function sync() {
     if (delay && !document.hidden) timer = setTimeout(sync, delay);
   }
 }
+AvatarLayout.ready.then(() => renderMembers(visibleMembers()));
 el("joinRoom").onclick = async () => {
   try {
     await api("join", { adult: el("adult").checked, rules: el("rules").checked });
@@ -506,12 +518,12 @@ async function roomSnapshot() {
   context.drawImage(background, 0, 0, size, size);
   const bounds = stage.getBoundingClientRect();
   for (const node of el("players").children) {
-    const box = node.getBoundingClientRect(),
-      left = ((box.left - bounds.left) / bounds.width) * size,
-      top = ((box.top - bounds.top) / bounds.height) * size,
-      width = (box.width / bounds.width) * size,
-      height = (box.height / bounds.height) * size;
     for (const image of node.querySelectorAll("img,canvas")) {
+      const box = image.getBoundingClientRect(),
+        left = ((box.left - bounds.left) / bounds.width) * size,
+        top = ((box.top - bounds.top) / bounds.height) * size,
+        width = (box.width / bounds.width) * size,
+        height = (box.height / bounds.height) * size;
       try {
         await image.decode?.();
         const avatar = JSON.parse(node.dataset.avatar || "{}");

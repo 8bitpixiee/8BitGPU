@@ -68,6 +68,7 @@ function baseLayers(avatar) {
   }
   return { body: "assets/avatar/body_fem_v1.png", head: "assets/avatar/head_fem_v1.png" };
 }
+let lastAvatar = null;
 function renderAvatar(avatar) {
   const base = baseLayers(avatar);
   const saved = avatar?.layers || {};
@@ -78,14 +79,14 @@ function renderAvatar(avatar) {
   });
   layers.forEach((name) => {
     const image = byId(name + "Layer");
-    const adjustment = avatar?.adjustments?.[name];
-    if (!image) return;
-    const x = Math.max(-20, Math.min(20, Number(adjustment?.x) || 0)),
-      y = Math.max(-20, Math.min(20, Number(adjustment?.y) || 0)),
-      scale = Math.max(0.7, Math.min(1.3, Number(adjustment?.scale) || 1));
-    image.style.transform = `translate(${x}%, ${y}%) scale(${scale})`;
+    const source = image && image.getAttribute("src");
+    if (source) AvatarLayout.apply(image, base.body, name, source);
+    if (image && name !== "body" && name !== "head")
+      image.style.transform = AvatarLayout.transform(avatar, name);
   });
+  lastAvatar = avatar;
 }
+AvatarLayout.ready.then(() => lastAvatar && renderAvatar(lastAvatar));
 function setTheme(theme) {
   document.body.dataset.theme = theme || "violet";
 }
