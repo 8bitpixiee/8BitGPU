@@ -400,6 +400,11 @@ function render(nextProfile) {
   byId("favoritesText").textContent =
     profile.favorites || "Add some favorite things to make this page yours.";
   renderAvatar(profile.avatar);
+  Badges.render(
+    byId("badgeRow"),
+    profile.badges,
+    isOwnProfile ? "No badges yet. Pick some in Edit My Page." : "No badges yet.",
+  );
   renderImages();
   document.querySelectorAll("[data-background-source]").forEach((button) => {
     button.disabled = !profile.images?.[button.dataset.backgroundSource];
@@ -433,6 +438,7 @@ async function loadProfile() {
     setStatus(error.message);
   }
 }
+let pickedBadges = () => [];
 function openEditor() {
   byId("moodInput").value = profile.mood;
   byId("aboutInput").value = profile.about;
@@ -444,6 +450,7 @@ function openEditor() {
     ),
   };
   Object.keys(colorNames).forEach(syncColorControls);
+  pickedBadges = Badges.picker(byId("badgePicker"), profile.badges?.picks || []);
   byId("uploadStatus").textContent = "";
   byId("editor").hidden = false;
   byId("moodInput").focus();
@@ -485,6 +492,7 @@ byId("profileForm").addEventListener("submit", async (event) => {
         about: byId("aboutInput").value,
         favorites: byId("favoritesInput").value,
         theme: "violet",
+        badges: pickedBadges(),
         style: { ...paletteFromSliders(), wallpaperUrl: profile.style?.wallpaperUrl || "" },
       }),
     });
