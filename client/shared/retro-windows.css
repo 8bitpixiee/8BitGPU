@@ -1,4 +1,4 @@
-/* Shared frame uses the original stream artwork beneath live window controls. */
+@import url('https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Delius&family=Pixelify+Sans:wght@400;700&display=swap');
 :root{--edge:#724a91;--accent:#b95fd4;--panel:#e4d5ee;--paper:#fffdf8;--ink:#321c48;--frame-filter:none;--title-ink:white;--control-ink:#321c48}
 .os-window,.lab-window,.media-player,.editor-window,.window,.store-window{border-radius:0!important;border:3px outset var(--panel)!important;background:var(--panel)!important;backdrop-filter:none!important;box-shadow:inset 1px 1px white,inset -1px -1px #222,3px 3px 0 #22152e66!important;padding:4px!important}
 .os-window{isolation:isolate}.os-window::before{content:none!important;display:none!important;background:none!important}.os-window:not(.is-active-window){filter:none!important}
