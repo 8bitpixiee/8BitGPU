@@ -230,8 +230,9 @@ h1, h2, .window-bar, .desktop-icon span {
     pointer-events: none;
     display: none;
     transform-origin: center bottom;
-    animation: beingIdle 2.4s steps(4, end) infinite;
 }
+
+#companion img.has-sprite { visibility: hidden; }
 
 /* Lower-right Being Dock + Start menu */
 .hero {
@@ -367,15 +368,6 @@ h1, h2, .window-bar, .desktop-icon span {
 .being-actions button { padding: 5px 2px; }
 .being-actions button:hover,
 #osStartMenu button:hover { transform: none; color: #fff; background: #7651a0; text-shadow: 1px 1px #352045; }
-#companion.is-wave { animation: beingWave 700ms ease-in-out; }
-#companion.is-dance { animation: beingDance 800ms ease-in-out; }
-#companion.is-spin { animation: beingSpin 800ms ease-in-out; }
-@keyframes beingWave { 0%,100%{transform:translateX(0)} 35%{transform:translateX(12px) rotate(4deg)} 70%{transform:translateX(-5px) rotate(-2deg)} }
-@keyframes beingDance { 0%,100%{transform:translateY(0)} 25%{transform:translate(-10px,-10px) rotate(-4deg)} 70%{transform:translate(10px,-4px) rotate(4deg)} }
-@keyframes beingSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-@keyframes beingIdle { 0%,100%{transform:translateY(0) scaleY(1)} 50%{transform:translateY(-4px) scaleY(1.01)} }
-@media (prefers-reduced-motion: reduce) { #companion { animation: none; } }
-
 #osStartMenu {
     position: fixed;
     z-index: 19999;

@@ -1,3 +1,18 @@
+// guests get a pixie to look at until they make their own
+const DEFAULT_OUTFIT = {
+  version: 2,
+  species: "Pixie",
+  build: "Fae",
+  skinTone: "Nutmeg",
+  layout: 2,
+  layers: {
+    ears: "assets/avatar/ears_fem_v1.png",
+    eyes: "assets/avatar/eyes_fem_v1.png",
+    hair: "assets/avatar/hair_fem_v1.png",
+    fit: "assets/avatar/fit_fem_v1.png",
+  },
+};
+
 function loadSavedOutfit() {
   let savedOutfit;
 
@@ -7,9 +22,7 @@ function loadSavedOutfit() {
     return;
   }
 
-  if (!savedOutfit) {
-    return;
-  }
+  if (!savedOutfit) savedOutfit = DEFAULT_OUTFIT;
 
   const companion = document.getElementById("companion");
   if (companion) companion.style.display = "block";
@@ -450,9 +463,7 @@ function closePocketApps() {
 function playBeingAction(action) {
   const companion = document.getElementById("companion");
   if (!companion || companion.style.display === "none") return;
-  companion.classList.remove("is-wave", "is-dance", "is-spin");
-  void companion.offsetWidth;
-  companion.classList.add(`is-${action}`);
+  BeingSprite.play(action);
 }
 
 window.toggleStartMenu = toggleStartMenu;
