@@ -1,6 +1,6 @@
 .git
 .git/**
-mode_modules/**
+node_modules/**
 server/**
 tests/**
 releases/**
@@ -8,3 +8,5 @@ backups/**
 *.zip
 art/**
 **/*.aseprite
+.wrangler/**
+package.json
