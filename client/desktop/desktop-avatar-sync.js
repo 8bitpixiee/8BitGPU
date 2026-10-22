@@ -4,18 +4,24 @@
   const setLayer = (id, source) => {
     const layer = document.getElementById(id);
     if (!layer) return;
-    layer.onerror = () => { layer.style.display = "none"; };
+    layer.onerror = () => {
+      layer.style.display = "none";
+    };
     layer.src = source || "";
     layer.style.display = source ? "block" : "none";
   };
   const variant = (tone, map, fallback) => map[tone] || fallback;
   const skinFilter = (color) => {
-    const value = (key, fallback) => Number.isFinite(Number(color?.[key])) ? Number(color[key]) : fallback;
+    const value = (key, fallback) => (Number.isFinite(Number(color?.[key])) ? Number(color[key]) : fallback);
     return `hue-rotate(${Math.max(-180, Math.min(180, value("hue", 0)))}deg) saturate(${Math.max(0, Math.min(200, value("saturation", 100)))}%) brightness(${Math.max(60, Math.min(140, value("lightness", 100)))}%)`;
   };
   function renderNewOutfit() {
     let saved;
-    try { saved = JSON.parse(localStorage.getItem("8bitgpu-avatar-outfit")); } catch { return; }
+    try {
+      saved = JSON.parse(localStorage.getItem("8bitgpu-avatar-outfit"));
+    } catch {
+      return;
+    }
     if (!saved || saved.version !== 2) return;
     const companion = document.getElementById("companion");
     const emptyState = document.getElementById("beingEmptyState");
@@ -28,16 +34,20 @@
     let head = "head_fem_v1.png";
     if (species === "Pixie" && saved.build === "Masc") {
       const v = variant(tone, { Nutmeg: "v1", Peachy: "v2", Creme: "v3" }, "v1");
-      body = `body_masc_${v}.png`; head = `head_masc_${v}.png`;
+      body = `body_masc_${v}.png`;
+      head = `head_masc_${v}.png`;
     } else if (species === "Pixie" && saved.build === "Chunky Masc") {
       const v = variant(tone, { Nutmeg: "v1", Peachy: "v2", Creme: "v3" }, "v1");
-      body = `body_chunky_masc_${v}.png`; head = `head_chunky_masc_${v}.png`;
+      body = `body_chunky_masc_${v}.png`;
+      head = `head_chunky_masc_${v}.png`;
     } else if (species === "Pixie") {
       const v = variant(tone, { Nutmeg: "v1", Peachy: "v2", Creme: "v3" }, "v1");
-      body = `body_fem_${v}.png`; head = `head_fem_${v}.png`;
+      body = `body_fem_${v}.png`;
+      head = `head_fem_${v}.png`;
     } else if (species === "Deerbra") {
       const v = variant(tone, { Wood: "v1", Copper: "v2", Pedal: "v3" }, "v1");
-      body = `body_fem_deerbra_${v}.png`; head = `head_fem_deerbra_${v}.png`;
+      body = `body_fem_deerbra_${v}.png`;
+      head = `head_fem_deerbra_${v}.png`;
     } else if (species === "Bovadill") {
       const toneNumber = variant(tone, { Cocoa: "1", Peachy: "2", Milky: "3" }, "1");
       const breedNumber = variant(saved.build, { Highland: "1", Holstein: "2", Dexter: "3" }, "1");
@@ -46,11 +56,15 @@
     } else if (species === "Thixie") {
       const bodyVersion = variant(tone, { Nutmeg: "v1", Creme: "v2", Peachy: "v3" }, "v1");
       const headVersion = variant(tone, { Nutmeg: "v1", Creme: "v2", Peachy: "v3" }, "v1");
-      body = `thixie_body_${bodyVersion}.png`; head = `thixie_head_${headVersion}.png`;
+      body = `thixie_body_${bodyVersion}.png`;
+      head = `thixie_head_${headVersion}.png`;
     }
     setLayer("bodyLayer", avatarPath + body);
     setLayer("headLayer", avatarPath + head);
-    ["bodyLayer", "headLayer"].forEach((id) => { const layer = document.getElementById(id); if (layer) layer.style.filter = skinFilter(saved.skinColor); });
+    ["bodyLayer", "headLayer"].forEach((id) => {
+      const layer = document.getElementById(id);
+      if (layer) layer.style.filter = skinFilter(saved.skinColor);
+    });
     const layers = saved.layers || {};
     setLayer("earsLayer", layers.ears);
     setLayer("hairLayer", layers.hair);
@@ -62,8 +76,9 @@
     if (event.key === "8bitgpu-avatar-outfit") renderNewOutfit();
   });
   window.addEventListener("message", (event) => {
-    if (event.origin === window.location.origin && event.data?.type === "8bitgpu-avatar-saved") renderNewOutfit();
+    if (event.origin === window.location.origin && event.data?.type === "8bitgpu-avatar-saved")
+      renderNewOutfit();
   });
   renderNewOutfit();
   window.refreshDesktopAvatar = renderNewOutfit;
-}());
+})();
