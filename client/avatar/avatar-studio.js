@@ -614,7 +614,7 @@ function tileMarkup(choice, className, selected) {
   // If a PNG was not uploaded yet, remove its tile rather than showing the
   // browser's broken-image icon. It automatically comes back when that PNG
   // exists in /avatar/.
-  const image = '<img src="' + choice.src + '" alt="" onerror="this.closest(\'button\').remove()">';
+  const image = '<img loading="lazy" decoding="async" src="' + choice.src + '" alt="" onerror="this.closest(\'button\').remove()">';
   return (
     '<button type="button" class="' +
     className +

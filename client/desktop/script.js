@@ -837,7 +837,7 @@ function addSavedDesktopBackground(url, label) {
   const button = document.createElement("button");
   button.type = "button";
   button.dataset.wallpaperIndex = String(index);
-  button.innerHTML = `<img src="${url}" alt="${label}"><span>${label}</span>`;
+  button.innerHTML = `<img loading="lazy" decoding="async" src="${url}" alt="${label}"><span>${label}</span>`;
   document.querySelector(".wallpaper-grid").append(button);
 }
 async function loadSavedDesktopBackgrounds() {
