@@ -54,6 +54,8 @@
         canvas.width = info.width;
         canvas.height = info.height;
         canvas.style.cssText = image.style.cssText;
+        canvas.dataset.avatarColorLayer = image.dataset.avatarColorLayer || "";
+        canvas.dataset.avatarSource = source;
         canvas.setAttribute("aria-hidden", "true");
         const context = canvas.getContext("2d");
         context.imageSmoothingEnabled = false;
