@@ -88,6 +88,57 @@ button:active {
     border-style: inset;
     box-shadow: none;
 }
+#fontPicker {
+    position: relative;
+}
+
+#fontPicker summary {
+    padding: 10px 12px;
+    background: var(--paper);
+    color: var(--ink);
+    border: 2px inset var(--panel);
+    cursor: pointer;
+    list-style: none;
+    font-family: Tahoma, Arial, sans-serif !important;
+}
+
+#fontPicker summary::-webkit-details-marker {
+    display: none;
+}
+
+#fontPicker .font-options {
+    max-height: 230px;
+    overflow-y: auto;
+    margin-top: 4px;
+    padding: 4px;
+    border: 2px inset var(--panel);
+    background: var(--paper);
+}
+
+#fontPicker .font-options button {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px;
+    margin-bottom: 3px;
+    text-align: left;
+    font-size: 20px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    box-shadow: none;
+}
+
+#fontPicker button:hover,
+#fontPicker button:focus-visible,
+#fontPicker button[aria-pressed="true"] {
+    background: var(--edge);
+    color: var(--title-ink);
+}
+
+#fontPickerLabel,
+#resetFont {
+    font-family: Tahoma, Arial, sans-serif !important;
+}
    </style>
 </head>
 <body>
@@ -114,26 +165,101 @@ button:active {
     <p role="status">Changes save automatically in this browser.</p>
 
     <script src="client/shared/window-theme.js"></script>
-    <script>
-        const choice = document.getElementById("fontChoice");
-        choice.replaceChildren();
+  <script>
+    const choice = document.getElementById("fontChoice");
+    const fonts = window.desktopFonts;
+    choice.hidden = true;
 
-Object.entries(window.desktopFonts).forEach(([key, stack]) => {
-    const option = document.createElement("option");
-    option.value = key;
-    option.textContent = stack.split(",")[0].replace(/'/g, "");
-    choice.appendChild(option);
-});
-        choice.value = window.getDesktopFont();
+    const picker = document.createElement("details");
+    picker.id = "fontPicker";
 
-        choice.addEventListener("change", () => {
-            window.setDesktopFont(choice.value);
+    const heading = document.createElement("summary");
+    heading.id = "fontPickerHeading";
+
+    const list = document.createElement("div");
+    list.className = "font-options";
+
+    picker.append(heading, list);
+    choice.before(picker);
+
+    const label = document.querySelector('label[for="fontChoice"]');
+    label.removeAttribute("for");
+    label.id = "fontPickerLabel";
+    heading.setAttribute(
+        "aria-labelledby",
+        "fontPickerLabel fontPickerHeading"
+    );
+
+    function updateSelection() {
+        const selected = window.getDesktopFont();
+        const stack = fonts[selected] || fonts.windows;
+        heading.textContent =
+            stack.split(",")[0].replace(/'/g, "") + " ▾";
+
+        list.querySelectorAll("button").forEach(button => {
+            button.setAttribute(
+                "aria-pressed",
+                String(button.dataset.font === selected)
+            );
+        });
+    }
+
+    Object.entries(fonts).forEach(([key, stack]) => {
+        const button = document.createElement("button");
+        const name = stack.split(",")[0].replace(/'/g, "");
+
+        button.type = "button";
+        button.dataset.font = key;
+        button.textContent = name + " · Aa 0123";
+
+        // Override the shared font rule for this preview only.
+        button.style.setProperty("font-family", stack, "important");
+
+        button.addEventListener("click", () => {
+            window.setDesktopFont(key);
+            updateSelection();
+            picker.open = false;
+            heading.focus();
         });
 
-        document.getElementById("resetFont").addEventListener("click", () => {
-            choice.value = "windows";
-            window.setDesktopFont("windows");
-        });
-    </script>
+        list.appendChild(button);
+    });
+
+    // Load previews when the dropdown is first opened.
+    picker.addEventListener("toggle", () => {
+        if (!picker.open || document.getElementById("fontPreviewSheet")) {
+            return;
+        }
+
+        const builtIn = ["windows", "verdana", "mono", "book"];
+        const families = Object.entries(fonts)
+            .filter(([key]) => !builtIn.includes(key))
+            .map(([, stack]) => stack.split(",")[0].replace(/'/g, ""));
+
+        const sheet = document.createElement("link");
+        sheet.id = "fontPreviewSheet";
+        sheet.rel = "stylesheet";
+        sheet.href = "https://fonts.googleapis.com/css2?" +
+            families.map(name => "family=" + encodeURIComponent(name))
+                .join("&") +
+            "&display=swap";
+
+        document.head.appendChild(sheet);
+    });
+
+    document.getElementById("resetFont").addEventListener("click", () => {
+        window.setDesktopFont("windows");
+        updateSelection();
+    });
+
+    picker.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            picker.open = false;
+            heading.focus();
+        }
+    });
+
+    updateSelection();
+</script>
 </body>
 </html>
