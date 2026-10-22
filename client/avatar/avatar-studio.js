@@ -913,7 +913,6 @@ document.getElementById("avatarPreview").addEventListener("keydown", (event) => 
 
 renderAll();
 setStep("species");
-// Body browser: browsing is separate from choosing.
 (() => {
     const oldGrid = document.getElementById("speciesGrid");
     const browser = document.createElement("section");
