@@ -87,6 +87,7 @@ export function roomAvatar(json) {
   return {
     layers,
     adjustments,
+    layout: a.layout >= 2 ? 2 : 1,
     skinColor,
     bodyAsset: a.bodyAsset || "",
     selection: a.selection || {},
