@@ -249,3 +249,47 @@
 #osStartMenu button:hover, #beingDock button:hover, #osTaskbar button:hover { transform: none; text-shadow: none; }
 #osStartMenu .sm-link:hover, #osStartMenu .sm-login:hover, #osTaskbar .os-task-tab:hover, #osTaskbar #osTray:hover { color: #fff; text-shadow: 0 1px 1px rgba(30, 10, 55, .7); }
 #osStartMenu .sm-item:hover { color: var(--pane-text); }
+
+/* window chrome. Colors follow the player's page theme (--accent / --edge), glass sheen on top.
+   retro-windows.css sets the old frame with !important, so this goes through the layer id. */
+#osWindowLayer .os-window {
+    padding: 0 6px 6px !important;
+    border: 1px solid rgba(255, 255, 255, .85) !important;
+    border-radius: 8px 8px 4px 4px !important;
+    background: linear-gradient(165deg, color-mix(in srgb, var(--accent) 60%, #fff) 0, var(--accent) 24%, var(--edge) 100%) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, .6), inset 0 0 0 1px rgba(40, 18, 70, .65), 0 8px 24px rgba(20, 8, 40, .55) !important;
+}
+#osWindowLayer .os-window:not(.is-active-window) { box-shadow: inset 0 1px rgba(255, 255, 255, .4), inset 0 0 0 1px rgba(40, 18, 70, .65), 0 4px 14px rgba(20, 8, 40, .4) !important; }
+#osWindowLayer .os-window-bar {
+    height: 32px !important;
+    margin: 0 !important;
+    padding: 0 0 0 4px !important;
+    border: 0 !important;
+    background: none !important;
+    color: #fff !important;
+    text-shadow: 0 0 8px rgba(255, 255, 255, .75), 0 1px 2px rgba(30, 10, 55, .85) !important;
+}
+#osWindowLayer .os-window-title { font: 600 13px var(--ui-font, "Segoe UI", Tahoma, sans-serif) !important; }
+#osWindowLayer .os-window-actions { gap: 1px !important; align-self: flex-start; margin-top: -1px; }
+#osWindowLayer .os-window-actions button {
+    width: 28px !important;
+    height: 20px !important;
+    border: 1px solid rgba(255, 255, 255, .85) !important;
+    border-radius: 0 0 4px 4px !important;
+    color: #fff !important;
+    background: linear-gradient(rgba(255, 255, 255, .55), rgba(255, 255, 255, .12) 48%, rgba(40, 18, 70, .35) 52%, rgba(255, 255, 255, .15)) !important;
+    box-shadow: inset 0 0 0 1px rgba(40, 18, 70, .35) !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    text-shadow: 0 1px 1px rgba(30, 10, 55, .8) !important;
+}
+#osWindowLayer .os-window-actions button:first-child { border-radius: 0 0 0 4px !important; }
+#osWindowLayer .os-window-actions button:hover { background: linear-gradient(rgba(255, 255, 255, .8), rgba(255, 255, 255, .3) 48%, rgba(120, 80, 170, .45) 52%, rgba(255, 255, 255, .35)) !important; }
+#osWindowLayer .os-window-actions button:last-child { width: 44px !important; background: linear-gradient(#f4b3a8, #dd5a47 48%, #c03020 52%, #e0705d) !important; }
+#osWindowLayer .os-window-actions button:last-child:hover { background: linear-gradient(#ffd0c8, #ef7561 48%, #d4402c 52%, #f08a76) !important; }
+#osWindowLayer .os-window > iframe,
+#osWindowLayer .os-window > div {
+    border: 1px solid rgba(40, 18, 70, .7) !important;
+    border-radius: 2px !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .45);
+}
