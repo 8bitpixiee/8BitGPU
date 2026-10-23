@@ -27,4 +27,18 @@
     counted = true;
     digits.textContent = String(visitorNumber(current)).padStart(6, "0");
   }).observe(document.getElementById("profileName"), { childList: true, characterData: true, subtree: true });
+
+  // egg: eight quick clicks roll the counter over and flip the page to a green screen (again to flip back)
+  let clicks = [];
+  let shown = digits.textContent;
+  counter.addEventListener("click", () => {
+    const now = Date.now();
+    clicks = clicks.filter((time) => now - time < 5000);
+    clicks.push(now);
+    if (clicks.length < 8) return;
+    clicks = [];
+    const on = document.body.classList.toggle("terminal-skin");
+    if (on) shown = digits.textContent;
+    digits.textContent = on ? "099999" : shown;
+  });
 })();
