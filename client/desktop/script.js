@@ -13,6 +13,14 @@ const DEFAULT_OUTFIT = {
   },
 };
 
+// the start menu portrait wears whatever the dock is wearing
+function syncStartBeing() {
+  document.querySelectorAll("#startUserBeing [data-avatar-layer]").forEach((preview) => {
+    const layer = document.getElementById(preview.dataset.avatarLayer);
+    if (layer) preview.style.cssText = layer.style.cssText;
+  });
+}
+
 function loadSavedOutfit() {
   let savedOutfit;
 
@@ -117,6 +125,7 @@ function loadSavedOutfit() {
         previewLayer.style.transform = transform;
       });
     });
+    syncStartBeing();
     return;
   }
 
@@ -310,6 +319,8 @@ function renderGameHud() {
   if (xpElement) xpElement.textContent = `${currentXp} / 300`;
   if (manaElement) manaElement.textContent = `${mana} / 100`;
   if (fill) fill.style.width = `${(currentXp / 300) * 100}%`;
+  const manaFill = document.getElementById("manaFill");
+  if (manaFill) manaFill.style.width = `${mana}%`;
 }
 
 renderPlayerBadge();
@@ -357,7 +368,7 @@ const desktopApps = {
     top: 105,
     content: `<section class="os-welcome"><h2>Welcome to 8BitGPU</h2><p>Games, streams and the store on one desktop.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>`,
   },
-  account: { title: "Account.exe", src: "account.html", width: 510, height: 650, left: 230, top: 65 },
+  account: { title: "Account.exe", src: "account.html", width: 510, height: 560, left: 230, top: 65 },
   chat: { title: "Chat.exe", src: "chat.html", width: 680, height: 650, left: 190, top: 45 },
   avatarLab: {
     title: "Avatar Lab.exe",

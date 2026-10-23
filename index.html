@@ -12,7 +12,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="client/shared/retro-windows.css"></head>
+<link rel="stylesheet" href="client/shared/retro-windows.css">
+<link rel="stylesheet" href="client/desktop/vista.css"></head>
 
 <body>
     <div id="osBootScreen" aria-label="8BitGPU is starting">
@@ -96,99 +97,76 @@
 </div> <!-- desktop -->
 
     <section id="beingDock" aria-label="Your Being">
-        <p class="being-dock-label">YOUR BEING</p>
-        <div class="being-frame">
+        <div class="dock-stage">
             <div id="companion">
-                <img id="extraLayer" class="avatar-layer">
-                <img src="assets/avatar/legacy/body_base_fem_idle_front_v1.png" id="bodyLayer" class="avatar-layer">
-                <img id="earsLayer" class="avatar-layer">
-                <img id="headLayer" class="avatar-layer">
-                <img id="chestLayer" class="avatar-layer">
-                <img id="eyesLayer" class="avatar-layer">
-                <img src="assets/avatar/legacy/volume_hair_fem_idle_front_v1.png" id="hairLayer" class="avatar-layer">
-                <img id="fitLayer" class="avatar-layer">
+                <img id="extraLayer" class="avatar-layer" alt="">
+                <img id="bodyLayer" class="avatar-layer" alt="">
+                <img id="earsLayer" class="avatar-layer" alt="">
+                <img id="headLayer" class="avatar-layer" alt="">
+                <img id="chestLayer" class="avatar-layer" alt="">
+                <img id="eyesLayer" class="avatar-layer" alt="">
+                <img id="hairLayer" class="avatar-layer" alt="">
+                <img id="fitLayer" class="avatar-layer" alt="">
             </div>
-            <p id="beingEmptyState">MAKE A BEING<br>IN AVATAR LAB</p>
         </div>
-        <div class="being-actions" aria-label="Being actions">
-            <button type="button" onclick="playBeingAction('wave')">WAVE</button>
-            <button type="button" onclick="playBeingAction('dance')">DANCE</button>
-            <button type="button" onclick="playBeingAction('spin')">SPIN</button>
+        <div class="dock-info">
+            <p class="dock-who"><strong id="playerName">Guest Pixie</strong><span>Lv <b id="beingLevel">01</b></span></p>
+            <div class="dock-meter" role="img" aria-label="Experience"><i id="xpFill"></i><span>XP <b id="beingXp">120 / 300</b></span></div>
+            <div class="dock-meter is-mana" role="img" aria-label="Mana"><i id="manaFill"></i><span>Mana <b id="manaValue">80 / 100</b></span></div>
+        </div>
+        <div class="dock-actions" aria-label="Being actions">
+            <button type="button" onclick="playBeingAction('wave')">Wave</button>
+            <button type="button" onclick="playBeingAction('dance')">Dance</button>
+            <button type="button" onclick="playBeingAction('spin')">Spin</button>
+        </div>
+        <div class="dock-links">
+            <button id="inventoryButton" type="button" onclick="openApp('inventory')">Inventory</button>
         </div>
     </section>
-
-    <aside id="beingHud" aria-label="Being stats">
-        <div class="mana-jar" title="Mana: 80 out of 100" aria-label="Mana 80 out of 100">
-            <span class="jar-lid"></span>
-            <span class="jar-glow"></span>
-            <span class="jar-sparkle">✦</span>
-        </div>
-        <div class="hud-stats">
-            <p><span>LVL</span> <strong id="beingLevel">01</strong></p>
-            <div class="xp-label"><span>XP</span><strong id="beingXp">120 / 300</strong></div>
-            <div class="xp-track" aria-label="120 of 300 experience"><span id="xpFill"></span></div>
-            <div class="mana-label"><span>MANA</span><strong id="manaValue">80 / 100</strong></div>
-            <button id="inventoryButton" type="button" onclick="openApp('inventory')">INVENTORY</button>
-        </div>
-    </aside>
 <section id="osStartMenu" aria-label="Start menu" aria-hidden="true">
-    <div class="classic-brand">8BitGPU</div>
-
-    <div class="classic-menu">
-        <details class="classic-group">
-            <summary>
-                <span class="menu-icon">▤</span>
-                Programs
-                <span class="classic-arrow">▶</span>
-            </summary>
-
-            <div class="classic-submenu">
-                <button type="button" onclick="openApp('avatarLab')">
-                    <span class="menu-icon">✦</span> Avatar Lab
+    <div class="sm-body">
+        <div class="sm-main">
+            <div class="sm-list">
+                <button type="button" class="sm-item" data-start-program onclick="openApp('avatarLab')">
+                    <img src="assets/ui/start-icon-wings.png" alt=""><span><b>Avatar Lab</b><small>Make your Being</small></span>
                 </button>
-                <button type="button" onclick="openApp('arcade')">
-                    <span class="menu-icon">☾</span> The Pillow Room
+                <button type="button" class="sm-item" data-start-program onclick="openApp('arcade')">
+                    <img src="assets/ui/start/pillow.png" alt=""><span><b>The Pillow Room</b><small>Hang out online</small></span>
                 </button>
-                <button type="button" onclick="openApp('profile')">
-                    <span class="menu-icon">▣</span> MyPixel
+                <button type="button" class="sm-item" data-start-program onclick="openApp('profile')">
+                    <img src="assets/ui/start/mypixel.png" alt=""><span><b>MyPixel</b><small>Your page</small></span>
                 </button>
+                <button type="button" class="sm-item" data-start-program onclick="openApp('social')">
+                    <img src="assets/ui/start/social.png" alt=""><span><b>Social</b><small>Friends and messages</small></span>
+                </button>
+                <button type="button" class="sm-item" data-start-program onclick="openApp('storefront')">
+                    <img src="assets/ui/start-icon-cash.png" alt=""><span><b>Store</b><small>Downloads and services</small></span>
+                </button>
+                <button type="button" class="sm-item" data-start-program onclick="openApp('twitch')">
+                    <img src="assets/ui/start-icon-music.png" alt=""><span><b>Media Player</b><small>Watch live</small></span>
+                </button>
+                <p class="start-search-empty" hidden>No programs match.</p>
             </div>
-        </details>
-
-        <button type="button" onclick="openApp('account')">
-            <span class="menu-icon">⚙</span> Account
-        </button>
-
-        <button type="button" data-open-wallpapers>
-            <span class="menu-icon">▧</span> Pictures
-        </button>
-
-        <details class="classic-group">
-            <summary>
-                <span class="menu-icon">✿</span>
-                Settings
-                <span class="classic-arrow">▶</span>
-            </summary>
-
-            <div class="classic-submenu">
-                <button type="button" onclick="openApp('appearance')">
-                    <span class="menu-icon">Aa</span> Fonts &amp; Appearance
-                </button>
-                <button type="button" data-open-wallpapers>
-                    <span class="menu-icon">▧</span> Wallpaper
-                </button>
+            <label class="sm-search"><span class="sr-only">Search programs</span><input id="startMenuSearch" type="search" placeholder="Search programs" autocomplete="off"></label>
+        </div>
+        <div class="sm-side">
+            <div class="sm-user">
+                <span class="sm-pic">
+                    <img id="startUserAvatar" src="assets/ui/user-pictures/user-avatar-2.png" alt="">
+                    <span id="startUserBeing" class="sm-being" hidden>
+                        <img data-avatar-layer="extraLayer" alt=""><img data-avatar-layer="bodyLayer" alt=""><img data-avatar-layer="earsLayer" alt=""><img data-avatar-layer="headLayer" alt=""><img data-avatar-layer="chestLayer" alt=""><img data-avatar-layer="eyesLayer" alt=""><img data-avatar-layer="hairLayer" alt=""><img data-avatar-layer="fitLayer" alt="">
+                    </span>
+                </span>
+                <strong id="startMenuName">Guest Pixie</strong>
             </div>
-        </details>
-
-        <button type="button" onclick="openApp('important')">
-            <span class="menu-icon">?</span> Help &amp; Important
-        </button>
-
-        <hr>
-
-        <button type="button" onclick="openApp('login')">
-            <span class="menu-icon">⚿</span> Log In
-        </button>
+            <button type="button" class="sm-link" onclick="openApp('account')"><img src="assets/ui/start/account.png" alt="">Account</button>
+            <button type="button" class="sm-link" data-open-wallpapers><img src="assets/ui/start/pictures.png" alt="">Pictures</button>
+            <button type="button" class="sm-link" onclick="openApp('appearance')"><img src="assets/ui/start/appearance.png" alt="">Appearance</button>
+            <button type="button" class="sm-link" onclick="openApp('important')"><img src="assets/ui/start-icon-disc.png" alt="">Important</button>
+        </div>
+    </div>
+    <div class="sm-foot">
+        <button type="button" class="sm-login" onclick="openApp('login')"><img src="assets/ui/start/login.png" alt="">Log In</button>
     </div>
 </section>
     <menu id="desktopContextMenu" aria-label="Desktop menu" hidden>
@@ -257,15 +235,13 @@
     </nav>
 
     <nav id="osTaskbar" aria-label="8BitGPU taskbar">
-        <button id="osStartButton" type="button" onclick="toggleStartMenu()" aria-label="Open Start menu"><img src="assets/ui/purplestartwindows.png" alt=""></button>
+        <button id="osStartButton" type="button" onclick="toggleStartMenu()" aria-label="Open Start menu"><img src="assets/ui/start-orb.png" alt=""></button>
         <div id="osTaskTabs"></div>
         <div id="osSystemTray">
             <div class="taskbar-socials" aria-label="Social links">
                 <button class="taskbar-social" type="button" onclick="openApp('twitch')" aria-label="Open Twitch"><img src="assets/media/twitch.png" alt=""></button>
                 <button class="taskbar-social" type="button" onclick="openApp('discord')" aria-label="Open Discord"><img src="assets/media/discord.png" alt=""></button>
-                <span class="taskbar-social taskbar-instagram-slot" title="Instagram icon coming soon">IG</span>
             </div>
-            <span class="tray-sparkle" aria-hidden="true">8</span>
             <span id="osClock" aria-label="Current local time"></span>
             <button id="osTray" type="button" onclick="cycleAngelTime()" aria-label="Change angel time message"></button>
         </div>
