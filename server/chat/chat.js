@@ -2,10 +2,16 @@ import { once } from "../once.js";
 import { portrait, roomAvatar } from "./chat-avatar.js";
 const reply = (body, status = 200) =>
   Response.json(body, { status, headers: { "cache-control": "no-store" } });
-export const loungeCall = (env, path, body) =>
-  env.LOUNGE?.get(env.LOUNGE.idFromName("lounge"))
-    .fetch("https://lounge" + path, { method: "POST", body: JSON.stringify(body || {}) })
-    .catch(() => {});
+const ROOM_IDS = ["arcade", "pillow"];
+const objectName = room => room === "arcade" ? "lounge" : "pillow";
+export const loungeCall = (env, path, body, room) => {
+  if (!env.LOUNGE) return Promise.resolve();
+  return Promise.all((room ? [room] : ROOM_IDS).map(id =>
+    env.LOUNGE.get(env.LOUNGE.idFromName(objectName(id)))
+      .fetch("https://lounge" + path, { method: "POST", body: JSON.stringify(body || {}) })
+      .catch(() => {})
+  ));
+};
 const ids = (value) =>
   String(value || "")
     .split(",")
@@ -16,10 +22,19 @@ export const ensureChatSchema = once(async (db) => {
   await db.exec(`CREATE TABLE IF NOT EXISTS chat_access (user_id TEXT PRIMARY KEY, allowed INTEGER NOT NULL, granted_by TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS chat_activities (user_id TEXT PRIMARY KEY, state_json TEXT NOT NULL, updated_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS chat_members (user_id TEXT PRIMARY KEY, adult_at INTEGER NOT NULL, muted_until INTEGER NOT NULL DEFAULT 0, banned INTEGER NOT NULL DEFAULT 0);
-CREATE TABLE IF NOT EXISTS chat_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, body TEXT NOT NULL, created_at INTEGER NOT NULL, deleted INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS chat_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, body TEXT NOT NULL, created_at INTEGER NOT NULL, deleted INTEGER NOT NULL DEFAULT 0, room TEXT NOT NULL DEFAULT 'arcade');
 CREATE INDEX IF NOT EXISTS chat_messages_user_time ON chat_messages(user_id, created_at);
 CREATE TABLE IF NOT EXISTS chat_blocks (user_id TEXT NOT NULL, blocked_id TEXT NOT NULL, PRIMARY KEY(user_id, blocked_id));
 CREATE TABLE IF NOT EXISTS chat_reports (message_id INTEGER NOT NULL, reporter_id TEXT NOT NULL, reason TEXT NOT NULL, created_at INTEGER NOT NULL, resolved INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(message_id, reporter_id));`);
+  const columns = await db.prepare("PRAGMA table_info(chat_messages)").all();
+  if (!columns.results.some(column => column.name === "room")) {
+    try { await db.exec("ALTER TABLE chat_messages ADD COLUMN room TEXT NOT NULL DEFAULT 'arcade'"); }
+    catch (error) {
+      const retry = await db.prepare("PRAGMA table_info(chat_messages)").all();
+      if (!retry.results.some(column => column.name === "room")) throw error;
+    }
+  }
+  await db.exec("CREATE INDEX IF NOT EXISTS chat_messages_room_id ON chat_messages(room,id)");
 });
 
 export async function handleChat(request, env, user, readBody) {
@@ -37,7 +52,10 @@ export async function handleChat(request, env, user, readBody) {
       403,
     );
   }
-  const path = new URL(request.url).pathname;
+  const url = new URL(request.url);
+  const path = url.pathname;
+  const room = url.searchParams.get("room") || "arcade";
+  if (!ROOM_IDS.includes(room)) return reply({ error: "Unknown room." }, 400);
   if (path === "/api/chat/access") {
     if (!owner) return reply({ error: "Only the owner can manage membership." }, 403);
     if (request.method === "GET") {
@@ -98,8 +116,10 @@ export async function handleChat(request, env, user, readBody) {
       return reply({ error: "Use this website to join the room." }, 403);
     if (!env.LOUNGE) return reply({ error: "The room is not available right now." }, 503);
     const row = await db.prepare("SELECT avatar_json AS avatar FROM player_data WHERE user_id=?").bind(user.id).first();
-    const who = { id: user.id, username: user.username, owner, avatar: roomAvatar(row?.avatar) };
-    return env.LOUNGE.get(env.LOUNGE.idFromName("lounge")).fetch(
+    const who = { id: user.id, username: user.username, owner, avatar: roomAvatar(row?.avatar), room,
+      from: url.searchParams.get("from") === (room === "arcade" ? "pillow" : "arcade") };
+    await loungeCall(env, "/kick", { userId: user.id, reason: "room_changed" }, room === "arcade" ? "pillow" : "arcade");
+    return env.LOUNGE.get(env.LOUNGE.idFromName(objectName(room))).fetch(
       new Request("https://lounge/connect", {
         headers: { Upgrade: "websocket", "x-lounge-user": encodeURIComponent(JSON.stringify(who)) },
       }),
@@ -137,10 +157,10 @@ export async function handleChat(request, env, user, readBody) {
       .prepare(
         `SELECT m.id,m.user_id AS userId,u.username,m.body,m.created_at AS createdAt,p.avatar_json AS avatar
       FROM chat_messages m JOIN users u ON u.id=m.user_id LEFT JOIN player_data p ON p.user_id=m.user_id
-      WHERE m.deleted=0 AND NOT EXISTS (SELECT 1 FROM chat_blocks b WHERE b.user_id=? AND b.blocked_id=m.user_id)
+      WHERE m.room=? AND m.deleted=0 AND NOT EXISTS (SELECT 1 FROM chat_blocks b WHERE b.user_id=? AND b.blocked_id=m.user_id)
       ORDER BY m.id DESC LIMIT 60`,
       )
-      .bind(user.id)
+      .bind(room, user.id)
       .all();
     const blocks = await db
       .prepare(
@@ -168,15 +188,15 @@ export async function handleChat(request, env, user, readBody) {
     const now = Date.now();
     const result = await db
       .prepare(
-        `INSERT INTO chat_messages (user_id,body,created_at)
-      SELECT ?,?,? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id=? AND created_at>?)
+        `INSERT INTO chat_messages (user_id,body,created_at,room)
+      SELECT ?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id=? AND created_at>?)
       AND EXISTS (SELECT 1 FROM chat_members WHERE user_id=? AND banned=0 AND muted_until<=?)`,
       )
-      .bind(user.id, message, now, user.id, now - 3000, user.id, now)
+      .bind(user.id, message, now, room, user.id, now - 3000, user.id, now)
       .run();
     if (!result.meta.changes)
       return reply({ error: "Wait a few seconds before sending another message." }, 429);
-    await loungeCall(env, "/poke");
+    await loungeCall(env, "/poke", {}, room);
     return reply({ ok: true }, 201);
   }
   if (path === "/api/chat/block" && request.method === "POST") {

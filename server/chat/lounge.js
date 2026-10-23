@@ -21,7 +21,7 @@ export class LoungeRoom extends DurableObject {
     const path = new URL(request.url).pathname;
     if (path === "/connect") return this.connect(request);
     const body = await request.json().catch(() => ({}));
-    if (path === "/kick") this.kick(body.userId, 4003, "removed");
+    if (path === "/kick") this.kick(body.userId, body.reason === "room_changed" ? 4000 : 4003, body.reason === "room_changed" ? "room_changed" : "removed");
     else if (path === "/poke") this.broadcast({ t: "chat" });
     else if (path === "/avatar") await this.setAvatar(body.userId, body.avatar);
     else return new Response("nope", { status: 404 });
@@ -40,13 +40,15 @@ export class LoungeRoom extends DurableObject {
     if (this.ctx.getWebSockets().length >= MAX_SEATS) return new Response("room full", { status: 503 });
     const { 0: client, 1: server } = new WebSocketPair();
     this.ctx.acceptWebSocket(server);
+    const pillow = who.room === "pillow";
     const seed = [...who.id].reduce((n, c) => n + c.charCodeAt(0), 0);
     server.serializeAttachment({
       id: who.id,
       username: who.username,
       owner: Boolean(who.owner),
-      x: 36 + (seed % 19),
-      y: 66 + (seed % 9),
+      room: pillow ? "pillow" : "arcade",
+      x: who.from ? (pillow ? 16 : 84) : pillow ? 78 : 36 + (seed % 19),
+      y: who.from ? 86 : pillow ? 84 : 66 + (seed % 9),
       facing: "down",
       flying: 0,
       emote: "",
@@ -75,7 +77,7 @@ export class LoungeRoom extends DurableObject {
       if (now - me.lastMove < 50) return;
       if (!Number.isFinite(msg.x) || !Number.isFinite(msg.y)) return;
       me.x = clamp(msg.x, 6, 94);
-      me.y = clamp(msg.y, 12, 94);
+      me.y = clamp(msg.y, me.room === "pillow" ? 76 : 12, 94);
       me.facing = FACINGS.has(msg.facing) ? msg.facing : "down";
       me.flying = msg.flying === true ? 1 : 0;
       me.lastMove = now;

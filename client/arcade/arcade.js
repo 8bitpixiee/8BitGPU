@@ -1,8 +1,8 @@
 const el = (id) => document.getElementById(id);
-const MAP_BOUNDS = { minX: 6, maxX: 94, minY: 12, maxY: 94 };
+const MAP_BOUNDS = RoomPage.room.bounds;
 const EMOTES = ["dance", "twerk", "smoke", "drink", "shroom", "laugh", "spin", "wave", "crashout"];
-let x = 48,
-  y = 73,
+let x = RoomPage.spawn.x,
+  y = RoomPage.spawn.y,
   target = null,
   keys = new Set(),
   joined = false,
@@ -47,7 +47,7 @@ function status(text) {
   el("roomStatus").textContent = text;
 }
 async function api(path, body, method) {
-  const r = await fetch("/api/chat/" + path, {
+  const r = await fetch(RoomPage.apiPath(path), {
     method: method || (body === undefined ? "GET" : "POST"),
     headers: body === undefined ? {} : { "content-type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -222,7 +222,7 @@ async function refreshMessages() {
 function connectSocket() {
   if (socket || giveUp) return;
   const ws = new WebSocket(
-    (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/api/chat/ws",
+    RoomPage.socketUrl(),
   );
   socket = ws;
   ws.onopen = () => {
@@ -250,7 +250,7 @@ function connectSocket() {
     if (leaving) return;
     if (event.code === 4000) {
       giveUp = true;
-      status("The lounge is open in another tab.");
+      status("You entered another room or opened this room in another tab.");
       return;
     }
     delay = event.code === 4003 ? 0 : 3000;
@@ -505,7 +505,8 @@ async function roomSnapshot() {
   const stage = el("mapStage"),
     size = 1200,
     canvas = document.createElement("canvas");
-  canvas.width = canvas.height = size;
+  canvas.width = size;
+  canvas.height = Math.round(size * RoomPage.room.height / RoomPage.room.width);
   const context = canvas.getContext("2d"),
     load = (source) =>
       new Promise((resolve, reject) => {
@@ -514,16 +515,16 @@ async function roomSnapshot() {
         image.onerror = reject;
         image.src = source;
       });
-  const background = await load("assets/maps/arcade/arcade-01-bg.png");
-  context.drawImage(background, 0, 0, size, size);
+  const background = await load(RoomPage.room.image);
+  context.drawImage(background, 0, 0, canvas.width, canvas.height);
   const bounds = stage.getBoundingClientRect();
   for (const node of el("players").children) {
     for (const image of node.querySelectorAll("img,canvas")) {
       const box = image.getBoundingClientRect(),
         left = ((box.left - bounds.left) / bounds.width) * size,
-        top = ((box.top - bounds.top) / bounds.height) * size,
+        top = ((box.top - bounds.top) / bounds.height) * canvas.height,
         width = (box.width / bounds.width) * size,
-        height = (box.height / bounds.height) * size;
+        height = (box.height / bounds.height) * canvas.height;
       try {
         await image.decode?.();
         const avatar = JSON.parse(node.dataset.avatar || "{}");
@@ -599,7 +600,7 @@ function startMoving() {
   }
 }
 el("mapStage").addEventListener("pointerdown", (e) => {
-  if (!joined || e.button !== 0 || e.target.closest(".being-profile-link")) return;
+  if (!joined || e.button !== 0 || e.target.closest(".being-profile-link, .room-door")) return;
   const r = e.currentTarget.getBoundingClientRect();
   target = clampPosition(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
   el("walkMarker").style.left = target.x + "%";

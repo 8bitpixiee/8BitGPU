@@ -1,0 +1,12 @@
+/* The stage, background, players and doors share one proportional coordinate space. */
+.connected-room #mapStage {width:var(--room-stage-width,100%)!important;height:var(--room-stage-height,100%)!important;flex:none;max-width:none;max-height:none;aspect-ratio:auto;background-size:contain!important;background-repeat:no-repeat;background-position:center;}
+.connected-room #arcadeMap {align-items:center;justify-content:center;}
+.connected-room .being {width:22cqh;height:22cqh;}
+.connected-room[data-room=pillow] .room-sign {display:none;}
+.room-door {position:absolute;z-index:25;transform:translate(-50%,-85%);display:flex;flex-direction:column;align-items:center;gap:3px;width:90px;padding:0;border:0;background:none;box-shadow:none;cursor:pointer;text-decoration:none;}
+.room-door:hover {transform:translate(-50%,-85%);}
+.room-door-icon {display:grid;place-items:center;width:30px;height:38px;border:3px outset #dec9ef;background:linear-gradient(90deg,#46305f,#8b59ac);color:white;font:bold 19px Tahoma,sans-serif;box-shadow:1px 2px #20152d;}
+.room-door-label {display:block;max-width:115px;padding:3px 5px;border:1px solid #e7d5f1;border-radius:3px;background:#2d1c40ed;color:#fff;font-size:10px;line-height:1.25;white-space:normal;text-align:center;}
+.room-door:hover .room-door-icon,.room-door:focus-visible .room-door-icon {outline:2px solid #c6ffdc;outline-offset:2px;}
+.connected-room .movement-hint {z-index:26;}
+@media(max-width:650px) and (orientation:portrait){.connected-room #arcadeMap{min-height:240px;height:min(66svh,500px);}.room-door-icon{width:28px;height:34px;}.room-door-label{max-width:90px;font-size:9px;}}
