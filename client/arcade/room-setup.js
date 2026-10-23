@@ -32,6 +32,15 @@
   const ratio=room.width/room.height;
   function fit(){const width=map.clientWidth,height=map.clientHeight;if(!width||!height)return;const w=Math.min(width,height*ratio);stage.style.setProperty('--room-stage-width',w+'px');stage.style.setProperty('--room-stage-height',(w/ratio)+'px');}
   new ResizeObserver(fit).observe(map);fit();
+  const toggle=document.createElement('button');toggle.type='button';toggle.id='roomMapView';
+  const chat=document.querySelector('.room-chat');chat.id='connectedRoomChat';toggle.setAttribute('aria-controls',chat.id);
+  document.querySelector('.arcade-header').insertBefore(toggle,document.getElementById('roomCamera'));
+  let expanded=false;
+  function mapView(value){expanded=value;document.body.classList.toggle('room-map-view',value);toggle.textContent=value?'Show chat':'Map view';toggle.setAttribute('aria-pressed',String(value));try{localStorage.setItem('8bitgpu-room-map-view',String(value));}catch{}requestAnimationFrame(fit);}
+  toggle.onclick=()=>mapView(!expanded);
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&expanded)mapView(false);});
+  try{expanded=localStorage.getItem('8bitgpu-room-map-view')==='true';}catch{}
+  mapView(expanded);
   // Keep the desktop window title in sync when a doorway changes the room.
   if(parent!==window)parent.postMessage({type:'8bitgpu-room-changed',room:room.id},location.origin);
 })();

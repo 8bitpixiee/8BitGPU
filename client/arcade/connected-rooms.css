@@ -10,3 +10,15 @@
 .room-door:hover .room-door-icon,.room-door:focus-visible .room-door-icon {outline:2px solid #c6ffdc;outline-offset:2px;}
 .connected-room .movement-hint {z-index:26;}
 @media(max-width:650px) and (orientation:portrait){.connected-room #arcadeMap{min-height:240px;height:min(66svh,500px);}.room-door-icon{width:28px;height:34px;}.room-door-label{max-width:90px;font-size:9px;}}
+
+/* Map view gives the proportional stage all the available window space. */
+.connected-room #roomMapView {white-space:nowrap;min-height:28px;cursor:pointer;}
+.connected-room .room-layout {grid-template-columns:minmax(0,1fr) 220px;}
+.connected-room.room-map-view #arcadeGame {position:relative;min-height:0;height:100dvh;}
+.connected-room.room-map-view .room-layout {display:grid!important;grid-template-columns:1fr!important;grid-template-rows:1fr!important;flex:1;min-height:0;overflow:hidden;}
+.connected-room.room-map-view #arcadeMap {height:100%!important;min-height:0!important;}
+.connected-room.room-map-view .room-chat,.connected-room.room-map-view footer {display:none!important;}
+.connected-room.room-map-view .arcade-header {position:absolute;right:6px;top:6px;z-index:40;width:auto;padding:0;border:0;background:transparent;}
+.connected-room.room-map-view .arcade-header > :not(#roomMapView) {display:none!important;}
+.connected-room.room-map-view #roomStatus {position:absolute;left:6px;bottom:30px;z-index:40;max-width:calc(100% - 12px);}
+@media(max-width:650px) and (orientation:portrait){.connected-room:not(.room-map-view) .room-layout {display:block;}.connected-room:not(.room-map-view) .arcade-header {flex-wrap:wrap;gap:6px;}}

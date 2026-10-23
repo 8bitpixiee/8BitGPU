@@ -33,10 +33,15 @@
     if (/^#[a-f\d]{6}$/i.test(colors.edge))
       document.documentElement.style.setProperty("--title-ink", contrast(colors.edge));
   }
+  const paletteKey = '8bitgpu-window-colors';
+  const remember = colors => {try {localStorage.setItem(paletteKey, JSON.stringify(colors));} catch {}};
+  try {apply(JSON.parse(localStorage.getItem(paletteKey) || 'null'));} catch {}
+  window.addEventListener('storage', event => {if(event.key === paletteKey){try {apply(JSON.parse(event.newValue || 'null'));} catch {}}});
   window.applyWindowTheme = apply;
   window.addEventListener("message", (e) => {
     if (e.origin === location.origin && e.data?.type === "8bitgpu-theme-saved") {
       apply(e.data.colors);
+      if (!e.data.preview) remember(e.data.colors);
       document
         .querySelectorAll("iframe")
         .forEach((f) => f.contentWindow?.postMessage(e.data, location.origin));
@@ -45,7 +50,7 @@
   if (!location.pathname.endsWith("profile.html"))
     fetch("/api/profile/me", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => apply(d?.profile?.style))
+      .then((d) => {if(d?.profile?.style){remember(d.profile.style);apply(d.profile.style);}})
       .catch(() => {});
   const pulse = () => {
     if (!document.hidden)
