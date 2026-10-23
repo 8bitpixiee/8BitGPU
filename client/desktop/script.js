@@ -355,7 +355,7 @@ const desktopApps = {
     height: 335,
     left: 210,
     top: 105,
-    content: `<section class="os-welcome"><h2>Welcome to 8BitGPU</h2><p>A little enchanted computer world for games, glow-ups, streams, store drops, and pixie behavior.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>`,
+    content: `<section class="os-welcome"><h2>Welcome to 8BitGPU</h2><p>Games, streams and the store on one desktop.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>`,
   },
   account: { title: "Account.exe", src: "account.html", width: 510, height: 650, left: 230, top: 65 },
   chat: { title: "Chat.exe", src: "chat.html", width: 680, height: 650, left: 190, top: 45 },
@@ -406,8 +406,8 @@ const desktopApps = {
       const inventory = getGameState().inventory || [];
       const items = inventory.length
         ? inventory.map((item) => `<li>✦ ${item}</li>`).join("")
-        : "<li>Nothing collected yet. Visit Arcade 01!</li>";
-      return `<section class="os-welcome os-inventory"><p class="os-profile-label">PIXIE POCKET</p><h2>Inventory</h2><ul>${items}</ul><button type="button" onclick="openApp('arcade')">Go to Arcade 01</button></section>`;
+        : "<li>Nothing collected yet.</li>";
+      return `<section class="os-welcome os-inventory"><h2>Inventory</h2><ul>${items}</ul><button type="button" onclick="openApp('arcade')">Open the Arcade</button></section>`;
     },
   },
   discord: {
@@ -641,7 +641,7 @@ function openApp(appName, profileUsername) {
     windowElement.appendChild(frame);
   } else if (app.external) {
     const content = document.createElement("div");
-    content.innerHTML = `<section class="os-welcome os-link-window"><p class="os-profile-label">DESKTOP SHORTCUT</p><h2>${app.title.replace(".exe", "")}</h2><p>${app.description}</p><button type="button" data-external-link>Launch</button></section>`;
+    content.innerHTML = `<section class="os-welcome os-link-window"><h2>${app.title.replace(".exe", "")}</h2><p>${app.description}</p><button type="button" data-external-link>Launch</button></section>`;
     content
       .querySelector("[data-external-link]")
       .addEventListener("click", () => window.open(app.external, "_blank", "noopener"));

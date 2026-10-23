@@ -108,7 +108,7 @@ function render(data) {
     }
     if (!data.messages.length) {
       const empty = document.createElement("p");
-      empty.textContent = "The Garden is quiet. Start the conversation!";
+      empty.textContent = "No messages yet.";
       fragment.append(empty);
     }
     log.replaceChildren(fragment);

@@ -64,7 +64,6 @@ body {
 }
 
 .eyebrow, h1, .intro, form, .status-card, .future-note { position: relative; z-index: 1; }
-.eyebrow { margin: 0; color: #266768; font-size: 14px; font-weight: 700; letter-spacing: 1px; text-shadow: 1px 1px #eaffff; }
 h1 { margin: 9px 0 7px; color: #593576; font-size: clamp(34px, 7vw, 50px); line-height: .95; text-shadow: 2px 2px #ffffff; }
 .intro { max-width: 400px; margin: 0 0 24px; color: #3c2450; font-size: 19px; }
 

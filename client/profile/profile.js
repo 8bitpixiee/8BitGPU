@@ -395,10 +395,10 @@ function render(nextProfile) {
   byId("profileUrl").textContent = path;
   byId("profileName").textContent = profile.username;
   byId("cardName").textContent = profile.username;
-  byId("moodText").textContent = profile.mood || "Currently decorating this page.";
-  byId("aboutText").textContent = profile.about || "This page is still being decorated.";
+  byId("moodText").textContent = profile.mood || "No mood set.";
+  byId("aboutText").textContent = profile.about || "Nothing here yet.";
   byId("favoritesText").textContent =
-    profile.favorites || "Add some favorite things to make this page yours.";
+    profile.favorites || "No favorites yet.";
   renderAvatar(profile.avatar);
   Badges.render(
     byId("badgeRow"),

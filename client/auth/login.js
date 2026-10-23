@@ -85,7 +85,7 @@ async function loadExistingAccount() {
     const response = await fetch("/api/auth/me", { cache: "no-store" });
     const data = await response.json();
     if (!data.user) {
-      setStatus("System ready. Log in or create your player account.");
+      setStatus("Log in or create an account.");
       return;
     }
     displayName.value = data.user.username;
@@ -96,7 +96,7 @@ async function loadExistingAccount() {
     }
     setStatus(`Already connected as ${data.user.username}.`);
   } catch {
-    setStatus("Player database is waking up. You can still continue as a guest.");
+    setStatus("Couldn't reach the server. You can still continue as a guest.");
   }
 }
 

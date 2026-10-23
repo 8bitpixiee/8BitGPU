@@ -17,18 +17,17 @@
         </header>
 
         <section class="login-content">
-            <p class="eyebrow">PLAYER ACCESS TERMINAL</p>
-            <h1>Welcome, creature.</h1>
-            <p class="intro">Make your player account once, then your creature and saved fits can follow you into the world.</p>
+            <h1>Log in</h1>
+            <p class="intro">Your account keeps your Being and outfits saved online.</p>
 
             <form id="loginForm">
                 <label for="displayName">Creature name</label>
                 <input id="displayName" name="displayName" minlength="3" maxlength="18" autocomplete="username" placeholder="ex. mossy.exe" required>
-                <p class="input-note">3–18 letters, numbers, dots, dashes, or underscores.</p>
+                <p class="input-note">3–18 characters. Letters, numbers, . - and _ only.</p>
 
                 <label for="password">Passcode</label>
                 <input id="password" name="password" type="password" minlength="8" autocomplete="current-password" placeholder="at least 8 characters" required>
-                <p class="input-note">Your passcode is protected by the player database—never stored in this browser.</p>
+                <p class="input-note">Your passcode is hashed on the server and never saved in the browser.</p>
 
                 <button class="primary-button" type="submit">Log In</button>
                 <button class="secondary-button" type="button" id="registerButton">Create Account</button>
@@ -43,7 +42,6 @@
 
             <details><summary>Forgot your passcode?</summary><form id="recoveryForm"><label for="savedRecoveryKey">Your saved recovery key</label><input id="savedRecoveryKey" type="password" autocomplete="off" maxlength="100" required><label for="newPassword">New passcode</label><input id="newPassword" type="password" autocomplete="new-password" minlength="8" maxlength="128" required><button class="secondary-button">Reset passcode</button></form><p>A recovery key must have been created in Account.exe before losing access.</p></details>
             <p><a href="account.html">Account settings &amp; recovery key</a></p>
-            <p class="future-note">Logged-in creatures keep their Avatar Lab outfit online. Inventory and game progress are next.</p>
         </section>
     </main>
     <script src="client/auth/login.js"></script>

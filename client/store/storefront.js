@@ -23,7 +23,7 @@ function products() {
             `<article class="product-card"><span class="tag">${p.type}</span><h2>${p.name}</h2><p>${p.description}</p><footer><strong class="price">${p.price == null ? "QUOTE" : money.format(p.price)}</strong>${p.price == null ? `<a href="${p.inquiryUrl}" target="_blank" rel="noopener">INQUIRE ↗</a>` : `<button data-add="${p.id}">ADD TO BAG</button>`}</footer></article>`,
         )
         .join("")
-    : `<article class="stocking-card"><strong>STOCKING THE SHELVES…</strong><p>The marketplace bones are online. Products are coming next.</p></article>`;
+    : `<article class="stocking-card"><strong>No products yet</strong><p>Check back soon.</p></article>`;
 }
 function payload() {
   return [...S.cart].map(([id, quantity]) => ({ id, quantity }));
