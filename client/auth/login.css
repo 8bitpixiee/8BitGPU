@@ -113,3 +113,5 @@ button { font-family: inherit; font-weight: 700; cursor: pointer; }
 .google-button[hidden] { display: none; }
 
 [hidden] { display: none !important; }
+
+.legal-links { margin: 10px 0 0; font-size: 13px; }

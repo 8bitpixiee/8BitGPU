@@ -294,3 +294,8 @@
     border-radius: 2px !important;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, .45);
 }
+
+.sm-foot { justify-content: space-between; align-items: center; }
+.sm-legal { display: flex; gap: 12px; }
+.sm-legal button { padding: 0; border: 0; color: rgba(255, 255, 255, .85); background: none; font-size: 11px; text-decoration: underline; cursor: pointer; }
+#osStartMenu .sm-legal button:hover { color: #fff; }

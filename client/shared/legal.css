@@ -1,0 +1,12 @@
+body { margin: 0; color: var(--ink, #321c48); background: var(--paper, #fffdf8); font-size: 15px; line-height: 1.6; }
+.legal { box-sizing: border-box; max-width: 760px; margin: 0 auto; padding: 24px 22px 48px; }
+.legal h1 { margin: 0 0 4px; font-size: 28px; }
+.legal .updated { margin: 0 0 22px; color: var(--ink, #321c48); opacity: .7; font-size: 13px; }
+.legal h2 { margin: 28px 0 6px; padding-bottom: 4px; border-bottom: 1px solid var(--panel, #e4d5ee); font-size: 18px; }
+.legal p, .legal li { margin: 0 0 10px; }
+.legal ul { margin: 0 0 10px; padding-left: 22px; }
+.legal a { color: var(--edge, #724a91); }
+.legal-nav { display: flex; gap: 14px; margin-bottom: 18px; font-size: 13px; }
+.legal table { width: 100%; margin: 0 0 12px; border-collapse: collapse; font-size: 14px; }
+.legal th, .legal td { padding: 6px 8px; border: 1px solid var(--panel, #e4d5ee); text-align: left; vertical-align: top; }
+.legal th { background: var(--panel, #e4d5ee); }
