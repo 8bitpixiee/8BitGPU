@@ -97,3 +97,27 @@ test("assembleBadges gives each name its own picks and friend badges", async () 
   assert.deepEqual(badges.plain, { picks: [], earned: [] });
   assert.deepEqual(badges.pickle.earned, ["crew"]);
 });
+
+test("once doesn't wedge when the request that started setup is cancelled", async () => {
+  let runs = 0;
+  // the first run never settles, like an I/O promise whose request was dropped
+  const ready = once(async () => {
+    if (++runs === 1) await new Promise(() => {});
+  }, 25);
+  const started = Date.now();
+  await ready({});
+  assert.equal(runs, 2);
+  assert.ok(Date.now() - started < 1000);
+  await ready({});
+  assert.equal(runs, 2);
+});
+
+test("once still shares one setup between calls that pile up", async () => {
+  let runs = 0;
+  const ready = once(async () => {
+    runs++;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }, 1000);
+  await Promise.all([ready({}), ready({}), ready({}), ready({})]);
+  assert.equal(runs, 1);
+});
