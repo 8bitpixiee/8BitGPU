@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="client/shared/retro-windows.css">
+<link rel="stylesheet" href="client/shared/global-appearance.css">
 <link rel="stylesheet" href="client/desktop/vista.css"></head>
 
 <body>
@@ -246,6 +247,7 @@
                 <button class="taskbar-social" type="button" onclick="openApp('twitch')" aria-label="Open Twitch"><img src="assets/media/twitch.png" alt=""></button>
                 <button class="taskbar-social" type="button" onclick="openApp('discord')" aria-label="Open Discord"><img src="assets/media/discord.png" alt=""></button>
             </div>
+            <button id="taskbarAppearance" type="button" onclick="openApp('appearance')" aria-label="Customize desktop colors and fonts" title="Appearance">?</button>
             <span id="osClock" aria-label="Current local time"></span>
             <button id="osTray" type="button" onclick="cycleAngelTime()" aria-label="Change angel time message"></button>
         </div>

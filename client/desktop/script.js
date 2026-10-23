@@ -425,8 +425,8 @@ const desktopApps = {
   appearance: {
     title: "Appearance",
     src: "appearance.html",
-    width: 480,
-    height: 420,
+    width: 520,
+    height: 640,
     left: 250,
     top: 100,
   },

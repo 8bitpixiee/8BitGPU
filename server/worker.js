@@ -1,5 +1,6 @@
 import { badgesFor, cleanPicks, savePicks } from "./badges.js";
 import { handleGoogle } from "./google.js";
+import { saveWindowStyle } from "./window-style.js";
 import { handleSocial } from "./social/social.js";
 import { handleChat, loungeCall } from "./chat/chat.js";
 import { mayUseBody, roomAvatar } from "./chat/chat-avatar.js";
@@ -705,6 +706,17 @@ async function handleApi(request, env, url) {
     return json({
       profile: publicProfile(await findProfileBy(env.DB, "id", user.id), await badgesFor(env.DB, user.id, user.username)),
     });
+  }
+
+  if (path === "/api/profile/me/style" && request.method === "PUT") {
+    const user = await currentUser(request, env.DB);
+    if (!user) return json({ error: "Sign in to save your desktop colors." }, 401);
+    const body = await readBody(request);
+    const current = await findProfileBy(env.DB, "id", user.id);
+    const style = profileStyle(body?.style, current?.theme || "violet");
+    if (!style) return json({ error: "Those desktop colors are not valid." }, 400);
+    await saveWindowStyle(env.DB, user.id, style);
+    return json({ profile: publicProfile(await findProfileBy(env.DB, "id", user.id)) });
   }
 
   if (path === "/api/profile/me" && request.method === "PUT") {

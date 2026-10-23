@@ -1,0 +1,13 @@
+#globalAppearanceColors {margin:16px 0;padding:8px;border:2px groove var(--panel);}
+#globalAppearanceColors summary {cursor:pointer;padding:5px;font-size:13px;font-weight:bold;}
+#globalAppearanceColors .global-color-item {margin-top:6px;border:1px solid var(--edge);}
+#globalAppearanceColors .global-swatch {display:inline-block;width:15px;height:15px;margin-right:7px;vertical-align:middle;border:1px solid currentColor;}
+#globalAppearanceColors .global-color-body {display:grid;gap:7px;padding:9px;}
+#globalAppearanceColors .global-color-heading {display:grid;grid-template-columns:45px minmax(0,1fr);gap:7px;align-items:center;}
+#globalAppearanceColors input[type=color] {width:45px;height:34px;padding:2px;}
+#globalAppearanceColors input[type=text] {min-width:0;width:100%;padding:6px;background:var(--paper);color:var(--ink);border:2px inset var(--panel);}
+#globalAppearanceColors label {display:flex;justify-content:space-between;font-size:12px;}
+#globalAppearanceColors input[type=range] {width:100%;margin:0;accent-color:var(--edge);}
+#globalAppearanceColors .global-color-actions {display:flex;gap:7px;flex-wrap:wrap;margin:10px 0;}
+#globalAppearanceColors button {min-height:32px;border:2px outset var(--panel);background:var(--panel);color:var(--control-ink);}
+#globalAppearanceStatus {font-size:11px;line-height:1.5;}
