@@ -5,6 +5,7 @@ import { handleSocial } from "./social/social.js";
 import { handleChat, loungeCall } from "./chat/chat.js";
 import { mayUseBody, roomAvatar } from "./chat/chat-avatar.js";
 import { once } from "./once.js";
+import { isBossName } from "./boss.js";
 import { STORE_PRODUCTS } from "./store/store-catalog.js";
 
 const SESSION_LENGTH_SECONDS = 60 * 60 * 24 * 30;
@@ -638,9 +639,17 @@ async function handleApi(request, env, url) {
     return json({ user: user ? publicUser(user) : null });
   }
 
+  if (path === "/api/auth/admin")
+    return json(
+      { error: "no admin session", hint: "a couple of names are kept for the boss" },
+      401,
+      { "x-reserved-names": "2" },
+    );
+
   if (path === "/api/auth/register" && request.method === "POST") {
     const body = await readBody(request);
     const username = typeof body?.username === "string" ? body.username.trim() : "";
+    if (isBossName(username)) return json({ error: "nice try", egg: "admin" }, 403, { "x-boss-fight": "not-today" });
     const password = body?.password;
     if (!validUsername(username || ""))
       return json({ error: "Use 3–18 letters, numbers, dots, dashes, or underscores." }, 400);
@@ -666,6 +675,7 @@ async function handleApi(request, env, url) {
     const body = await readBody(request);
     const username = typeof body?.username === "string" ? body.username.trim() : "";
     const password = body?.password;
+    if (isBossName(username)) return json({ error: "nice try", egg: "admin" }, 403, { "x-boss-fight": "not-today" });
     const user =
       typeof username === "string"
         ? await env.DB.prepare("SELECT * FROM users WHERE username = ?").bind(username).first()

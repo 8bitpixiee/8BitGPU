@@ -121,3 +121,11 @@ test("once still shares one setup between calls that pile up", async () => {
   await Promise.all([ready({}), ready({}), ready({}), ready({})]);
   assert.equal(runs, 1);
 });
+
+test("admin and administrator are boss names, any case", async () => {
+  const { isBossName } = await import("../server/boss.js");
+  assert.equal(isBossName("admin"), true);
+  assert.equal(isBossName("  Administrator "), true);
+  assert.equal(isBossName("adminton"), false);
+  assert.equal(isBossName(undefined), false);
+});
