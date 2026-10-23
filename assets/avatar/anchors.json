@@ -28,6 +28,7 @@
     "macho.png",
     "mermaid_f.png",
     "mermaid_m.png",
+    "pickle.png",
     "voidling_f.png",
     "voidling_m.png"
   ],
@@ -408,6 +409,32 @@
       "extra": {
         "x": 2,
         "y": -11
+      },
+      "chest": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "pickle.png": {
+      "ears": {
+        "x": 2,
+        "y": -7
+      },
+      "eyes": {
+        "x": 2,
+        "y": -7
+      },
+      "hair": {
+        "x": 2,
+        "y": -7
+      },
+      "fit": {
+        "x": 2,
+        "y": -8
+      },
+      "extra": {
+        "x": 2,
+        "y": -8
       },
       "chest": {
         "x": 0,

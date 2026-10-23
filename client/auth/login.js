@@ -85,7 +85,7 @@ async function loadExistingAccount() {
     const response = await fetch("/api/auth/me", { cache: "no-store" });
     const data = await response.json();
     if (!data.user) {
-      setStatus("System ready. Log in or create your player account.");
+      setStatus("Log in or create an account.");
       return;
     }
     displayName.value = data.user.username;
@@ -96,11 +96,29 @@ async function loadExistingAccount() {
     }
     setStatus(`Already connected as ${data.user.username}.`);
   } catch {
-    setStatus("Player database is waking up. You can still continue as a guest.");
+    setStatus("Couldn't reach the server. You can still continue as a guest.");
   }
 }
 
 loadExistingAccount();
+
+// inside the desktop the legal pages open as windows instead of replacing this one
+document.querySelectorAll("a[data-app]").forEach((link) =>
+  link.addEventListener("click", (event) => {
+    if (window.parent === window) return;
+    event.preventDefault();
+    window.parent.postMessage({ type: "8bitgpu-open-app", app: link.dataset.app }, location.origin);
+  }),
+);
+
+// the button only shows once the deployment has Google keys
+fetch("/api/auth/google/config", { cache: "no-store" })
+  .then((response) => response.json())
+  .then((data) => {
+    document.getElementById("googleButton").hidden = !data.enabled;
+    document.getElementById("orRule").hidden = !data.enabled;
+  })
+  .catch(() => {});
 
 document.getElementById("recoveryForm").addEventListener("submit", async (event) => {
   event.preventDefault();

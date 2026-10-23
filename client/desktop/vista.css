@@ -1,0 +1,301 @@
+/* Start menu, being dock and taskbar. Vista-style glass without live blur:
+   the wallpaper is a full-screen photo, so backdrop-filter repaints too much on hover. */
+:root {
+    --glass-top: rgba(166, 126, 220, .92);
+    --glass-bottom: rgba(66, 40, 108, .95);
+    --glass-edge: rgba(255, 255, 255, .85);
+    --glass-ink: rgba(52, 26, 88, .75);
+    --pane-light: #f8f3ff;
+    --pane-text: #2d1b45;
+    --pane-hint: #6e5a86;
+    --btn-light: linear-gradient(#f8f2ff, #d3bcf0 48%, #ab8cd8 52%, #cbb0ea);
+}
+
+/* taskbar */
+#osTaskbar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 20000;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px 0 6px;
+    border-top: 1px solid rgba(255, 255, 255, .8);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 35%, #fff) 0, color-mix(in srgb, var(--accent) 80%, #fff) 46%, color-mix(in srgb, var(--edge) 85%, #000) 50%, color-mix(in srgb, var(--edge) 70%, #000));
+    box-shadow: 0 -1px 0 rgba(58, 28, 90, .6), inset 0 1px rgba(255, 255, 255, .55);
+}
+#osStartButton {
+    flex: 0 0 auto;
+    width: 46px;
+    height: 46px;
+    margin-top: -6px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+#osStartButton img { display: block; width: 44px; height: 44px; image-rendering: pixelated; filter: drop-shadow(0 2px 3px rgba(30, 10, 55, .55)); }
+#osStartButton:hover img { filter: drop-shadow(0 0 6px rgba(255, 255, 255, .85)) brightness(1.12); }
+#osTaskTabs { flex: 1; min-width: 0; display: flex; gap: 4px; align-items: center; }
+.os-task-tab {
+    flex: 0 1 150px;
+    min-width: 0;
+    height: 34px;
+    padding: 0 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .6);
+    border-radius: 5px;
+    color: #fff;
+    background: linear-gradient(rgba(255, 255, 255, .34), rgba(255, 255, 255, .08) 48%, rgba(40, 18, 70, .3) 52%, rgba(255, 255, 255, .1));
+    font-size: 12px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-shadow: 0 1px 1px rgba(30, 10, 55, .7);
+    cursor: pointer;
+}
+.os-task-tab:hover { background: linear-gradient(rgba(255, 255, 255, .5), rgba(255, 255, 255, .2) 48%, rgba(120, 80, 170, .35) 52%, rgba(255, 255, 255, .25)); }
+.os-task-tab.is-active { border-color: #fff; background: linear-gradient(rgba(255, 255, 255, .6), rgba(255, 255, 255, .28) 48%, rgba(150, 110, 205, .5) 52%, rgba(255, 255, 255, .4)); box-shadow: inset 0 0 8px rgba(255, 255, 255, .45); }
+#osSystemTray {
+    flex: 0 0 auto;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    border: 1px solid rgba(255, 255, 255, .45);
+    border-radius: 6px;
+    background: linear-gradient(rgba(255, 255, 255, .22), rgba(40, 18, 70, .28));
+}
+.taskbar-socials { display: flex; gap: 4px; }
+.taskbar-social, #taskbarAppearance {
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .55);
+    border-radius: 5px;
+    background: linear-gradient(rgba(255, 255, 255, .4), rgba(86, 60, 120, .45));
+    cursor: pointer;
+}
+#taskbarAppearance { color: #fff; font-size: 14px; font-weight: 700; text-shadow: 0 1px 1px rgba(30, 10, 55, .8); }
+.taskbar-social img { width: 18px; height: 18px; object-fit: contain; image-rendering: pixelated; }
+#osClock, #osTray { color: #fff; font-size: 12px; text-shadow: 0 1px 1px rgba(30, 10, 55, .7); }
+#osTray { max-width: 230px; overflow: hidden; padding: 0; border: 0; background: none; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+
+/* start menu */
+#osStartMenu {
+    position: fixed;
+    bottom: 50px;
+    left: 6px;
+    z-index: 20001;
+    display: none;
+    width: min(440px, calc(100vw - 12px));
+    padding: 6px 6px 0;
+    border: 1px solid var(--glass-edge);
+    border-radius: 10px 10px 6px 6px;
+    background: linear-gradient(160deg, var(--glass-top), var(--glass-bottom));
+    box-shadow: inset 0 1px rgba(255, 255, 255, .55), inset 0 0 0 1px var(--glass-ink), 0 10px 26px rgba(20, 8, 40, .6);
+}
+#osStartMenu.is-open { display: block; }
+.sm-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 170px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .7);
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px var(--glass-ink);
+}
+.sm-main { display: flex; flex-direction: column; gap: 6px; min-height: 330px; padding: 6px; color: var(--pane-text); background: linear-gradient(var(--pane-light), #e8dcf7); }
+.sm-list { display: flex; flex: 1; flex-direction: column; gap: 2px; }
+.sm-item {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 5px 8px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--pane-text);
+    background: none;
+    text-align: left;
+    cursor: pointer;
+}
+.sm-item[hidden] { display: none; }
+.sm-item img { width: 36px; height: 36px; object-fit: contain; image-rendering: pixelated; }
+.sm-item span { display: grid; gap: 1px; min-width: 0; }
+.sm-item b { font-size: 13px; font-weight: 600; }
+.sm-item small { overflow: hidden; color: var(--pane-hint); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.sm-item:hover, .sm-item:focus-visible { border-color: #b69edb; background: linear-gradient(#f6efff, #dcc8f3); box-shadow: inset 0 0 0 1px #fff; outline: none; }
+.start-search-empty { margin: 18px 8px; color: var(--pane-hint); font-size: 12px; text-align: center; }
+.start-search-empty[hidden] { display: none; }
+.sm-search { display: block; padding-top: 6px; border-top: 1px solid #cdb9e6; }
+.sm-search input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 28px;
+    padding: 0 12px;
+    border: 1px solid #a98bd0;
+    border-radius: 14px;
+    outline: 0;
+    color: var(--pane-text);
+    background: #fff;
+    box-shadow: inset 0 1px 3px rgba(80, 50, 120, .25);
+    font-size: 12px;
+}
+.sm-search input::placeholder { color: var(--pane-hint); font-style: italic; }
+.sm-search input:focus { border-color: #7e57b8; box-shadow: 0 0 0 2px rgba(150, 110, 215, .35); }
+.sm-side { display: flex; flex-direction: column; gap: 2px; padding: 8px 6px; color: #fff; border-left: 1px solid rgba(255, 255, 255, .35); background: linear-gradient(170deg, rgba(122, 82, 176, .97), rgba(62, 36, 102, .98)); }
+.sm-user { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; padding: 2px 4px 10px; border-bottom: 1px solid rgba(255, 255, 255, .22); }
+.sm-user strong { min-width: 0; overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 2px rgba(30, 10, 55, .7); }
+.sm-pic { position: relative; flex: 0 0 48px; width: 48px; height: 48px; overflow: hidden; border: 2px solid rgba(255, 255, 255, .85); border-radius: 8px; background: linear-gradient(160deg, #cdf5ee, #8c78c0); box-shadow: inset 0 0 6px rgba(255, 255, 255, .4); }
+.sm-pic > img { display: block; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+.sm-pic > img[hidden], .sm-being[hidden] { display: none; }
+/* the layers carry the dock's percentages, so this box has to be the same square stage, just bigger */
+.sm-being { position: absolute; top: -2px; left: 50%; width: 132px; height: 132px; transform: translateX(-50%); }
+.sm-being img { image-rendering: pixelated; }
+.sm-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 34px;
+    padding: 3px 8px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #fff;
+    background: none;
+    font-size: 13px;
+    text-align: left;
+    text-shadow: 0 1px 1px rgba(30, 10, 55, .7);
+    cursor: pointer;
+}
+.sm-link img { width: 24px; height: 24px; object-fit: contain; image-rendering: pixelated; }
+.sm-link:hover, .sm-link:focus-visible { border-color: rgba(255, 255, 255, .55); background: linear-gradient(rgba(255, 255, 255, .32), rgba(255, 255, 255, .1)); box-shadow: inset 0 0 6px rgba(255, 255, 255, .25); outline: none; }
+.sm-foot { display: flex; justify-content: flex-end; padding: 6px 4px 6px; }
+.sm-login {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 30px;
+    padding: 2px 14px 2px 5px;
+    border: 1px solid rgba(255, 255, 255, .75);
+    border-radius: 15px;
+    color: #fff;
+    background: linear-gradient(#b68be0, #6e43a0);
+    font-size: 13px;
+    text-shadow: 0 1px 1px rgba(30, 10, 55, .7);
+    cursor: pointer;
+}
+.sm-login img { width: 22px; height: 22px; image-rendering: pixelated; }
+.sm-login:hover { background: linear-gradient(#cba5f0, #8458bb); }
+
+/* being dock: portrait, stats and actions in one card */
+#beingDock {
+    position: fixed;
+    right: 14px;
+    bottom: 58px;
+    z-index: 9999;
+    display: grid;
+    gap: 6px;
+    width: 236px;
+    box-sizing: border-box;
+    padding: 6px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 10px;
+    color: #fff;
+    background: linear-gradient(160deg, var(--glass-top), var(--glass-bottom));
+    box-shadow: inset 0 1px rgba(255, 255, 255, .55), inset 0 0 0 1px var(--glass-ink), 0 6px 18px rgba(20, 8, 40, .5);
+}
+.dock-stage {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .75);
+    border-radius: 6px;
+    background: radial-gradient(circle at 82% 16%, #fff 0 2px, transparent 6px), linear-gradient(160deg, #d2f6ef, #9fc9df 55%, #8f7cc4);
+    box-shadow: inset 0 0 14px rgba(255, 255, 255, .35);
+}
+#companion { position: absolute; bottom: -14px; left: 50%; display: none; width: 190px; height: 190px; transform: translateX(-50%); pointer-events: none; }
+#companion img.has-sprite { visibility: hidden; }
+.dock-info { display: grid; gap: 4px; padding: 0 2px; }
+.dock-who { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 2px; font-size: 12px; text-shadow: 0 1px 2px rgba(30, 10, 55, .7); }
+.dock-who strong { overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.dock-meter { position: relative; height: 16px; overflow: hidden; border: 1px solid rgba(255, 255, 255, .75); border-radius: 8px; background: rgba(30, 14, 55, .6); box-shadow: inset 0 1px 3px rgba(0, 0, 0, .45); }
+.dock-meter i { position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(#86e6a4, #35b874 55%, #249458); box-shadow: inset 0 1px rgba(255, 255, 255, .6); }
+.dock-meter.is-mana i { width: 80%; background: linear-gradient(#c995f2, #9450d0 55%, #7634b0); }
+.dock-meter span, .dock-meter b { color: #fff; }
+.dock-meter span { position: relative; display: flex; justify-content: space-between; padding: 0 8px; font-size: 11px; line-height: 14px; text-shadow: 0 1px 1px rgba(0, 0, 0, .7); }
+.dock-actions, .dock-links { display: grid; gap: 4px; grid-auto-flow: column; grid-auto-columns: 1fr; }
+#beingDock .dock-actions button, #beingDock .dock-links button {
+    height: 26px;
+    padding: 0 6px;
+    border: 1px solid rgba(255, 255, 255, .8);
+    border-radius: 5px;
+    color: var(--pane-text);
+    background: var(--btn-light);
+    box-shadow: inset 0 1px rgba(255, 255, 255, .7);
+    font-size: 12px;
+    font-weight: 600;
+    text-shadow: none;
+    cursor: pointer;
+}
+#beingDock .dock-actions button:hover, #beingDock .dock-links button:hover { color: var(--pane-text); filter: brightness(1.08); }
+
+/* the old base stylesheet stacks buttons in a column and nudges them on hover; menus and the dock want neither */
+#osStartMenu button, #beingDock button, #osTaskbar button { flex-direction: row; }
+#osStartMenu button:hover, #beingDock button:hover, #osTaskbar button:hover { transform: none; text-shadow: none; }
+#osStartMenu .sm-link:hover, #osStartMenu .sm-login:hover, #osTaskbar .os-task-tab:hover, #osTaskbar #osTray:hover { color: #fff; text-shadow: 0 1px 1px rgba(30, 10, 55, .7); }
+#osStartMenu .sm-item:hover { color: var(--pane-text); }
+
+/* window chrome. Colors follow the player's page theme (--accent / --edge), glass sheen on top.
+   retro-windows.css sets the old frame with !important, so this goes through the layer id. */
+#osWindowLayer .os-window {
+    padding: 0 6px 6px !important;
+    border: 1px solid rgba(255, 255, 255, .85) !important;
+    border-radius: 8px 8px 4px 4px !important;
+    background: linear-gradient(165deg, color-mix(in srgb, var(--accent) 60%, #fff) 0, var(--accent) 24%, var(--edge) 100%) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, .6), inset 0 0 0 1px rgba(40, 18, 70, .65), 0 8px 24px rgba(20, 8, 40, .55) !important;
+}
+#osWindowLayer .os-window:not(.is-active-window) { box-shadow: inset 0 1px rgba(255, 255, 255, .4), inset 0 0 0 1px rgba(40, 18, 70, .65), 0 4px 14px rgba(20, 8, 40, .4) !important; }
+#osWindowLayer .os-window-bar {
+    height: 32px !important;
+    margin: 0 !important;
+    padding: 0 0 0 4px !important;
+    border: 0 !important;
+    background: none !important;
+    color: #fff !important;
+    text-shadow: 0 0 8px rgba(255, 255, 255, .75), 0 1px 2px rgba(30, 10, 55, .85) !important;
+}
+#osWindowLayer .os-window-title { font: 600 13px var(--ui-font, "Segoe UI", Tahoma, sans-serif) !important; }
+#osWindowLayer .os-window-actions { gap: 1px !important; align-self: flex-start; margin-top: -1px; }
+#osWindowLayer .os-window-actions button {
+    width: 28px !important;
+    height: 20px !important;
+    border: 1px solid rgba(255, 255, 255, .85) !important;
+    border-radius: 0 0 4px 4px !important;
+    color: #fff !important;
+    background: linear-gradient(rgba(255, 255, 255, .55), rgba(255, 255, 255, .12) 48%, rgba(40, 18, 70, .35) 52%, rgba(255, 255, 255, .15)) !important;
+    box-shadow: inset 0 0 0 1px rgba(40, 18, 70, .35) !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    text-shadow: 0 1px 1px rgba(30, 10, 55, .8) !important;
+}
+#osWindowLayer .os-window-actions button:first-child { border-radius: 0 0 0 4px !important; }
+#osWindowLayer .os-window-actions button:hover { background: linear-gradient(rgba(255, 255, 255, .8), rgba(255, 255, 255, .3) 48%, rgba(120, 80, 170, .45) 52%, rgba(255, 255, 255, .35)) !important; }
+#osWindowLayer .os-window-actions button:last-child { width: 44px !important; background: linear-gradient(#f4b3a8, #dd5a47 48%, #c03020 52%, #e0705d) !important; }
+#osWindowLayer .os-window-actions button:last-child:hover { background: linear-gradient(#ffd0c8, #ef7561 48%, #d4402c 52%, #f08a76) !important; }
+#osWindowLayer .os-window > iframe,
+#osWindowLayer .os-window > div {
+    border: 1px solid rgba(40, 18, 70, .7) !important;
+    border-radius: 2px !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .45);
+}
+
+.sm-foot { justify-content: space-between; align-items: center; }
+.sm-legal { display: flex; gap: 12px; }
+.sm-legal button { padding: 0; border: 0; color: rgba(255, 255, 255, .85); background: none; font-size: 11px; text-decoration: underline; cursor: pointer; }
+#osStartMenu .sm-legal button:hover { color: #fff; }

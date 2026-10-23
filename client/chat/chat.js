@@ -51,6 +51,7 @@ function render(data) {
       row.className = "message";
       const name = document.createElement("strong");
       name.textContent = message.username;
+      Badges.mark(name, message.username);
       const time = document.createElement("time");
       time.dateTime = new Date(message.createdAt).toISOString();
       time.textContent = new Date(message.createdAt).toLocaleTimeString([], {
@@ -108,7 +109,7 @@ function render(data) {
     }
     if (!data.messages.length) {
       const empty = document.createElement("p");
-      empty.textContent = "The Garden is quiet. Start the conversation!";
+      empty.textContent = "No messages yet.";
       fragment.append(empty);
     }
     log.replaceChildren(fragment);

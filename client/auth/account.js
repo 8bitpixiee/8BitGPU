@@ -2,7 +2,7 @@ const byId = (id) => document.getElementById(id);
 const status = (text) => (byId("accountStatus").textContent = text);
 (async () => {
   try {
-    const r = await fetch("/api/auth/me", { cache: "no-store" });
+    const r = await fetch("/api/auth/me", { cache: "no-store", signal: AbortSignal.timeout(10000) });
     if (!r.ok) throw Error("Unable to load your account.");
     const { user } = await r.json();
     if (!user) {
@@ -12,11 +12,46 @@ const status = (text) => (byId("accountStatus").textContent = text);
     byId("signedIn").hidden = false;
     byId("accountName").textContent = user.username;
     byId("accountId").textContent = user.id;
-    status("Your account is connected.");
+    const linked = new URLSearchParams(location.search).get("link");
+    status(
+      {
+        done: "Google account linked.",
+        taken: "That Google account is already linked to a different account.",
+        already: "This account already has a Google account linked.",
+      }[linked] || "Your account is connected.",
+    );
+  } catch (e) {
+    status(e.name === "TimeoutError" ? "The server isn't answering. Close this window and try again in a moment." : e.message);
+  }
+})();
+async function loadGoogle() {
+  try {
+    const r = await fetch("/api/auth/google/status", { cache: "no-store" });
+    const g = await r.json();
+    if (!r.ok || !g.enabled) return;
+    byId("googleLink").hidden = false;
+    byId("googleState").textContent = g.linked
+      ? `Linked to ${g.email}. You can sign in with Google or your passcode.`
+      : "Link a Google account to sign in with it. This keeps this account, its Being and its friends.";
+    byId("googleLinkButton").hidden = g.linked;
+    byId("googleUnlink").hidden = !g.linked || !g.canUnlink;
+    if (g.linked && !g.canUnlink) byId("googleState").textContent += " This account has no passcode, so Google can't be unlinked.";
+  } catch {
+    /* the section just stays hidden */
+  }
+}
+byId("googleUnlink").onclick = async () => {
+  try {
+    const r = await fetch("/api/auth/google/unlink", { method: "POST" });
+    const d = await r.json();
+    if (!r.ok) throw Error(d.error);
+    status("Google unlinked.");
+    loadGoogle();
   } catch (e) {
     status(e.message);
   }
-})();
+};
+loadGoogle();
 byId("keyForm").onsubmit = async (e) => {
   e.preventDefault();
   const button = e.submitter;

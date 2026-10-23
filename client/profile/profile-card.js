@@ -14,8 +14,8 @@ async function load() {
       picture.hidden = false;
       picture.onerror = () => (picture.hidden = true);
     }
-    id("about").textContent = p.about || "This page is still being decorated.";
-    id("mood").textContent = p.mood || "Currently decorating their corner of the internet.";
+    id("about").textContent = p.about || "Nothing here yet.";
+    id("mood").textContent = p.mood || "No mood set.";
     window.applyWindowTheme?.(p.style);
     id("visit").onclick = () =>
       parent.postMessage({ type: "8bitgpu-open-profile", username: p.username }, location.origin);

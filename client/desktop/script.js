@@ -1,3 +1,26 @@
+// guests get a pixie to look at until they make their own
+const DEFAULT_OUTFIT = {
+  version: 2,
+  species: "Pixie",
+  build: "Fae",
+  skinTone: "Nutmeg",
+  layout: 2,
+  layers: {
+    ears: "assets/avatar/ears_fem_v1.png",
+    eyes: "assets/avatar/eyes_fem_v1.png",
+    hair: "assets/avatar/hair_fem_v1.png",
+    fit: "assets/avatar/fit_fem_v1.png",
+  },
+};
+
+// the start menu portrait wears whatever the dock is wearing
+function syncStartBeing() {
+  document.querySelectorAll("#startUserBeing [data-avatar-layer]").forEach((preview) => {
+    const layer = document.getElementById(preview.dataset.avatarLayer);
+    if (layer) preview.style.cssText = layer.style.cssText;
+  });
+}
+
 function loadSavedOutfit() {
   let savedOutfit;
 
@@ -7,9 +30,7 @@ function loadSavedOutfit() {
     return;
   }
 
-  if (!savedOutfit) {
-    return;
-  }
+  if (!savedOutfit) savedOutfit = DEFAULT_OUTFIT;
 
   const companion = document.getElementById("companion");
   if (companion) companion.style.display = "block";
@@ -93,6 +114,7 @@ function loadSavedOutfit() {
         previewLayer.style.transform = transform;
       });
     });
+    syncStartBeing();
     return;
   }
 
@@ -286,6 +308,8 @@ function renderGameHud() {
   if (xpElement) xpElement.textContent = `${currentXp} / 300`;
   if (manaElement) manaElement.textContent = `${mana} / 100`;
   if (fill) fill.style.width = `${(currentXp / 300) * 100}%`;
+  const manaFill = document.getElementById("manaFill");
+  if (manaFill) manaFill.style.width = `${mana}%`;
 }
 
 renderPlayerBadge();
@@ -319,8 +343,15 @@ async function restoreOnlinePlayer() {
   }
 }
 
+// Google sends people back here with ?link=done|taken|already after linking an account
+const returnedFrom = new URLSearchParams(location.search);
+if (returnedFrom.has("link") || returnedFrom.has("signin")) history.replaceState(null, "", location.pathname);
+
 restoreOnlinePlayer().then((isLoggedIn) => {
-  if (!isLoggedIn && localStorage.getItem("8bitgpu-guest-session") !== "true") openApp("login");
+  if (returnedFrom.has("link") && isLoggedIn) {
+    desktopApps.account.src = `account.html?link=${encodeURIComponent(returnedFrom.get("link"))}`;
+    openApp("account");
+  } else if (!isLoggedIn && localStorage.getItem("8bitgpu-guest-session") !== "true") openApp("login");
 });
 
 const desktopApps = {
@@ -331,9 +362,9 @@ const desktopApps = {
     height: 335,
     left: 210,
     top: 105,
-    content: `<section class="os-welcome"><h2>Welcome to 8BitGPU</h2><p>A little enchanted computer world for games, glow-ups, streams, store drops, and pixie behavior.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>`,
+    content: `<section class="os-welcome"><h2>Welcome to 8BitGPU</h2><p>Games, streams and the store on one desktop.</p><button type="button" onclick="openApp('avatarLab')">Open Avatar Lab</button></section>`,
   },
-  account: { title: "Account.exe", src: "account.html", width: 510, height: 650, left: 230, top: 65 },
+  account: { title: "Account.exe", src: "account.html", width: 510, height: 560, left: 230, top: 65 },
   chat: { title: "Chat.exe", src: "chat.html", width: 680, height: 650, left: 190, top: 45 },
   avatarLab: {
     title: "Avatar Lab.exe",
@@ -382,8 +413,8 @@ const desktopApps = {
       const inventory = getGameState().inventory || [];
       const items = inventory.length
         ? inventory.map((item) => `<li>✦ ${item}</li>`).join("")
-        : "<li>Nothing collected yet. Visit Arcade 01!</li>";
-      return `<section class="os-welcome os-inventory"><p class="os-profile-label">PIXIE POCKET</p><h2>Inventory</h2><ul>${items}</ul><button type="button" onclick="openApp('arcade')">Go to Arcade 01</button></section>`;
+        : "<li>Nothing collected yet.</li>";
+      return `<section class="os-welcome os-inventory"><h2>Inventory</h2><ul>${items}</ul><button type="button" onclick="openApp('arcade')">Open the Arcade</button></section>`;
     },
   },
   discord: {
@@ -395,6 +426,8 @@ const desktopApps = {
     left: 315,
     top: 150,
   },
+  terms: { title: "Terms of Service", src: "terms.html", width: 620, height: 560, left: 260, top: 70 },
+  privacy: { title: "Privacy Policy", src: "privacy.html", width: 620, height: 560, left: 290, top: 90 },
   important: { title: "IMPORTANT.exe", src: "nick.html", width: 550, height: 450, left: 330, top: 105 },
   sonic: { title: "Sonic.exe", src: "sonic.html", width: 550, height: 450, left: 365, top: 130 },
   profile: { title: "MyPixel.exe", src: "profile.html", width: 900, height: 650, left: 125, top: 50 },
@@ -439,9 +472,7 @@ function closePocketApps() {
 function playBeingAction(action) {
   const companion = document.getElementById("companion");
   if (!companion || companion.style.display === "none") return;
-  companion.classList.remove("is-wave", "is-dance", "is-spin");
-  void companion.offsetWidth;
-  companion.classList.add(`is-${action}`);
+  BeingSprite.play(action);
 }
 
 window.toggleStartMenu = toggleStartMenu;
@@ -619,7 +650,7 @@ function openApp(appName, profileUsername) {
     windowElement.appendChild(frame);
   } else if (app.external) {
     const content = document.createElement("div");
-    content.innerHTML = `<section class="os-welcome os-link-window"><p class="os-profile-label">DESKTOP SHORTCUT</p><h2>${app.title.replace(".exe", "")}</h2><p>${app.description}</p><button type="button" data-external-link>Launch</button></section>`;
+    content.innerHTML = `<section class="os-welcome os-link-window"><h2>${app.title.replace(".exe", "")}</h2><p>${app.description}</p><button type="button" data-external-link>Launch</button></section>`;
     content
       .querySelector("[data-external-link]")
       .addEventListener("click", () => window.open(app.external, "_blank", "noopener"));

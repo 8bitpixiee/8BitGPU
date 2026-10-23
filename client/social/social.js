@@ -74,6 +74,7 @@ function friendRow(friend, preview = "") {
   const text = document.createElement("span"),
     name = document.createElement("strong");
   name.textContent = friend.username;
+  Badges.mark(name, friend.username);
   text.append(name);
   if (preview) {
     const info = document.createElement("small");
@@ -97,7 +98,7 @@ async function loadHome() {
     friendBox.append(
       Object.assign(document.createElement("div"), {
         className: "entry empty",
-        textContent: "No accepted friends yet.",
+        textContent: "No friends yet. Add 8Bit_Pixiee.dev or pickle to get a badge for it.",
       }),
     );
   for (const f of friends) {

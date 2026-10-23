@@ -1,8 +1,8 @@
 .emote-bar {
     display: flex;
     gap: 4px;
+    flex-wrap: wrap;
     padding: 6px;
-    overflow-x: auto;
     background: #bda2cc;
     border-bottom: 1px solid #8f70a4;
 }
@@ -63,7 +63,7 @@
     #arcadeMap { height: min(66svh, 560px); min-height: 360px; }
     .room-chat { min-height: 360px; border-top: 2px solid #ab87c3; }
     #roomMessages { min-height: 190px; max-height: 38svh; }
-    .emote-bar { position: sticky; top: 0; z-index: 4; }
+    .emote-bar { position: sticky; top: 0; z-index: 4; flex-wrap: nowrap; overflow-x: auto; }
 }
 @media (max-height: 520px) and (orientation: landscape) {
     #arcadeGame { min-height: 0; }

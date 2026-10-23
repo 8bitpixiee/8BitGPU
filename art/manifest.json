@@ -2344,6 +2344,13 @@
       "source": "art/source/avatar/animated/wings_v3.aseprite",
       "sha256": "2c18fbefa48a915da8316c95dff4c6f4eb5ea297a8f51593f8bda7f139e3e02e",
       "source_sha256": "70b33d1eb20af8e4a57ae9fc87c0e01a2aea3cacd163e3e49c396af5fecf96de"
+    },
+    {
+      "original": "assets/avatar/pickle.png",
+      "runtime": "assets/avatar/animations/pickle.png",
+      "source": "art/source/avatar/animated/pickle.aseprite",
+      "sha256": "69b352f5d71d196c103595da83c56ce021674ad1a317ad021317118b024f829f",
+      "source_sha256": "517ad3e40fab8b7ed764282fac3b25b714f3c3161e8e5d86436cb49e72d27449"
     }
   ]
 }

@@ -1,5 +1,5 @@
 (() => {
-  const hud = document.getElementById("beingHud");
+  const hud = document.querySelector("#beingDock .dock-links");
   if (!hud) return;
   const button = document.createElement("button");
   button.id = "socialLauncher";
