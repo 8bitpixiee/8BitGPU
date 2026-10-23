@@ -85,5 +85,72 @@
     return () => [...chosen];
   }
 
-  root.Badges = { SELF, CREW, MAX_PICKS, chip, render, picker };
+  // small icon-only version that sits next to a name in chats and rooms
+  function mini(id) {
+    const node = document.createElement("span");
+    node.className = "badge-mini";
+    node.dataset.badge = id;
+    if (CREW[id]) {
+      node.title = CREW[id][0];
+      const icon = document.createElement("img");
+      icon.src = `assets/ui/badges/${id}.png`;
+      icon.alt = "";
+      node.append(icon);
+    } else if (SELF[id]) {
+      node.title = SELF[id][0];
+      node.style.setProperty("--hue", SELF[id][1]);
+      node.classList.add("is-self");
+    } else return null;
+    return node;
+  }
+
+  // names are looked up in batches and remembered for a minute
+  const cache = new Map();
+  const waiting = new Map();
+  let timer = 0;
+  function lookup(name) {
+    const key = name.toLowerCase();
+    const hit = cache.get(key);
+    if (hit && hit.until > Date.now()) return Promise.resolve(hit.badges);
+    if (!waiting.has(key)) {
+      let resolve;
+      waiting.set(key, { name, promise: new Promise((r) => (resolve = r)), resolve });
+    }
+    if (!timer)
+      timer = setTimeout(async () => {
+        timer = 0;
+        const batch = [...waiting.values()];
+        waiting.clear();
+        let found = {};
+        try {
+          const response = await fetch("/api/badges?users=" + encodeURIComponent(batch.map((b) => b.name).join(",")));
+          if (response.ok) found = (await response.json()).badges || {};
+        } catch {
+          /* names just show without badges */
+        }
+        const byLower = Object.fromEntries(Object.entries(found).map(([n, v]) => [n.toLowerCase(), v]));
+        for (const item of batch) {
+          const badges = byLower[item.name.toLowerCase()] || { picks: [], earned: [] };
+          cache.set(item.name.toLowerCase(), { badges, until: Date.now() + 60000 });
+          item.resolve(badges);
+        }
+      }, 30);
+    return waiting.get(key).promise;
+  }
+
+  // appends a strip to the element and fills it once the badges arrive: earned first, then up to two picks
+  function mark(element, name) {
+    if (!name) return;
+    const strip = document.createElement("span");
+    strip.className = "badge-strip";
+    element.append(strip);
+    lookup(name).then((badges) => {
+      for (const id of [...badges.earned, ...badges.picks.slice(0, 2)]) {
+        const node = mini(id);
+        if (node) strip.append(node);
+      }
+    });
+  }
+
+  root.Badges = { SELF, CREW, MAX_PICKS, chip, mini, mark, lookup, render, picker };
 })(window);

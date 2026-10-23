@@ -1,4 +1,4 @@
-import { badgesFor, cleanPicks, savePicks } from "./badges.js";
+import { badgesFor, badgesForMany, cleanPicks, savePicks } from "./badges.js";
 import { handleGoogle } from "./google.js";
 import { saveWindowStyle } from "./window-style.js";
 import { handleSocial } from "./social/social.js";
@@ -625,7 +625,13 @@ async function handleApi(request, env, url) {
     });
   }
   if (path.startsWith("/api/auth/google/"))
-    return handleGoogle(request, env, url, { db: env.DB, createSession, readCookies, json });
+    return handleGoogle(request, env, url, {
+      db: env.DB,
+      createSession,
+      readCookies,
+      json,
+      currentUser: () => currentUser(request, env.DB),
+    });
 
   if (path === "/api/auth/me" && request.method === "GET") {
     const user = await currentUser(request, env.DB);
@@ -698,6 +704,12 @@ async function handleApi(request, env, url) {
     return json({ ok: true }, 200, {
       "set-cookie": "eightbit_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
     });
+  }
+
+  if (path === "/api/badges" && request.method === "GET") {
+    const names = [...new Set((url.searchParams.get("users") || "").split(",").filter((name) => validUsername(name)))].slice(0, 40);
+    if (!names.length) return json({ badges: {} });
+    return json({ badges: await badgesForMany(env.DB, names) }, 200, { "cache-control": "public, max-age=30" });
   }
 
   if (path === "/api/profile/me" && request.method === "GET") {

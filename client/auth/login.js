@@ -116,6 +116,7 @@ fetch("/api/auth/google/config", { cache: "no-store" })
   .then((response) => response.json())
   .then((data) => {
     document.getElementById("googleButton").hidden = !data.enabled;
+    document.getElementById("orRule").hidden = !data.enabled;
   })
   .catch(() => {});
 

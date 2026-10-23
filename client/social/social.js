@@ -74,6 +74,7 @@ function friendRow(friend, preview = "") {
   const text = document.createElement("span"),
     name = document.createElement("strong");
   name.textContent = friend.username;
+  Badges.mark(name, friend.username);
   text.append(name);
   if (preview) {
     const info = document.createElement("small");

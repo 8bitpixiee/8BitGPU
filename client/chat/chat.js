@@ -51,6 +51,7 @@ function render(data) {
       row.className = "message";
       const name = document.createElement("strong");
       name.textContent = message.username;
+      Badges.mark(name, message.username);
       const time = document.createElement("time");
       time.dateTime = new Date(message.createdAt).toISOString();
       time.textContent = new Date(message.createdAt).toLocaleTimeString([], {

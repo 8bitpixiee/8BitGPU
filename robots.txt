@@ -11,4 +11,4 @@ Disallow: /nick.html
 Disallow: /sonic.html
 Disallow: /silversteen.html
 
-Sitemap: https://8bitgpu.net/sitemap.xml
+Sitemap: https://8bitgpu.world/sitemap.xml

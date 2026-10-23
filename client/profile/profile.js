@@ -387,7 +387,7 @@ function render(nextProfile) {
   profile = nextProfile;
   setTheme(profile.theme);
   applyStyle(profile.style);
-  const path = `8bitgpu.net/~${profile.username}`;
+  const path = `8bitgpu.world/~${profile.username}`;
   byId("profileAddress").textContent = path;
   byId("profileUrl").textContent = path;
   byId("profileName").textContent = profile.username;
