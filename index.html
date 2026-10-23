@@ -195,7 +195,12 @@
     </div>
     <div class="sm-foot">
         <span class="sm-legal"><button type="button" onclick="openApp('terms')">Terms</button><button type="button" onclick="openApp('privacy')">Privacy</button></span>
-        <button type="button" class="sm-login" onclick="openApp('login')"><img src="assets/ui/start/login.png" alt="">Log In</button>
+        <button type="button" class="sm-login" id="startLogin" onclick="openApp('login')"><img src="assets/ui/start/login.png" alt="">Log In</button>
+        <span class="sm-session" id="startSession" hidden>
+            <button type="button" class="sm-login" id="startSwitch" aria-haspopup="menu" aria-expanded="false"><img src="assets/ui/start/login.png" alt="">Switch Account</button>
+            <button type="button" class="sm-login" id="startLogout">Log Out</button>
+            <menu id="startAccounts" aria-label="Saved accounts" hidden></menu>
+        </span>
     </div>
 </section>
     <menu id="desktopContextMenu" aria-label="Desktop menu" hidden>
@@ -280,6 +285,8 @@
 <script src="client/shared/avatar-layout.js"></script>
 <script src="client/shared/avatar-colors.js"></script>
 <script src="client/shared/konami.js"></script>
+<script src="client/shared/accounts.js"></script>
+<script src="client/desktop/start-accounts.js"></script>
 <script src="client/desktop/being-sprite.js"></script>
 <script src="client/desktop/welcome-back.js"></script>
 <script src="client/desktop/script.js"></script>
