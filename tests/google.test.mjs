@@ -12,10 +12,10 @@ test("google stays off until real keys are set", () => {
 
 test("the redirect can be overridden", () => {
   const config = googleConfig(
-    { GOOGLE_CLIENT_ID: "id", GOOGLE_CLIENT_SECRET: "s", GOOGLE_REDIRECT_URI: "https://8bitgpu.net/api/auth/google/callback" },
+    { GOOGLE_CLIENT_ID: "id", GOOGLE_CLIENT_SECRET: "s", GOOGLE_REDIRECT_URI: "https://8bitgpu.world/api/auth/google/callback" },
     "https://x.test",
   );
-  assert.equal(config.redirectUri, "https://8bitgpu.net/api/auth/google/callback");
+  assert.equal(config.redirectUri, "https://8bitgpu.world/api/auth/google/callback");
 });
 
 test("the authorize link carries state and a pkce challenge", async () => {
