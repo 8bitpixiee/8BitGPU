@@ -36,6 +36,11 @@
                     <p class="input-note">Names are 3–18 characters: letters, numbers, . - and _</p>
                 </form>
 
+                <section id="savedAccounts" class="saved-accounts" hidden>
+                    <h2>Saved on this device</h2>
+                    <div id="savedList"></div>
+                </section>
+
                 <div class="status-card" id="statusCard" aria-live="polite">
                     <span class="status-dot"></span>
                     <span>Checking the player database...</span>
@@ -52,6 +57,7 @@
         </section>
     </main>
     <div id="bossErrors" aria-live="assertive"></div>
+    <script src="client/shared/accounts.js"></script>
     <script src="client/auth/login.js"></script>
 <script src="client/shared/window-theme.js"></script></body>
 </html>

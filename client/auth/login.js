@@ -69,6 +69,9 @@ async function sendAccountRequest(path) {
       if (path === "/api/auth/login" && response.status === 401) countWrongLogin();
       throw new Error(data.detail || data.error || "The account terminal blinked out.");
     }
+    const sameAccount = localStorage.getItem("8bitgpu-player-name")?.toLowerCase() === data.user.username.toLowerCase();
+    // a different account must not inherit the last one's local outfit or garden
+    if (!sameAccount) Accounts.forgetPlayer(localStorage);
     if (data.user.avatar) {
       localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(data.user.avatar));
     } else {
@@ -109,6 +112,39 @@ async function loadExistingAccount() {
 }
 
 loadExistingAccount();
+
+// every account signed into on this device, one tap to switch
+async function showSavedAccounts() {
+  try {
+    const data = await Accounts.list();
+    const others = data.accounts.filter((account) => account.id !== data.active);
+    if (!others.length) return;
+    const list = document.getElementById("savedList");
+    list.replaceChildren(
+      ...others.map((account) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "secondary-button";
+        button.textContent = `Continue as ${account.username}`;
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            const user = await Accounts.switchTo(account.id);
+            enterWorld(user.username, true);
+          } catch (error) {
+            button.disabled = false;
+            setStatus(error.message);
+          }
+        });
+        return button;
+      }),
+    );
+    document.getElementById("savedAccounts").hidden = false;
+  } catch {
+    // no saved list, the form still works
+  }
+}
+showSavedAccounts();
 
 // inside the desktop the legal pages open as windows instead of replacing this one
 document.querySelectorAll("a[data-app]").forEach((link) =>

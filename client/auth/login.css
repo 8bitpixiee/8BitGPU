@@ -100,6 +100,10 @@ a { color: var(--edge, #724a91); }
 /* account.html reuses the container for its own sections */
 .login-content > h1, .login-content > p { margin-bottom: 8px; }
 
+.saved-accounts { display: grid; gap: 6px; margin-top: 12px; }
+.saved-accounts h2 { margin: 0; font-size: 13px; }
+#savedList { display: grid; gap: 6px; }
+
 /* easter egg: the pile of error windows from signing in as the boss */
 #bossErrors { position: fixed; inset: 0; z-index: 50; pointer-events: none; }
 .boss-error { position: absolute; width: min(330px, calc(100vw - 48px)); padding: 2px; border: 2px solid; border-color: #fff #404040 #404040 #fff; color: #000; background: #c0c0c0; box-shadow: 2px 2px 0 rgba(0, 0, 0, .35); font: 12px/1.35 Tahoma, "MS Sans Serif", sans-serif; pointer-events: auto; }
