@@ -1,0 +1,243 @@
+diff --git a/client/arcade/room-setup.js b/client/arcade/room-setup.js
+--- a/client/arcade/room-setup.js
++++ b/client/arcade/room-setup.js
+@@ -32,6 +32,15 @@
+   const ratio=room.width/room.height;
+   function fit(){const width=map.clientWidth,height=map.clientHeight;if(!width||!height)return;const w=Math.min(width,height*ratio);stage.style.setProperty('--room-stage-width',w+'px');stage.style.setProperty('--room-stage-height',(w/ratio)+'px');}
+   new ResizeObserver(fit).observe(map);fit();
++  const toggle=document.createElement('button');toggle.type='button';toggle.id='roomMapView';
++  const chat=document.querySelector('.room-chat');chat.id='connectedRoomChat';toggle.setAttribute('aria-controls',chat.id);
++  document.querySelector('.arcade-header').insertBefore(toggle,document.getElementById('roomCamera'));
++  let expanded=false;
++  function mapView(value){expanded=value;document.body.classList.toggle('room-map-view',value);toggle.textContent=value?'Show chat':'Map view';toggle.setAttribute('aria-pressed',String(value));try{localStorage.setItem('8bitgpu-room-map-view',String(value));}catch{}requestAnimationFrame(fit);}
++  toggle.onclick=()=>mapView(!expanded);
++  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&expanded)mapView(false);});
++  try{expanded=localStorage.getItem('8bitgpu-room-map-view')==='true';}catch{}
++  mapView(expanded);
+   // Keep the desktop window title in sync when a doorway changes the room.
+   if(parent!==window)parent.postMessage({type:'8bitgpu-room-changed',room:room.id},location.origin);
+ })();
+diff --git a/client/arcade/connected-rooms.css b/client/arcade/connected-rooms.css
+--- a/client/arcade/connected-rooms.css
++++ b/client/arcade/connected-rooms.css
+@@ -10,3 +10,15 @@
+ .room-door:hover .room-door-icon,.room-door:focus-visible .room-door-icon {outline:2px solid #c6ffdc;outline-offset:2px;}
+ .connected-room .movement-hint {z-index:26;}
+ @media(max-width:650px) and (orientation:portrait){.connected-room #arcadeMap{min-height:240px;height:min(66svh,500px);}.room-door-icon{width:28px;height:34px;}.room-door-label{max-width:90px;font-size:9px;}}
++
++/* Map view gives the proportional stage all the available window space. */
++.connected-room #roomMapView {white-space:nowrap;min-height:28px;cursor:pointer;}
++.connected-room .room-layout {grid-template-columns:minmax(0,1fr) 220px;}
++.connected-room.room-map-view #arcadeGame {position:relative;min-height:0;height:100dvh;}
++.connected-room.room-map-view .room-layout {display:grid!important;grid-template-columns:1fr!important;grid-template-rows:1fr!important;flex:1;min-height:0;overflow:hidden;}
++.connected-room.room-map-view #arcadeMap {height:100%!important;min-height:0!important;}
++.connected-room.room-map-view .room-chat,.connected-room.room-map-view footer {display:none!important;}
++.connected-room.room-map-view .arcade-header {position:absolute;right:6px;top:6px;z-index:40;width:auto;padding:0;border:0;background:transparent;}
++.connected-room.room-map-view .arcade-header > :not(#roomMapView) {display:none!important;}
++.connected-room.room-map-view #roomStatus {position:absolute;left:6px;bottom:30px;z-index:40;max-width:calc(100% - 12px);}
++@media(max-width:650px) and (orientation:portrait){.connected-room:not(.room-map-view) .room-layout {display:block;}.connected-room:not(.room-map-view) .arcade-header {flex-wrap:wrap;gap:6px;}}
+diff --git a/index.html b/index.html
+--- a/index.html
++++ b/index.html
+@@ -12,7 +12,8 @@
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
+ 
+-<link rel="stylesheet" href="client/shared/retro-windows.css"></head>
++<link rel="stylesheet" href="client/shared/retro-windows.css"><link rel="stylesheet" href="client/shared/global-appearance.css">
++</head>
+ 
+ <body>
+     <div id="osBootScreen" aria-label="8BitGPU is starting">
+@@ -262,7 +263,7 @@
+     </nav>
+ 
+     <nav id="osTaskbar" aria-label="8BitGPU taskbar">
+-        <button id="osStartButton" type="button" onclick="toggleStartMenu()" aria-label="Open Start menu"><img src="assets/ui/purplestartwindows.png" alt=""></button>
++        <button id="osStartButton" type="button" onclick="toggleStartMenu()" aria-label="Open Start menu"><span class="start-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Start</span></button>
+         <div id="osTaskTabs"></div>
+         <div id="osSystemTray">
+             <div class="taskbar-socials" aria-label="Social links">
+@@ -271,6 +272,7 @@
+                 <span class="taskbar-social taskbar-instagram-slot" title="Instagram icon coming soon">IG</span>
+             </div>
+             <span class="tray-sparkle" aria-hidden="true">8</span>
++            <button id="taskbarAppearance" type="button" onclick="openApp('appearance')" aria-label="Customize desktop colors and fonts" title="Appearance">⚙</button>
+             <span id="osClock" aria-label="Current local time"></span>
+             <button id="osTray" type="button" onclick="cycleAngelTime()" aria-label="Change angel time message"></button>
+         </div>
+diff --git a/appearance.html b/appearance.html
+--- a/appearance.html
++++ b/appearance.html
+@@ -140,6 +140,7 @@ button:active {
+     font-family: Tahoma, Arial, sans-serif !important;
+ }
+    </style>
++<link rel="stylesheet" href="client/shared/global-appearance.css">
+ </head>
+ <body>
+     <h1>Make yourself at home.</h1>
+@@ -261,5 +262,6 @@ button:active {
+ 
+     updateSelection();
+ </script>
++<script src="client/shared/global-appearance.js"></script>
+ </body>
+ </html>
+\ No newline at end of file
+diff --git a/client/desktop/script.js b/client/desktop/script.js
+--- a/client/desktop/script.js
++++ b/client/desktop/script.js
+@@ -401,8 +401,8 @@ const desktopApps = {
+   appearance: {
+     title: "Appearance",
+     src: "appearance.html",
+-    width: 480,
+-    height: 420,
++    width: 520,
++    height: 640,
+     left: 250,
+     top: 100,
+   },
+diff --git a/client/shared/window-theme.js b/client/shared/window-theme.js
+--- a/client/shared/window-theme.js
++++ b/client/shared/window-theme.js
+@@ -33,10 +33,15 @@
+     if (/^#[a-f\d]{6}$/i.test(colors.edge))
+       document.documentElement.style.setProperty("--title-ink", contrast(colors.edge));
+   }
++  const paletteKey = '8bitgpu-window-colors';
++  const remember = colors => {try {localStorage.setItem(paletteKey, JSON.stringify(colors));} catch {}};
++  try {apply(JSON.parse(localStorage.getItem(paletteKey) || 'null'));} catch {}
++  window.addEventListener('storage', event => {if(event.key === paletteKey){try {apply(JSON.parse(event.newValue || 'null'));} catch {}}});
+   window.applyWindowTheme = apply;
+   window.addEventListener("message", (e) => {
+     if (e.origin === location.origin && e.data?.type === "8bitgpu-theme-saved") {
+       apply(e.data.colors);
++      if (!e.data.preview) remember(e.data.colors);
+       document
+         .querySelectorAll("iframe")
+         .forEach((f) => f.contentWindow?.postMessage(e.data, location.origin));
+@@ -45,7 +50,7 @@
+   if (!location.pathname.endsWith("profile.html"))
+     fetch("/api/profile/me", { cache: "no-store" })
+       .then((r) => (r.ok ? r.json() : null))
+-      .then((d) => apply(d?.profile?.style))
++      .then((d) => {if(d?.profile?.style){remember(d.profile.style);apply(d.profile.style);}})
+       .catch(() => {});
+   const pulse = () => {
+     if (!document.hidden)
+diff --git a/server/worker.js b/server/worker.js
+--- a/server/worker.js
++++ b/server/worker.js
+@@ -1,3 +1,4 @@
++import { saveWindowStyle } from "./window-style.js";
+ import { handleSocial } from "./social/social.js";
+ import { handleChat, loungeCall } from "./chat/chat.js";
+ import { roomAvatar } from "./chat/chat-avatar.js";
+@@ -699,6 +700,17 @@ async function handleApi(request, env, url) {
+     return json({ profile: publicProfile(await findProfileBy(env.DB, "id", user.id)) });
+   }
+ 
++  if (path === "/api/profile/me/style" && request.method === "PUT") {
++    const user = await currentUser(request, env.DB);
++    if (!user) return json({ error: "Sign in to save your desktop colors." }, 401);
++    const body = await readBody(request);
++    const current = await findProfileBy(env.DB, "id", user.id);
++    const style = profileStyle(body?.style, current?.theme || "violet");
++    if (!style) return json({ error: "Those desktop colors are not valid." }, 400);
++    await saveWindowStyle(env.DB, user.id, style);
++    return json({ profile: publicProfile(await findProfileBy(env.DB, "id", user.id)) });
++  }
++
+   if (path === "/api/profile/me" && request.method === "PUT") {
+     const user = await currentUser(request, env.DB);
+     if (!user) return json({ error: "Sign in to update your profile." }, 401);
+diff --git a/client/shared/global-appearance.css b/client/shared/global-appearance.css
+new file mode 100644
+--- /dev/null
++++ b/client/shared/global-appearance.css
+@@ -0,0 +1,30 @@
++/* Shared Appearance variables drive all taskbar chrome. */
++#osTaskbar {--bar-light:color-mix(in srgb,var(--panel),white 75%);--bar-dark:color-mix(in srgb,var(--panel),black 60%);height:46px!important;padding:4px!important;gap:5px!important;background:var(--panel)!important;color:var(--control-ink)!important;border:2px solid!important;border-color:var(--bar-light) var(--bar-dark) var(--bar-dark) var(--bar-light)!important;border-radius:0!important;box-shadow:inset 1px 1px var(--bar-light)!important;backdrop-filter:none!important;text-shadow:none!important;}
++#osTaskbar,#osTaskbar button,#osTaskbar span {font-family:var(--ui-font,Tahoma,Arial,sans-serif)!important;}
++#osTaskbar #osStartButton,#osTaskbar .os-task-tab,#osTaskbar .taskbar-social,#osTaskbar #taskbarAppearance {display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;border:2px solid!important;border-color:var(--bar-light) var(--bar-dark) var(--bar-dark) var(--bar-light)!important;border-radius:0!important;background:var(--panel)!important;color:var(--control-ink)!important;box-shadow:none!important;text-shadow:none!important;transform:none!important;filter:none!important;}
++#osTaskbar #osStartButton {flex:0 0 96px!important;width:96px!important;height:34px!important;padding:3px 8px!important;margin:0!important;gap:7px!important;font-size:14px!important;font-weight:bold;}
++#osTaskbar .start-mark {display:grid;grid-template-columns:repeat(2,6px);grid-template-rows:repeat(2,6px);gap:2px;transform:skewY(-9deg);}
++#osTaskbar .start-mark i {background:var(--edge);border:1px solid var(--bar-dark);}
++#osTaskbar .start-mark i:nth-child(2),#osTaskbar .start-mark i:nth-child(3) {background:var(--accent);}
++#osTaskbar .os-task-tab {height:34px!important;padding:4px 8px!important;font-size:12px!important;}
++#osTaskbar .os-task-tab.is-active {background:var(--edge)!important;color:var(--title-ink)!important;border-color:var(--bar-dark) var(--bar-light) var(--bar-light) var(--bar-dark)!important;}
++#osTaskbar button:active {border-color:var(--bar-dark) var(--bar-light) var(--bar-light) var(--bar-dark)!important;}
++#osTaskbar #osSystemTray {height:34px;gap:4px;padding:2px 4px;background:var(--paper)!important;color:var(--ink)!important;border:2px solid!important;border-color:var(--bar-dark) var(--bar-light) var(--bar-light) var(--bar-dark)!important;border-radius:0!important;box-shadow:none!important;}
++#osTaskbar .taskbar-social {width:25px!important;height:25px!important;justify-content:center!important;padding:1px!important;}
++#osTaskbar #taskbarAppearance {width:26px;height:25px;padding:0!important;justify-content:center!important;font-size:17px!important;cursor:pointer;}
++#osTaskbar #osClock,#osTaskbar #osTray,#osTaskbar .tray-sparkle {color:var(--ink)!important;text-shadow:none!important;background:transparent!important;}
++#osTaskbar #osClock,#osTaskbar #osTray {font-size:11px!important;}
++#osTaskbar button:focus-visible {outline:1px dotted currentColor;outline-offset:-4px;}
++#globalAppearanceColors {margin:16px 0;padding:8px;border:2px groove var(--panel);}
++#globalAppearanceColors summary {cursor:pointer;padding:5px;font-size:13px;font-weight:bold;}
++#globalAppearanceColors .global-color-item {margin-top:6px;border:1px solid var(--edge);}
++#globalAppearanceColors .global-swatch {display:inline-block;width:15px;height:15px;margin-right:7px;vertical-align:middle;border:1px solid currentColor;}
++#globalAppearanceColors .global-color-body {display:grid;gap:7px;padding:9px;}
++#globalAppearanceColors .global-color-heading {display:grid;grid-template-columns:45px minmax(0,1fr);gap:7px;align-items:center;}
++#globalAppearanceColors input[type=color] {width:45px;height:34px;padding:2px;}
++#globalAppearanceColors input[type=text] {min-width:0;width:100%;padding:6px;background:var(--paper);color:var(--ink);border:2px inset var(--panel);}
++#globalAppearanceColors label {display:flex;justify-content:space-between;font-size:12px;}
++#globalAppearanceColors input[type=range] {width:100%;margin:0;accent-color:var(--edge);}
++#globalAppearanceColors .global-color-actions {display:flex;gap:7px;flex-wrap:wrap;margin:10px 0;}
++#globalAppearanceColors button {min-height:32px;border:2px outset var(--panel);background:var(--panel);color:var(--control-ink);}
++#globalAppearanceStatus {font-size:11px;line-height:1.5;}
+diff --git a/client/shared/global-appearance.js b/client/shared/global-appearance.js
+new file mode 100644
+--- /dev/null
++++ b/client/shared/global-appearance.js
+@@ -0,0 +1,37 @@
++// Edit the same saved palette used by MyPixel and the shared window theme.
++(() => {
++ const defaults={panel:'#e4d5ee',edge:'#724a91',accent:'#b95fd4',paper:'#fffdf8',ink:'#321c48'};
++ const names={panel:'Taskbar & button faces',edge:'Active windows & selections',accent:'Accent color',paper:'Inset panels & clock tray',ink:'Text on inset panels'};
++ const valid=value=>/^#[0-9a-f]{6}$/i.test(value||'');
++ const panel=document.createElement('details');panel.id='globalAppearanceColors';panel.open=true;
++ const summary=document.createElement('summary');summary.textContent='Desktop colors · taskbar, menus & windows';panel.append(summary);
++ const controls=new Map(),dirty=new Set();let baseline={...defaults},palette={...defaults},saving=false;
++ function notify(preview=true){window.applyWindowTheme?.(palette);if(parent!==window)parent.postMessage({type:'8bitgpu-theme-saved',colors:palette,preview},location.origin);}
++ function toHsl(hex){const [r,g,b]=hex.slice(1).match(/../g).map(v=>parseInt(v,16)/255),max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min,l=(max+min)/2;let h=0;if(d)h=max===r?((g-b)/d+6)%6:max===g?(b-r)/d+2:(r-g)/d+4;return {h:Math.round(h*60),s:Math.round(d?d/(1-Math.abs(2*l-1))*100:0),l:Math.round(l*100)};}
++ function toHex(h,s,l){s/=100;l/=100;const c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs(h/60%2-1)),m=l-c/2,rgb=h<60?[c,x,0]:h<120?[x,c,0]:h<180?[0,c,x]:h<240?[0,x,c]:h<300?[x,0,c]:[c,0,x];return '#'+rgb.map(v=>Math.round((v+m)*255).toString(16).padStart(2,'0')).join('');}
++ const status=document.createElement('p');status.id='globalAppearanceStatus';status.setAttribute('role','status');
++ for(const [key,name] of Object.entries(names)){
++  const item=document.createElement('details');item.className='global-color-item';const title=document.createElement('summary'),swatch=document.createElement('span');swatch.className='global-swatch';swatch.setAttribute('aria-hidden','true');title.append(swatch,name);item.append(title);
++  const body=document.createElement('div');body.className='global-color-body';const heading=document.createElement('div');heading.className='global-color-heading';const well=document.createElement('input');well.type='color';well.setAttribute('aria-label',name+' color');const hex=document.createElement('input');hex.type='text';hex.maxLength=7;hex.setAttribute('aria-label',name+' hex');heading.append(well,hex);body.append(heading);const sliders={};
++  function edit(value,hsl){if(!valid(value))return;palette[key]=value.toLowerCase();dirty.add(key);update(hsl);notify();status.textContent='Previewing changes. Save colors to keep them.';}
++  for(const [part,label,max] of [['h','Hue',360],['s','Saturation',100],['l','Lightness',100]]){const row=document.createElement('label'),output=document.createElement('output'),range=document.createElement('input');row.textContent=label;row.append(output);range.type='range';range.min=0;range.max=max;range.step=1;range.setAttribute('aria-label',name+' '+label);range.oninput=()=>{const hsl={h:+sliders.h.range.value,s:+sliders.s.range.value,l:+sliders.l.range.value};edit(toHex(hsl.h,hsl.s,hsl.l),hsl);};body.append(row,range);sliders[part]={range,output};}
++  function update(hsl=toHsl(palette[key])){well.value=hex.value=palette[key];swatch.style.background=palette[key];for(const [part,{range,output}] of Object.entries(sliders)){range.value=hsl[part];output.textContent=hsl[part]+(part==='h'?'°':'%');}}
++  well.oninput=()=>edit(well.value);hex.oninput=()=>{hex.setCustomValidity(hex.value&&!valid(hex.value)?'Use a hex color such as #b998dd.':'');if(valid(hex.value))edit(hex.value);};hex.onchange=()=>{if(!valid(hex.value))update();};controls.set(key,update);item.append(body);panel.append(item);
++ }
++ const actions=document.createElement('div');actions.className='global-color-actions';const save=document.createElement('button'),revert=document.createElement('button');save.type=revert.type='button';save.textContent='Save colors';revert.textContent='Revert preview';actions.append(save,revert);panel.append(actions,status);
++ document.querySelector('label[for="fontChoice"]')?.before(panel);
++ if(!panel.isConnected)document.querySelector('h1').after(panel);
++ async function getProfile(){const response=await fetch('/api/profile/me',{cache:'no-store'});if(!response.ok)throw Error('Sign in to save your desktop colors.');return (await response.json()).profile;}
++ function adopt(style){for(const key of Object.keys(defaults))if(valid(style?.[key]))palette[key]=style[key];baseline={...palette};controls.forEach(update=>update());}
++ getProfile().then(profile=>{if(!dirty.size)adopt(profile.style);status.textContent='These are the same saved colors used by MyPixel.';}).catch(error=>{adopt({});status.textContent=error.message;});
++ revert.onclick=()=>{palette={...baseline};dirty.clear();controls.forEach(update=>update());notify();status.textContent='Preview reverted.';};
++ save.onclick=async()=>{
++  if(saving||!dirty.size)return;saving=true;save.disabled=true;
++  const edits=Object.fromEntries([...dirty].map(key=>[key,palette[key]]));
++  try{const fresh=await getProfile();const response=await fetch('/api/profile/me/style',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({style:{...fresh.style,...edits}})});const data=await response.json();if(!response.ok)throw Error(data.error||'Could not save colors.');adopt(data.profile.style);dirty.clear();notify(false);status.textContent='Saved to your account. Taskbar, windows and MyPixel share this palette.';}
++  catch(error){status.textContent=error.message;}finally{saving=false;save.disabled=false;}
++ };
++ window.addEventListener('pagehide',()=>{if(dirty.size){palette={...baseline};notify();}});
++ window.addEventListener('message',event=>{if(event.origin===location.origin&&event.data?.type==='8bitgpu-theme-saved'&&!event.data.preview&&!dirty.size)adopt(event.data.colors);});
++ controls.forEach(update=>update());
++})();
+diff --git a/server/window-style.js b/server/window-style.js
+new file mode 100644
+--- /dev/null
++++ b/server/window-style.js
+@@ -0,0 +1,6 @@
++// Save window colors without changing profile text, images or avatar data.
++export async function saveWindowStyle(db,userId,style){
++ await db.prepare(`INSERT INTO player_profile_styles (user_id,background_color,paper_color,panel_color,edge_color,accent_color,ink_color,wallpaper_url,updated_at)
++ VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET background_color=excluded.background_color,paper_color=excluded.paper_color,panel_color=excluded.panel_color,edge_color=excluded.edge_color,accent_color=excluded.accent_color,ink_color=excluded.ink_color,wallpaper_url=excluded.wallpaper_url,updated_at=excluded.updated_at`)
++ .bind(userId,style.background,style.paper,style.panel,style.edge,style.accent,style.ink,style.wallpaperUrl,Date.now()).run();
++}
