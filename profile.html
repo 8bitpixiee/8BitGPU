@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>MyPixel</title>
     <link rel="stylesheet" href="client/profile/profile.css">
+    <link rel="stylesheet" href="client/shared/badges.css">
 <link rel="stylesheet" href="client/shared/retro-windows.css"></head>
 <body data-theme="violet">
     <main class="web-shell">
@@ -32,7 +33,6 @@
         <section id="profile" class="profile-page" hidden>
             <header class="profile-title">
                 <div>
-                    <p>WELCOME TO</p>
                     <h1 id="profileName">Loading...</h1>
                     <span id="profileUrl">8bitgpu.net/~</span>
                 </div>
@@ -54,7 +54,6 @@
                         </div>
                     </div>
                     <h2 id="cardName"></h2>
-                    <p class="mood-label">CURRENT MOOD</p>
                     <p id="moodText" class="mood">Loading...</p>
                     <button id="visitLounge" type="button">✦ Find me in the Lounge</button>
                 </aside>
@@ -62,49 +61,48 @@
                 <section class="profile-content">
                     <article id="notepad" class="web-panel favorites-panel notepad-panel">
                         <h2>My Notepad</h2>
-                        <p id="aboutText">This page is still being decorated.</p>
+                        <p id="aboutText">Nothing here yet.</p>
                     </article>
                     <article id="favorites" class="web-panel favorites-summary">
                         <h2>Favorites</h2>
-                        <p id="favoritesText">Add some favorite things to make this page yours.</p>
+                        <p id="favoritesText">No favorites yet.</p>
                     </article>
                     <article id="collection" class="web-panel collection-panel">
-                        <h2>Character Collection</h2>
-                        <div class="badge-row">
-                            <span>✦ Being</span><span>✦ Arcade Visitor</span><span>✦ Profile Owner</span>
-                        </div>
-                        <p>Badges, inventory showcases, and game achievements will live here.</p>
+                        <h2>Badges</h2>
+                        <div id="badgeRow" class="badge-row"></div>
                     </article>
                     <article id="connections" class="web-panel connections-panel">
                         <h2>Connections</h2>
-                        <p>Connections and a guestbook are coming after the first private-room test.</p>
+                        <p>Connections and a guestbook are coming.</p>
                     </article>
                 </section>
             </div>
             <section class="photo-gallery" aria-label="My picture windows">
-                <figure class="photo-window"><figcaption>MyPixel • Picture 1</figcaption><div class="photo-content"><img id="photo1" alt="Profile picture 1" hidden><p id="photoEmpty1">Your little picture window<br><span>Add a favorite moment, artwork, or mood.</span></p></div></figure>
-<figure class="photo-window"><figcaption>MyPixel • Picture 2</figcaption><div class="photo-content"><img id="photo2" alt="Profile picture 2" hidden><p id="photoEmpty2">Your little picture window<br><span>Add a favorite moment, artwork, or mood.</span></p></div></figure>
-<figure class="photo-window"><figcaption>MyPixel • Picture 3</figcaption><div class="photo-content"><img id="photo3" alt="Profile picture 3" hidden><p id="photoEmpty3">Your little picture window<br><span>Add a favorite moment, artwork, or mood.</span></p></div></figure>
+                <figure class="photo-window"><figcaption>MyPixel • Picture 1</figcaption><div class="photo-content"><img id="photo1" alt="Profile picture 1" hidden><p id="photoEmpty1">No picture yet</p></div></figure>
+<figure class="photo-window"><figcaption>MyPixel • Picture 2</figcaption><div class="photo-content"><img id="photo2" alt="Profile picture 2" hidden><p id="photoEmpty2">No picture yet</p></div></figure>
+<figure class="photo-window"><figcaption>MyPixel • Picture 3</figcaption><div class="photo-content"><img id="photo3" alt="Profile picture 3" hidden><p id="photoEmpty3">No picture yet</p></div></figure>
             </section>
         </section>
 
         <section id="editor" class="editor-window" hidden>
-            <header><strong>MYPIXEL • MAKE IT YOURS</strong><button id="closeEditor" type="button" aria-label="Close editor">×</button></header>
+            <header><strong>Edit MyPixel</strong><button id="closeEditor" type="button" aria-label="Close editor">×</button></header>
             <form id="profileForm">
                 <label for="moodInput">Current mood <small>80 characters</small></label>
-                <input id="moodInput" maxlength="80" placeholder="feeling sparkly">
+                <input id="moodInput" maxlength="80" placeholder="what's the mood">
                 <label for="aboutInput">Notepad <small>1,000 characters</small></label>
                 <textarea id="aboutInput" maxlength="1000" rows="5" placeholder="Write whatever you want here..."></textarea>
                 <label for="favoritesInput">Favorite things <small>240 characters</small></label>
                 <input id="favoritesInput" maxlength="240" placeholder="games, colors, snacks, songs...">
-                <fieldset class="color-mixer"><legend>Your colors</legend><p>Every part has its own hue, saturation, and lightness. Mix them independently.</p><div id="colorControls"></div></fieldset>
-                <fieldset class="image-mixer"><legend>Your images</legend><p>Choose files from your phone or computer. Images are resized and saved immediately; they are visible on your public page.</p><div id="imageControls"></div><p id="uploadStatus" role="status"></p></fieldset>
+                <fieldset class="badge-mixer"><legend>Your badges <small>pick up to five</small></legend><div id="badgePicker" class="badge-picker"></div></fieldset>
+                <fieldset class="color-mixer"><legend>Your colors</legend><p>Pick a color for each part of your page.</p><div id="colorControls"></div></fieldset>
+                <fieldset class="image-mixer"><legend>Your images</legend><p>Pick an image to upload. It is resized, saved right away and shown on your public page.</p><div id="imageControls"></div><p id="uploadStatus" role="status"></p></fieldset>
                 <button id="saveProfile" type="submit">Save My Page</button>
             </form>
         </section>
     </main>
 <script src="client/shared/avatar-layout.js"></script>
 <script src="client/shared/avatar-colors.js"></script>
+<script src="client/shared/badges.js"></script>
 <script src="client/profile/profile.js"></script>
 <script src="client/profile/profile-layout.js"></script>
 <script src="client/profile/profile-social.js"></script>

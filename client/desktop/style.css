@@ -217,196 +217,21 @@ h1, h2, .window-bar, .desktop-icon span {
     font-weight: 700;
 }
 
-#companion {
-    position: fixed;
-    bottom: 32px;
-    left: 20px;
-    width: 256px;
-    height: 256px;
-    z-index: 9999;
-    border: none;
-    outline: none;
-    background: transparent;
-    pointer-events: none;
-    display: none;
-    transform-origin: center bottom;
-    animation: beingIdle 2.4s steps(4, end) infinite;
-}
-
 /* Lower-right Being Dock + Start menu */
 .hero {
     right: 46px;
     bottom: 278px;
 }
 
-#beingDock {
-    position: fixed;
-    right: 30px;
-    bottom: 52px;
-    z-index: 9999;
-    width: 220px;
-    color: #fff7ff;
-    text-align: center;
-    pointer-events: none;
-}
-.being-dock-label {
-    margin: 0 0 4px;
-    color: #eac7ff;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-shadow: 1px 1px #392151;
-}
-.being-frame {
-    position: relative;
-    height: 178px;
-    overflow: hidden;
-    border: 3px outset #e8d2ff;
-    background: linear-gradient(145deg, #60406f, #3b5745 58%, #2e3a4c);
-    box-shadow: 0 0 0 2px #624275, 0 0 13px #d896ff88, inset 0 0 0 2px #a8e97e77;
-}
-.being-frame::before,
-.being-frame::after {
-    position: absolute;
-    z-index: 1;
-    color: #dfffc4;
-    font-size: 25px;
-    line-height: 1;
-    text-shadow: 0 0 6px #b8ff8c;
-    content: "âœ¦";
-}
-.being-frame::before { top: 9px; left: 10px; }
-.being-frame::after { right: 9px; bottom: 7px; color: #f0c7ff; }
-#beingDock #companion {
-    position: absolute;
-    bottom: -6px;
-    left: -18px;
-    width: 254px;
-    height: 254px;
-    z-index: 2;
-}
-#beingDock #companion.is-wide {
-    bottom: -4px;
-    left: 16px;
-    width: 182px;
-    height: 182px;
-}
-#beingEmptyState {
-    position: absolute;
-    z-index: 3;
-    top: 66px;
-    left: 0;
-    right: 0;
-    margin: 0;
-    color: #eddbff;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1.45;
-    text-shadow: 1px 1px #352045;
-}
-
-#beingHud {
-    position: fixed;
-    right: 262px;
-    bottom: 58px;
-    z-index: 9998;
-    display: flex;
-    align-items: flex-end;
-    gap: 7px;
-    padding: 7px 9px;
-    border: 2px outset #efe6ff;
-    color: #fff;
-    background: linear-gradient(145deg, #51326c, #273a4b);
-    box-shadow: 2px 2px 0 #26192e, 0 0 12px #d896ff77, inset 1px 1px #a8e97e55;
-    font-size: 10px;
-    text-shadow: 1px 1px #29183a;
-}
-.mana-jar {
-    position: relative;
-    width: 32px;
-    height: 43px;
-    overflow: hidden;
-    border: 3px solid #f0d6ff;
-    border-radius: 4px 4px 8px 8px;
-    background: linear-gradient(90deg, #8050a3, #e0b8ff 45%, #70428e);
-    box-shadow: inset 2px 0 #ffffff88, 0 0 8px #f1a9ff;
-}
-.jar-lid { position: absolute; top: -4px; left: 5px; width: 18px; height: 5px; border: 2px solid #f5deae; background: #8b6e41; }
-.jar-glow { position: absolute; right: 2px; bottom: 2px; left: 2px; height: 76%; background: linear-gradient(#ffbdff, #c759df); box-shadow: 0 -2px 7px #ffd4ff; }
-.jar-sparkle { position: absolute; z-index: 2; top: 12px; left: 9px; color: white; font-size: 13px; text-shadow: 0 0 5px white; }
-.hud-stats { width: 128px; }
-.hud-stats p, .xp-label, .mana-label { display: flex; justify-content: space-between; margin: 0 0 4px; font-size: 10px; line-height: 1.1; }
-.hud-stats p span, .xp-label span, .mana-label span { color: #baff96; }
-.hud-stats strong { color: #fff9df; font-size: 10px; }
-.xp-track { height: 9px; overflow: hidden; border: 2px inset #d5c5e6; background: #2a2036; box-shadow: inset 1px 1px #160e1e; }
-#xpFill { display: block; width: 40%; height: 100%; background: linear-gradient(90deg, #b8ff8c, #6eecbf); box-shadow: 0 0 5px #a8ff9e; }
-.mana-label { margin-top: 5px; margin-bottom: 0; }
-#inventoryButton { width: 100%; margin-top: 5px; padding: 3px 2px; border: 2px outset #f0e7ff; color: #fff; background: linear-gradient(#7b52a0, #4b3169); font: inherit; font-size: 9px; font-weight: 700; text-shadow: 1px 1px #2d1b3e; }
-#inventoryButton:hover { transform: none; filter: brightness(1.15); }
 .os-inventory ul { display: grid; gap: 8px; margin: 18px 0; padding: 0; list-style: none; }
 .os-inventory li { padding: 8px; border: 2px inset #d7c6e2; color: #3b2553; background: #d9f4e3; font-weight: 700; }
-.being-actions {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 3px;
-    margin-top: 4px;
-    pointer-events: auto;
-}
-.being-actions button,
-#osStartMenu button {
-    display: block;
-    border: 2px outset #f3edff;
-    border-radius: 0;
-    color: #2d1b3e;
-    background: linear-gradient(#d8c7e6, #a88ab9);
-    box-shadow: inset 1px 1px #fff, 1px 1px #352440;
-    font-size: 11px;
-    font-weight: 700;
-    text-shadow: none;
-}
-.being-actions button { padding: 5px 2px; }
-.being-actions button:hover,
-#osStartMenu button:hover { transform: none; color: #fff; background: #7651a0; text-shadow: 1px 1px #352045; }
-#companion.is-wave { animation: beingWave 700ms ease-in-out; }
-#companion.is-dance { animation: beingDance 800ms ease-in-out; }
-#companion.is-spin { animation: beingSpin 800ms ease-in-out; }
-@keyframes beingWave { 0%,100%{transform:translateX(0)} 35%{transform:translateX(12px) rotate(4deg)} 70%{transform:translateX(-5px) rotate(-2deg)} }
-@keyframes beingDance { 0%,100%{transform:translateY(0)} 25%{transform:translate(-10px,-10px) rotate(-4deg)} 70%{transform:translate(10px,-4px) rotate(4deg)} }
-@keyframes beingSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-@keyframes beingIdle { 0%,100%{transform:translateY(0) scaleY(1)} 50%{transform:translateY(-4px) scaleY(1.01)} }
-@media (prefers-reduced-motion: reduce) { #companion { animation: none; } }
-
-#osStartMenu {
-    position: fixed;
-    z-index: 19999;
-    bottom: 40px;
-    left: 2px;
-    width: 240px;
-    padding: 5px;
-    border: 3px outset #fff;
-    color: #261735;
-    background: linear-gradient(90deg, #5b3d7b 0 27px, #c9c9c9 27px);
-    box-shadow: 4px 4px 0 #2c2c2c, 0 0 16px #d896ff88;
-    transform: translateY(12px);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
-}
-#osStartMenu.is-open { transform: translateY(0); opacity: 1; visibility: visible; }
-#osStartMenu button { width: calc(100% - 27px); margin-left: 27px; padding: 9px 8px; text-align: left; }
-#osStartMenu .start-user-card { display: flex; align-items: center; gap: 8px; min-height: 56px; color: #fff; background: linear-gradient(#8050a3, #4c2d6b); text-shadow: 1px 1px #29183a; }
-.start-user-icon { display: grid; width: 38px; height: 38px; place-items: center; overflow: hidden; border: 2px inset #d8c7e6; background: #4a6849; }
-.start-user-icon img { width: 48px; height: 48px; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 0 3px #f5c8ff); }
-.start-user-card small { display: block; color: #baff96; font-size: 9px; }
-.start-user-card strong { display: block; margin-top: 4px; font-size: 14px; }
-.start-menu-divider { width: calc(100% - 27px); height: 2px; margin: 5px 0 5px 27px; background: #8a8a8a; border-bottom: 1px solid #fff; }
 
 @media (max-width: 700px) {
     .hero { right: 18px; bottom: 248px; }
     h1 { font-size: 68px; }
-    #beingDock { right: 12px; bottom: 62px; transform: scale(.8); transform-origin: right bottom; }
-    #osStartMenu { bottom: 54px; }
-    #beingHud { right: 182px; bottom: 63px; transform: scale(.75); transform-origin: right bottom; }
+    
+    
+    
 }
 
 /* ================================================================
@@ -507,27 +332,16 @@ html, body {
 }
 
 /* Do not squash the saved Being preview. */
-#beingDock .avatar-layer,
-#beingDock .avatar-preview img,
-#companion .avatar-layer {
-    object-fit: contain !important;
-    image-rendering: pixelated !important;
-}
 
 /* Keep the desktop UI above the vines. */
 .container,
 .hero,
 #playerBadge,
-#beingDock,
-#beingHud,
-#osTaskbar,
-#osStartMenu,
 #osWindowLayer {
     z-index: 10;
 }
 
-#osTaskbar { z-index: 20000 !important; }
-#osStartMenu, #osWindowLayer { z-index: 20001 !important; }
+ #osWindowLayer { z-index: 20001 !important; }
 
 @media (max-width: 700px) {
     html, body { overflow: hidden; }
@@ -678,27 +492,9 @@ html, body {
 .os-window[data-app="coaching"] .os-welcome, .os-window[data-app="mealPlanning"] .os-welcome { background: linear-gradient(135deg, #c4f0ef, #b7d7f4 54%, #d1c3ef); }
 .os-window[data-app="twitch"] .os-welcome, .os-window[data-app="discord"] .os-welcome { background: linear-gradient(135deg, #e6cbff, #c7dcff 55%, #c5efcb); }
 
-#osTaskbar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 20000; box-sizing: border-box; height: 40px; display: flex; align-items: center; gap: 5px; padding: 3px 6px 3px 3px; overflow: hidden; border-top: 2px solid #ffffff; background: linear-gradient(#e9e9e9 0 18%, #c9c9c9 18% 66%, #9d9d9d 100%); box-shadow: 0 -2px 0 #686868, 0 -4px 9px #0009, inset 0 1px #ffffff; }
-#osStartButton { width: 142px; height: 33px; flex: 0 0 auto; display: flex; align-items: center; justify-content: flex-start; padding: 1px 7px; border: 2px outset #ffffff; border-radius: 0; color: #ffffff; background: linear-gradient(90deg, #3e6f43, #72aa5e 58%, #467b46); font-family: "Pixelify Sans", monospace; font-size: 16px; font-weight: 700; letter-spacing: .2px; text-align: left; text-shadow: 1px 1px #254d2a; box-shadow: inset 1px 1px #c9f3a5, inset -1px -1px #284d30, 1px 1px 0 #747474; }
-#osStartButton:hover { transform: none; filter: brightness(1.08); }
-.start-pixel { display: inline-grid; width: 27px; height: 27px; place-items: center; overflow: hidden; margin-right: 5px; border: 1px solid #c7f1a4; background: #3c653d url("/assets/media/pixilart pixie.png") center 28% / 34px auto no-repeat; box-shadow: inset 1px 1px #213d26; image-rendering: pixelated; }
-#osTaskTabs { display: flex; min-width: 0; flex: 1; gap: 3px; overflow-x: auto; }
-.os-task-tab { max-width: 185px; min-width: 106px; height: 32px; display: block; overflow: hidden; padding: 5px 7px; border: 2px outset #ffffff; border-radius: 0; color: #29183a; background: linear-gradient(#e4e4e4, #bdbdbd); box-shadow: 1px 1px 0 #777777; font-family: "Pixelify Sans", monospace; font-size: 12px; font-weight: 700; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
-.os-task-tab.is-active { border-style: inset; color: #ffffff; background: linear-gradient(#7651a0, #4e326b); box-shadow: inset 1px 1px #2f1f40; text-shadow: 1px 1px #281a38; }
-.os-task-tab:hover { transform: none; }
-#osSystemTray { display: flex; flex: 0 0 auto; align-items: center; gap: 3px; padding: 2px 3px; border: 2px inset #eeeeee; background: #acacac; box-shadow: inset 1px 1px #696969, 1px 1px 0 #777777; }
-.taskbar-socials { display: flex; align-items: center; gap: 2px; padding-right: 3px; border-right: 1px solid #777777; }
-.taskbar-social { width: 26px; height: 26px; display: grid; place-items: center; padding: 1px; border: 1px outset #ffffff; border-radius: 0; color: #ffffff; background: linear-gradient(#dedede, #acacac); box-shadow: 1px 1px 0 #717171; font-family: "Pixelify Sans", monospace; font-size: 10px; font-weight: 700; line-height: 1; }
-.taskbar-social:hover { transform: none; filter: brightness(1.12); }
-.taskbar-social:active { border-style: inset; box-shadow: none; }
-.taskbar-social img { width: 19px; height: 19px; object-fit: contain; image-rendering: pixelated; }
 .taskbar-instagram-slot { color: #55326f; background: linear-gradient(#e4caff, #ad77cd); text-shadow: 1px 1px #f9eaff; }
-.tray-sparkle { display: grid; width: 18px; height: 18px; place-items: center; border: 1px solid #7650a1; color: #ffffff; background: #5d3c7e; font-family: "Pixelify Sans", monospace; font-size: 11px; line-height: 1; text-shadow: 1px 1px #261533; }
-#osClock { flex: 0 0 auto; min-width: 61px; padding: 3px 4px; border-left: 1px solid #777777; color: #24152f; font-family: "Pixelify Sans", monospace; font-size: 12px; font-weight: 700; text-align: center; text-shadow: 1px 1px #ffffff; }
-#osTray { flex: 0 0 auto; display: block; max-width: 240px; overflow: hidden; padding: 3px 4px; border: 0; border-radius: 0; color: #321c45; background: transparent; font-family: "Pixelify Sans", monospace; font-size: 11px; font-weight: 700; text-align: right; text-overflow: ellipsis; white-space: nowrap; text-shadow: 1px 1px #fff; }
-#osTray:hover { transform: none; color: #4c2771; background: #eeeeee; }
 
-@media (max-width: 700px) { .os-window { min-width: 280px; } .os-window-title { font-size: 14px; } #osTaskbar { height: 55px; } #osStartButton { width: 105px; height: 43px; font-size: 17px; } .start-pixel { width: 19px; height: 19px; font-size: 14px; } .os-task-tab { min-width: 112px; height: 38px; font-size: 14px; } #osSystemTray { display: none; } }
+@media (max-width: 700px) { .os-window { min-width: 280px; } .os-window-title { font-size: 14px; }      }
 
 #gamesButton {
     position: fixed;
@@ -737,13 +533,13 @@ html, body {
     .vine-top { top: -34px; left: -18px; width: 74vw; }
     .container, .hero, .nav-buttons { display: none; }
     #avatarLabButton, #loginButton { display: none !important; }
-    #osTaskbar, #osStartMenu { display: none !important; }
+    
     #playerBadge { top: 16px; right: 14px; min-width: 122px; padding: 7px 9px; }
     #playerBadge span { font-size: 9px; }
     #playerBadge strong { font-size: 13px; }
-    #beingHud { right: 12px; bottom: 83px; transform: scale(.74); transform-origin: right bottom; z-index: 12; }
-    #beingDock { right: 12px; bottom: 137px; transform: scale(.72); transform-origin: right bottom; z-index: 11; }
-    #beingDock .being-actions { display: none; }
+    
+    
+    
     #mobilePocketHome { position: fixed; z-index: 9; top: 88px; left: 16px; right: 16px; display: block; padding: 18px; border: 3px outset #f3ecff; color: #fff; background: linear-gradient(145deg, #533276e8, #253b5dd9 58%, #5a3c76dd); box-shadow: 4px 4px 0 #1b1128, 0 0 22px #d394ff88; }
     .pocket-kicker { margin: 0 0 7px; color: #baff96; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
     #mobilePocketHome h2 { margin: 0; color: #f0b6ff; font-size: clamp(29px, 10vw, 40px); line-height: .96; text-shadow: 2px 2px #39214e, 0 0 12px #e18dff; }
@@ -832,8 +628,19 @@ html, body {
         object-fit: contain !important;
         image-rendering: pixelated !important;
     }
-    #beingDock .avatar-layer, #beingDock .avatar-preview img, #companion .avatar-layer { object-fit: contain !important; image-rendering: pixelated !important; }
-    .container, .hero, #playerBadge, #beingDock, #beingHud, #osTaskbar, #osStartMenu, #osWindowLayer { z-index: 10; }
-    #osTaskbar { z-index: 20000 !important; }
-    #osStartMenu, #osWindowLayer { z-index: 20001 !important; }
+    
+    .container, .hero, #playerBadge, #osWindowLayer { z-index: 10; }
+    
+     #osWindowLayer { z-index: 20001 !important; }
+}
+
+#konamiStickman {
+    position: fixed;
+    bottom: 40px;
+    left: 0;
+    z-index: 30000;
+    width: 320px;
+    height: 320px;
+    image-rendering: pixelated;
+    cursor: pointer;
 }

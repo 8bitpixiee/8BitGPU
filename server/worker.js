@@ -1,6 +1,8 @@
+import { badgesFor, cleanPicks, savePicks } from "./badges.js";
+import { handleGoogle } from "./google.js";
 import { handleSocial } from "./social/social.js";
 import { handleChat, loungeCall } from "./chat/chat.js";
-import { roomAvatar } from "./chat/chat-avatar.js";
+import { mayUseBody, roomAvatar } from "./chat/chat-avatar.js";
 import { once } from "./once.js";
 import { STORE_PRODUCTS } from "./store/store-catalog.js";
 
@@ -269,7 +271,7 @@ function profileStyle(value, theme) {
   }
   return { ...defaultProfileStyles[theme], ...style, wallpaperUrl };
 }
-function publicProfile(row) {
+function publicProfile(row, badges = { picks: [], earned: [] }) {
   const theme = profileThemes.has(row.theme) ? row.theme : "violet";
   return {
     username: row.username,
@@ -295,6 +297,7 @@ function publicProfile(row) {
       ink: row.inkColor || defaultProfileStyles[theme].ink,
       wallpaperUrl: row.wallpaperUrl || "",
     },
+    badges,
     updatedAt: row.updatedAt || null,
   };
 }
@@ -620,6 +623,9 @@ async function handleApi(request, env, url) {
       "set-cookie": "eightbit_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
     });
   }
+  if (path.startsWith("/api/auth/google/"))
+    return handleGoogle(request, env, url, { db: env.DB, createSession, readCookies, json });
+
   if (path === "/api/auth/me" && request.method === "GET") {
     const user = await currentUser(request, env.DB);
     return json({ user: user ? publicUser(user) : null });
@@ -696,7 +702,9 @@ async function handleApi(request, env, url) {
   if (path === "/api/profile/me" && request.method === "GET") {
     const user = await currentUser(request, env.DB);
     if (!user) return json({ error: "Sign in to open your profile." }, 401);
-    return json({ profile: publicProfile(await findProfileBy(env.DB, "id", user.id)) });
+    return json({
+      profile: publicProfile(await findProfileBy(env.DB, "id", user.id), await badgesFor(env.DB, user.id, user.username)),
+    });
   }
 
   if (path === "/api/profile/me" && request.method === "PUT") {
@@ -716,6 +724,9 @@ async function handleApi(request, env, url) {
       );
     }
     if (!style) return json({ error: "Those page colors or wall image link are not valid." }, 400);
+    const picks = body?.badges === undefined ? null : cleanPicks(body.badges);
+    if (body?.badges !== undefined && !picks) return json({ error: "Pick up to five different badges from the list." }, 400);
+    if (picks) await savePicks(env.DB, user.id, picks);
     await env.DB.prepare(
       `
       INSERT INTO player_profiles (user_id, mood, about_text, favorites_text, theme, updated_at)
@@ -757,14 +768,16 @@ async function handleApi(request, env, url) {
         Date.now(),
       )
       .run();
-    return json({ profile: publicProfile(await findProfileBy(env.DB, "id", user.id)) });
+    return json({
+      profile: publicProfile(await findProfileBy(env.DB, "id", user.id), await badgesFor(env.DB, user.id, user.username)),
+    });
   }
 
   const profileMatch = path.match(/^\/api\/profile\/([a-zA-Z0-9_.-]{3,18})$/);
   if (profileMatch && request.method === "GET") {
     const profile = await findProfileBy(env.DB, "username", profileMatch[1]);
     if (!profile) return json({ error: "That profile does not exist." }, 404);
-    return json({ profile: publicProfile(profile) });
+    return json({ profile: publicProfile(profile, await badgesFor(env.DB, profile.id, profile.username)) });
   }
 
   if (path === "/api/avatar" && request.method === "PUT") {
@@ -778,6 +791,8 @@ async function handleApi(request, env, url) {
       JSON.stringify(avatar).length > 12000
     )
       return json({ error: "That outfit data is not valid." }, 400);
+    if (!mayUseBody(user.username, avatar.bodyAsset))
+      return json({ error: "That body belongs to someone else." }, 403);
     await env.DB.prepare(
       `
       INSERT INTO player_data (user_id, avatar_json, updated_at) VALUES (?, ?, ?)

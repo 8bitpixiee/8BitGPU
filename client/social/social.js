@@ -97,7 +97,7 @@ async function loadHome() {
     friendBox.append(
       Object.assign(document.createElement("div"), {
         className: "entry empty",
-        textContent: "No accepted friends yet.",
+        textContent: "No friends yet. Add 8Bit_Pixiee.dev or pickle to get a badge for it.",
       }),
     );
   for (const f of friends) {
