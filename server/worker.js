@@ -6,6 +6,7 @@ import { handleChat, loungeCall } from "./chat/chat.js";
 import { mayUseBody, roomAvatar } from "./chat/chat-avatar.js";
 import { once } from "./once.js";
 import { isBossName } from "./boss.js";
+import { accountsCookie, addAccount, parseAccounts, removeAccount, sessionCookie } from "./accounts.js";
 import { STORE_PRODUCTS } from "./store/store-catalog.js";
 
 const SESSION_LENGTH_SECONDS = 60 * 60 * 24 * 30;
@@ -199,6 +200,37 @@ async function createSession(userId, database) {
     .bind(await sha256(token), userId, expiresAt)
     .run();
   return `eightbit_session=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_LENGTH_SECONDS}`;
+}
+
+// the saved accounts that still have a live session, oldest first
+async function savedAccounts(request, database) {
+  const tokens = parseAccounts(readCookies(request).eightbit_accounts);
+  const current = readCookies(request).eightbit_session;
+  if (current && !tokens.includes(current)) tokens.push(current);
+  const live = [];
+  for (const token of tokens) {
+    const row = await database
+      .prepare(
+        "SELECT users.id, users.username FROM sessions JOIN users ON users.id = sessions.user_id WHERE sessions.token_hash = ? AND sessions.expires_at > ?",
+      )
+      .bind(await sha256(token), Date.now())
+      .first();
+    if (row) live.push({ ...row, token });
+  }
+  return live;
+}
+
+// any response that starts a session also files it under the saved accounts
+function rememberAccount(request, response) {
+  const started = response.headers
+    .getSetCookie()
+    .map((cookie) => /^eightbit_session=([^;]+)/.exec(cookie)?.[1])
+    .find(Boolean);
+  if (!started || response.headers.getSetCookie().some((cookie) => cookie.startsWith("eightbit_accounts="))) return response;
+  const out = new Response(response.body, response);
+  const saved = addAccount(parseAccounts(readCookies(request).eightbit_accounts), decodeURIComponent(started));
+  out.headers.append("set-cookie", accountsCookie(saved, SESSION_LENGTH_SECONDS));
+  return out;
 }
 
 function publicUser(user) {
@@ -705,15 +737,47 @@ async function handleApi(request, env, url) {
     );
   }
 
+  if (path === "/api/auth/accounts" && request.method === "GET") {
+    const saved = await savedAccounts(request, env.DB);
+    const response = json({
+      active: saved.find((account) => account.token === readCookies(request).eightbit_session)?.id ?? null,
+      accounts: saved.map(({ id, username }) => ({ id, username })),
+    });
+    // dead sessions fall out of the saved list as soon as anyone looks
+    const tokens = saved.map((account) => account.token);
+    if (tokens.length !== parseAccounts(readCookies(request).eightbit_accounts).length)
+      response.headers.append("set-cookie", accountsCookie(tokens, SESSION_LENGTH_SECONDS));
+    return response;
+  }
+
+  if (path === "/api/auth/switch" && request.method === "POST") {
+    const body = await readBody(request);
+    const saved = await savedAccounts(request, env.DB);
+    const target = saved.find((account) => account.id === body?.id);
+    if (!target) return json({ error: "That account is not saved on this device." }, 404);
+    const avatar = await env.DB.prepare("SELECT avatar_json AS avatar FROM player_data WHERE user_id = ?")
+      .bind(target.id)
+      .first();
+    const response = json({
+      user: { id: target.id, username: target.username, avatar: avatar?.avatar ? JSON.parse(avatar.avatar) : null },
+    });
+    response.headers.append("set-cookie", sessionCookie(target.token, SESSION_LENGTH_SECONDS));
+    response.headers.append("set-cookie", accountsCookie(addAccount(saved.map((a) => a.token), target.token), SESSION_LENGTH_SECONDS));
+    return response;
+  }
+
   if (path === "/api/auth/logout" && request.method === "POST") {
     const token = readCookies(request).eightbit_session;
     if (token)
       await env.DB.prepare("DELETE FROM sessions WHERE token_hash = ?")
         .bind(await sha256(token))
         .run();
-    return json({ ok: true }, 200, {
-      "set-cookie": "eightbit_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
-    });
+    // only the account that signed out leaves the saved list, the others stay one tap away
+    const rest = removeAccount(parseAccounts(readCookies(request).eightbit_accounts), token);
+    const response = json({ ok: true, remaining: rest.length });
+    response.headers.append("set-cookie", "eightbit_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0");
+    response.headers.append("set-cookie", accountsCookie(rest, SESSION_LENGTH_SECONDS));
+    return response;
   }
 
   if (path === "/api/badges" && request.method === "GET") {
@@ -849,7 +913,7 @@ export default {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/api/")) {
       try {
-        return await handleApi(request, env, url);
+        return rememberAccount(request, await handleApi(request, env, url));
       } catch (error) {
         console.error(error);
         return json({ error: "The player database is temporarily unavailable." }, 500);
