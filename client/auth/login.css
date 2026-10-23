@@ -111,3 +111,5 @@ button { font-family: inherit; font-weight: 700; cursor: pointer; }
 
 .google-button { display: block; box-sizing: border-box; margin-top: 8px; text-align: center; text-decoration: none; }
 .google-button[hidden] { display: none; }
+
+[hidden] { display: none !important; }
