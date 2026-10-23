@@ -191,3 +191,7 @@ body.has-wallpaper { background-image:none!important; }
   #windowCanvas .being-portrait{height:286px}
   #windowCanvas .identity-card #cardName{margin-top:8px}
 }
+
+/* geocities-style visitor counter under the page address */
+.hit-counter { display:block; margin-top:6px; padding:2px 8px; border:2px inset #6a6a6a; color:#7dff9a; background:#000; font:12px/1.4 'Courier New',monospace; letter-spacing:1px; cursor:default; }
+.hit-counter output { padding:0 3px; color:#fff; background:#222; letter-spacing:3px; }
