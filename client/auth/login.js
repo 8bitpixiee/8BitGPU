@@ -102,6 +102,14 @@ async function loadExistingAccount() {
 
 loadExistingAccount();
 
+// the button only shows once the deployment has Google keys
+fetch("/api/auth/google/config", { cache: "no-store" })
+  .then((response) => response.json())
+  .then((data) => {
+    document.getElementById("googleButton").hidden = !data.enabled;
+  })
+  .catch(() => {});
+
 document.getElementById("recoveryForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const button = event.submitter;

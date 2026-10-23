@@ -109,3 +109,6 @@ button { font-family: inherit; font-weight: 700; cursor: pointer; }
 @media (max-width: 530px) {
     .login-content { background: linear-gradient(180deg, #b9e9e9 0%, #cce4ff 29%, #ffd9e7 29%, #ffe8cc 100%); }
 }
+
+.google-button { display: block; box-sizing: border-box; margin-top: 8px; text-align: center; text-decoration: none; }
+.google-button[hidden] { display: none; }
