@@ -1,0 +1,370 @@
+diff --git a/server/chat/chat.js b/server/chat/chat.js
+--- a/server/chat/chat.js
++++ b/server/chat/chat.js
+@@ -2,10 +2,16 @@ import { once } from "../once.js";
+ import { portrait, roomAvatar } from "./chat-avatar.js";
+ const reply = (body, status = 200) =>
+   Response.json(body, { status, headers: { "cache-control": "no-store" } });
+-export const loungeCall = (env, path, body) =>
+-  env.LOUNGE?.get(env.LOUNGE.idFromName("lounge"))
+-    .fetch("https://lounge" + path, { method: "POST", body: JSON.stringify(body || {}) })
+-    .catch(() => {});
++const ROOM_IDS = ["arcade", "pillow"];
++const objectName = room => room === "arcade" ? "lounge" : "pillow";
++export const loungeCall = (env, path, body, room) => {
++  if (!env.LOUNGE) return Promise.resolve();
++  return Promise.all((room ? [room] : ROOM_IDS).map(id =>
++    env.LOUNGE.get(env.LOUNGE.idFromName(objectName(id)))
++      .fetch("https://lounge" + path, { method: "POST", body: JSON.stringify(body || {}) })
++      .catch(() => {})
++  ));
++};
+ const ids = (value) =>
+   String(value || "")
+     .split(",")
+@@ -16,10 +22,19 @@ export const ensureChatSchema = once(async (db) => {
+   await db.exec(`CREATE TABLE IF NOT EXISTS chat_access (user_id TEXT PRIMARY KEY, allowed INTEGER NOT NULL, granted_by TEXT NOT NULL);
+ CREATE TABLE IF NOT EXISTS chat_activities (user_id TEXT PRIMARY KEY, state_json TEXT NOT NULL, updated_at INTEGER NOT NULL);
+ CREATE TABLE IF NOT EXISTS chat_members (user_id TEXT PRIMARY KEY, adult_at INTEGER NOT NULL, muted_until INTEGER NOT NULL DEFAULT 0, banned INTEGER NOT NULL DEFAULT 0);
+-CREATE TABLE IF NOT EXISTS chat_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, body TEXT NOT NULL, created_at INTEGER NOT NULL, deleted INTEGER NOT NULL DEFAULT 0);
++CREATE TABLE IF NOT EXISTS chat_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, body TEXT NOT NULL, created_at INTEGER NOT NULL, deleted INTEGER NOT NULL DEFAULT 0, room TEXT NOT NULL DEFAULT 'arcade');
+ CREATE INDEX IF NOT EXISTS chat_messages_user_time ON chat_messages(user_id, created_at);
+ CREATE TABLE IF NOT EXISTS chat_blocks (user_id TEXT NOT NULL, blocked_id TEXT NOT NULL, PRIMARY KEY(user_id, blocked_id));
+ CREATE TABLE IF NOT EXISTS chat_reports (message_id INTEGER NOT NULL, reporter_id TEXT NOT NULL, reason TEXT NOT NULL, created_at INTEGER NOT NULL, resolved INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(message_id, reporter_id));`);
++  const columns = await db.prepare("PRAGMA table_info(chat_messages)").all();
++  if (!columns.results.some(column => column.name === "room")) {
++    try { await db.exec("ALTER TABLE chat_messages ADD COLUMN room TEXT NOT NULL DEFAULT 'arcade'"); }
++    catch (error) {
++      const retry = await db.prepare("PRAGMA table_info(chat_messages)").all();
++      if (!retry.results.some(column => column.name === "room")) throw error;
++    }
++  }
++  await db.exec("CREATE INDEX IF NOT EXISTS chat_messages_room_id ON chat_messages(room,id)");
+ });
+ 
+ export async function handleChat(request, env, user, readBody) {
+@@ -37,7 +52,10 @@ export async function handleChat(request, env, user, readBody) {
+       403,
+     );
+   }
+-  const path = new URL(request.url).pathname;
++  const url = new URL(request.url);
++  const path = url.pathname;
++  const room = url.searchParams.get("room") || "arcade";
++  if (!ROOM_IDS.includes(room)) return reply({ error: "Unknown room." }, 400);
+   if (path === "/api/chat/access") {
+     if (!owner) return reply({ error: "Only the owner can manage membership." }, 403);
+     if (request.method === "GET") {
+@@ -98,8 +116,10 @@ export async function handleChat(request, env, user, readBody) {
+       return reply({ error: "Use this website to join the room." }, 403);
+     if (!env.LOUNGE) return reply({ error: "The room is not available right now." }, 503);
+     const row = await db.prepare("SELECT avatar_json AS avatar FROM player_data WHERE user_id=?").bind(user.id).first();
+-    const who = { id: user.id, username: user.username, owner, avatar: roomAvatar(row?.avatar) };
+-    return env.LOUNGE.get(env.LOUNGE.idFromName("lounge")).fetch(
++    const who = { id: user.id, username: user.username, owner, avatar: roomAvatar(row?.avatar), room,
++      from: url.searchParams.get("from") === (room === "arcade" ? "pillow" : "arcade") };
++    await loungeCall(env, "/kick", { userId: user.id, reason: "room_changed" }, room === "arcade" ? "pillow" : "arcade");
++    return env.LOUNGE.get(env.LOUNGE.idFromName(objectName(room))).fetch(
+       new Request("https://lounge/connect", {
+         headers: { Upgrade: "websocket", "x-lounge-user": encodeURIComponent(JSON.stringify(who)) },
+       }),
+@@ -137,10 +157,10 @@ export async function handleChat(request, env, user, readBody) {
+       .prepare(
+         `SELECT m.id,m.user_id AS userId,u.username,m.body,m.created_at AS createdAt,p.avatar_json AS avatar
+       FROM chat_messages m JOIN users u ON u.id=m.user_id LEFT JOIN player_data p ON p.user_id=m.user_id
+-      WHERE m.deleted=0 AND NOT EXISTS (SELECT 1 FROM chat_blocks b WHERE b.user_id=? AND b.blocked_id=m.user_id)
++      WHERE m.room=? AND m.deleted=0 AND NOT EXISTS (SELECT 1 FROM chat_blocks b WHERE b.user_id=? AND b.blocked_id=m.user_id)
+       ORDER BY m.id DESC LIMIT 60`,
+       )
+-      .bind(user.id)
++      .bind(room, user.id)
+       .all();
+     const blocks = await db
+       .prepare(
+@@ -168,15 +188,15 @@ export async function handleChat(request, env, user, readBody) {
+     const now = Date.now();
+     const result = await db
+       .prepare(
+-        `INSERT INTO chat_messages (user_id,body,created_at)
+-      SELECT ?,?,? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id=? AND created_at>?)
++        `INSERT INTO chat_messages (user_id,body,created_at,room)
++      SELECT ?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id=? AND created_at>?)
+       AND EXISTS (SELECT 1 FROM chat_members WHERE user_id=? AND banned=0 AND muted_until<=?)`,
+       )
+-      .bind(user.id, message, now, user.id, now - 3000, user.id, now)
++      .bind(user.id, message, now, room, user.id, now - 3000, user.id, now)
+       .run();
+     if (!result.meta.changes)
+       return reply({ error: "Wait a few seconds before sending another message." }, 429);
+-    await loungeCall(env, "/poke");
++    await loungeCall(env, "/poke", {}, room);
+     return reply({ ok: true }, 201);
+   }
+   if (path === "/api/chat/block" && request.method === "POST") {
+diff --git a/server/chat/lounge.js b/server/chat/lounge.js
+--- a/server/chat/lounge.js
++++ b/server/chat/lounge.js
+@@ -21,7 +21,7 @@ export class LoungeRoom extends DurableObject {
+     const path = new URL(request.url).pathname;
+     if (path === "/connect") return this.connect(request);
+     const body = await request.json().catch(() => ({}));
+-    if (path === "/kick") this.kick(body.userId, 4003, "removed");
++    if (path === "/kick") this.kick(body.userId, body.reason === "room_changed" ? 4000 : 4003, body.reason === "room_changed" ? "room_changed" : "removed");
+     else if (path === "/poke") this.broadcast({ t: "chat" });
+     else if (path === "/avatar") await this.setAvatar(body.userId, body.avatar);
+     else return new Response("nope", { status: 404 });
+@@ -40,13 +40,15 @@ export class LoungeRoom extends DurableObject {
+     if (this.ctx.getWebSockets().length >= MAX_SEATS) return new Response("room full", { status: 503 });
+     const { 0: client, 1: server } = new WebSocketPair();
+     this.ctx.acceptWebSocket(server);
++    const pillow = who.room === "pillow";
+     const seed = [...who.id].reduce((n, c) => n + c.charCodeAt(0), 0);
+     server.serializeAttachment({
+       id: who.id,
+       username: who.username,
+       owner: Boolean(who.owner),
+-      x: 36 + (seed % 19),
+-      y: 66 + (seed % 9),
++      room: pillow ? "pillow" : "arcade",
++      x: who.from ? (pillow ? 16 : 84) : pillow ? 78 : 36 + (seed % 19),
++      y: who.from ? 86 : pillow ? 84 : 66 + (seed % 9),
+       facing: "down",
+       flying: 0,
+       emote: "",
+@@ -75,7 +77,7 @@ export class LoungeRoom extends DurableObject {
+       if (now - me.lastMove < 50) return;
+       if (!Number.isFinite(msg.x) || !Number.isFinite(msg.y)) return;
+       me.x = clamp(msg.x, 6, 94);
+-      me.y = clamp(msg.y, 12, 94);
++      me.y = clamp(msg.y, me.room === "pillow" ? 76 : 12, 94);
+       me.facing = FACINGS.has(msg.facing) ? msg.facing : "down";
+       me.flying = msg.flying === true ? 1 : 0;
+       me.lastMove = now;
+diff --git a/client/arcade/arcade.js b/client/arcade/arcade.js
+--- a/client/arcade/arcade.js
++++ b/client/arcade/arcade.js
+@@ -1,8 +1,8 @@
+ const el = (id) => document.getElementById(id);
+-const MAP_BOUNDS = { minX: 6, maxX: 94, minY: 12, maxY: 94 };
++const MAP_BOUNDS = RoomPage.room.bounds;
+ const EMOTES = ["dance", "twerk", "smoke", "drink", "shroom", "laugh", "spin", "wave", "crashout"];
+-let x = 48,
+-  y = 73,
++let x = RoomPage.spawn.x,
++  y = RoomPage.spawn.y,
+   target = null,
+   keys = new Set(),
+   joined = false,
+@@ -47,7 +47,7 @@ function status(text) {
+   el("roomStatus").textContent = text;
+ }
+ async function api(path, body, method) {
+-  const r = await fetch("/api/chat/" + path, {
++  const r = await fetch(RoomPage.apiPath(path), {
+     method: method || (body === undefined ? "GET" : "POST"),
+     headers: body === undefined ? {} : { "content-type": "application/json" },
+     body: body === undefined ? undefined : JSON.stringify(body),
+@@ -222,7 +222,7 @@ async function refreshMessages() {
+ function connectSocket() {
+   if (socket || giveUp) return;
+   const ws = new WebSocket(
+-    (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/api/chat/ws",
++    RoomPage.socketUrl(),
+   );
+   socket = ws;
+   ws.onopen = () => {
+@@ -250,7 +250,7 @@ function connectSocket() {
+     if (leaving) return;
+     if (event.code === 4000) {
+       giveUp = true;
+-      status("The lounge is open in another tab.");
++      status("You entered another room or opened this room in another tab.");
+       return;
+     }
+     delay = event.code === 4003 ? 0 : 3000;
+@@ -505,7 +505,8 @@ async function roomSnapshot() {
+   const stage = el("mapStage"),
+     size = 1200,
+     canvas = document.createElement("canvas");
+-  canvas.width = canvas.height = size;
++  canvas.width = size;
++  canvas.height = Math.round(size * RoomPage.room.height / RoomPage.room.width);
+   const context = canvas.getContext("2d"),
+     load = (source) =>
+       new Promise((resolve, reject) => {
+@@ -514,16 +515,16 @@ async function roomSnapshot() {
+         image.onerror = reject;
+         image.src = source;
+       });
+-  const background = await load("assets/maps/arcade/arcade-01-bg.png");
+-  context.drawImage(background, 0, 0, size, size);
++  const background = await load(RoomPage.room.image);
++  context.drawImage(background, 0, 0, canvas.width, canvas.height);
+   const bounds = stage.getBoundingClientRect();
+   for (const node of el("players").children) {
+     for (const image of node.querySelectorAll("img,canvas")) {
+       const box = image.getBoundingClientRect(),
+         left = ((box.left - bounds.left) / bounds.width) * size,
+-        top = ((box.top - bounds.top) / bounds.height) * size,
++        top = ((box.top - bounds.top) / bounds.height) * canvas.height,
+         width = (box.width / bounds.width) * size,
+-        height = (box.height / bounds.height) * size;
++        height = (box.height / bounds.height) * canvas.height;
+       try {
+         await image.decode?.();
+         const avatar = JSON.parse(node.dataset.avatar || "{}");
+@@ -599,7 +600,7 @@ function startMoving() {
+   }
+ }
+ el("mapStage").addEventListener("pointerdown", (e) => {
+-  if (!joined || e.button !== 0 || e.target.closest(".being-profile-link")) return;
++  if (!joined || e.button !== 0 || e.target.closest(".being-profile-link, .room-door")) return;
+   const r = e.currentTarget.getBoundingClientRect();
+   target = clampPosition(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
+   el("walkMarker").style.left = target.x + "%";
+diff --git a/arcade.html b/arcade.html
+--- a/arcade.html
++++ b/arcade.html
+@@ -1,5 +1,5 @@
+ <!doctype html>
+-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Arcade Lounge · 8BitGPU</title><link rel="stylesheet" href="client/arcade/arcade.css"><link rel="stylesheet" href="arcade-fill.css"><link rel="stylesheet" href="client/shared/retro-windows.css"></head>
++<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Arcade Lounge · 8BitGPU</title><link rel="stylesheet" href="client/arcade/arcade.css"><link rel="stylesheet" href="arcade-fill.css"><link rel="stylesheet" href="client/shared/retro-windows.css"><link rel="stylesheet" href="client/arcade/connected-rooms.css"></head>
+ <body><main id="arcadeGame">
+ <header class="arcade-header"><div><strong>✦ ARCADE LOUNGE</strong><small>OUR FIRST SHARED ROOM · 18+</small></div><span id="roomCount">Connecting...</span><button id="roomCamera" type="button" title="Photograph this room">📷 Camera</button><a href="account.html">Account</a></header>
+ <div id="roomStatus" role="status">Checking your access...</div>
+@@ -13,6 +13,7 @@
+ <script src="client/shared/avatar-layout.js"></script>
+ <script src="client/shared/avatar-colors.js"></script>
+ <script src="client/arcade/avatar-animations.js"></script>
++<script src="client/arcade/room-setup.js"></script>
+ <script src="client/arcade/arcade.js"></script>
+ <script src="client/arcade/arcade-profile.js"></script>
+ <script src="client/shared/window-theme.js"></script>
+diff --git a/client/desktop/script.js b/client/desktop/script.js
+--- a/client/desktop/script.js
++++ b/client/desktop/script.js
+@@ -371,7 +371,7 @@ const desktopApps = {
+     left: 185,
+     top: 75,
+   },
+-  arcade: { title: "PillowRoom.exe", src: "arcade.html", width: 900, height: 650, left: 125, top: 50 },
++  arcade: { title: "Arcade Lounge.exe", src: "arcade.html?room=arcade", width: 900, height: 650, left: 125, top: 50 },
+   inventory: {
+     title: "INVENTORY.exe",
+     width: 440,
+diff --git a/index.html b/index.html
+--- a/index.html
++++ b/index.html
+@@ -147,6 +147,9 @@
+                     <span class="menu-icon">✦</span> Avatar Lab
+                 </button>
+                 <button type="button" onclick="openApp('arcade')">
++                    <span class="menu-icon">▤</span> Arcade Lounge
++                </button>
++                <button type="button" onclick="openApp('pillow')">
+                     <span class="menu-icon">☾</span> The Pillow Room
+                 </button>
+                 <button type="button" onclick="openApp('profile')">
+@@ -242,6 +245,7 @@
+         <div class="pocket-launch-grid">
+             <button type="button" onclick="openApp('avatarLab')"><span>✦</span> Avatar Lab</button>
+             <button type="button" onclick="openApp('arcade')"><span>✦</span> Arcade Lounge</button>
++            <button type="button" onclick="openApp('pillow')"><span>☾</span> The Pillow Room</button>
+             <button type="button" onclick="openApp('profile')"><span>✦</span> MyPixel</button>
+             <button type="button" onclick="openApp('twitch')"><span>✦</span> Watch Live</button>
+             <button type="button" onclick="openApp('inventory')"><span>✦</span> Inventory</button>
+@@ -274,6 +278,7 @@
+ <script src="client/shared/avatar-layout.js"></script>
+ <script src="client/shared/avatar-colors.js"></script>
+ <script src="client/desktop/script.js"></script>
++<script src="client/desktop/desktop-rooms.js"></script>
+ 
+ <script src="client/shared/window-theme.js"></script><script src="client/desktop/desktop-social.js"></script></body>
+ </html>
+diff --git a/client/arcade/room-setup.js b/client/arcade/room-setup.js
+new file mode 100644
+--- /dev/null
++++ b/client/arcade/room-setup.js
+@@ -0,0 +1,37 @@
++// Shared room page: the URL chooses the room; the server validates it again.
++(() => {
++  const rooms = {
++    arcade: {id:'arcade',name:'Arcade Lounge',title:'Arcade Lounge.exe',image:'assets/maps/arcade/arcade-01-bg.png',width:1200,height:1200,spawn:{x:48,y:73},entry:{x:84,y:86},bounds:{minX:6,maxX:94,minY:12,maxY:94},other:'pillow',door:{x:88,y:85}},
++    pillow: {id:'pillow',name:'The Pillow Room',title:'Pillow Room.exe',image:'assets/maps/pillow/pillow-room.png',width:300,height:216,spawn:{x:78,y:84},entry:{x:16,y:86},bounds:{minX:6,maxX:94,minY:76,maxY:94},other:'arcade',door:{x:12,y:85}}
++  };
++  const params=new URLSearchParams(location.search),room=rooms[params.get('room')]||rooms.arcade;
++  const other=rooms[room.other];
++  const spawn=params.get('from')===room.other?room.entry:room.spawn;
++  const apiPath=path=>'/api/chat/'+path+(path.includes('?')?'&':'?')+'room='+room.id;
++  const socketUrl=()=>{const url=new URL(apiPath('ws'),location.origin);url.protocol=location.protocol==='https:'?'wss:':'ws:';if(params.get('from')===room.other)url.searchParams.set('from',room.other);return url.href;};
++  window.RoomPage={room,spawn,apiPath,socketUrl};
++  document.body.classList.add('connected-room');document.body.dataset.room=room.id;
++  document.title=room.name+' · 8BitGPU';
++  document.querySelector('.arcade-header strong').textContent='✦ '+room.name.toUpperCase();
++  document.querySelector('.arcade-header small').textContent='CONNECTED ROOMS · 18+';
++  document.querySelector('#roomGate h1').textContent='Come hang out in '+room.name;
++  const map=document.getElementById('arcadeMap'),stage=document.getElementById('mapStage');
++  map.setAttribute('aria-label',room.name);stage.style.backgroundImage=`url("${room.image}")`;
++  const door=document.createElement('a');door.href='arcade.html?room='+other.id+'&from='+room.id;door.className='room-door';
++  door.style.left=room.door.x+'%';door.style.top=room.door.y+'%';
++  door.setAttribute('aria-label','Enter '+other.name);door.title='Enter '+other.name;
++  const frame=document.createElement('span');frame.className='room-door-icon';frame.setAttribute('aria-hidden','true');frame.textContent='↔';
++  const label=document.createElement('span');label.className='room-door-label';label.textContent=other.name;
++  door.append(frame,label);stage.append(door);
++  function travel(event){
++    event.preventDefault();event.stopPropagation();
++    if(parent!==window)parent.postMessage({type:'8bitgpu-room-travel',room:other.id,from:room.id},location.origin);
++    else location.assign(door.href);
++  }
++  door.addEventListener('click',travel);
++  const ratio=room.width/room.height;
++  function fit(){const width=map.clientWidth,height=map.clientHeight;if(!width||!height)return;const w=Math.min(width,height*ratio);stage.style.setProperty('--room-stage-width',w+'px');stage.style.setProperty('--room-stage-height',(w/ratio)+'px');}
++  new ResizeObserver(fit).observe(map);fit();
++  // Keep the desktop window title in sync when a doorway changes the room.
++  if(parent!==window)parent.postMessage({type:'8bitgpu-room-changed',room:room.id},location.origin);
++})();
+diff --git a/client/arcade/connected-rooms.css b/client/arcade/connected-rooms.css
+new file mode 100644
+--- /dev/null
++++ b/client/arcade/connected-rooms.css
+@@ -0,0 +1,12 @@
++/* The stage, background, players and doors share one proportional coordinate space. */
++.connected-room #mapStage {width:var(--room-stage-width,100%)!important;height:var(--room-stage-height,100%)!important;flex:none;max-width:none;max-height:none;aspect-ratio:auto;background-size:contain!important;background-repeat:no-repeat;background-position:center;}
++.connected-room #arcadeMap {align-items:center;justify-content:center;}
++.connected-room .being {width:22cqh;height:22cqh;}
++.connected-room[data-room=pillow] .room-sign {display:none;}
++.room-door {position:absolute;z-index:25;transform:translate(-50%,-85%);display:flex;flex-direction:column;align-items:center;gap:3px;width:90px;padding:0;border:0;background:none;box-shadow:none;cursor:pointer;text-decoration:none;}
++.room-door:hover {transform:translate(-50%,-85%);}
++.room-door-icon {display:grid;place-items:center;width:30px;height:38px;border:3px outset #dec9ef;background:linear-gradient(90deg,#46305f,#8b59ac);color:white;font:bold 19px Tahoma,sans-serif;box-shadow:1px 2px #20152d;}
++.room-door-label {display:block;max-width:115px;padding:3px 5px;border:1px solid #e7d5f1;border-radius:3px;background:#2d1c40ed;color:#fff;font-size:10px;line-height:1.25;white-space:normal;text-align:center;}
++.room-door:hover .room-door-icon,.room-door:focus-visible .room-door-icon {outline:2px solid #c6ffdc;outline-offset:2px;}
++.connected-room .movement-hint {z-index:26;}
++@media(max-width:650px) and (orientation:portrait){.connected-room #arcadeMap{min-height:240px;height:min(66svh,500px);}.room-door-icon{width:28px;height:34px;}.room-door-label{max-width:90px;font-size:9px;}}
+diff --git a/client/desktop/desktop-rooms.js b/client/desktop/desktop-rooms.js
+new file mode 100644
+--- /dev/null
++++ b/client/desktop/desktop-rooms.js
+@@ -0,0 +1,23 @@
++// Loaded after desktop/script.js. Both launch buttons reuse the same room window.
++(() => {
++  const original=window.openApp;
++  const configs={arcade:{title:'Arcade Lounge.exe',src:'arcade.html?room=arcade'},pillow:{title:'Pillow Room.exe',src:'arcade.html?room=pillow'}};
++  function configure(room){
++    Object.assign(desktopApps.arcade,configs[room]);
++    const win=openWindows.get('arcade');
++    if(win){win.querySelector('.os-window-title').textContent=configs[room].title;const tab=document.querySelector('#osTaskTabs [data-app="arcade"]');if(tab)tab.textContent=configs[room].title;}
++    return win;
++  }
++  window.openApp=(name,...args)=>{
++    if(name!=='arcade'&&name!=='pillow')return original(name,...args);
++    const room=name,win=configure(room),frame=win?.querySelector('iframe');
++    if(frame){let href=frame.src;try{href=frame.contentWindow.location.href;}catch{}const current=new URL(href,location.href).searchParams.get('room')||'arcade';if(current!==room)frame.src=configs[room].src;}
++    return original('arcade',...args);
++  };
++  window.addEventListener('message',event=>{
++    if(event.origin!==location.origin||!['8bitgpu-room-changed','8bitgpu-room-travel'].includes(event.data?.type)||!configs[event.data.room])return;
++    const win=openWindows.get('arcade');if(event.source!==win?.querySelector('iframe')?.contentWindow)return;
++    configure(event.data.room);
++    if(event.data.type==='8bitgpu-room-travel')win.querySelector('iframe').src=configs[event.data.room].src+'&from='+(event.data.room==='arcade'?'pillow':'arcade');
++  });
++})();

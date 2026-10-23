@@ -371,7 +371,7 @@ const desktopApps = {
     left: 185,
     top: 75,
   },
-  arcade: { title: "PillowRoom.exe", src: "arcade.html", width: 900, height: 650, left: 125, top: 50 },
+  arcade: { title: "Arcade Lounge.exe", src: "arcade.html?room=arcade", width: 900, height: 650, left: 125, top: 50 },
   inventory: {
     title: "INVENTORY.exe",
     width: 440,
