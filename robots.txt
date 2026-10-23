@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /account.html
+Disallow: /login.html
+Disallow: /chat.html
+Disallow: /social.html
+Disallow: /profile-card.html
+Disallow: /animation-tester.html
+Disallow: /nick.html
+Disallow: /sonic.html
+Disallow: /silversteen.html
+
+Sitemap: https://8bitgpu.net/sitemap.xml
