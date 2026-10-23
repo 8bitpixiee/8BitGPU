@@ -31,3 +31,9 @@
 .badge-choice input:checked + .badge { opacity: 1; filter: none; }
 .badge-choice input:focus-visible + .badge { outline: 2px solid currentColor; outline-offset: 1px; }
 .badge-picker[data-count="5"] .badge-choice input:not(:checked) + .badge { opacity: .3; cursor: not-allowed; }
+
+.badge-strip { display: inline-flex; align-items: center; gap: 3px; margin-left: 5px; vertical-align: middle; }
+.badge-strip:empty { display: none; }
+.badge-mini { display: inline-grid; place-items: center; width: 14px; height: 14px; }
+.badge-mini img { width: 14px; height: 14px; image-rendering: pixelated; }
+.badge-mini.is-self { border: 1px solid rgba(255, 255, 255, .9); border-radius: 3px; background: hsl(var(--hue, 280) 70% 62%); box-shadow: 0 0 0 1px hsl(var(--hue, 280) 60% 36%); width: 9px; height: 9px; }

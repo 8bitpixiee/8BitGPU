@@ -81,3 +81,19 @@ test("pickle's body stays on pickle's account", async () => {
   assert.equal(mayUseBody("someone", "Null.png"), true);
   assert.equal(mayUseBody("someone", undefined), true);
 });
+
+test("assembleBadges gives each name its own picks and friend badges", async () => {
+  const { assembleBadges } = await import("../server/badges.js");
+  const users = [
+    { id: "1", username: "mossy" },
+    { id: "2", username: "plain" },
+    { id: "9", username: "pickle" },
+  ];
+  const picks = [{ user_id: "1", picks: JSON.stringify(["gamer", "cozy"]) }, { user_id: "2", picks: "not json" }];
+  const pairs = [{ a: "1", b: "9" }];
+  const devs = [{ id: "9", username: "pickle" }];
+  const badges = assembleBadges(users, picks, pairs, devs);
+  assert.deepEqual(badges.mossy, { picks: ["gamer", "cozy"], earned: ["pickle-pal"] });
+  assert.deepEqual(badges.plain, { picks: [], earned: [] });
+  assert.deepEqual(badges.pickle.earned, ["crew"]);
+});

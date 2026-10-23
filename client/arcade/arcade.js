@@ -106,6 +106,7 @@ function renderMembers(members) {
       name.className = "name being-profile-link";
       name.textContent = m.username + (m.id === myId ? " (you)" : "");
       name.title = m.id === myId ? "Your MyPixel page" : "Open " + m.username + "'s MyPixel page";
+      Badges.mark(name, m.username);
       node.append(art, bubble, effect, name);
       el("players").append(node);
       beings.set(m.id, node);
@@ -190,6 +191,7 @@ function renderLog(data) {
         name = document.createElement("strong"),
         text = document.createElement("span");
       name.textContent = m.username;
+      Badges.mark(name, m.username);
       text.textContent = m.body;
       p.append(name, text);
       return p;
