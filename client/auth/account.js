@@ -2,7 +2,7 @@ const byId = (id) => document.getElementById(id);
 const status = (text) => (byId("accountStatus").textContent = text);
 (async () => {
   try {
-    const r = await fetch("/api/auth/me", { cache: "no-store" });
+    const r = await fetch("/api/auth/me", { cache: "no-store", signal: AbortSignal.timeout(10000) });
     if (!r.ok) throw Error("Unable to load your account.");
     const { user } = await r.json();
     if (!user) {
@@ -21,7 +21,7 @@ const status = (text) => (byId("accountStatus").textContent = text);
       }[linked] || "Your account is connected.",
     );
   } catch (e) {
-    status(e.message);
+    status(e.name === "TimeoutError" ? "The server isn't answering. Close this window and try again in a moment." : e.message);
   }
 })();
 async function loadGoogle() {
