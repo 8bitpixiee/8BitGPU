@@ -419,6 +419,8 @@ const desktopApps = {
     left: 315,
     top: 150,
   },
+  terms: { title: "Terms of Service", src: "terms.html", width: 620, height: 560, left: 260, top: 70 },
+  privacy: { title: "Privacy Policy", src: "privacy.html", width: 620, height: 560, left: 290, top: 90 },
   important: { title: "IMPORTANT.exe", src: "nick.html", width: 550, height: 450, left: 330, top: 105 },
   sonic: { title: "Sonic.exe", src: "sonic.html", width: 550, height: 450, left: 365, top: 130 },
   profile: { title: "MyPixel.exe", src: "profile.html", width: 900, height: 650, left: 125, top: 50 },

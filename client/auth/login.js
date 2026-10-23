@@ -102,6 +102,15 @@ async function loadExistingAccount() {
 
 loadExistingAccount();
 
+// inside the desktop the legal pages open as windows instead of replacing this one
+document.querySelectorAll("a[data-app]").forEach((link) =>
+  link.addEventListener("click", (event) => {
+    if (window.parent === window) return;
+    event.preventDefault();
+    window.parent.postMessage({ type: "8bitgpu-open-app", app: link.dataset.app }, location.origin);
+  }),
+);
+
 // the button only shows once the deployment has Google keys
 fetch("/api/auth/google/config", { cache: "no-store" })
   .then((response) => response.json())
