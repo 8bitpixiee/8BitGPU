@@ -1,0 +1,39 @@
+MAP VIEW + GLOBAL APPEARANCE
+
+Extract this ZIP into C:\Users\SOwil\CODING SHIT\8BitGPU (beside index.html).
+Save all open files first. In VSCodium's terminal run:
+
+  git apply --check .\map-taskbar.patch
+
+If the check prints no errors, apply ONCE:
+
+  git apply .\map-taskbar.patch
+  git diff --stat
+
+If the check fails, stop and share the output. Do not reapply an already-applied patch.
+This only changes local files. Commit on the working branch, push, and merge into main
+when ready to publish. Include the new server/window-style.js and the two new shared
+Appearance files in the commit, along with the modified files.
+
+WHAT CHANGED
+- Rooms have Map view / Show chat. Map view uses the window's full map area while
+  preserving the complete map and original aspect ratio. Escape brings chat back.
+  The last view preference is remembered in this browser.
+- Normal desktop room view uses a slightly narrower chat column to free map width.
+- Taskbar, active app buttons, Start button, clock tray, and fonts use the existing
+  global Appearance palette. Start is now native text so it can use the selected font.
+- The gear beside the clock opens Appearance directly.
+- Appearance now includes color wells, editable hex, HSL sliders, live preview,
+  Save colors, and Revert preview. These are the same colors saved by MyPixel.
+- A style-only API saves palette changes without replacing profile text or avatars.
+  No database migration is required. Server and browser files must deploy together.
+
+Map view keeps the entire artwork visible. Some empty space is unavoidable whenever
+the window and image have different proportions; filling that space would require
+cropping or distortion. This update does neither.
+
+LOCAL VALIDATION
+Patch applicability and JS syntax; style-only database writes preserve profile text
+and wallpaper; preview/save/revert; MyPixel saved-theme messages; taskbar colors and
+fonts; larger proportional maps in both rooms; Escape/chat restoration; phone widths;
+no browser page errors. No active project or live site was changed by package creation.
