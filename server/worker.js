@@ -625,7 +625,13 @@ async function handleApi(request, env, url) {
     });
   }
   if (path.startsWith("/api/auth/google/"))
-    return handleGoogle(request, env, url, { db: env.DB, createSession, readCookies, json });
+    return handleGoogle(request, env, url, {
+      db: env.DB,
+      createSession,
+      readCookies,
+      json,
+      currentUser: () => currentUser(request, env.DB),
+    });
 
   if (path === "/api/auth/me" && request.method === "GET") {
     const user = await currentUser(request, env.DB);

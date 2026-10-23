@@ -66,6 +66,12 @@ async function freeUsername(db, base) {
   return `${base.slice(0, 8)}${crypto.randomUUID().slice(0, 8)}`;
 }
 
+// the sign-in cookie holds state, pkce verifier and whether this run is linking an existing account
+export function parseOauthCookie(value) {
+  const [state, verifier, mode] = String(value || "").split(".");
+  return { state, verifier, link: mode === "l" };
+}
+
 const redirect = (location, cookies = []) => {
   const headers = new Headers({ location, "cache-control": "no-store" });
   for (const cookie of cookies) headers.append("set-cookie", cookie);
@@ -73,21 +79,42 @@ const redirect = (location, cookies = []) => {
 };
 const clearState = `${COOKIE}=; Path=${COOKIE_PATH}; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
 
-export async function handleGoogle(request, env, url, { db, createSession, readCookies, json }) {
+export async function handleGoogle(request, env, url, { db, createSession, readCookies, json, currentUser }) {
   const config = googleConfig(env, url.origin);
   if (url.pathname === "/api/auth/google/config") return json({ enabled: Boolean(config) });
+
+  if (url.pathname === "/api/auth/google/status") {
+    const user = await currentUser();
+    if (!user) return json({ error: "Sign in first." }, 401);
+    await ensureGoogleSchema(db);
+    const link = await db.prepare("SELECT email FROM google_accounts WHERE user_id = ?").bind(user.id).first();
+    const row = await db.prepare("SELECT password_hash FROM users WHERE id = ?").bind(user.id).first();
+    // an account made through Google has no passcode, so unlinking it would lock the owner out
+    return json({ enabled: Boolean(config), linked: Boolean(link), email: link?.email || null, canUnlink: row?.password_hash !== "google-sso" });
+  }
+  if (url.pathname === "/api/auth/google/unlink" && request.method === "POST") {
+    const user = await currentUser();
+    if (!user) return json({ error: "Sign in first." }, 401);
+    const row = await db.prepare("SELECT password_hash FROM users WHERE id = ?").bind(user.id).first();
+    if (row?.password_hash === "google-sso") return json({ error: "This account only signs in with Google, so it can't be unlinked." }, 400);
+    await ensureGoogleSchema(db);
+    await db.prepare("DELETE FROM google_accounts WHERE user_id = ?").bind(user.id).run();
+    return json({ ok: true });
+  }
   if (request.method !== "GET") return json({ error: "Not found." }, 404);
   if (!config) return json({ error: "Google sign-in isn't set up on this deployment yet." }, 503);
 
   if (url.pathname === "/api/auth/google/start") {
+    const linking = url.searchParams.get("link") === "1";
+    if (linking && !(await currentUser())) return redirect("/?signin=failed");
     const state = randomToken(24);
     const verifier = randomToken(48);
-    const cookie = `${COOKIE}=${state}.${verifier}; Path=${COOKIE_PATH}; HttpOnly; Secure; SameSite=Lax; Max-Age=600`;
+    const cookie = `${COOKIE}=${state}.${verifier}.${linking ? "l" : "s"}; Path=${COOKIE_PATH}; HttpOnly; Secure; SameSite=Lax; Max-Age=600`;
     return redirect(authorizeUrl(config, state, await pkceChallenge(verifier)), [cookie]);
   }
 
   if (url.pathname === "/api/auth/google/callback") {
-    const [state, verifier] = (readCookies(request)[COOKIE] || "").split(".");
+    const { state, verifier, link: linking } = parseOauthCookie(readCookies(request)[COOKIE]);
     const fail = (reason) => redirect(`/?signin=${reason}`, [clearState]);
     if (url.searchParams.get("error")) return fail("cancelled");
     if (!state || !verifier || url.searchParams.get("state") !== state || !url.searchParams.get("code"))
@@ -112,6 +139,19 @@ export async function handleGoogle(request, env, url, { db, createSession, readC
     if (!profile?.sub || !profile.email || profile.email_verified !== true) return fail("unverified");
 
     await ensureGoogleSchema(db);
+    if (linking) {
+      const user = await currentUser();
+      if (!user) return fail("failed");
+      const done = (result) => redirect(`/?link=${result}`, [clearState]);
+      const taken = await db.prepare("SELECT user_id FROM google_accounts WHERE google_sub = ?").bind(profile.sub).first();
+      if (taken) return done(taken.user_id === user.id ? "done" : "taken");
+      if (await db.prepare("SELECT 1 FROM google_accounts WHERE user_id = ?").bind(user.id).first()) return done("already");
+      await db
+        .prepare("INSERT INTO google_accounts (google_sub, user_id, email, created_at) VALUES (?, ?, ?, ?)")
+        .bind(profile.sub, user.id, profile.email, Date.now())
+        .run();
+      return done("done");
+    }
     let link = await db.prepare("SELECT user_id FROM google_accounts WHERE google_sub = ?").bind(profile.sub).first();
     if (!link) {
       const id = crypto.randomUUID();

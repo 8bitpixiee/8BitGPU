@@ -343,8 +343,15 @@ async function restoreOnlinePlayer() {
   }
 }
 
+// Google sends people back here with ?link=done|taken|already after linking an account
+const returnedFrom = new URLSearchParams(location.search);
+if (returnedFrom.has("link") || returnedFrom.has("signin")) history.replaceState(null, "", location.pathname);
+
 restoreOnlinePlayer().then((isLoggedIn) => {
-  if (!isLoggedIn && localStorage.getItem("8bitgpu-guest-session") !== "true") openApp("login");
+  if (returnedFrom.has("link") && isLoggedIn) {
+    desktopApps.account.src = `account.html?link=${encodeURIComponent(returnedFrom.get("link"))}`;
+    openApp("account");
+  } else if (!isLoggedIn && localStorage.getItem("8bitgpu-guest-session") !== "true") openApp("login");
 });
 
 const desktopApps = {

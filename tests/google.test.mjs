@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { authorizeUrl, googleConfig, pkceChallenge, usernameFrom } from "../server/google.js";
+import { authorizeUrl, googleConfig, parseOauthCookie, pkceChallenge, usernameFrom } from "../server/google.js";
 
 test("google stays off until real keys are set", () => {
   assert.equal(googleConfig({}, "https://x.test"), null);
@@ -33,4 +33,11 @@ test("usernames come out valid", () => {
   for (const [email, name] of [["mossy.exe@gmail.com", ""], ["a@x.com", "Ann Lee"], ["", "Ann Lee"], ["très+tag@x.com", ""], ["averyveryverylongaddress@x.com", ""]])
     assert.match(usernameFrom(email, name), valid);
   assert.equal(usernameFrom("mossy.exe@gmail.com"), "mossy.exe");
+});
+
+test("the sign-in cookie says whether this run is linking", () => {
+  assert.deepEqual(parseOauthCookie("abc.def.l"), { state: "abc", verifier: "def", link: true });
+  assert.equal(parseOauthCookie("abc.def.s").link, false);
+  assert.equal(parseOauthCookie("abc.def").link, false);
+  assert.equal(parseOauthCookie(undefined).link, false);
 });
