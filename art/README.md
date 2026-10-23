@@ -33,3 +33,15 @@ To refresh the manifest after changing a sheet, run `python art/tools/update-ani
 Every layer is drawn on one 50x50 stage, so a part lands where its body expects it. Standard art lives on a 48x43 canvas pinned at (1, 9) on that stage. The white custom bodies are 50x50 and sit at (0, 0). `assets/avatar/anchors.json` holds the per body nudges, in art pixels, matched by body filename prefix (ears, eyes and hair follow the head, fit and extra follow the torso). Browser code reads it through `client/shared/avatar-layout.js`, so the studio, lounge, profile, desktop dock and chat portraits all agree.
 
 Adding a body: drop in the PNG (and its Aseprite source), run `python art/tools/build-anchors.py` (needs Pillow) to rebuild the anchors from its silhouette, then eyeball it with a few hairs and fits. Hand tuned standard rigs live at the top of that script. Saved outfits carry `layout: 2`. Older saves have their manual nudges ignored, because those nudges were fighting the old misalignment.
+
+## Custom sprites and small art
+
+`pickle.png` is a 50x50 body with its own 96 frame sheet (`animations/pickle.png`), same tag order as every other part. It is colored, not white, and only the account named `pickle` can pick or save it: the studio hides the button for everyone else and the worker refuses the save (`RESERVED_BODIES` in `server/chat/chat-avatar.js`). Its anchors live in `anchors.json` like any wide body.
+
+`assets/ui/badges/` holds the three friend badges (16x16). `pixiee-pal` and `pickle-pal` are earned by being friends with `8Bit_Pixiee.dev` or `pickle`, `crew` is for those two accounts. Everything else is a self assigned chip drawn in CSS (`client/shared/badges.js`, mirrored by `SELF_BADGES` in `server/badges.js`).
+
+`assets/ui/start/` has the start menu tiles (32x32) and `assets/ui/start-orb.png` is the taskbar button. `assets/media/konami-stickman.png` is the 8 frame strip (64x64 cells) the Konami code plays: up up down down left right left right b a on the desktop.
+
+## Google sign in
+
+The Google button on the login window only appears when the worker has `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. Copy `.dev.vars.example` to `.dev.vars` for local work, and set both as worker secrets for the deployed site. Neither value goes in the repo.
