@@ -1,17 +1,18 @@
-/* Start menu, being dock and taskbar. Vista-style glass without live blur:
-   the wallpaper is a full-screen photo, so backdrop-filter repaints too much on hover. */
+/*Start menu, being dock and taskbar
 :root {
-    --glass-top: rgba(166, 126, 220, .92);
-    --glass-bottom: rgba(66, 40, 108, .95);
+    --glass-top: var(--accent);
+    --glass-bottom: var(--edge);
     --glass-edge: rgba(255, 255, 255, .85);
-    --glass-ink: rgba(52, 26, 88, .75);
-    --pane-light: #f8f3ff;
-    --pane-text: #2d1b45;
-    --pane-hint: #6e5a86;
-    --btn-light: linear-gradient(#f8f2ff, #d3bcf0 48%, #ab8cd8 52%, #cbb0ea);
+    --glass-ink: var(--edge);
+    --pane-light: var(--paper);
+    --pane-text: var(--ink);
+    --pane-hint: var(--ink);
+    --btn-light: linear-gradient(
+        color-mix(in srgb, var(--panel), white 30%),
+        var(--panel)
+    );
 }
-
-/* taskbar */
+/*
 #osTaskbar {
     position: fixed;
     right: 0;
@@ -305,3 +306,33 @@
 .sm-legal { display: flex; gap: 12px; }
 .sm-legal button { padding: 0; border: 0; color: rgba(255, 255, 255, .85); background: none; font-size: 11px; text-decoration: underline; cursor: pointer; }
 #osStartMenu .sm-legal button:hover { color: #fff; }
+/* global palette*/
+.sm-main {
+    background: var(--paper);
+
+}
+.sm-side {
+    background: linear-gradient(
+        170deg,
+        var(--glass-top0,
+        var(--glass-bottom)
+        );
+}
+.sm-login {
+    background: var(--btn-light);
+    color: var(--control-ink);
+    text-shadow: none;
+}
+.sm pic,
+.dock-stage {
+    background: linear-gradient(
+        160deg,
+        var(--paper),
+        var(--panel)
+    );
+}
+
+#beingDock .dock-actions button,
+#beingDock .dock-links button {
+    color: var(--control-ink);
+}
