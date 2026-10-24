@@ -7,6 +7,7 @@ const EMOTE_MS = 8000;
 const MAX_SEATS = 50;
 const STALE_MS = 90000;
 const FLUSH_MS = 100;
+const CHALLENGE_MS = 30000;
 
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 
@@ -89,9 +90,71 @@ export class LoungeRoom extends DurableObject {
       me.emote = msg.emote;
       me.emoteUntil = now + EMOTE_MS;
       me.lastEmote = now;
+    } else if (msg.t === "challenge" || msg.t === "challenge-reply" || msg.t === "challenge-cancel") {
+      await this.challenge(ws, me, msg, now);
+      return;
     } else return;
     ws.serializeAttachment(me);
     this.schedule(FLUSH_MS);
+  }
+
+  findSocket(id) {
+    return this.ctx.getWebSockets().find((ws) => ws.deserializeAttachment()?.id === id);
+  }
+
+  // asking someone to a brawl. these go straight to their socket, nothing waits for the room flush
+  async challenge(ws, me, msg, now) {
+    const tell = (socket, payload) => {
+      try {
+        socket.send(JSON.stringify(payload));
+      } catch {}
+    };
+    if (msg.t === "challenge") {
+      if (now - (me.lastChallenge || 0) < 2000) return;
+      me.lastChallenge = now;
+      ws.serializeAttachment(me);
+      const target = typeof msg.to === "string" ? this.findSocket(msg.to) : null;
+      const them = target?.deserializeAttachment();
+      if (!them || them.id === me.id) return tell(ws, { t: "challenge-fail", reason: "gone" });
+      await this.ctx.storage.put(`ch:${them.id}:${me.id}`, now + CHALLENGE_MS);
+      tell(target, { t: "challenged", from: { id: me.id, username: me.username } });
+      tell(ws, { t: "challenge-sent", to: { id: them.id, username: them.username } });
+    } else if (msg.t === "challenge-cancel") {
+      await this.ctx.storage.delete(`ch:${msg.to}:${me.id}`);
+      const target = this.findSocket(msg.to);
+      if (target) tell(target, { t: "challenge-cancelled", from: { id: me.id, username: me.username } });
+    } else {
+      const key = `ch:${me.id}:${msg.to}`;
+      const until = await this.ctx.storage.get(key);
+      await this.ctx.storage.delete(key);
+      const from = typeof msg.to === "string" ? this.findSocket(msg.to) : null;
+      if (!until || until < now || !from) return tell(ws, { t: "challenge-fail", reason: "expired" });
+      if (msg.accept !== true) return tell(from, { t: "challenge-declined", by: me.username });
+      await this.startMatch(from, from.deserializeAttachment(), ws, me);
+    }
+  }
+
+  async startMatch(socketA, a, socketB, b) {
+    const players = [];
+    for (const who of [a, b]) {
+      const avatar = this.avatars.get(who.id) || (await this.ctx.storage.get("a:" + who.id)) || null;
+      players.push({ id: who.id, username: who.username, avatar, race: avatar?.race || "pixie" });
+    }
+    const id = crypto.randomUUID();
+    const made = this.env.BRAWL
+      ? await this.env.BRAWL.get(this.env.BRAWL.idFromName(id)).fetch("https://brawl/create", { method: "POST", body: JSON.stringify({ id, players }) })
+      : null;
+    const fail = JSON.stringify({ t: "challenge-fail", reason: "unavailable" });
+    if (!made?.ok) {
+      for (const socket of [socketA, socketB]) {
+        try {
+          socket.send(fail);
+        } catch {}
+      }
+      return;
+    }
+    socketA.send(JSON.stringify({ t: "match", id, side: 0, opp: players[1] }));
+    socketB.send(JSON.stringify({ t: "match", id, side: 1, opp: players[0] }));
   }
 
   async webSocketClose(ws, code) {
