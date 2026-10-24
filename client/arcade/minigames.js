@@ -4,7 +4,7 @@
   const room = () => window.loungeApi;
   const GAMES = [
     { id: "brawl", title: "Pixie Brawl", blurb: "1v1 street brawler. Your own Being fights, and every race brings its own special move.", icon: "assets/ui/minigames/icon-brawl.png" },
-    { id: "fps", title: "Super Cool FPS game no HACKING", blurb: "Absolutely a real game. Please do not look at the pickle.", icon: "assets/ui/minigames/icon-pickle.png" },
+    { id: "fps", title: "Super Cool FPS game no HACKING", blurb: "Not a real game. It is a joke. You will get pickled.", icon: "assets/ui/minigames/icon-pickle.png" },
   ];
   const LEVELS = [["easy", "Easy"], ["normal", "Normal"], ["hard", "Hard"]];
   const CONTROLS = "Move A D / ← →   Jump W / ↑   Block S / ↓   Light J   Heavy K   Special L";
@@ -231,7 +231,11 @@
   function fpsView() {
     title.textContent = "Super Cool FPS game no HACKING";
     const host = el("div", "mg-fps");
-    body.append(host, button("← Games", () => show("pick"), "mg-back"));
+    body.append(
+      host,
+      el("p", "mg-joke", "This is a joke. There is no game, only a pickle. Click anything to get pickled."),
+      button("← Games", () => show("pick"), "mg-back"),
+    );
     fps = CoolFps.mount(host);
   }
 

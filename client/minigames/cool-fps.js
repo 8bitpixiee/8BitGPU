@@ -16,8 +16,9 @@
     canvas.width = W;
     canvas.height = H;
     canvas.className = "fps-canvas";
+    canvas.style.cursor = "crosshair";
     canvas.setAttribute("role", "img");
-    canvas.setAttribute("aria-label", "A pickle with the DeltaVDevs logo on its back, wiggling, in front of a pretend first person shooter menu");
+    canvas.setAttribute("aria-label", "A joke game. A pickle with the DeltaVDevs logo on it wiggles in front of a pretend first person shooter screen that says you just got pickled");
     host.append(canvas);
     const ctx = canvas.getContext("2d");
     ctx.imageSmoothingEnabled = false;
@@ -82,8 +83,50 @@
       if (logo.complete) ctx.drawImage(logo, x - 6 * s, top + 17 * s, 12 * s, 12 * s);
     }
 
+    const PICKLED = "YOU JUST GOT PICKLED";
+    // every click on the game gets you pickled again
+    const splats = [];
+    let pickled = 0;
+    canvas.addEventListener("pointerdown", (event) => {
+      const box = canvas.getBoundingClientRect();
+      splats.push({
+        x: ((event.clientX - box.left) / box.width) * W,
+        y: ((event.clientY - box.top) / box.height) * H,
+        at: performance.now(),
+        angle: Math.random() * Math.PI,
+      });
+      pickled++;
+      if (splats.length > 12) splats.shift();
+      if (still) frame(0);
+    });
+
+    function drawSplats(now) {
+      for (const splat of splats) {
+        const age = (now - splat.at) / 900;
+        if (age > 1) continue;
+        ctx.save();
+        ctx.globalAlpha = 1 - age;
+        ctx.translate(splat.x, splat.y);
+        ctx.rotate(splat.angle);
+        for (let i = 0; i < 7; i++) {
+          const a = (i / 7) * Math.PI * 2;
+          const reach = 14 + age * 34 + (i % 2) * 10;
+          circle(Math.cos(a) * reach, Math.sin(a) * reach, 7 - age * 4, i % 2 ? "#6dbf4a" : "#a8e582");
+        }
+        circle(0, 0, 16 + age * 8, "#4f9a38");
+        ctx.rotate(-splat.angle);
+        ctx.fillStyle = "#fff";
+        ctx.strokeStyle = "#1c4a14";
+        ctx.lineWidth = 4;
+        ctx.font = "bold 18px Impact, 'Arial Black', sans-serif";
+        ctx.textAlign = "center";
+        ctx.strokeText(PICKLED, 0, -26 - age * 30);
+        ctx.fillText(PICKLED, 0, -26 - age * 30);
+        ctx.restore();
+      }
+    }
+
     function hud(t) {
-      ctx.fillStyle = "#fff";
       ctx.strokeStyle = "#fff";
       ctx.lineWidth = 2;
       ctx.beginPath();
@@ -96,36 +139,43 @@
       ctx.moveTo(W / 2, H / 2 + 4);
       ctx.lineTo(W / 2, H / 2 + 14);
       ctx.stroke();
+
+      // the whole screen is one joke
+      const beat = still ? 0 : Math.sin(t / 160);
+      ctx.textAlign = "center";
+      ctx.shadowColor = "#000";
+      ctx.shadowBlur = 10;
+      ctx.font = `bold ${40 + beat * 2}px Impact, 'Arial Black', sans-serif`;
+      ctx.fillStyle = Math.floor(t / 300) % 2 === 0 || still ? "#b8ff6a" : "#ffd34a";
+      ctx.fillText(PICKLED, W / 2, 56 + beat * 2);
+      ctx.shadowBlur = 0;
+      ctx.font = "bold 14px Tahoma, Arial, sans-serif";
+      ctx.fillStyle = "#fff";
+      ctx.fillText("SUPER COOL FPS GAME  ·  NO HACKING  ·  (IT IS A JOKE)", W / 2, 80);
+
       ctx.font = "bold 22px Tahoma, Arial, sans-serif";
       ctx.textAlign = "left";
-      ctx.fillText("HP 100", 18, H - 18);
+      ctx.fillText("HP: PICKLED", 18, H - 18);
       ctx.textAlign = "right";
-      ctx.fillText("AMMO ∞", W - 18, H - 18);
-      ctx.textAlign = "center";
-      ctx.font = "bold 34px Impact, 'Arial Black', sans-serif";
-      ctx.fillStyle = "#ffd34a";
-      ctx.shadowColor = "#000";
-      ctx.shadowBlur = 8;
-      ctx.fillText("SUPER COOL FPS GAME", W / 2, 46);
-      const blink = still || Math.floor(t / 450) % 2 === 0;
-      ctx.fillStyle = blink ? "#ff4a6a" : "#ffd34a";
-      ctx.font = "bold 26px Impact, 'Arial Black', sans-serif";
-      ctx.fillText("NO HACKING", W / 2, 78);
-      ctx.shadowBlur = 0;
+      ctx.fillText("AMMO: PICKLED", W - 18, H - 18);
+
       ctx.font = "12px Tahoma, Arial, sans-serif";
       ctx.fillStyle = "#cfe";
       ctx.textAlign = "right";
-      ctx.fillText("anti-cheat: 0 hackers found", W - 12, 20);
-      ctx.fillText("DeltaVDevs QA: this is fine", W - 12, 36);
+      ctx.fillText("[DeltaVDevs] you got pickled", W - 12, 108);
+      ctx.fillText("[DeltaVDevs] you got pickled again", W - 12, 124);
+      ctx.fillStyle = "#b8ff6a";
+      ctx.fillText(PICKLED.toLowerCase(), W - 12, 140);
       ctx.textAlign = "left";
-      ctx.fillStyle = "#fff9";
-      ctx.fillText("kills 0   deaths 0   wiggles ∞", 14, 20);
+      ctx.fillStyle = "#fffc";
+      ctx.fillText(`times pickled: ${pickled}  (click anything)`, 14, 20);
     }
 
     function frame(t) {
       room(t);
       if (sheet.complete && sheet.naturalWidth) pickle(still ? 0 : t, W / 2, 96, 4.2);
       hud(t);
+      drawSplats(performance.now());
       if (!still) raf = requestAnimationFrame(frame);
     }
     const start = () => {
