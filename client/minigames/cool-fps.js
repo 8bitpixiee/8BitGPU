@@ -1,0 +1,149 @@
+// "Super Cool FPS game no HACKING": it is not a game, it is a pickle with the DeltaVDevs logo on its
+// back doing the wiggle. The sprite is the pickle's twerk row, with the middle stretched out and
+// each half bouncing on its own.
+(() => {
+  const SHEET = "assets/avatar/animations/pickle.png";
+  const LOGO = "assets/media/deltavdevs-logo.svg";
+  const FRAME = 50;
+  const TWERK_ROW = 4;
+  const TWERK_MS = 100;
+  const W = 640;
+  const H = 360;
+
+  function mount(host) {
+    host.replaceChildren();
+    const canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    canvas.className = "fps-canvas";
+    canvas.setAttribute("role", "img");
+    canvas.setAttribute("aria-label", "A pickle with the DeltaVDevs logo on its back, wiggling, in front of a pretend first person shooter menu");
+    host.append(canvas);
+    const ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    const sheet = new Image();
+    sheet.src = SHEET;
+    const logo = new Image();
+    logo.src = LOGO;
+    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let raf = 0;
+
+    function room(t) {
+      const sky = ctx.createLinearGradient(0, 0, 0, H * 0.55);
+      sky.addColorStop(0, "#0c0818");
+      sky.addColorStop(1, "#2a1850");
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, W, H);
+      // a floor that rushes toward you
+      const horizon = H * 0.55;
+      ctx.fillStyle = "#162a3a";
+      ctx.fillRect(0, horizon, W, H - horizon);
+      ctx.strokeStyle = "#2f6f8f";
+      ctx.lineWidth = 2;
+      for (let i = -12; i <= 12; i++) {
+        ctx.beginPath();
+        ctx.moveTo(W / 2 + i * 14, horizon);
+        ctx.lineTo(W / 2 + i * 90, H);
+        ctx.stroke();
+      }
+      for (let i = 0; i < 9; i++) {
+        const p = (i + ((t / 900) % 1)) / 9;
+        const y = horizon + (H - horizon) * p * p;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+    }
+
+    function pickle(t, x, y, scale) {
+      const frame = Math.floor(t / TWERK_MS) % 8;
+      const sx = frame * FRAME;
+      const sy = TWERK_ROW * FRAME;
+      const s = scale;
+      const wob = Math.sin(t / 55);
+      const draw = (fromY, rows, dx, dy, widen) => {
+        const width = FRAME * s * widen;
+        ctx.drawImage(sheet, sx, sy + fromY, FRAME, rows, x - width / 2 + dx, y + fromY * s + dy, width, rows * s);
+      };
+      // head and belly, then the two cheeks bouncing against each other, then the feet
+      draw(0, 30, 0, 0, 1);
+      const cheek = (side) => {
+        const width = FRAME * s * 1.75;
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(side < 0 ? x - width / 2 : x, y + 30 * s - 12, width / 2, 12 * s + 24);
+        ctx.clip();
+        ctx.drawImage(sheet, sx, sy + 30, FRAME, 12, x - width / 2, y + 30 * s + side * wob * 5, width, 12 * s);
+        ctx.restore();
+      };
+      cheek(-1);
+      cheek(1);
+      draw(42, 8, 0, 0, 1);
+      // the logo is printed across the pickle's chest
+      if (logo.complete) ctx.drawImage(logo, x - 5 * s, y + 13 * s, 10 * s, 10 * s);
+    }
+
+    function hud(t) {
+      ctx.fillStyle = "#fff";
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(W / 2 - 14, H / 2);
+      ctx.lineTo(W / 2 - 4, H / 2);
+      ctx.moveTo(W / 2 + 4, H / 2);
+      ctx.lineTo(W / 2 + 14, H / 2);
+      ctx.moveTo(W / 2, H / 2 - 14);
+      ctx.lineTo(W / 2, H / 2 - 4);
+      ctx.moveTo(W / 2, H / 2 + 4);
+      ctx.lineTo(W / 2, H / 2 + 14);
+      ctx.stroke();
+      ctx.font = "bold 22px Tahoma, Arial, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("HP 100", 18, H - 18);
+      ctx.textAlign = "right";
+      ctx.fillText("AMMO ∞", W - 18, H - 18);
+      ctx.textAlign = "center";
+      ctx.font = "bold 34px Impact, 'Arial Black', sans-serif";
+      ctx.fillStyle = "#ffd34a";
+      ctx.shadowColor = "#000";
+      ctx.shadowBlur = 8;
+      ctx.fillText("SUPER COOL FPS GAME", W / 2, 46);
+      const blink = still || Math.floor(t / 450) % 2 === 0;
+      ctx.fillStyle = blink ? "#ff4a6a" : "#ffd34a";
+      ctx.font = "bold 26px Impact, 'Arial Black', sans-serif";
+      ctx.fillText("NO HACKING", W / 2, 78);
+      ctx.shadowBlur = 0;
+      ctx.font = "12px Tahoma, Arial, sans-serif";
+      ctx.fillStyle = "#cfe";
+      ctx.textAlign = "right";
+      ctx.fillText("anti-cheat: 0 hackers found", W - 12, 20);
+      ctx.fillText("DeltaVDevs QA: this is fine", W - 12, 36);
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#fff9";
+      ctx.fillText("kills 0   deaths 0   wiggles ∞", 14, 20);
+    }
+
+    function frame(t) {
+      room(t);
+      if (sheet.complete && sheet.naturalWidth) pickle(still ? 0 : t, W / 2, 112, 3.6);
+      hud(t);
+      if (!still) raf = requestAnimationFrame(frame);
+    }
+    const start = () => {
+      raf = requestAnimationFrame(frame);
+    };
+    if (sheet.complete) start();
+    else sheet.onload = start;
+    logo.onload = () => still && frame(0);
+
+    return {
+      destroy() {
+        cancelAnimationFrame(raf);
+        host.replaceChildren();
+      },
+    };
+  }
+
+  window.CoolFps = { mount };
+})();
