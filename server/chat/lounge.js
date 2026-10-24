@@ -1,4 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
+import RoomSpots from "../../client/shared/room-spots.js";
 
 const EMOTES = new Set(["dance", "twerk", "smoke", "drink", "shroom", "laugh", "spin", "wave", "crashout"]);
 const FACINGS = new Set(["up", "down", "left", "right"]);
@@ -83,6 +84,8 @@ export class LoungeRoom extends DurableObject {
       me.lastMove = now;
     } else if (msg.t === "emote") {
       if (!EMOTES.has(msg.emote) || now - me.lastEmote < 500) return;
+      // drinking, smoking and shrooms only happen at the bar and the stump
+      if (!RoomSpots.mayEmote(me.room, msg.emote, me.x, me.y)) return;
       me.emote = msg.emote;
       me.emoteUntil = now + EMOTE_MS;
       me.lastEmote = now;
