@@ -48,7 +48,7 @@ export class LoungeRoom extends DurableObject {
       username: who.username,
       owner: Boolean(who.owner),
       room: pillow ? "pillow" : "arcade",
-      x: who.from ? (pillow ? 16 : 84) : pillow ? 78 : 36 + (seed % 19),
+      x: who.from ? (pillow ? 16 : 50) : pillow ? 78 : 36 + (seed % 19),
       y: who.from ? 86 : pillow ? 84 : 66 + (seed % 9),
       facing: "down",
       flying: 0,

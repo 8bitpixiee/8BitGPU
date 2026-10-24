@@ -12,8 +12,8 @@
       {
         id: "bar",
         label: "Bar",
-        x: 66.7,
-        y: 58,
+        x: 82.5,
+        y: 60,
         radius: 9,
         actions: [
           { emote: "drink", label: "Order a drink" },
@@ -23,7 +23,7 @@
       {
         id: "stump",
         label: "Mushroom stump",
-        x: 33.3,
+        x: 16.7,
         y: 90,
         radius: 9,
         actions: [{ emote: "shroom", label: "Eat a mushroom" }],
