@@ -41,3 +41,10 @@ test("the server's slack lets a slightly late position through", () => {
   assert.equal(mayEmote("arcade", "drink", bar.x, bar.y + bar.radius * 1.4), true);
   assert.equal(mayEmote("arcade", "drink", bar.x, bar.y + bar.radius * 2), false);
 });
+
+test("the arcade cabinets open the games window and are not an emote", () => {
+  const cabinets = SPOTS.arcade.find((spot) => spot.id === "cabinets");
+  assert.equal(cabinets.actions[0].open, "minigames");
+  assert.equal(spotAt("arcade", cabinets.x, cabinets.y)?.id, "cabinets");
+  assert.equal(GATED.has(undefined), false);
+});

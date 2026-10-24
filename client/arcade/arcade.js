@@ -245,6 +245,7 @@ function connectSocket() {
       lastMembers = msg.members;
       renderMembers(visibleMembers());
     } else if (msg.t === "chat") refreshMessages();
+    else window.Minigames?.onLounge(msg);
   };
   ws.onclose = (event) => {
     clearInterval(pingTimer);
@@ -356,6 +357,21 @@ for (const spot of spots) {
   });
   el("mapStage").append(marker);
 }
+// a spot either plays an emote or opens the arcade cabinet window
+function useAction(action) {
+  if (action.open === "minigames") return window.Minigames?.open();
+  return playEmote(action.emote);
+}
+// what the arcade window needs from the room
+window.loungeApi = {
+  send: (payload) => {
+    if (!socketOpen) return false;
+    socket.send(JSON.stringify(payload));
+    return true;
+  },
+  me: () => lastMembers.find((m) => m.id === myId) || null,
+  others: () => visibleMembers().filter((m) => m.id !== myId),
+};
 function updateSpotPrompt() {
   const here = joined ? RoomSpots.spotAt(RoomPage.room.id, x, y) : null;
   if (here === promptSpot) return;
@@ -369,7 +385,7 @@ function updateSpotPrompt() {
     const button = document.createElement("button");
     button.type = "button";
     button.textContent = (index ? "" : "E · ") + action.label;
-    button.addEventListener("click", () => playEmote(action.emote));
+    button.addEventListener("click", () => useAction(action));
     spotPrompt.append(button);
   });
 }
@@ -659,7 +675,7 @@ el("mapStage").addEventListener("pointerdown", (e) => {
 document.addEventListener("keydown", (e) => {
   if (!joined || e.target.closest("textarea,input,button,a")) return;
   const key = e.key.toLowerCase();
-  if (key === "e" && promptSpot) return void playEmote(promptSpot.actions[0].emote);
+  if (key === "e" && promptSpot) return void useAction(promptSpot.actions[0]);
   if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key)) {
     e.preventDefault();
     keys.add(key);

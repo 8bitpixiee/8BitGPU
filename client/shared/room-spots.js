@@ -10,6 +10,14 @@
   const SPOTS = {
     arcade: [
       {
+        id: "cabinets",
+        label: "Arcade cabinets",
+        x: 12.8,
+        y: 60,
+        radius: 9,
+        actions: [{ open: "minigames", label: "Play arcade games" }],
+      },
+      {
         id: "bar",
         label: "Bar",
         x: 82.5,
@@ -33,7 +41,7 @@
   };
 
   // emotes you can't do from the chat side, only at a spot that offers them
-  const GATED = new Set(SPOTS.arcade.flatMap((spot) => spot.actions.map((action) => action.emote)));
+  const GATED = new Set(SPOTS.arcade.flatMap((spot) => spot.actions.map((action) => action.emote).filter(Boolean)));
 
   const distance = (room, spot, x, y) => Math.hypot((x - spot.x) * (RATIO[room] || 1), y - spot.y);
 
