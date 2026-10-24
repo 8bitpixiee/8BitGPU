@@ -56,32 +56,30 @@
       }
     }
 
-    function pickle(t, x, y, scale) {
+    function circle(cx, cy, r, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // the pickle's own twerk row, with two huge cheeks added that bounce against each other
+    function pickle(t, x, top, s) {
       const frame = Math.floor(t / TWERK_MS) % 8;
-      const sx = frame * FRAME;
-      const sy = TWERK_ROW * FRAME;
-      const s = scale;
-      const wob = Math.sin(t / 55);
-      const draw = (fromY, rows, dx, dy, widen) => {
-        const width = FRAME * s * widen;
-        ctx.drawImage(sheet, sx, sy + fromY, FRAME, rows, x - width / 2 + dx, y + fromY * s + dy, width, rows * s);
-      };
-      // head and belly, then the two cheeks bouncing against each other, then the feet
-      draw(0, 30, 0, 0, 1);
-      const cheek = (side) => {
-        const width = FRAME * s * 1.75;
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(side < 0 ? x - width / 2 : x, y + 30 * s - 12, width / 2, 12 * s + 24);
-        ctx.clip();
-        ctx.drawImage(sheet, sx, sy + 30, FRAME, 12, x - width / 2, y + 30 * s + side * wob * 5, width, 12 * s);
-        ctx.restore();
-      };
-      cheek(-1);
-      cheek(1);
-      draw(42, 8, 0, 0, 1);
+      const size = FRAME * s;
+      ctx.drawImage(sheet, frame * FRAME, TWERK_ROW * FRAME, FRAME, FRAME, x - size / 2, top, size, size);
+      const bounce = Math.sin(t / 70);
+      const r = 8.6 * s;
+      for (const side of [-1, 1]) {
+        const cx = x + side * r * 0.82;
+        const cy = top + 37 * s + side * bounce * r * 0.3;
+        circle(cx, cy, r + 3, "#2f6b24");
+        circle(cx, cy, r, "#6dbf4a");
+        circle(cx - r * 0.3, cy - r * 0.35, r * 0.3, "#a8e582");
+        circle(cx + r * 0.25, cy + r * 0.4, r * 0.18, "#58a83c");
+      }
       // the logo is printed across the pickle's chest
-      if (logo.complete) ctx.drawImage(logo, x - 5 * s, y + 13 * s, 10 * s, 10 * s);
+      if (logo.complete) ctx.drawImage(logo, x - 6 * s, top + 17 * s, 12 * s, 12 * s);
     }
 
     function hud(t) {
@@ -126,7 +124,7 @@
 
     function frame(t) {
       room(t);
-      if (sheet.complete && sheet.naturalWidth) pickle(still ? 0 : t, W / 2, 112, 3.6);
+      if (sheet.complete && sheet.naturalWidth) pickle(still ? 0 : t, W / 2, 96, 4.2);
       hud(t);
       if (!still) raf = requestAnimationFrame(frame);
     }
