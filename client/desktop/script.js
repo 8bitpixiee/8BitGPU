@@ -21,9 +21,9 @@ function syncStartBeing() {
   });
 }
 
-async function loadSaveOutfit() {
+async function loadSavedOutfit() {
   let savedOutfit;
-}
+
   try {
     savedOutfit = JSON.parse(localStorage.getItem("8bitgpu-avatar-outfit"));
   } catch {
@@ -57,10 +57,10 @@ async function loadSaveOutfit() {
   );
 
   await Promise.all([...layers].map((layer) => {
-    const key = (layer.dataset.avatarLayer)
-      .replace ("layer","");
+    const key = (layer.id || layer.dataset.avatarLayer)
+      .replace ("Layer","");
 
-      return AvatarColors.applyLayer(layer, saved, key, bady);
+      return AvatarColors.applyLayer(layer, saved, key, body);
     }));
   };
   // Avatar Lab v2 saves stable asset paths, not the old numeric option
