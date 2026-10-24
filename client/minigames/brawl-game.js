@@ -111,7 +111,7 @@
       net = {
         send() {
           if (!ws || ws.readyState !== 1) return;
-          unacked.push({ q: ++seq, p: tapped });
+          unacked.push({ q: ++seq, p: tapped, at: performance.now() });
           ws.send(JSON.stringify({ t: "in", q: seq, h: held, p: tapped }));
           tapped = 0;
           if (unacked.length > 120) unacked = unacked.slice(-60);
@@ -165,17 +165,12 @@
 
       const loop = (now) => {
         if (snap) {
-          const pred = BrawlSim.clone(snap);
-          const lead = Math.min(10, Math.round(rtt / 2 / FRAME));
-          const frames = Math.min(16, Math.floor((now - snapAt) / FRAME) + lead);
-          const oppBits = pred.f[1 - mySide].prev;
-          let tapBits = tapped;
-          for (const entry of unacked) tapBits |= entry.p;
-          for (let i = 0; i < frames; i++) {
-            const mine = i === 0 ? held | tapBits : held;
-            BrawlSim.step(pred, mySide === 0 ? mine : oppBits, mySide === 0 ? oppBits : mine);
-            showEvents(pred.ev);
-          }
+          let taps = tapped;
+          for (const entry of unacked) taps |= entry.p;
+          const frames = BrawlPredict.framesAhead(now - snapAt, rtt);
+          const age = unacked.length ? (now - unacked[0].at) / FRAME : Infinity;
+          const { state: pred, events } = BrawlPredict.predict(snap, mySide, { held, taps, frames, age });
+          showEvents(events);
           state = pred;
           view.render(pred);
         }
