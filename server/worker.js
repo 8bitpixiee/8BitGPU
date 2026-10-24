@@ -501,6 +501,22 @@ async function handleApi(request, env, url) {
     if (limit.attempts > 20)
       return json({ error: "Too many account attempts. Please wait ten minutes." }, 429);
   }
+  if (path === "/api/brawl/ws") {
+    const user = await currentUser(request, env.DB);
+    if (!user) return json({ error: "Sign in to play." }, 401);
+    if (request.headers.get("Upgrade") !== "websocket") return json({ error: "Open the match from the arcade." }, 426);
+    if (request.headers.get("Origin") !== url.origin) return json({ error: "Use this website to play." }, 403);
+    const match = url.searchParams.get("match") || "";
+    if (!env.BRAWL || !/^[0-9a-f-]{36}$/.test(match)) return json({ error: "That match is not available." }, 404);
+    return env.BRAWL.get(env.BRAWL.idFromName(match)).fetch(
+      new Request("https://brawl/connect", {
+        headers: {
+          Upgrade: "websocket",
+          "x-brawl-user": encodeURIComponent(JSON.stringify({ id: user.id, username: user.username })),
+        },
+      }),
+    );
+  }
   if (path.startsWith("/api/chat/"))
     return handleChat(request, env, await currentUser(request, env.DB), readBody);
 
@@ -907,6 +923,7 @@ async function handleApi(request, env, url) {
 }
 
 export { LoungeRoom } from "./chat/lounge.js";
+export { BrawlRoom } from "./brawl/room.js";
 
 export default {
   async fetch(request, env) {

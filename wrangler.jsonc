@@ -11,9 +11,15 @@
     ]
   },
   "durable_objects": {
-    "bindings": [{ "name": "LOUNGE", "class_name": "LoungeRoom" }]
+    "bindings": [
+      { "name": "LOUNGE", "class_name": "LoungeRoom" },
+      { "name": "BRAWL", "class_name": "BrawlRoom" }
+    ]
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["LoungeRoom"] }],
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["LoungeRoom"] },
+    { "tag": "v2", "new_sqlite_classes": ["BrawlRoom"] }
+  ],
   "d1_databases": [
     {
       "binding": "DB",

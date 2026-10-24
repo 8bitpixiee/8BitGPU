@@ -151,3 +151,9 @@ test("parseAccounts ignores junk and base64 tokens survive the round trip", asyn
   assert.deepEqual(parseAccounts(accountsCookie([token], 5).split(";")[0].split("=").slice(1).join("=")), [token]);
   assert.match(accountsCookie([], 5), /Max-Age=0/);
 });
+
+test("roomAvatar tells the brawler which race you are", () => {
+  assert.equal(roomAvatar(JSON.stringify({ species: "Deerbra", skinTone: "Wood", build: "Fae" })).race, "deerbra");
+  assert.equal(roomAvatar(JSON.stringify({ species: "Custom", bodyAsset: "Clanker_F.png" })).race, "clanker");
+  assert.equal(roomAvatar("garbage").race, "pixie");
+});
