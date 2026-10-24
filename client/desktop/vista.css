@@ -336,3 +336,44 @@
 #beingDock .dock-links button {
     color: var(--control-ink);
 }
+
+.sm-user {
+    flex-direction: column;
+    text-align: center;
+}
+
+.sm-pic {
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
+}
+
+.sm-user strong {
+    width:100%;
+    white-space: normal;
+    overflow: visble;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    line-height: 1.5;
+}
+
+.sm-link {
+    height: auto;
+    min-height: 34px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+}
+
+.sm-link img {
+    flex-shrink: 0;
+}
+
+.sm-item b,
+.sm-item small {
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    line-height: 1.5;
+}
