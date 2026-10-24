@@ -21,9 +21,9 @@ function syncStartBeing() {
   });
 }
 
-function loadSavedOutfit() {
+async function loadSaveOutfit() {
   let savedOutfit;
-
+}
   try {
     savedOutfit = JSON.parse(localStorage.getItem("8bitgpu-avatar-outfit"));
   } catch {
@@ -50,14 +50,19 @@ function loadSavedOutfit() {
       previewLayer.style.display = source ? "block" : "none";
     });
   };
-  const applySkinColor = (saved) => {
-    const body = document.getElementById("bodyLayer");
-    document.querySelectorAll("#companion .avatar-layer, [data-avatar-layer]").forEach(layer => {
-      const key = (layer.id || layer.dataset.avatarLayer || "").replace("Layer", "");
-      AvatarColors.applyLayer(layer, saved, key, body);
-    });
-  };
+ const applySkinColor = async (saved) => {
+  const body = document.getElementById("bodyLayer");
+  const layers = document.querySelectorAll(
+    "#companion img.avatar-layer, img[data-avatar-layer]"
+  );
 
+  await Promise.all([...layers].map((layer) => {
+    const key = (layer.dataset.avatarLayer)
+      .replace ("layer","");
+
+      return AvatarColors.applyLayer(layer, saved, key, bady);
+    }));
+  };
   // Avatar Lab v2 saves stable asset paths, not the old numeric option
   // indexes. Render those paths directly so every studio button maps to the
   // same PNG on the desktop after Save.
@@ -101,7 +106,7 @@ function loadSavedOutfit() {
     setLayer("eyesLayer", layers.eyes);
     setLayer("fitLayer", layers.fit);
     setLayer("extraLayer", layers.extra);
-    applySkinColor(savedOutfit);
+   await applySkinColor(savedOutfit);
     if (companion) companion.classList.toggle("is-wide", AvatarLayout.isWide(body));
     ["body", "head", "ears", "chest", "hair", "eyes", "fit", "extra"].forEach((category) => {
       const layer = document.getElementById(category + "Layer");
