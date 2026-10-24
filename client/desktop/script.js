@@ -21,7 +21,7 @@ function syncStartBeing() {
   });
 }
 
-async function loadSaveOutfit() {
+async function loadSavedOutfit() {
   let savedOutfit;
 
   try {
@@ -60,7 +60,7 @@ async function loadSaveOutfit() {
     const key = (layer.id || layer.dataset.avatarLayer)
       .replace ("Layer","");
 
-      return AvatarColors.applyLayer(layer, saved, key, bady);
+      return AvatarColors.applyLayer(layer, saved, key, body);
     }));
   };
   // Avatar Lab v2 saves stable asset paths, not the old numeric option
