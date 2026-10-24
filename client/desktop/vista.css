@@ -312,18 +312,18 @@
 
 }
 .sm-side {
-    background: linear-gradient(
-        170deg,
-        var(--glass-top0,
-        var(--glass-bottom)
-        );
+    background: var(--edge);
+    color: var(--title-ink);
+}
+.sm-side .sm-link {
+    color: var(--title-ink);
 }
 .sm-login {
     background: var(--btn-light);
     color: var(--control-ink);
     text-shadow: none;
 }
-.sm pic,
+.sm-pic,
 .dock-stage {
     background: linear-gradient(
         160deg,
