@@ -79,7 +79,7 @@ export class LoungeRoom extends DurableObject {
       if (now - me.lastMove < 50) return;
       if (!Number.isFinite(msg.x) || !Number.isFinite(msg.y)) return;
       me.x = clamp(msg.x, 6, 94);
-      me.y = clamp(msg.y, me.room === "pillow" ? 76 : 12, 94);
+      me.y = clamp(msg.y, me.room === "pillow" ? 6 : 12, 94);
       me.facing = FACINGS.has(msg.facing) ? msg.facing : "down";
       me.flying = msg.flying === true ? 1 : 0;
       me.lastMove = now;
