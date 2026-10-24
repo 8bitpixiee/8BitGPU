@@ -3,7 +3,7 @@
 // each half bouncing on its own.
 (() => {
   const SHEET = "assets/avatar/animations/pickle.png";
-  const LOGO = "assets/media/deltavdevs-logo.svg";
+  const LOGO = "assets/media/deltavdevs-logo.png";
   const FRAME = 50;
   const TWERK_ROW = 4;
   const TWERK_MS = 100;

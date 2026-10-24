@@ -5,9 +5,10 @@
   const H = 540;
   const EMOTE = { light: "wave", heavy: "spin", special: "crashout" };
   const FAR = () => Date.now() + 60000;
+  const ICONS = "assets/ui/minigames/";
   const TOUCH = [
-    ["L", "◀", BIT.L], ["R", "▶", BIT.R], ["U", "▲", BIT.U], ["B", "🛡", BIT.B],
-    ["A", "A", BIT.A], ["H", "B", BIT.H], ["S", "★", BIT.S],
+    ["L", "pad-left", "Left", BIT.L], ["R", "pad-right", "Right", BIT.R], ["U", "pad-up", "Jump", BIT.U], ["B", "pad-block", "Block", BIT.B],
+    ["A", "pad-light", "Light attack", BIT.A], ["H", "pad-heavy", "Heavy attack", BIT.H], ["S", "pad-special", "Special", BIT.S],
   ];
 
   const el = (tag, className, text) => {
@@ -91,10 +92,14 @@
 
     // touch buttons, hidden unless the device has a touchscreen
     const pad = el("div", "bw-touch");
-    for (const [name, label, bit] of TOUCH) {
-      const button = el("button", "bw-btn bw-btn-" + name, label);
+    for (const [name, icon, label, bit] of TOUCH) {
+      const button = el("button", "bw-btn bw-btn-" + name);
+      const image = el("img");
+      image.src = `${ICONS}${icon}.png`;
+      image.alt = "";
+      button.append(image);
       button.type = "button";
-      button.setAttribute("aria-label", name);
+      button.setAttribute("aria-label", label);
       const press = (down) => (event) => {
         event.preventDefault();
         onInput?.(bit, down);

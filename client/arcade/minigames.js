@@ -3,8 +3,8 @@
 (() => {
   const room = () => window.loungeApi;
   const GAMES = [
-    { id: "brawl", title: "Pixie Brawl", blurb: "1v1 street brawler. Your own Being fights, and every race brings its own special move.", icon: "👊" },
-    { id: "fps", title: "Super Cool FPS game no HACKING", blurb: "Absolutely a real game. Please do not look at the pickle.", icon: "🥒" },
+    { id: "brawl", title: "Pixie Brawl", blurb: "1v1 street brawler. Your own Being fights, and every race brings its own special move.", icon: "assets/ui/minigames/icon-brawl.png" },
+    { id: "fps", title: "Super Cool FPS game no HACKING", blurb: "Absolutely a real game. Please do not look at the pickle.", icon: "assets/ui/minigames/icon-pickle.png" },
   ];
   const LEVELS = [["easy", "Easy"], ["normal", "Normal"], ["hard", "Hard"]];
   const CONTROLS = "Move A D / ← →   Jump W / ↑   Block S / ↓   Light J   Heavy K   Special L";
@@ -94,7 +94,10 @@
     for (const info of GAMES) {
       const card = el("button", "mg-card");
       card.type = "button";
-      card.append(el("span", "mg-icon", info.icon), el("strong", "", info.title), el("small", "", info.blurb));
+      const icon = el("img", "mg-icon");
+      icon.src = info.icon;
+      icon.alt = "";
+      card.append(icon, el("strong", "", info.title), el("small", "", info.blurb));
       card.addEventListener("click", () => show(info.id));
       list.append(card);
     }
