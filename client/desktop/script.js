@@ -23,7 +23,7 @@ function syncStartBeing() {
 
 async function loadSaveOutfit() {
   let savedOutfit;
-}
+
   try {
     savedOutfit = JSON.parse(localStorage.getItem("8bitgpu-avatar-outfit"));
   } catch {
@@ -57,8 +57,8 @@ async function loadSaveOutfit() {
   );
 
   await Promise.all([...layers].map((layer) => {
-    const key = (layer.dataset.avatarLayer)
-      .replace ("layer","");
+    const key = (layer.id || layer.dataset.avatarLayer)
+      .replace ("Layer","");
 
       return AvatarColors.applyLayer(layer, saved, key, bady);
     }));
