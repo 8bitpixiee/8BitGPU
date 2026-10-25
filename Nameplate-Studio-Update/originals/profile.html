@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<!-- Profile page -->
+<!-- anotha one -->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>MyPixel</title>
+    <link rel="stylesheet" href="client/profile/profile.css">
+    <link rel="stylesheet" href="client/shared/badges.css">
+<link rel="stylesheet" href="client/shared/retro-windows.css"></head>
+<body data-theme="violet">
+    <main class="web-shell">
+        <header class="browser-bar">
+            <div class="browser-buttons" aria-hidden="true"><i></i><i></i><i></i></div>
+            <button id="backButton" type="button" aria-label="Back">←</button>
+            <button id="forwardButton" type="button" aria-label="Forward">→</button>
+            <div class="address-bar"><span>✦</span><output id="profileAddress">8bitgpu.world</output></div>
+            <a class="browser-link" href="index.html">Desktop</a>
+        </header>
+        <nav class="web-nav" aria-label="MyPixel navigation">
+            <strong>MyPixel</strong>
+            <a href="#profile">Profile</a>
+            <a href="#favorites">Favorites</a>
+            <a href="#notepad">Notepad</a>
+            <a href="#collection">Collection</a>
+            <a href="#connections">Connections</a>
+            <button id="openLounge" type="button">Arcade Lounge</button>
+        </nav>
+
+        <p id="pageStatus" role="status">Connecting to MyPixel...</p>
+
+        <section id="profile" class="profile-page" hidden>
+            <header class="profile-title">
+                <div>
+                    <h1 id="profileName">Loading...</h1>
+                    <span id="profileUrl">8bitgpu.world/~</span>
+                </div>
+                <button id="editButton" type="button" hidden>Edit My Page</button>
+            </header>
+
+            <div class="profile-grid">
+                <aside class="identity-card"><h2 class="identity-title">My Being</h2>
+                    <div id="beingPortrait" class="being-portrait" aria-label="Player Being">
+                        <div class="avatar-stage">
+                            <img id="extraLayer" class="avatar-layer" alt="">
+                            <img id="bodyLayer" class="avatar-layer" alt="">
+                            <img id="earsLayer" class="avatar-layer" alt="">
+                            <img id="headLayer" class="avatar-layer" alt="">
+                            <img id="chestLayer" class="avatar-layer" alt="">
+                            <img id="eyesLayer" class="avatar-layer" alt="">
+                            <img id="hairLayer" class="avatar-layer" alt="">
+                            <img id="fitLayer" class="avatar-layer" alt="">
+                        </div>
+                    </div>
+                    <h2 id="cardName"></h2>
+                    <p id="moodText" class="mood">Loading...</p>
+                    <button id="visitLounge" type="button">✦ Find me in the Lounge</button>
+                </aside>
+
+                <section class="profile-content">
+                    <article id="notepad" class="web-panel favorites-panel notepad-panel">
+                        <h2>My Notepad</h2>
+                        <p id="aboutText">Nothing here yet.</p>
+                    </article>
+                    <article id="favorites" class="web-panel favorites-summary">
+                        <h2>Favorites</h2>
+                        <p id="favoritesText">No favorites yet.</p>
+                    </article>
+                    <article id="collection" class="web-panel collection-panel">
+                        <h2>Badges</h2>
+                        <div id="badgeRow" class="badge-row"></div>
+                    </article>
+                    <article id="connections" class="web-panel connections-panel">
+                        <h2>Connections</h2>
+                        <p>Connections and a guestbook are coming.</p>
+                    </article>
+                </section>
+            </div>
+            <section class="photo-gallery" aria-label="My picture windows">
+                <figure class="photo-window"><figcaption>MyPixel • Picture 1</figcaption><div class="photo-content"><img id="photo1" alt="Profile picture 1" hidden><p id="photoEmpty1">No picture yet</p></div></figure>
+<figure class="photo-window"><figcaption>MyPixel • Picture 2</figcaption><div class="photo-content"><img id="photo2" alt="Profile picture 2" hidden><p id="photoEmpty2">No picture yet</p></div></figure>
+<figure class="photo-window"><figcaption>MyPixel • Picture 3</figcaption><div class="photo-content"><img id="photo3" alt="Profile picture 3" hidden><p id="photoEmpty3">No picture yet</p></div></figure>
+            </section>
+        </section>
+
+        <section id="editor" class="editor-window" hidden>
+            <header><strong>Edit MyPixel</strong><button id="closeEditor" type="button" aria-label="Close editor">×</button></header>
+            <form id="profileForm">
+                <label for="moodInput">Current mood <small>80 characters</small></label>
+                <input id="moodInput" maxlength="80" placeholder="what's the mood">
+                <label for="aboutInput">Notepad <small>1,000 characters</small></label>
+                <textarea id="aboutInput" maxlength="1000" rows="5" placeholder="Write whatever you want here..."></textarea>
+                <label for="favoritesInput">Favorite things <small>240 characters</small></label>
+                <input id="favoritesInput" maxlength="240" placeholder="games, colors, snacks, songs...">
+                <fieldset class="badge-mixer"><legend>Your badges <small>pick up to five</small></legend><div id="badgePicker" class="badge-picker"></div></fieldset>
+                <fieldset class="color-mixer"><legend>Your colors</legend><p>Pick a color for each part of your page.</p><div id="colorControls"></div></fieldset>
+                <fieldset class="image-mixer"><legend>Your images</legend><p>Pick an image to upload. It is resized, saved right away and shown on your public page.</p><div id="imageControls"></div><p id="uploadStatus" role="status"></p></fieldset>
+                <button id="saveProfile" type="submit">Save My Page</button>
+            </form>
+        </section>
+    </main>
+<script src="client/shared/avatar-layout.js"></script>
+<script src="client/shared/avatar-colors.js"></script>
+<script src="client/shared/badges.js"></script>
+<script src="client/profile/profile.js"></script>
+<script src="client/profile/profile-layout.js"></script>
+<script src="client/profile/profile-social.js"></script>
+<script src="client/shared/window-theme.js"></script></body>
+</html>
+
