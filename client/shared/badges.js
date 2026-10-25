@@ -21,6 +21,7 @@
     "pickle-pal": ["Pickle's Pal", "Friends with pickle"],
     crew: ["Crew", "Makes 8BitGPU"],
   };
+  const DETAILS = {"night-owl":["Moonlit chats and late-night adventures.","☾"],"early-bird":["A bright start to the day.","☀"],"gamer":["Always ready for another round.","✧"],"artist":["Making a little magic with color.","flower"],"musician":["A soundtrack for every mood.","music"],"streamer":["Sharing the fun, one stream at a time.","disc"],"builder":["Dreaming it up and making it real.","✦"],"dancer":["Moving to their own rhythm.","wings"],"collector":["A home for tiny treasures.","cash"],"cozy":["Soft vibes and a comfy corner.","♡"],"chaotic":["A little mischief in the mix.","eyes"],"plant-parent":["Growing a greener little world.","flower"],"tea-person":["A warm cup and good company.","☕"],"cat-person":["A soft spot for whiskers and paws.","♡"]};
   const MAX_PICKS = 5;
 
   function chip(id) {
@@ -40,6 +41,19 @@
       gem.setAttribute("aria-hidden", "true");
       node.append(gem, SELF[id][0]);
     } else return null;
+    const label=CREW[id]?.[0]||SELF[id]?.[0];
+    const description=CREW[id]?.[1]||DETAILS[id]?.[0]||'';
+    if(SELF[id]&&DETAILS[id]) {
+      const art=DETAILS[id][1];
+      let icon;
+      if(art.length>2){icon=document.createElement('img');icon.src='assets/ui/nameplates/'+art+'-transparent.png';icon.alt='';}
+      else {icon=document.createElement('span');icon.className='badge-symbol';icon.setAttribute('aria-hidden','true');icon.textContent=art;}
+      node.replaceChildren(icon);
+    } else node.removeChild(node.lastChild);
+    const copy=document.createElement('span');copy.className='badge-copy';
+    const title=document.createElement('strong');title.textContent=label;
+    const detail=document.createElement('small');detail.textContent=description;
+    copy.append(title,detail);node.append(copy);node.title=description;node.setAttribute('aria-label',label+'. '+description+(CREW[id]?'. Earned badge.':'. Self-selected badge.'));
     return node;
   }
 
@@ -97,7 +111,7 @@
       icon.alt = "";
       node.append(icon);
     } else if (SELF[id]) {
-      node.title = SELF[id][0];
+      node.title = SELF[id][0]+" · "+DETAILS[id][0];
       node.style.setProperty("--hue", SELF[id][1]);
       node.classList.add("is-self");
     } else return null;

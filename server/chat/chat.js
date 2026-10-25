@@ -1,3 +1,4 @@
+import { nameplateFor } from "../nameplates.js";
 import { once } from "../once.js";
 import { portrait, roomAvatar } from "./chat-avatar.js";
 const reply = (body, status = 200) =>
@@ -116,7 +117,7 @@ export async function handleChat(request, env, user, readBody) {
       return reply({ error: "Use this website to join the room." }, 403);
     if (!env.LOUNGE) return reply({ error: "The room is not available right now." }, 503);
     const row = await db.prepare("SELECT avatar_json AS avatar FROM player_data WHERE user_id=?").bind(user.id).first();
-    const who = { id: user.id, username: user.username, owner, avatar: roomAvatar(row?.avatar), room,
+    const who = { id: user.id, username: user.username, nameplate: await nameplateFor(db,user.id), owner, avatar: roomAvatar(row?.avatar), room,
       from: url.searchParams.get("from") === (room === "arcade" ? "pillow" : "arcade") };
     await loungeCall(env, "/kick", { userId: user.id, reason: "room_changed" }, room === "arcade" ? "pillow" : "arcade");
     return env.LOUNGE.get(env.LOUNGE.idFromName(objectName(room))).fetch(

@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nameplate Studio · 8BitGPU</title><link rel="stylesheet" href="client/shared/nameplates.css"><link rel="stylesheet" href="client/profile/nameplate-studio.css"></head>
+<body><main class="studio-shell">
+<header class="studio-title"><span>✦ Nameplate Studio</span><a href="arcade.html">Back to Lounge ↗</a></header>
+<div class="studio-intro"><p class="eyebrow">A LITTLE MORE YOU</p><h1>Small plate. Big personality.</h1><p>A charm, a color, a tiny title. Dress up the name under your Being.</p></div>
+<p id="studioStatus" role="status">Loading your nameplate…</p>
+<div class="studio-layout"><aside class="preview-column"><div class="preview-scene"><span class="scene-star star-one">✧</span><span class="scene-star star-two">✦</span><div id="studioBeing" class="studio-being" aria-hidden="true"></div><div id="platePreview" class="cute-nameplate"></div></div><p class="preview-caption">YOUR LOUNGE LOOK</p><p class="preview-note">Your username stays yours. Your title is just for fun.</p><div class="charm-detail"><span id="charmPreview"></span><div><strong id="charmName">Stardust</strong><p id="charmDescription">A tiny sparkle for your little corner of the room.</p><small>Decorative charm</small></div></div></aside>
+<form id="nameplateForm"><fieldset><legend><span>01</span> Pick your palette</legend><div id="paletteChoices" class="palette-choices"></div></fieldset>
+<fieldset><legend><span>02</span> Find your shape</legend><div id="frameChoices" class="frame-choices"></div></fieldset>
+<fieldset><legend><span>03</span> Add a little charm</legend><p class="field-note">Tiny treasures from your icon collection.</p><div id="charmChoices" class="charm-choices"></div></fieldset>
+<fieldset><legend><span>04</span> Your tiny title</legend><label for="plateTitle">A mood, a nickname, a little lore</label><input id="plateTitle" maxlength="28" placeholder="e.g. professional daydreamer"><div class="title-footnote"><span>Shown below your username</span><output id="titleCount" for="plateTitle">0 / 28</output></div></fieldset>
+<div class="studio-actions"><button id="resetPlate" type="button">Reset style</button><button id="savePlate" type="submit" disabled>Save nameplate ✦</button></div><p class="save-note">Saved to your account. This only changes your nameplate.</p></form></div>
+</main><script src="client/shared/avatar-layout.js"></script><script src="client/shared/avatar-colors.js"></script><script src="client/shared/nameplates.js"></script><script src="client/profile/nameplate-studio.js"></script></body></html>

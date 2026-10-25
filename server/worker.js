@@ -1,3 +1,4 @@
+import { validateNameplate, nameplateFor } from "./nameplates.js";
 import { badgesFor, badgesForMany, cleanPicks, savePicks } from "./badges.js";
 import { handleGoogle } from "./google.js";
 import { saveWindowStyle } from "./window-style.js";
@@ -152,6 +153,7 @@ const ensureSchema = once(async (database) => {
   await database.exec(
     "CREATE TABLE IF NOT EXISTS player_data (user_id TEXT PRIMARY KEY, avatar_json TEXT, updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));",
   );
+  await database.exec("CREATE TABLE IF NOT EXISTS player_nameplates (user_id TEXT PRIMARY KEY, settings_json TEXT NOT NULL);");
   await database.exec(
     "CREATE TABLE IF NOT EXISTS player_profiles (user_id TEXT PRIMARY KEY, mood TEXT NOT NULL DEFAULT '', about_text TEXT NOT NULL DEFAULT '', favorites_text TEXT NOT NULL DEFAULT '', theme TEXT NOT NULL DEFAULT 'violet', updated_at INTEGER NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id));",
   );
@@ -309,6 +311,7 @@ function publicProfile(row, badges = { picks: [], earned: [] }) {
   const theme = profileThemes.has(row.theme) ? row.theme : "violet";
   return {
     username: row.username,
+    nameplate: row.nameplate,
     joinedAt: row.createdAt,
     avatar: row.avatar ? JSON.parse(row.avatar) : null,
     mood: row.mood || "",
@@ -369,6 +372,7 @@ async function findProfileBy(database, field, value) {
         .bind(row.id)
         .all()
     ).results;
+  if(row) row.nameplate=await nameplateFor(database,row.id);
   return row;
 }
 
@@ -794,6 +798,18 @@ async function handleApi(request, env, url) {
     response.headers.append("set-cookie", "eightbit_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0");
     response.headers.append("set-cookie", accountsCookie(rest, SESSION_LENGTH_SECONDS));
     return response;
+  }
+
+  if (path === '/api/nameplate/me' && ['GET','PUT'].includes(request.method)) {
+    const user=await currentUser(request,env.DB);
+    if(!user)return json({error:'Sign in to customize your nameplate.'},401);
+    if(request.method==='PUT') {
+      const body=await readBody(request), nameplate=validateNameplate(body?.nameplate);
+      if(!nameplate)return json({error:'Choose a nameplate style and a title up to 28 characters.'},400);
+      await env.DB.prepare('INSERT INTO player_nameplates VALUES (?,?) ON CONFLICT(user_id) DO UPDATE SET settings_json=excluded.settings_json').bind(user.id,JSON.stringify(nameplate)).run();
+      await loungeCall(env,'/nameplate',{userId:user.id,nameplate});
+    }
+    return json({username:user.username,nameplate:await nameplateFor(env.DB,user.id)});
   }
 
   if (path === "/api/badges" && request.method === "GET") {

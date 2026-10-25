@@ -407,6 +407,7 @@ const desktopApps = {
     left: 185,
     top: 75,
   },
+  nameplate: { title: "Nameplate Studio.exe", src: "nameplate.html", width: 940, height: 730, left: 110, top: 30 },
   arcade: { title: "Arcade Lounge.exe", src: "arcade.html?room=arcade", width: 1040, height: 640, left: 90, top: 40 },
   inventory: {
     title: "INVENTORY.exe",
@@ -703,6 +704,7 @@ window.openProfileCard = (username) => {
 };
 window.addEventListener("message", (event) => {
   if (event.origin !== window.location.origin) return;
+  if(event.data?.type==='8bitgpu-nameplate-saved')document.querySelectorAll('iframe').forEach(frame=>frame.contentWindow?.postMessage({type:'8bitgpu-nameplate-saved'},location.origin));
   if (event.data?.type === "8bitgpu-open-profile") openApp("profile", event.data.username);
   if (event.data?.type === "8bitgpu-open-social-dm") window.openSocialDm(event.data.friend);
   if (event.data?.type === "8bitgpu-open-app") openApp(event.data.app);
