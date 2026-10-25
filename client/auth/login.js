@@ -60,7 +60,18 @@ async function sendAccountRequest(path) {
       body: JSON.stringify({ username, password: password.value }),
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.detail || data.error || "The account terminal blinked out.");
+    if (data.egg === "admin") {
+      showBossError();
+      setStatus("ADMIN.SYS is not accepting visitors.");
+      return;
+    }
+    if (!response.ok) {
+      if (path === "/api/auth/login" && response.status === 401) countWrongLogin();
+      throw new Error(data.detail || data.error || "The account terminal blinked out.");
+    }
+    const sameAccount = localStorage.getItem("8bitgpu-player-name")?.toLowerCase() === data.user.username.toLowerCase();
+    // a different account must not inherit the last one's local outfit or garden
+    if (!sameAccount) Accounts.forgetPlayer(localStorage);
     if (data.user.avatar) {
       localStorage.setItem("8bitgpu-avatar-outfit", JSON.stringify(data.user.avatar));
     } else {
@@ -101,6 +112,39 @@ async function loadExistingAccount() {
 }
 
 loadExistingAccount();
+
+// every account signed into on this device, one tap to switch
+async function showSavedAccounts() {
+  try {
+    const data = await Accounts.list();
+    const others = data.accounts.filter((account) => account.id !== data.active);
+    if (!others.length) return;
+    const list = document.getElementById("savedList");
+    list.replaceChildren(
+      ...others.map((account) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "secondary-button";
+        button.textContent = `Continue as ${account.username}`;
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            const user = await Accounts.switchTo(account.id);
+            enterWorld(user.username, true);
+          } catch (error) {
+            button.disabled = false;
+            setStatus(error.message);
+          }
+        });
+        return button;
+      }),
+    );
+    document.getElementById("savedAccounts").hidden = false;
+  } catch {
+    // no saved list, the form still works
+  }
+}
+showSavedAccounts();
 
 // inside the desktop the legal pages open as windows instead of replacing this one
 document.querySelectorAll("a[data-app]").forEach((link) =>
@@ -145,3 +189,39 @@ document.getElementById("recoveryForm").addEventListener("submit", async (event)
     button.disabled = false;
   }
 });
+
+// easter egg: the boss names are reserved, so signing in as one gets you the classic error pile-up
+const bossErrors = document.getElementById("bossErrors");
+const BOSS_TEXT = [
+  "ADMIN.SYS has stopped responding.",
+  "A fatal exception 0E has occurred at 0028:C0011E36.",
+  "The boss is not in. Press OK to pretend this didn't happen.",
+];
+
+function showBossError() {
+  const count = bossErrors.children.length;
+  if (count >= 6) {
+    bossErrors.replaceChildren();
+    return;
+  }
+  const box = document.createElement("div");
+  box.className = "boss-error";
+  box.style.left = `${24 + count * 22}px`;
+  box.style.top = `${40 + count * 26}px`;
+  box.innerHTML = `<div class="boss-title"><span>Login.exe</span><i>x</i></div>
+    <div class="boss-body"><b class="boss-icon">x</b><p>${BOSS_TEXT.map(escapeHtml).join("<br>")}</p></div>
+    <div class="boss-buttons"><button type="button">OK</button></div>`;
+  box.querySelector("button").addEventListener("click", showBossError);
+  box.querySelector("i").addEventListener("click", () => box.remove());
+  bossErrors.append(box);
+}
+
+// four wrong passcodes in a row and the recovery link gets sassy
+let wrongLogins = 0;
+function countWrongLogin() {
+  if (++wrongLogins < 4) return;
+  document.getElementById("forgotSummary").textContent = "Have you tried turning it off and on again?";
+}
+
+// the boss check only exists on the server; this just leaves a trail in the network log
+fetch("/api/auth/admin", { cache: "no-store" }).catch(() => {});

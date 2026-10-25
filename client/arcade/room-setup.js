@@ -1,8 +1,8 @@
 // Shared room page: the URL chooses the room; the server validates it again.
 (() => {
   const rooms = {
-    arcade: {id:'arcade',name:'Arcade Lounge',title:'Arcade Lounge.exe',image:'assets/maps/arcade/arcade-01-bg.png',width:1200,height:1200,spawn:{x:48,y:73},entry:{x:84,y:86},bounds:{minX:6,maxX:94,minY:12,maxY:94},other:'pillow',door:{x:88,y:85}},
-    pillow: {id:'pillow',name:'The Pillow Room',title:'Pillow Room.exe',image:'assets/maps/pillow/pillow-room.png',width:300,height:216,spawn:{x:78,y:84},entry:{x:16,y:86},bounds:{minX:6,maxX:94,minY:76,maxY:94},other:'arcade',door:{x:12,y:85}}
+    arcade: {id:'arcade',name:'Arcade Lounge',title:'Arcade Lounge.exe',image:'assets/maps/arcade/arcade-02-wide.png',width:1800,height:1200,spawn:{x:50,y:70},entry:{x:50,y:84},bounds:{minX:6,maxX:94,minY:12,maxY:94},other:'pillow',door:{x:50,y:90}},
+    pillow: {id:'pillow',name:'The Pillow Room',title:'Pillow Room.exe',image:'assets/maps/pillow/pillow-room.png',width:300,height:216,spawn:{x:78,y:84},entry:{x:16,y:86},bounds:{minX:6,maxX:94,minY:6,maxY:94},other:'arcade',door:{x:12,y:85}}
   };
   const params=new URLSearchParams(location.search),room=rooms[params.get('room')]||rooms.arcade;
   const other=rooms[room.other];

@@ -121,3 +121,39 @@ test("once still shares one setup between calls that pile up", async () => {
   await Promise.all([ready({}), ready({}), ready({}), ready({})]);
   assert.equal(runs, 1);
 });
+
+test("admin and administrator are boss names, any case", async () => {
+  const { isBossName } = await import("../server/boss.js");
+  assert.equal(isBossName("admin"), true);
+  assert.equal(isBossName("  Administrator "), true);
+  assert.equal(isBossName("adminton"), false);
+  assert.equal(isBossName(undefined), false);
+});
+
+test("saved accounts keep order, dedupe and cap at five", async () => {
+  const { addAccount, parseAccounts, removeAccount, accountsCookie } = await import("../server/accounts.js");
+  const tokens = ["a".repeat(24), "b".repeat(24), "c".repeat(24), "d".repeat(24), "e".repeat(24), "f".repeat(24)];
+  let saved = [];
+  for (const token of tokens) saved = addAccount(saved, token);
+  assert.deepEqual(saved, tokens.slice(1));
+  assert.deepEqual(addAccount(saved, tokens[2]).at(-1), tokens[2]);
+  assert.equal(addAccount(saved, tokens[2]).length, 5);
+  assert.deepEqual(removeAccount(saved, tokens[3]).includes(tokens[3]), false);
+  const cookie = accountsCookie(saved, 100);
+  assert.deepEqual(parseAccounts(cookie.split(";")[0].split("=")[1]), saved);
+});
+
+test("parseAccounts ignores junk and base64 tokens survive the round trip", async () => {
+  const { parseAccounts, accountsCookie } = await import("../server/accounts.js");
+  assert.deepEqual(parseAccounts(undefined), []);
+  assert.deepEqual(parseAccounts("short.%E0%A4%A.<script>"), []);
+  const token = "ab+/cd==ab+/cd==ab+/cd==ab+/cd==";
+  assert.deepEqual(parseAccounts(accountsCookie([token], 5).split(";")[0].split("=").slice(1).join("=")), [token]);
+  assert.match(accountsCookie([], 5), /Max-Age=0/);
+});
+
+test("roomAvatar tells the brawler which race you are", () => {
+  assert.equal(roomAvatar(JSON.stringify({ species: "Deerbra", skinTone: "Wood", build: "Fae" })).race, "deerbra");
+  assert.equal(roomAvatar(JSON.stringify({ species: "Custom", bodyAsset: "Clanker_F.png" })).race, "clanker");
+  assert.equal(roomAvatar("garbage").race, "pixie");
+});

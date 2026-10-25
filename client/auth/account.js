@@ -76,10 +76,7 @@ byId("keyForm").onsubmit = async (e) => {
 };
 byId("signOut").onclick = async () => {
   try {
-    const r = await fetch("/api/auth/logout", { method: "POST" });
-    if (!r.ok) throw Error("Unable to sign out.");
-    for (const key of ["8bitgpu-player-name", "8bitgpu-account-active", "8bitgpu-avatar-outfit"])
-      localStorage.removeItem(key);
+    await Accounts.logout();
     if (parent !== window) parent.location.reload();
     else location.href = "login.html";
   } catch (e) {

@@ -226,11 +226,7 @@ $("cancelReport").onclick = () => $("reportDialog").close();
 $("refreshReports").onclick = () => reports().catch((e) => notice(e.message));
 $("logout").onclick = async () => {
   try {
-    const r = await fetch("/api/auth/logout", { method: "POST" });
-    if (!r.ok) throw Error("Unable to sign out. Try again.");
-    localStorage.removeItem("8bitgpu-player-name");
-    localStorage.removeItem("8bitgpu-account-active");
-    localStorage.removeItem("8bitgpu-avatar-outfit");
+    await Accounts.logout();
     clearTimeout(timer);
     location.href = "login.html";
   } catch (e) {

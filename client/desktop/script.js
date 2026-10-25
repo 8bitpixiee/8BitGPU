@@ -407,8 +407,8 @@ const desktopApps = {
     left: 185,
     top: 75,
   },
-  nameplate: {title:"Nameplate Studio.exe",src:"nameplate.html",width:940,height:730,left:110,top:30},
-  arcade: { title: "Arcade Lounge.exe", src: "arcade.html?room=arcade", width: 900, height: 650, left: 125, top: 50 },
+  nameplate: { title: "Nameplate Studio.exe", src: "nameplate.html", width: 940, height: 730, left: 110, top: 30 },
+  arcade: { title: "Arcade Lounge.exe", src: "arcade.html?room=arcade", width: 1040, height: 640, left: 90, top: 40 },
   inventory: {
     title: "INVENTORY.exe",
     width: 440,

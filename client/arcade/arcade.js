@@ -71,6 +71,7 @@ function positionSelf() {
     node.dataset.facing = facing;
     node.classList.toggle("is-flying", flying);
   }
+  updateSpotPrompt();
 }
 function face(dx, dy) {
   if (Math.abs(dx) >= Math.abs(dy)) facing = dx < 0 ? "left" : "right";
@@ -245,6 +246,7 @@ function connectSocket() {
       lastMembers = msg.members;
       renderMembers(visibleMembers());
     } else if (msg.t === "chat") refreshMessages();
+    else window.Minigames?.onLounge(msg);
   };
   ws.onclose = (event) => {
     clearInterval(pingTimer);
@@ -330,6 +332,64 @@ el("roomMessage").addEventListener("keydown", (event) => {
     if (!el("sendMessage").disabled) el("roomComposer").requestSubmit();
   }
 });
+// the bar and the stump: walk up to one and it offers what you can do there
+const spots = RoomSpots.SPOTS[RoomPage.room.id] || [];
+const spotPrompt = document.createElement("div");
+spotPrompt.className = "spot-prompt";
+spotPrompt.hidden = true;
+el("mapStage").append(spotPrompt);
+let promptSpot = null;
+for (const spot of spots) {
+  const marker = document.createElement("button");
+  marker.type = "button";
+  marker.className = "room-spot";
+  marker.style.left = spot.x + "%";
+  marker.style.top = spot.y + "%";
+  marker.innerHTML = '<span class="room-spot-ring" aria-hidden="true"></span>';
+  marker.append(spot.label);
+  marker.setAttribute("aria-label", "Walk to the " + spot.label.toLowerCase());
+  marker.addEventListener("click", () => {
+    if (!joined) return status("Enter the room first.");
+    target = { x: spot.x, y: spot.y };
+    el("walkMarker").style.left = spot.x + "%";
+    el("walkMarker").style.top = spot.y + "%";
+    el("walkMarker").hidden = false;
+    startMoving();
+  });
+  el("mapStage").append(marker);
+}
+// a spot either plays an emote or opens the arcade cabinet window
+function useAction(action) {
+  if (action.open === "minigames") return window.Minigames?.open();
+  return playEmote(action.emote);
+}
+// what the arcade window needs from the room
+window.loungeApi = {
+  send: (payload) => {
+    if (!socketOpen) return false;
+    socket.send(JSON.stringify(payload));
+    return true;
+  },
+  me: () => lastMembers.find((m) => m.id === myId) || null,
+  others: () => visibleMembers().filter((m) => m.id !== myId),
+};
+function updateSpotPrompt() {
+  const here = joined ? RoomSpots.spotAt(RoomPage.room.id, x, y) : null;
+  if (here === promptSpot) return;
+  promptSpot = here;
+  spotPrompt.hidden = !here;
+  spotPrompt.replaceChildren();
+  if (!here) return;
+  spotPrompt.style.left = here.x + "%";
+  spotPrompt.style.top = here.y + "%";
+  here.actions.forEach((action, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = (index ? "" : "E · ") + action.label;
+    button.addEventListener("click", () => useAction(action));
+    spotPrompt.append(button);
+  });
+}
 async function playEmote(emote) {
   if (!joined) {
     status("Enter the room before using an emote.");
@@ -583,7 +643,8 @@ function animate(time) {
       el("walkMarker").hidden = true;
     }
   }
-  const length = Math.hypot(dx, dy);
+  // measured in room pixels, so a wide room does not make sideways walking faster than up and down
+  const length = Math.hypot(dx * (RoomPage.room.width / RoomPage.room.height), dy);
   if (length) {
     face(dx, dy);
     const step = Math.min(length, 23 * dt);
@@ -603,7 +664,7 @@ function startMoving() {
   }
 }
 el("mapStage").addEventListener("pointerdown", (e) => {
-  if (!joined || e.button !== 0 || e.target.closest(".being-profile-link, .room-door")) return;
+  if (!joined || e.button !== 0 || e.target.closest(".being-profile-link, .room-door, .room-spot, .spot-prompt")) return;
   const r = e.currentTarget.getBoundingClientRect();
   target = clampPosition(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
   el("walkMarker").style.left = target.x + "%";
@@ -615,6 +676,7 @@ el("mapStage").addEventListener("pointerdown", (e) => {
 document.addEventListener("keydown", (e) => {
   if (!joined || e.target.closest("textarea,input,button,a")) return;
   const key = e.key.toLowerCase();
+  if (key === "e" && promptSpot) return void useAction(promptSpot.actions[0]);
   if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key)) {
     e.preventDefault();
     keys.add(key);

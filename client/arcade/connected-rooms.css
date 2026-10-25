@@ -9,6 +9,14 @@
 .room-door-label {display:block;max-width:115px;padding:3px 5px;border:1px solid #e7d5f1;border-radius:3px;background:#2d1c40ed;color:#fff;font-size:10px;line-height:1.25;white-space:normal;text-align:center;}
 .room-door:hover .room-door-icon,.room-door:focus-visible .room-door-icon {outline:2px solid #c6ffdc;outline-offset:2px;}
 .connected-room .movement-hint {z-index:26;}
+/* walk-up spots: the bar and the stump */
+.room-spot {position:absolute;z-index:24;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;padding:0;border:0;background:none;box-shadow:none;color:#fff;font-size:10px;line-height:1.2;text-shadow:0 1px 2px #20152d,0 0 4px #20152d;cursor:pointer;}
+.room-spot-ring {display:block;width:11cqh;height:5cqh;border:2px dashed #ffffffcc;border-radius:50%;background:#ffffff22;animation:spot-pulse 2.4s ease-in-out infinite;}
+.room-spot:hover .room-spot-ring,.room-spot:focus-visible .room-spot-ring {border-color:#c6ffdc;background:#c6ffdc44;}
+.spot-prompt {position:absolute;z-index:30;transform:translate(-50%,-165%);display:flex;flex-direction:column;gap:3px;min-width:120px;padding:4px;border:1px solid #e7d5f1;border-radius:6px;background:#2d1c40f2;}
+.spot-prompt button {padding:4px 8px;font-size:11px;text-align:left;white-space:nowrap;}
+@keyframes spot-pulse {0%,100% {opacity:.55;transform:scale(1);} 50% {opacity:1;transform:scale(1.08);}}
+@media(prefers-reduced-motion:reduce){.room-spot-ring{animation:none;}}
 @media(max-width:650px) and (orientation:portrait){.connected-room #arcadeMap{min-height:240px;height:min(66svh,500px);}.room-door-icon{width:28px;height:34px;}.room-door-label{max-width:90px;font-size:9px;}}
 
 /* Map view gives the proportional stage all the available window space. */

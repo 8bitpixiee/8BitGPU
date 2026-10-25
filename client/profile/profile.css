@@ -191,3 +191,14 @@ body.has-wallpaper { background-image:none!important; }
   #windowCanvas .being-portrait{height:286px}
   #windowCanvas .identity-card #cardName{margin-top:8px}
 }
+
+/* geocities-style visitor counter under the page address */
+.hit-counter { display:block; margin-top:6px; padding:2px 8px; border:2px inset #6a6a6a; color:#7dff9a; background:#000; font:12px/1.4 'Courier New',monospace; letter-spacing:1px; cursor:default; }
+.hit-cone { width:14px; height:14px; vertical-align:-2px; image-rendering:pixelated; }
+.hit-counter output { padding:0 3px; color:#fff; background:#222; letter-spacing:3px; }
+
+/* egg: the green screen, forced over whatever colors the owner picked */
+body.terminal-skin { --ink:#46ff7a !important; --paper:#031a0a !important; --panel:#06280f !important; --edge:#1fa84a !important; --accent:#0f7a2f !important; --soft:#0b3d18 !important; --title-ink:#b8ffcb !important; --control-ink:#46ff7a !important; --wallpaper-image:none !important; color:#46ff7a; background:#000 !important; font-family:'Courier New',monospace; }
+body.terminal-skin #profile { background-image:none !important; }
+body.terminal-skin .being-portrait { filter:hue-rotate(80deg) saturate(.7) brightness(.85); }
+body.terminal-skin .hit-counter output { color:#000; background:#46ff7a; }

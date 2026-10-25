@@ -1,3 +1,5 @@
+import Races from "../../client/shared/brawl-races.js";
+
 // bodies that belong to one account
 export const RESERVED_BODIES = { "pickle.png": "pickle" };
 
@@ -94,6 +96,7 @@ export function roomAvatar(json) {
     ...(typeof color.hex === "string" && /^#[0-9a-f]{6}$/i.test(color.hex) ? { hex: color.hex.toLowerCase() } : {}),
   };
   return {
+    race: Races.raceOf(a),
     layers,
     adjustments,
     layout: a.layout >= 2 ? 2 : 1,
