@@ -111,6 +111,7 @@ function renderMembers(members) {
       el("players").append(node);
       beings.set(m.id, node);
     }
+    Nameplates.render(node.querySelector(".name"),m.username,m.nameplate,m.id===myId);
     const signature = JSON.stringify(m.avatar) + AvatarLayout.isReady();
     if (node.dataset.avatar !== signature) {
       const motion = node.querySelector(".avatar-motion");

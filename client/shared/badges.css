@@ -37,3 +37,5 @@
 .badge-mini { display: inline-grid; place-items: center; width: 14px; height: 14px; }
 .badge-mini img { width: 14px; height: 14px; image-rendering: pixelated; }
 .badge-mini.is-self { border: 1px solid rgba(255, 255, 255, .9); border-radius: 3px; background: hsl(var(--hue, 280) 70% 62%); box-shadow: 0 0 0 1px hsl(var(--hue, 280) 60% 36%); width: 9px; height: 9px; }
+
+.badge{padding:5px 8px;gap:7px}.badge-copy{display:grid;gap:1px;line-height:1.25}.badge-copy strong{font-size:11px}.badge-copy small{font-size:9px;font-weight:normal;max-width:190px}.badge-symbol{display:grid;place-items:center;width:22px;height:22px;font-size:19px}.badge img{width:24px;height:24px;object-fit:contain}.badge-choice .badge-copy small{display:none}.badge-choice .badge img{width:18px;height:18px}.badge-choice .badge-symbol{width:18px;height:18px;font-size:16px}

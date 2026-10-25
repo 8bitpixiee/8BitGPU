@@ -1,3 +1,4 @@
+import { validateNameplate, defaultNameplate } from "../nameplates.js";
 import { DurableObject } from "cloudflare:workers";
 
 const EMOTES = new Set(["dance", "twerk", "smoke", "drink", "shroom", "laugh", "spin", "wave", "crashout"]);
@@ -23,6 +24,7 @@ export class LoungeRoom extends DurableObject {
     const body = await request.json().catch(() => ({}));
     if (path === "/kick") this.kick(body.userId, body.reason === "room_changed" ? 4000 : 4003, body.reason === "room_changed" ? "room_changed" : "removed");
     else if (path === "/poke") this.broadcast({ t: "chat" });
+    else if (path === "/nameplate") this.setNameplate(body.userId, body.nameplate);
     else if (path === "/avatar") await this.setAvatar(body.userId, body.avatar);
     else return new Response("nope", { status: 404 });
     return new Response("ok");
@@ -45,6 +47,7 @@ export class LoungeRoom extends DurableObject {
     server.serializeAttachment({
       id: who.id,
       username: who.username,
+      nameplate: validateNameplate(who.nameplate) || { ...defaultNameplate },
       owner: Boolean(who.owner),
       room: pillow ? "pillow" : "arcade",
       x: who.from ? (pillow ? 16 : 84) : pillow ? 78 : 36 + (seed % 19),
@@ -121,6 +124,16 @@ export class LoungeRoom extends DurableObject {
     await this.ctx.storage.delete("a:" + id);
   }
 
+  setNameplate(userId, value) {
+    const nameplate=validateNameplate(value);
+    if(typeof userId!=='string'||!nameplate)return;
+    for(const ws of this.ctx.getWebSockets()) {
+      const me=ws.deserializeAttachment();
+      if(me?.id===userId)ws.serializeAttachment({...me,nameplate});
+    }
+    this.schedule(FLUSH_MS);
+  }
+
   async setAvatar(userId, avatar) {
     if (typeof userId !== "string" || !avatar) return;
     this.avatars.set(userId, avatar);
@@ -163,6 +176,7 @@ export class LoungeRoom extends DurableObject {
       members.push({
         id: me.id,
         username: me.username,
+        nameplate: me.nameplate || { ...defaultNameplate },
         x: me.x,
         y: me.y,
         facing: me.facing,
