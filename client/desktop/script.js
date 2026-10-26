@@ -407,7 +407,7 @@ const desktopApps = {
     left: 185,
     top: 75,
   },
-  nameplate: { title: "Nameplate Studio.exe", src: "nameplate.html", width: 940, height: 730, left: 110, top: 30 },
+  nameplate: { title: "Nameplate Studio.exe", src: "nameplate.html", width:440,height:610, left: 110, top: 30 },
   arcade: { title: "Arcade Lounge.exe", src: "arcade.html?room=arcade", width: 1040, height: 640, left: 90, top: 40 },
   inventory: {
     title: "INVENTORY.exe",
@@ -689,12 +689,13 @@ window.openSocialDm = (friend) => {
   };
   openApp(appName);
 };
-window.openProfileCard = (username) => {
+window.openProfileCard = (username, source) => {
+  const context=["arcade","avatarLab"].includes(source)?source:"profile";
   if (!username) return;
-  const appName = `profile-card-${username.toLowerCase()}`;
+  const appName = `profile-card-${username.toLowerCase()}-${context}`;
   desktopApps[appName] = {
     title: `${username} • MyPixel`,
-    src: `profile-card.html?u=${encodeURIComponent(username)}`,
+    src: `profile-card.html?u=${encodeURIComponent(username)}&from=${context}`,
     width: 360,
     height: 400,
     left: 560,
@@ -708,7 +709,7 @@ window.addEventListener("message", (event) => {
   if (event.data?.type === "8bitgpu-open-profile") openApp("profile", event.data.username);
   if (event.data?.type === "8bitgpu-open-social-dm") window.openSocialDm(event.data.friend);
   if (event.data?.type === "8bitgpu-open-app") openApp(event.data.app);
-  if (event.data?.type === "8bitgpu-open-profile-card") window.openProfileCard(event.data.username);
+  if (event.data?.type === "8bitgpu-open-profile-card") window.openProfileCard(event.data.username,event.data.source);
 });
 
 function escapePlayerName() {

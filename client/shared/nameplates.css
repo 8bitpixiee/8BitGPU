@@ -1,20 +1,15 @@
-.cute-nameplate{--plate-top:#fff4ff;--plate-bottom:#d9b9ed;--plate-edge:#9270b2;--plate-ink:#422657;display:inline-flex;align-items:center;justify-content:center;gap:6px;max-width:240px;padding:5px 9px;color:var(--plate-ink);background:linear-gradient(180deg,var(--plate-top),var(--plate-bottom));border:1px solid var(--plate-edge);border-radius:15px;box-shadow:inset 0 1px 0 #fff,0 2px 0 #35203e45,0 3px 8px #25163526;font-family:Tahoma,Arial,sans-serif;text-shadow:none;line-height:1.2;vertical-align:middle}
-.cute-nameplate[data-palette=rose]{--plate-top:#fff3f8;--plate-bottom:#f4b8d3;--plate-edge:#b96d90;--plate-ink:#672745}
-.cute-nameplate[data-palette=mint]{--plate-top:#f1fff8;--plate-bottom:#b3e3d2;--plate-edge:#5a9988;--plate-ink:#245349}
-.cute-nameplate[data-palette=peach]{--plate-top:#fff8e9;--plate-bottom:#ffd1ad;--plate-edge:#bd865d;--plate-ink:#69452d}
-.cute-nameplate[data-palette=midnight]{--plate-top:#51416f;--plate-bottom:#29233f;--plate-edge:#b9a0df;--plate-ink:#fff1ff}
-.cute-nameplate[data-frame=scallop]{border-radius:7px 14px 7px 14px;outline:1px dotted var(--plate-edge);outline-offset:2px}
-.cute-nameplate[data-frame=ticket]{border-radius:3px;border-inline:3px double var(--plate-edge)}
-.plate-copy{display:grid;gap:2px;min-width:0;text-align:center}.plate-copy strong{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.plate-copy small{font-size:9px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:normal;letter-spacing:.2px}
-.plate-charm{flex:0 0 22px;width:22px;height:22px;display:inline-grid;place-items:center;font-size:19px;line-height:1}.plate-charm:empty{display:none}
-.plate-charm img{position:static!important;inset:auto!important;display:block;width:100%!important;height:100%!important;object-fit:contain;image-rendering:auto}
-.plate-detail{flex:none;font-size:8px;border-left:1px solid var(--plate-edge);padding-left:5px;opacity:.8}
-#players .being .name.cute-nameplate{bottom:-8%;width:max-content;padding:4px 7px;min-width:90px;max-width:210px;color:var(--plate-ink);background:linear-gradient(180deg,var(--plate-top),var(--plate-bottom));border-color:var(--plate-edge);white-space:normal}
-#players .being.self .name.cute-nameplate{color:var(--plate-ink);border-color:var(--plate-edge)}
-#players .plate-charm{flex-basis:19px;width:19px;height:19px}
-.identity-card #cardName.cute-nameplate{margin:12px auto 8px;max-width:100%}
-.badge-details{display:grid;gap:8px}.badge-details .collection-badge{display:flex;gap:9px;align-items:center;padding:9px;border:1px solid var(--edge);border-radius:8px;background:var(--paper);color:var(--ink);font:11px Tahoma,Arial,sans-serif}.collection-badge .plate-charm{flex-basis:30px;width:30px;height:30px}.collection-badge strong{display:block;margin-bottom:3px}.collection-badge p{font:11px/1.4 Tahoma,Arial,sans-serif;margin:0;white-space:normal}
-@media(max-width:550px){#players .being .name.cute-nameplate{min-width:76px;max-width:155px}.plate-copy strong{font-size:10px}.plate-copy small{font-size:8px;max-width:110px}}
-#windowCanvas .identity-card #cardName.cute-nameplate{color:var(--plate-ink);text-shadow:none;font-family:Tahoma,Arial,sans-serif}
 
-#customizeNameplate{display:block;text-align:center;font-size:11px;margin:8px;color:var(--ink)}#customizeNameplate[hidden]{display:none!important}.cute-nameplate .badge-mini img{position:static!important;inset:auto!important;width:14px!important;height:14px!important}.cute-nameplate .badge-strip{margin-left:0}
+.cute-nameplate{--plate-background:hsl(270 22% 24%);--plate-border:hsl(270 26% 65%);--plate-name:hsl(275 30% 92%);--plate-title:hsl(270 22% 78%);position:relative;display:inline-flex;justify-content:center;align-items:center;width:max-content;max-width:260px;min-width:88px;padding:4px 13px;border:0;border-radius:0;background:transparent!important;color:var(--plate-name)!important;box-shadow:none;text-shadow:none;font-family:'Pixelify Sans',Tahoma,sans-serif;isolation:isolate;overflow:visible;line-height:1.1;white-space:normal}
+.cute-nameplate::before,.cute-nameplate::after{content:'';position:absolute;z-index:-1;pointer-events:none;clip-path:polygon(4px 0,calc(100% - 4px) 0,calc(100% - 4px) 2px,100% 2px,100% calc(100% - 2px),calc(100% - 4px) calc(100% - 2px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 2px),0 calc(100% - 2px),0 2px,4px 2px)}
+.cute-nameplate::before{inset:0;background:var(--plate-border)}.cute-nameplate::after{inset:1px;background:var(--plate-background);box-shadow:inset 0 2px #ffffff0d,inset 0 -2px #00000016}
+.plate-copy{display:grid;gap:2px;text-align:center;min-width:0}.plate-copy strong{font-size:11px;font-weight:500;color:var(--plate-name);white-space:normal;overflow-wrap:anywhere}.plate-copy small{font-size:9px;font-weight:400;color:var(--plate-title);white-space:normal;overflow-wrap:anywhere}
+#players .being .name.cute-nameplate{top:calc(100% + 18px);bottom:auto;left:50%;transform:translateX(-50%);width:max-content;max-width:220px;min-width:82px;padding:4px 12px;border:0;border-radius:0;pointer-events:auto;z-index:3}
+.cute-nameplate .badge-strip{position:absolute;inset:0;display:block;margin:0;pointer-events:none}
+.cute-nameplate .badge-mini{position:absolute;pointer-events:auto;width:7px;height:12px;animation:shard-bob 3s ease-in-out infinite;animation-delay:calc(var(--shard-index,0) * -.43s)}
+.cute-nameplate .badge-mini:nth-child(odd){left:-12px;top:calc(50% - 7px)}.cute-nameplate .badge-mini:nth-child(even){right:-12px;top:calc(50% - 7px)}
+.cute-nameplate .badge-mini:nth-child(3){left:-23px;top:1px}.cute-nameplate .badge-mini:nth-child(4){right:-23px;top:2px}
+.cute-nameplate .badge-mini:nth-child(5){left:12%;top:calc(100% + 6px)}.cute-nameplate .badge-mini:nth-child(6){right:14%;top:calc(100% + 7px)}
+.cute-nameplate .badge-mini:nth-child(7){left:32%;top:calc(100% + 9px)}.cute-nameplate .badge-mini:nth-child(8){right:32%;top:calc(100% + 9px)}
+@keyframes shard-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){.cute-nameplate .badge-mini{animation:none}}
+#windowCanvas .identity-card #cardName.cute-nameplate{color:var(--plate-name);text-shadow:none;font-family:'Pixelify Sans',Tahoma,sans-serif}

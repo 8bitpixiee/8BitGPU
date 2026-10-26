@@ -24,37 +24,21 @@
   const DETAILS = {"night-owl":["Moonlit chats and late-night adventures.","☾"],"early-bird":["A bright start to the day.","☀"],"gamer":["Always ready for another round.","✧"],"artist":["Making a little magic with color.","flower"],"musician":["A soundtrack for every mood.","music"],"streamer":["Sharing the fun, one stream at a time.","disc"],"builder":["Dreaming it up and making it real.","✦"],"dancer":["Moving to their own rhythm.","wings"],"collector":["A home for tiny treasures.","cash"],"cozy":["Soft vibes and a comfy corner.","♡"],"chaotic":["A little mischief in the mix.","eyes"],"plant-parent":["Growing a greener little world.","flower"],"tea-person":["A warm cup and good company.","☕"],"cat-person":["A soft spot for whiskers and paws.","♡"]};
   const MAX_PICKS = 5;
 
+  const SHADES=['#b9a2d6','#a7c7bb','#d3abc4','#a5b8d5','#d6bea3','#9dc9cd','#c4b3d7','#b8c7a5','#c7b1ca','#b3bddb','#d5b4c0','#a7c3b6','#d2c49d','#b6aed1','#c2a9da','#a9cbbf','#b4bdda'];
+  function mini(id) {
+    const ids=[...Object.keys(SELF),...Object.keys(CREW)],index=ids.indexOf(id);if(index<0)return null;
+    const node=document.createElement('span');node.className='badge-mini crystal';node.dataset.badge=id;
+    node.title=CREW[id]?.[0]||SELF[id][0];node.setAttribute('role','img');node.setAttribute('aria-label',node.title);
+    node.style.setProperty('--crystal',SHADES[index]);node.dataset.cut=index%4;
+    const face=document.createElement('span');face.className='crystal-face';face.setAttribute('aria-hidden','true');node.append(face);return node;
+  }
   function chip(id) {
-    const node = document.createElement("span");
-    node.className = "badge";
-    node.dataset.badge = id;
-    if (CREW[id]) {
-      node.classList.add("is-crew");
-      node.title = CREW[id][1];
-      const icon = document.createElement("img");
-      icon.src = `assets/ui/badges/${id}.png`;
-      icon.alt = "";
-      node.append(icon, CREW[id][0]);
-    } else if (SELF[id]) {
-      node.style.setProperty("--hue", SELF[id][1]);
-      const gem = document.createElement("i");
-      gem.setAttribute("aria-hidden", "true");
-      node.append(gem, SELF[id][0]);
-    } else return null;
-    const label=CREW[id]?.[0]||SELF[id]?.[0];
-    const description=CREW[id]?.[1]||DETAILS[id]?.[0]||'';
-    if(SELF[id]&&DETAILS[id]) {
-      const art=DETAILS[id][1];
-      let icon;
-      if(art.length>2){icon=document.createElement('img');icon.src='assets/ui/nameplates/'+art+'-transparent.png';icon.alt='';}
-      else {icon=document.createElement('span');icon.className='badge-symbol';icon.setAttribute('aria-hidden','true');icon.textContent=art;}
-      node.replaceChildren(icon);
-    } else node.removeChild(node.lastChild);
+    const crystal=mini(id);if(!crystal)return null;
+    const node=document.createElement('span');node.className='badge';node.dataset.badge=id;
     const copy=document.createElement('span');copy.className='badge-copy';
-    const title=document.createElement('strong');title.textContent=label;
-    const detail=document.createElement('small');detail.textContent=description;
-    copy.append(title,detail);node.append(copy);node.title=description;node.setAttribute('aria-label',label+'. '+description+(CREW[id]?'. Earned badge.':'. Self-selected badge.'));
-    return node;
+    const title=document.createElement('strong');title.textContent=crystal.title;
+    const detail=document.createElement('small');detail.textContent=CREW[id]?.[1]||DETAILS[id]?.[0]||'';
+    copy.append(title,detail);node.append(crystal,copy);return node;
   }
 
   // earned ones lead, they are the ones somebody else gave you
@@ -99,25 +83,6 @@
     return () => [...chosen];
   }
 
-  // small icon-only version that sits next to a name in chats and rooms
-  function mini(id) {
-    const node = document.createElement("span");
-    node.className = "badge-mini";
-    node.dataset.badge = id;
-    if (CREW[id]) {
-      node.title = CREW[id][0];
-      const icon = document.createElement("img");
-      icon.src = `assets/ui/badges/${id}.png`;
-      icon.alt = "";
-      node.append(icon);
-    } else if (SELF[id]) {
-      node.title = SELF[id][0]+" · "+DETAILS[id][0];
-      node.style.setProperty("--hue", SELF[id][1]);
-      node.classList.add("is-self");
-    } else return null;
-    return node;
-  }
-
   // names are looked up in batches and remembered for a minute
   const cache = new Map();
   const waiting = new Map();
@@ -152,19 +117,17 @@
     return waiting.get(key).promise;
   }
 
-  // appends a strip to the element and fills it once the badges arrive: earned first, then up to two picks
-  function mark(element, name) {
-    if (!name) return;
-    const strip = document.createElement("span");
-    strip.className = "badge-strip";
-    element.append(strip);
-    lookup(name).then((badges) => {
-      for (const id of [...badges.earned, ...badges.picks.slice(0, 2)]) {
-        const node = mini(id);
-        if (node) strip.append(node);
-      }
-    });
+  function refresh(element){
+    const badges=element._badgeData,strip=element.querySelector('.badge-strip');if(!badges||!strip)return;
+    const selected=element._nameplate?.visibleBadges;
+    const all=[...new Set([...(badges.earned||[]),...(badges.picks||[])])];
+    const ids=element._nameplate?all.filter(id=>selected==null||selected.includes(id)):[...(badges.earned||[]),...(badges.picks||[]).slice(0,2)];
+    strip.replaceChildren();ids.forEach((id,index)=>{const node=mini(id);if(node){node.style.setProperty('--shard-index',index);strip.append(node);}});
   }
-
-  root.Badges = { SELF, CREW, MAX_PICKS, chip, mini, mark, lookup, render, picker };
+  function mark(element,name){
+    if(!name)return;
+    if(!element.querySelector('.badge-strip')){const strip=document.createElement('span');strip.className='badge-strip';element.append(strip);}
+    lookup(name).then(badges=>{element._badgeData=badges;refresh(element);});
+  }
+  root.Badges={SELF,CREW,MAX_PICKS,chip,mini,mark,lookup,render,picker,refresh};
 })(window);

@@ -20,6 +20,18 @@ async function load() {
     id("visit").onclick = () =>
       parent.postMessage({ type: "8bitgpu-open-profile", username: p.username }, location.origin);
     const friendButton = id("friend");
+    const meResponse=await fetch('/api/auth/me',{cache:'no-store'});
+    const me=meResponse.ok?await meResponse.json():{};
+    const own=me.user?.username?.toLowerCase()===p.username.toLowerCase();
+    const source=new URLSearchParams(location.search).get('from');
+    if(own){
+      friendButton.hidden=true;
+      if(['arcade','avatarLab'].includes(source)){
+        id('customizeNameplate').hidden=false;
+        id('customizeNameplate').onclick=()=>{if(parent===window)location.href='nameplate.html';else parent.postMessage({type:'8bitgpu-open-app',app:'nameplate'},location.origin);};
+      }
+      return;
+    }
     const social = await fetch("/api/friends", { cache: "no-store" });
     if (social.ok) {
       const state = await social.json();
