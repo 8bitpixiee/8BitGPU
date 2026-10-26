@@ -392,7 +392,6 @@ function render(nextProfile) {
   byId("profileUrl").textContent = path;
   byId("profileName").textContent = profile.username;
   Nameplates.render(byId("cardName"),profile.username,profile.nameplate);
-  byId("customizeNameplate").hidden=!isOwnProfile;
   byId("moodText").textContent = profile.mood || "No mood set.";
   byId("aboutText").textContent = profile.about || "Nothing here yet.";
   byId("favoritesText").textContent =
@@ -507,5 +506,4 @@ byId("profileForm").addEventListener("submit", async (event) => {
 
 loadProfile();
 
-byId('customizeNameplate').addEventListener('click',event=>{if(parent===window)return;event.preventDefault();parent.postMessage({type:'8bitgpu-open-app',app:'nameplate'},location.origin);});
 window.addEventListener('message',event=>{if(event.origin===location.origin&&event.data?.type==='8bitgpu-nameplate-saved')loadProfile();});
