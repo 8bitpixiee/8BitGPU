@@ -38,7 +38,8 @@
 
 <link rel="stylesheet" href="client/shared/retro-windows.css">
 <link rel="stylesheet" href="client/shared/global-appearance.css">
-<link rel="stylesheet" href="client/desktop/vista.css"></head>
+<link rel="stylesheet" href="client/desktop/vista.css">
+<link rel="stylesheet" href="client/desktop/halloween.css"></head>
 
 <body>
     <div id="osBootScreen" aria-label="8BitGPU is starting">
@@ -245,6 +246,21 @@
         </footer>
     </section>
 
+    <aside id="halloweenDrop" aria-label="Halloween on your desktop" hidden>
+        <img class="halloween-decor halloween-pumpkin" src="assets/decor/halloween/pumpkin.png" width="112" height="112" alt="">
+        <img class="halloween-decor halloween-bat" src="assets/decor/halloween/bat.png" width="112" height="112" alt="">
+        <img class="halloween-decor halloween-bat-small" src="assets/decor/halloween/bat.png" width="70" height="70" alt="">
+        <button class="halloween-launch" type="button" data-halloween-open aria-expanded="false" aria-controls="halloweenPanel"><img src="assets/decor/halloween/candy-bowl.png" width="44" height="44" alt=""><span>Trick or treat</span></button>
+        <section id="halloweenPanel" class="halloween-panel" data-halloween-panel aria-labelledby="halloweenTitle" aria-describedby="halloweenIntro" hidden>
+            <header><h2 id="halloweenTitle">Knock, knock...</h2><button class="halloween-close" type="button" data-halloween-close aria-label="Close Halloween panel">Close</button></header>
+            <p id="halloweenIntro">A little Halloween mischief for your pixie desktop. Six treats. A few ghostly visitors.</p>
+            <div class="halloween-bowl"><img src="assets/decor/halloween/candy-bowl.png" width="84" height="84" alt="Pixel pumpkin bowl of candy"><strong data-halloween-count>0 / 6 treats</strong></div>
+            <button class="halloween-knock" type="button" data-halloween-knock>Trick or treat!</button>
+            <p class="halloween-status" data-halloween-status role="status">Knock to collect a treat or meet a little ghost. Treats stay in this browser.</p>
+            <label class="halloween-quiet"><input type="checkbox" data-halloween-quiet>Quiet mode: hide decorations &amp; ghosts</label>
+        </section>
+        <img class="halloween-ghost" data-halloween-ghost src="assets/decor/halloween/ghost.png" width="140" height="140" alt="" hidden>
+    </aside>
     <div id="osWindowLayer" aria-live="polite"></div>
 
     <section id="mobilePocketHome" aria-label="8BitGPU mobile desktop">
@@ -291,6 +307,7 @@
 <script src="client/desktop/welcome-back.js"></script>
 <script src="client/desktop/script.js"></script>
 <script src="client/desktop/desktop-rooms.js"></script>
+<script src="client/desktop/halloween.js"></script>
 
 <script src="client/shared/window-theme.js"></script><script src="client/desktop/desktop-social.js"></script></body>
 </html>
