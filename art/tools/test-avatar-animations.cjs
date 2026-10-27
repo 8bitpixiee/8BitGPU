@@ -29,6 +29,7 @@ const context = {
     hidden: false,
     createElement: () => ({
       style: {},
+      dataset: {},
       isConnected: true,
       setAttribute() {},
       getContext: () => ({ clearRect() {}, drawImage: (...args) => draws.push(args) }),
@@ -41,6 +42,7 @@ function image() {
   return {
     isConnected: true,
     style: { cssText: "filter:sepia(1)" },
+    dataset: { avatarColorLayer: "body" },
     replaceWith(canvas) {
       this.canvas = canvas;
     },
@@ -57,6 +59,8 @@ function frame(time) {
   assert.equal(img.canvas.width, 48);
   assert.equal(img.canvas.height, 43);
   assert.equal(img.canvas.style.cssText, img.style.cssText);
+  assert.equal(img.canvas.dataset.avatarColorLayer, "body");
+  assert.equal(img.canvas.dataset.avatarSource, "/assets/avatar/body_fem_v1.png");
   assert.equal(frame(400)[1], 96); // Third idle frame.
   context.window.AvatarAnimations.moved(node);
   assert.equal(frame(450)[2], 43); // Walking row.
