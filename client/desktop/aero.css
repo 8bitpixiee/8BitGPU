@@ -193,6 +193,14 @@ button, a, [role="button"], input, label { cursor: pointer !important; }
     outline: none;
 }
 
+.nav-buttons button > span {
+    padding: 2px 5px;
+    border-radius: 3px;
+    color: #fff;
+    background: #39204f;
+    text-shadow: none;
+}
+
 .desktop-icon,
 .nav-buttons .desktop-icon {
     filter: drop-shadow(0 3px 2px rgba(35,14,48,.6)) drop-shadow(0 0 5px rgba(255,255,255,.28));
@@ -465,7 +473,7 @@ button, a, [role="button"], input, label { cursor: pointer !important; }
     padding: 6px 12px 7px 7px;
     border: 2px solid;
     border-color: #fff #3d245b #3d245b #fff;
-    background: linear-gradient(90deg, #39206f 0%, #7543a7 54%, #ba83da 100%);
+    background: linear-gradient(90deg, #39206f 0%, #63358e 54%, #7543a7 100%);
     box-shadow: 1px 1px 0 #130c23, inset 1px 1px 0 rgba(255,255,255,.42), 0 4px 14px rgba(47,20,78,.4);
     color: #fff;
     font: 700 25px/1 'Pixelify Sans', sans-serif;
@@ -480,7 +488,7 @@ button, a, [role="button"], input, label { cursor: pointer !important; }
     place-items: center;
     border: 1px solid;
     border-color: #fff #24133d #24133d #fff;
-    background: linear-gradient(135deg, #9ff4e1 0 48%, #9c58d0 49% 100%);
+    background: linear-gradient(135deg, #9ff4e1 0 48%, #c2a4e2 49% 100%);
     color: #291044;
     font-size: 20px;
     text-shadow: 1px 1px #fff;
