@@ -1,0 +1,37 @@
+#halloweenDrop { --h-ink: #24152f; --h-paper: #fff1db; --h-peach: #ffc36a; position: relative; z-index: 10; color: var(--h-paper); }
+#halloweenDrop [hidden] { display: none !important; }
+#halloweenDrop img { image-rendering: pixelated; pointer-events: none; }
+#halloweenDrop button { min-height: 44px; box-sizing: border-box; padding: 8px 12px; border: 1px solid #d5a6dd; border-radius: 5px; color: var(--h-paper); background: #432653; font: 16px/1.2 'Pixelify Sans', sans-serif; text-shadow: none; transform: none; }
+#halloweenDrop button:hover { background: #603a70; }
+#halloweenDrop button:focus-visible, #halloweenDrop input:focus-visible { outline: 3px solid var(--h-peach); outline-offset: 3px; }
+#halloweenDrop .halloween-launch { position: fixed; top: 83px; right: 30px; display: flex; flex-direction: row; gap: 8px; padding: 3px 12px 3px 3px; border-color: var(--h-peach); background: #382044; box-shadow: 0 4px 12px #24152f55; }
+.halloween-launch img { width: 44px; height: 44px; }
+.halloween-panel { position: fixed; top: 143px; right: 30px; width: min(300px, calc(100vw - 24px)); box-sizing: border-box; padding: 14px; border: 1px solid var(--h-peach); border-radius: 8px; background: #2e1b3c; box-shadow: 0 8px 24px #160e2666; max-height: calc(100dvh - 210px); overflow-y: auto; scrollbar-color: #a88ac2 #2e1b3c; }
+.halloween-panel header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.halloween-panel h2 { margin: 0; color: var(--h-peach); font: 700 25px/1.1 'Pixelify Sans', sans-serif; }
+#halloweenDrop .halloween-close { padding: 6px; min-width: 44px; font-size: 14px; }
+#halloweenDrop p { margin: 12px 0; color: var(--h-paper); font: 16px/1.4 'Pixelify Sans', sans-serif; }
+.halloween-bowl { display: flex; align-items: center; gap: 8px; }
+.halloween-bowl img { width: 84px; height: 84px; }
+.halloween-bowl strong { color: var(--h-peach); font-size: 22px; }
+#halloweenDrop .halloween-knock { width: 100%; background: #ffc36a; border-color: #ffc36a; color: #24152f; font-size: 18px; font-weight: 700; }
+#halloweenDrop .halloween-knock:hover { background: #ffe99a; }
+.halloween-status { min-height: 4.2em; }
+.halloween-quiet { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 15px; cursor: pointer; }
+.halloween-quiet input { width: 18px; height: 18px; accent-color: #ffc36a; }
+.halloween-decor { position: fixed; pointer-events: none; filter: drop-shadow(0 4px 5px #24152f55); }
+.halloween-pumpkin { width: 112px; height: 112px; bottom: 56px; left: 160px; }
+.halloween-bat { width: 112px; height: 112px; top: 15px; left: 45%; transform: rotate(-8deg); }
+.halloween-bat-small { width: 70px; height: 70px; top: 75px; left: 52%; transform: rotate(12deg); }
+.halloween-ghost { position: fixed; pointer-events: none; width: 140px; height: 140px; top: 30%; left: calc(50% - 70px); }
+.halloween-ghost.is-haunting { animation: halloween-boo 2400ms cubic-bezier(.16, 1, .3, 1) both; }
+.is-quiet .halloween-decor { display: none; }
+@keyframes halloween-boo { 0% { transform: translateY(22px) rotate(-8deg); opacity: 0; } 20%, 75% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(-30px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .halloween-ghost.is-haunting { animation: none; } }
+@media (max-width: 700px), (max-height: 520px) and (orientation: landscape) {
+  #halloweenDrop .halloween-launch { top: 7px; left: 12px; right: auto; font-size: 14px; }
+  .halloween-launch img { width: 36px; height: 36px; }
+  .halloween-panel { top: 62px; left: 12px; right: auto; max-height: calc(100dvh - 132px); }
+  .halloween-bat, .halloween-bat-small { display: none; }
+  .halloween-pumpkin { left: auto; right: 10px; bottom: 62px; width: 70px; height: 70px; }
+}
