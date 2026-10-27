@@ -1,4 +1,4 @@
-#halloweenDrop { --h-ink: #24152f; --h-paper: #fff1db; --h-peach: #ffc36a; position: relative; z-index: 10; color: var(--h-paper); }
+#halloweenDrop { --h-ink: #24152f; --h-paper: #fff1db; --h-peach: #ffc36a; position: relative; z-index: 10002; color: var(--h-paper); }
 #halloweenDrop [hidden] { display: none !important; }
 #halloweenDrop img { image-rendering: pixelated; pointer-events: none; }
 #halloweenDrop button { min-height: 44px; box-sizing: border-box; padding: 8px 12px; border: 1px solid #d5a6dd; border-radius: 5px; color: var(--h-paper); background: #432653; font: 16px/1.2 'Pixelify Sans', sans-serif; text-shadow: none; transform: none; }
