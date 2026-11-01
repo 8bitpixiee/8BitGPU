@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>CODEX OCTAVUS</title>
+<link rel="stylesheet" href="hell.css">
+</head>
+<body data-page="liber" data-calm class="v">
+
+<style>
+  body.v::before { display: none; }
+  #bwrap { position: relative; width: 100%; overflow: hidden; }
+  #bk { position: absolute; left: 50%; top: 14px; width: 730px; height: 720px; margin-left: -365px; transform-origin: 50% 0; }
+  #bk img { image-rendering: pixelated; display: block; }
+  #bk .eyec { position: absolute; width: 88px; height: 62px; }
+  #bk .eyec img { width: 100%; height: 100%; }
+  #bk .parch { position: absolute; left: 72px; top: 70px; width: 345px; height: 472px; overflow: hidden; box-shadow: inset 0 0 40px rgba(0,0,0,.7); background: #bdb460; }
+  #bk .parch img.p { width: 100%; height: 100%; object-fit: cover; transition: filter 1.2s; }
+  #bk .brain { position: absolute; left: 70px; top: 190px; width: 170px; height: 170px; filter: drop-shadow(12px 14px 14px rgba(0,0,0,.6)); transform: rotate(-12deg); transition: opacity 1s; }
+  #bk .brain img { width: 100%; height: 100%; mix-blend-mode: lighten; }
+  #bk.fade .brain { opacity: 0; }
+  #bk.fade .parch img.p { filter: brightness(1.12) contrast(.7) saturate(.6); }
+  #bk .plate { position: absolute; left: 418px; width: 118px; height: 118px; }
+  #bk .plate img { width: 100%; height: 100%; }
+  #bk .med { position: absolute; left: 536px; width: 118px; height: 118px; }
+  #bk .med img.w { width: 100%; height: 100%; }
+  #bk .med img.m { position: absolute; left: 9px; top: 9px; width: 100px; height: 100px; transition: transform .4s; }
+  #bk .med:hover img.m { transform: scale(1.12) rotate(6deg); }
+  #bk h2 { position: absolute; left: 0; width: 730px; top: 626px; text-align: center; margin: 0; color: #fff; font: italic 900 34px/1.1 Arial, Helvetica, sans-serif; letter-spacing: .08em; transform: scaleX(1.08); }
+  #bk h2 span { display: block; font-size: 25px; letter-spacing: .1em; }
+</style>
+<div id="bwrap"><div id="bk">
+  <div class="parch"><img class="p" src="../assets/hell/book/parchment.png" alt=""></div>
+  <a class="brain r" href="#"><img src="../assets/hell/tiles/t04.png" alt=""></a>
+  <h2>CODEX OCTAVUS:<span>THE BOOK OF OPEN WINDOWS</span></h2>
+</div></div>
+<div class="mini"><button id="snd" type="button">sound: off</button> &middot; esc</div>
+<script src="hell.js"></script>
+<script>
+
+(function () {
+  var bk = document.getElementById("bk");
+  var rnd = Hell.mulberry(808);
+  var cols = 8, rows = 9, CW = 88, CH = 62;
+  function eye(x, y) {
+    var d = document.createElement("a");
+    d.className = "eyec r"; d.href = "#";
+    d.style.left = (x + (rnd() * 6 - 3)) + "px"; d.style.top = (y + (rnd() * 6 - 3)) + "px";
+    d.style.width = (CW - 3 + Math.floor(rnd() * 8)) + "px"; d.style.height = (CH - 4 + Math.floor(rnd() * 8)) + "px";
+    var im = document.createElement("img");
+    var v = 1 + Math.floor(rnd() * 4);
+    im.src = "../assets/hell/book/eye" + v + ".png"; im.alt = "";
+    d.append(im); bk.append(d);
+    d.__v = v;
+    d.addEventListener("mouseenter", function () { im.src = "../assets/hell/book/eye3.png"; });
+    d.addEventListener("mouseleave", function () { im.src = "../assets/hell/book/eye" + d.__v + ".png"; });
+    return d;
+  }
+  var all = [];
+  for (var c = 0; c < cols; c++) { all.push(eye(c * 85 + 6, 2)); all.push(eye(c * 85 + 4, 546)); }
+  for (var r = 0; r < rows; r++) { all.push(eye(4, 64 + r * 54)); all.push(eye(655, 60 + r * 54)); }
+  // blinking
+  setInterval(function () {
+    var e = all[Math.floor(Math.random() * all.length)];
+    var img = e.firstChild; img.src = "../assets/hell/book/eye3.png";
+    setTimeout(function () { img.src = "../assets/hell/book/eye" + e.__v + ".png"; }, 180);
+  }, 700);
+  var meds = ["t01", "t20", "t13", "t02", "t14", "t15", "t26", "t22"];
+  var order = [0, 1, 2, 3];
+  order.forEach(function (i) {
+    var y = 68 + i * 118;
+    var p = document.createElement("div"); p.className = "plate";
+    p.style.top = y + "px"; p.innerHTML = '<img src="../assets/hell/book/wood1.png" alt="">'; bk.append(p);
+    var a = document.createElement("a"); a.className = "med r"; a.href = "#"; a.style.top = y + "px";
+    a.innerHTML = '<img class="w" src="../assets/hell/book/wood2.png" alt=""><img class="m" src="../assets/hell/book/med-' + meds[(i * 2 + Math.floor(rnd() * 2)) % meds.length] + '.png" alt="">';
+    a.addEventListener("mouseenter", function () { bk.classList.add("fade"); });
+    a.addEventListener("mouseleave", function () { bk.classList.remove("fade"); });
+    bk.append(a);
+  });
+  function fit() {
+    var k = Math.min(innerWidth / 730, (innerHeight - 6) / 725);
+    bk.style.transform = "scale(" + k + ")";
+    document.getElementById("bwrap").style.height = (725 * k) + "px";
+  }
+  fit(); addEventListener("resize", fit);
+})();
+
+</script>
+</body>
+</html>
