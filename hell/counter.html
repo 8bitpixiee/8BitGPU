@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Counter</title>
+<link rel="stylesheet" href="hell.css">
+</head>
+<body data-page="counter" class="t-b">
+
+<main class="p-wrap center">
+  <marquee scrollamount="14">YOU ARE VISITOR NUMBER</marquee>
+  <p><span class="digits" id="d">000666</span></p>
+  <p>(we do not know who the first 665 were. we know where they are.)</p>
+  <p>THIS SITE IS BEST VIEWED WITH THE EYES CLOSED AT 800 x 600</p>
+  <p><img src="../assets/media/sonicexe.gif" width="120" alt="" style="image-rendering:pixelated"> <img src="../assets/media/nickwilde.gif" width="120" alt="" style="image-rendering:pixelated"></p>
+</main>
+<div class="mini"><button id="snd" type="button">sound: off</button> &middot; esc</div>
+<script src="hell.js"></script>
+<script>
+
+var n = 666;
+setInterval(function () { n += 1 + Hell.rint(3); document.getElementById("d").textContent = String(n).padStart(6, "0"); }, 2600);
+
+</script>
+</body>
+</html>

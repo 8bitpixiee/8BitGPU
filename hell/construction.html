@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>UNDER CONSTRUCTION</title>
+<link rel="stylesheet" href="hell.css">
+</head>
+<body data-page="construction" class="t-c">
+
+<main class="p-wrap center">
+  <marquee scrollamount="12">/// UNDER CONSTRUCTION /// UNDER CONSTRUCTION /// THE WALLS ARE STILL BEING GROWN /// UNDER CONSTRUCTION ///</marquee>
+  <p class="big blink" style="color:#ff0">UNDER CONSTRUCTION</p>
+  <p>this page will be finished when you are.</p>
+  <div class="imgrid nolink" id="g"></div>
+</main>
+<div class="mini"><button id="snd" type="button">sound: off</button> &middot; esc</div>
+<script src="hell.js"></script>
+<script>
+
+var g = document.getElementById("g");
+for (var i = 0; i < 28; i++) {
+  var a = Hell.makeLink("");
+  var im = document.createElement("img");
+  im.src = Hell.IMGS[Hell.rint(Hell.IMGS.length)];
+  im.alt = "";
+  if (Math.random() < .3) im.style.filter = "hue-rotate(" + Hell.rint(360) + "deg)";
+  if (Math.random() < .2) im.style.transform = "rotate(" + (Hell.rint(40) - 20) + "deg)";
+  a.append(im);
+  g.append(a);
+}
+
+</script>
+</body>
+</html>
