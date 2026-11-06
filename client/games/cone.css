@@ -1,1 +1,23 @@
 /* cone cabinet styles */
+.cone-wrap{position:relative;width:100%;max-width:360px;margin:0 auto;aspect-ratio:320/480;max-height:100%;background:#14082e;border:2px solid #7c5cd6;border-radius:6px;overflow:hidden;user-select:none;touch-action:manipulation}
+.cone-canvas{display:block;width:100%;height:100%;image-rendering:pixelated;cursor:pointer}
+.cone-panel{position:absolute;inset:0;overflow-y:auto;padding:14px 12px;text-align:center;background:rgba(20,8,46,.88);color:#e6dcff;font-family:monospace;display:flex;flex-direction:column;align-items:center;gap:8px}
+.cone-panel[hidden]{display:none}
+.cone-panel h2{margin:0;font-size:24px;color:#ffb347;text-shadow:2px 2px #c2410c}
+.cone-panel p{margin:0;font-size:12px}
+.cone-hero{width:48px;height:48px;image-rendering:pixelated}
+.cone-final{font-size:14px!important;color:#ffe14a}
+.cone-note{min-height:14px;color:#7dffb0}
+.cone-best{color:#9d8ad8}
+.cone-modes{display:flex;flex-direction:column;gap:6px;width:100%}
+.cone-mode{display:flex;flex-direction:column;gap:2px;text-align:left;padding:6px 8px;background:#241449;color:#e6dcff;border:2px solid #4b3a86;border-left:6px solid var(--c);border-radius:4px;font:inherit;cursor:pointer}
+.cone-mode strong{font-size:13px;color:var(--c)}
+.cone-mode span{font-size:10px;opacity:.85}
+.cone-mode.on{border-color:var(--c);background:#33206a}
+.cone-mode:disabled{opacity:.45;cursor:not-allowed}
+.cone-row{display:flex;gap:6px}
+.cone-go{padding:8px 18px;font:bold 14px monospace;color:#1a0b3a;background:#ffb347;border:0;border-radius:4px;cursor:pointer;box-shadow:0 3px #c2410c}
+.cone-go.alt{background:#b9a9e8;box-shadow:0 3px #5b4a9a}
+.cone-go:active{transform:translateY(2px);box-shadow:0 1px #c2410c}
+.cone-board{width:100%}
+.cone-board .lb-canvas{width:100%}
