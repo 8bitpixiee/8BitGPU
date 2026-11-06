@@ -13,12 +13,14 @@
   "durable_objects": {
     "bindings": [
       { "name": "LOUNGE", "class_name": "LoungeRoom" },
-      { "name": "BRAWL", "class_name": "BrawlRoom" }
+      { "name": "BRAWL", "class_name": "BrawlRoom" },
+      { "name": "GAMES", "class_name": "GameRoom" }
     ]
   },
   "migrations": [
     { "tag": "v1", "new_sqlite_classes": ["LoungeRoom"] },
-    { "tag": "v2", "new_sqlite_classes": ["BrawlRoom"] }
+    { "tag": "v2", "new_sqlite_classes": ["BrawlRoom"] },
+    { "tag": "v3", "new_sqlite_classes": ["GameRoom"] }
   ],
   "d1_databases": [
     {

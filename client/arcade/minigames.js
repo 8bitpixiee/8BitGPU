@@ -27,6 +27,7 @@
   let title = null;
   let game = null;
   let fps = null;
+  let extra = null;
   let level = "normal";
   let waiting = null; // who I challenged and am waiting on
   let incoming = new Map(); // challenges from other people, by id
@@ -63,6 +64,8 @@
     game = null;
     fps?.destroy();
     fps = null;
+    extra?.destroy?.();
+    extra = null;
   }
 
   function closeWindow() {
@@ -86,12 +89,33 @@
     if (next === "pick") return pick();
     if (next === "brawl") return brawlMenu();
     if (next === "fps") return fpsView();
+    const extra = window.ArcadeGames?.get(next);
+    if (extra) return extraView(extra);
+  }
+
+  // games from client/games/*.js. they get the whole window body and clean up through destroy()
+  function extraView(info) {
+    title.textContent = info.title;
+    const host = el("div", "mg-extra");
+    host.dataset.game = info.id;
+    body.append(host);
+    win.classList.add("playing");
+    const me = () => room()?.me();
+    const ctx = {
+      me,
+      others: () => room()?.others() || [],
+      close: () => show("pick"),
+      setTitle: (text) => { title.textContent = text; },
+      leaderboard: window.Leaderboard,
+      net: (game, code, handlers) => window.GameNet.connect(game, code, handlers),
+    };
+    extra = info.mount(host, ctx) || null;
   }
 
   function pick() {
     title.textContent = "Arcade.exe · pick a game";
     const list = el("div", "mg-games");
-    for (const info of GAMES) {
+    for (const info of [...GAMES, ...(window.ArcadeGames?.list() || [])]) {
       const card = el("button", "mg-card");
       card.type = "button";
       const icon = el("img", "mg-icon");

@@ -1,4 +1,6 @@
 import { validateNameplate, nameplateFor } from "./nameplates.js";
+import { handleLeaderboard } from "./leaderboard.js";
+import { GAMES } from "./games/config.js";
 import { badgesFor, badgesForMany, cleanPicks, savePicks } from "./badges.js";
 import { handleGoogle } from "./google.js";
 import { saveWindowStyle } from "./window-style.js";
@@ -521,6 +523,22 @@ async function handleApi(request, env, url) {
       }),
     );
   }
+  if (path.startsWith("/api/leaderboard/")) return handleLeaderboard(request, env, await currentUser(request, env.DB), url);
+  // generic multiplayer relay: /api/games/ws?game=kart&room=ABCD
+  if (path === "/api/games/ws") {
+    const user = await currentUser(request, env.DB);
+    if (!user) return json({ error: "Sign in to play." }, 401);
+    if (request.headers.get("Upgrade") !== "websocket") return json({ error: "Open this from the arcade." }, 426);
+    if (request.headers.get("Origin") !== url.origin) return json({ error: "Use this website to play." }, 403);
+    const game = url.searchParams.get("game") || "";
+    const code = (url.searchParams.get("room") || "").toUpperCase();
+    if (!GAMES[game]?.max || !/^[A-Z0-9-]{3,40}$/.test(code)) return json({ error: "That room is not available." }, 404);
+    return env.GAMES.get(env.GAMES.idFromName(`${game}:${code}`)).fetch(
+      new Request("https://games/connect", {
+        headers: { Upgrade: "websocket", "x-game": game, "x-game-user": encodeURIComponent(JSON.stringify({ id: user.id, username: user.username })) },
+      }),
+    );
+  }
   if (path.startsWith("/api/chat/"))
     return handleChat(request, env, await currentUser(request, env.DB), readBody);
 
@@ -939,6 +957,7 @@ async function handleApi(request, env, url) {
 }
 
 export { LoungeRoom } from "./chat/lounge.js";
+export { GameRoom } from "./games/room.js";
 export { BrawlRoom } from "./brawl/room.js";
 
 export default {
