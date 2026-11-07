@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { BrawlSession } from "../server/brawl/session.js";
+import Sim from "../client/shared/brawl-sim.js";
 
 const players = [
   { id: "a", username: "ann", avatar: {}, race: "pixie" },
@@ -58,7 +59,7 @@ test("a tap that is over before the next tick still counts as a press", () => {
   assert.equal(session.sim.phase, "fight");
   session.sim.f[0].x = 400;
   session.sim.f[1].x = 450;
-  session.message(0, JSON.stringify({ t: "in", q: 1, h: 0, p: 16 }));
+  session.message(0, JSON.stringify({ t: "in", v: Sim.PROTOCOL, q: 1, h: 0, p: 16 }));
   advance(300);
   assert.ok(last(1).s.f[1].hp < last(1).s.f[1].max);
   assert.equal(last(0).a[0], 1);
@@ -71,10 +72,10 @@ test("junk and floods from a browser are ignored", () => {
   session.message(0, "not json");
   session.message(0, JSON.stringify({ t: "other" }));
   session.message(0, "x".repeat(500));
-  session.message(0, JSON.stringify({ t: "in", q: 1, h: 99999, p: "nope" }));
-  assert.equal(session.held[0], 99999 & 127);
+  session.message(0, JSON.stringify({ t: "in", v: Sim.PROTOCOL, q: 1, h: 99999, p: "nope" }));
+  assert.equal(session.held[0], 99999 & 255);
   assert.equal(session.pending[0], 0);
-  for (let i = 0; i < 1000; i++) session.message(1, JSON.stringify({ t: "in", q: i + 1, h: 1, p: 0 }));
+  for (let i = 0; i < 1000; i++) session.message(1, JSON.stringify({ t: "in", v: Sim.PROTOCOL, q: i + 1, h: 1, p: 0 }));
   assert.ok(session.seq[1] <= 240);
 });
 
@@ -140,4 +141,24 @@ test("a long stall skips ahead instead of replaying every missed frame", () => {
   clock.t += 5000;
   session.tick();
   assert.ok(session.sim.frame <= 10);
+});
+
+test("hello carries the protocol version and the stage is the same for the same match id", () => {
+  const { session, sent } = room();
+  session.connect(0);
+  assert.equal(JSON.parse(sent[0][0]).v, Sim.PROTOCOL);
+  const again = room();
+  assert.equal(again.session.sim.stage, session.sim.stage);
+  assert.equal(session.sim.stage, Sim.stageFor("m1"));
+});
+
+test("a page speaking an older protocol is told once and its buttons are ignored", () => {
+  const { session, sent } = room();
+  session.connect(0);
+  session.connect(1);
+  session.message(0, JSON.stringify({ t: "in", q: 1, h: 2, p: 16 }));
+  session.message(0, JSON.stringify({ t: "in", v: 1, q: 2, h: 2, p: 16 }));
+  assert.equal(session.held[0], 0);
+  assert.equal(sent[0].filter((text) => text.includes('"reason":"version"')).length, 1);
+  assert.equal(session.finished, false);
 });
