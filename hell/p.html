@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>...</title>
+<link rel="stylesheet" href="hell.css">
+</head>
+<body data-page="p" class="v">
+<script src="lore.js"></script><main id="pm"></main>
+<div class="mini"><button id="snd" type="button">sound: off</button> &middot; esc</div>
+<script src="hell.js"></script>
+<script>
+
+(function () {
+  var q = new URLSearchParams(location.search);
+  var n = parseInt(q.get("n"), 10); if (isNaN(n)) n = 0;
+  var f = parseInt(q.get("f"), 10); if (isNaN(f) || f < 1) f = 1; if (f > 9) f = 9;
+  var keys = Hell.keyCount();
+  var allowed = Hell.allowedFloor(keys);
+  var rnd = Hell.mulberry(n * 7919 + f * 104729 + 13);
+  var pm = document.getElementById("pm");
+  var LORE = window.LORE || [];
+  var strip = function (h) { return h.replace(/<[^>]+>/g, ""); };
+  var spaced = function (t) { return t.toUpperCase().split("").join(" "); };
+  var img = function () { return Hell.IMGS[Math.floor(rnd() * Hell.IMGS.length)]; };
+  var folio = function (i) { i = ((i % LORE.length) + LORE.length) % LORE.length; return LORE[i]; };
+  var floorLink = function (label, num, fl) { return "<a href='p.html?n=" + num + "&f=" + fl + "'>" + label + "</a>"; };
+  var rl = function () { return Math.floor(rnd() * 99999); };
+  Hell.S.maxFloor = Math.max(Hell.S.maxFloor || 0, Math.min(f, allowed)); Hell.save();
+  var themes = ["t-a","t-b","t-c","t-d","t-e","t-f","t-g","t-h"];
+  var cls = "v";
+  var out = "";
+  var foot = "<p class='center tiny'>floor " + f + " &middot; page " + n + "</p>";
+
+  // locked floors
+  if (f > allowed) {
+    var need = f >= 9 ? 8 : f >= 8 ? 6 : f >= 6 ? 4 : 2;
+    document.body.className = "v";
+    document.title = "locked";
+    pm.innerHTML = "<div class='wrap center' style='padding-top:14vh'><h1 style='letter-spacing:.4em'>FLOOR " + f + "</h1><p class='big' style='color:#c21;font-family:Arial,sans-serif;font-weight:700'>LOCKED</p><p>you hold " + keys + " of the " + need + " keys it asks for.</p><p class='dim'>the keys are words. the words are in the walls. say them at the keyhole.</p><p><a class='r' href='#'>go back down</a> &nbsp; <a href='keyhole.html'>the keyhole</a></p></div>";
+    return;
+  }
+
+  var title = strip(Hell.salad(rnd, 1)).replace(/[.]+$/, "").slice(0, 60);
+
+  // dead ends and one-link loops, on the upper floors
+  if (f <= 4 && n % 11 === 0) {
+    document.body.className = themes[Math.floor(rnd() * themes.length)];
+    document.body.setAttribute("data-nosoup", "");
+    var e = folio(n + f);
+    out = "<div class='p-wrap'><h1>" + e[0] + "</h1><p>" + e[1] + "</p><p class='dim'>this is a dead end. it is the same dead end as the one before, and the one before that.</p><p>" + floorLink("back", n - 1, f) + "</p></div>" + foot;
+    document.title = e[0];
+    pm.innerHTML = out; return;
+  }
+  if (f <= 4 && n % 13 === 0) {
+    document.body.className = "fl5";
+    document.body.setAttribute("data-nosoup", "");
+    pm.innerHTML = "<div class='wrap center' style='padding-top:22vh'><p>there is a door here. you came through it.</p><p>" + floorLink("the other door", n + 1, f) + "</p></div>" + foot;
+    return;
+  }
+
+  if (f === 1) {
+    cls = themes[Math.floor(rnd() * themes.length)] + (rnd() < .25 ? " cube" : "") + (rnd() < .6 ? " stz" : "");
+    var variant = Math.floor(rnd() * 5);
+    var mq = "<marquee scrollamount='" + (4 + Math.floor(rnd() * 14)) + "'>" + strip(Hell.salad(rnd, 2)) + "</marquee>";
+    var lorep = rnd() < .5 ? "<p>" + folio(Math.floor(rnd() * 999))[1] + "</p>" : "";
+    if (variant === 0) out = mq + "<div class='p-wrap'><h1 style='letter-spacing:.25em'>" + spaced(title.slice(0, 28)) + "</h1><p>" + Hell.rant(rnd, 3) + "</p><p>" + Hell.rant(rnd, 3) + "</p>" + lorep + "<p class='center'><a class='r' href='#'><img src='" + img() + "' width='" + (120 + Math.floor(rnd() * 200)) + "' alt=''></a></p><p>" + Hell.salad(rnd, 5) + "</p></div>";
+    else if (variant === 1) { var cells = ""; for (var i = 0; i < 30; i++) cells += "<a class='r' href='#'><img src='" + img() + "' alt=''></a>"; out = "<div class='imgrid'>" + cells + "</div><div class='p-wrap'>" + lorep + "<p>" + Hell.salad(rnd, 3) + "</p></div>"; }
+    else if (variant === 2) { var cs = ["#ff0","#f33","#3af","#1f1","#f3f","#fff"]; var h = ""; for (var j = 0; j < 7; j++) h += "<p class='big' style='color:" + cs[j % 6] + ";text-align:center;font-family:Arial,sans-serif;font-weight:700;margin:.3em 0'>" + strip(Hell.salad(rnd, 1)).toUpperCase() + "</p>"; out = "<div class='p-wrap'>" + h + lorep + "</div>"; }
+    else if (variant === 3) { var t = "<table class='wl'>"; for (var r = 0; r < 6; r++) { t += "<tr>"; for (var c = 0; c < 4; c++) t += "<td><a class='r' href='#'>" + strip(Hell.salad(rnd, 1)).slice(0, 30) + "</a></td>"; t += "</tr>"; } out = mq + "<div class='p-wrap'><h1 class='center'>" + title + "</h1>" + t + "</table>" + lorep + "<p>" + Hell.rant(rnd, 3) + "</p></div>"; }
+    else { var vols = ""; for (var v = 0; v < 22; v++) vols += "<a class='r' href='#'>VOL. " + Math.floor(rnd() * 999) + "</a> &nbsp; "; out = "<div class='center'><a class='r' href='#'><img src='" + img() + "' style='max-width:90%;max-height:300px' alt=''></a></div><div class='p-wrap'><p class='center spaced'>" + spaced(title.slice(0, 24)) + "</p><p>" + Hell.rant(rnd, 3) + "</p>" + lorep + "<p class='center'><a class='r' href='#'><img src='../assets/hell/enter.png' alt='enter' width='56' style='image-rendering:pixelated'></a></p><p class='center'>" + vols + "</p></div>"; }
+  } else if (f === 2) {
+    cls = "t-c";
+    var names = ["MOCHI","VEE","KIT","NULL","BETTY","ANON","A","THE ROOM","YOU"];
+    var rows = "";
+    for (var k = 0; k < 9; k++) rows += "<tr><td>" + (k + 1) + "</td><td>" + names[Math.floor(rnd() * names.length)] + "</td><td>" + String(Math.floor(rnd() * 999999)).padStart(6, "0") + "</td></tr>";
+    var sp = ""; for (var s = 0; s < 10; s++) sp += "<a class='r' href='#'><img src='" + img() + "' width='64' style='image-rendering:pixelated' alt=''></a> ";
+    out = "<marquee scrollamount='10'>INSERT COIN &nbsp;&nbsp; INSERT COIN &nbsp;&nbsp; INSERT A DIFFERENT COIN</marquee><div class='p-wrap center'><p class='big blink' style='color:#ff0'>HIGH SCORES</p><table class='wl'>" + rows + "</table><p>" + sp + "</p><p>" + folio(n)[1] + "</p><p>" + Hell.rant(rnd, 2) + "</p><p>" + floorLink("PLAY AGAIN", rl(), 2) + " &nbsp; " + floorLink("NEXT LEVEL", rl(), 3) + " &nbsp; <a class='r' href='#'>CONTINUE?</a></p></div>";
+  } else if (f === 3) {
+    cls = "fl3";
+    var a = folio(n), b = folio(n * 3 + 7), c2 = folio(n + 19);
+    out = "<div class='p-wrap'><p class='tiny'>THE ARCHIVE &mdash; shelf " + (n % 40) + ", box " + (n % 9) + "</p>" +
+      "<h2 class='fol'>FOLIO " + ((n % 256) + 1) + " &mdash; " + a[0] + "</h2><p>" + a[1] + "</p>" +
+      "<h2 class='fol'>FOLIO " + (((n * 3 + 7) % 256) + 1) + " &mdash; " + b[0] + "</h2><p>" + b[1] + "</p>" +
+      "<p class='tiny'>see also: <a class='r' href='#'>" + c2[0] + "</a>, <a class='r' href='#'>" + folio(n + 4)[0] + "</a>, <a class='r' href='#'>" + folio(n + 31)[0] + "</a></p>" +
+      "<p>" + floorLink("next box", rl(), 3) + " &nbsp; " + floorLink("down", rl(), 4) + " &nbsp; " + floorLink("up", rl(), 2) + "</p></div>";
+  } else if (f === 4) {
+    cls = "fl4";
+    var Q = [["what is a window","a hole you pay for"],["what is a door","a window you can stand in"],["who is the teacher","the one who is not in the room"],["what is the answer","the same as the question but quieter"],["why is the board dark","so you can see it"],["who is in the back row","you, and the one who is also you"],["how many are in the class","count again"],["what is for homework","look at the back of your hand"]];
+    var qa = "";
+    for (var z = 0; z < 4; z++) { var qq = Q[Math.floor(rnd() * Q.length)]; qa += "<p>Q: " + qq[0] + "?<br>A: " + qq[1] + ".</p>"; }
+    out = "<div class='p-wrap'><p class='center big'>LESSON " + (n % 99) + "</p>" + qa + "<p>" + Hell.rant(rnd, 3) + "</p><p>" + folio(n + 5)[1] + "</p><p class='center'><a class='r' href='#'><img src='../assets/hell/tiles/t24.png' width='96' style='image-rendering:pixelated' alt=''></a></p><p>" + floorLink("next lesson", rl(), 4) + " &nbsp; " + floorLink("down", rl(), 5) + " &nbsp; " + floorLink("up", rl(), 3) + "</p></div>";
+  } else if (f === 5) {
+    cls = "fl5";
+    document.body.setAttribute("data-nosoup", "");
+    var d = ((n % 256) + 256) % 256;
+    var landing = d % 16 === 0;
+    var more = landing ? "<p style='max-width:520px;margin:30px auto;text-align:left'>" + folio(d)[1] + "</p>" : "";
+    var side = landing ? "<p>" + floorLink("a staircase down", rl(), 6) + " &nbsp; " + floorLink("a staircase up", rl(), 4) + "</p>" : "";
+    out = "<div class='center' style='padding-top:22vh'><p class='tiny'>door</p><p class='big'>" + d.toString(16).toUpperCase().padStart(2, "0") + "</p>" + more + "<p>" + floorLink("next door", (d + 1) % 256, 5) + "</p>" + side + (rnd() < .06 ? "<p class='tiny'>" + floorLink("(the other direction)", (d + 200) % 256, 5) + "</p>" : "") + "</div>";
+  } else if (f === 6) {
+    cls = "t-h";
+    var m1 = folio(n * 5 + 2), m2 = folio(n + 11);
+    out = "<div style='transform:scaleX(-1)'><div class='p-wrap'><h1>" + m1[0] + "</h1><p>" + m1[1] + "</p><p>" + m2[1] + "</p><p>" + Hell.rant(rnd, 3) + "</p><p>" + floorLink("deeper", rl(), 7) + " &nbsp; " + floorLink("sideways", rl(), 6) + " &nbsp; " + floorLink("up", rl(), 5) + "</p></div></div>";
+  } else if (f === 7) {
+    cls = "fl7";
+    var line = folio(n * 7 + 3)[1].split(". ");
+    var fr = "";
+    line.forEach(function (s) {
+      var wds = s.split(" ").map(function (w) { return rnd() < .12 ? "<a class='r' href='#'>" + "&#9608;".repeat(Math.max(2, Math.min(7, w.length))) + "</a>" : w; });
+      fr += "<p class='big' style='text-align:center;mix-blend-mode:difference;color:#fff;font-size:" + (22 + Math.floor(rnd() * 30)) + "px'>" + wds.join(" ") + "</p>";
+    });
+    out = "<canvas id='st' style='position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;image-rendering:pixelated'></canvas><div class='p-wrap'>" + fr + "<p class='center'>" + floorLink("through", rl(), 8) + " &nbsp; " + floorLink("again", rl(), 7) + " &nbsp; " + floorLink("back", rl(), 6) + "</p></div>";
+    setTimeout(function () {
+      var c = document.getElementById("st"); if (!c) return;
+      c.width = 160; c.height = 90; var g = c.getContext("2d"); var im = g.createImageData(160, 90);
+      setInterval(function () { for (var i = 0; i < 160 * 90; i++) { var v = Math.random() < .5 ? Math.random() * 90 : 0; im.data[i * 4] = v; im.data[i * 4 + 1] = v; im.data[i * 4 + 2] = v; im.data[i * 4 + 3] = 255; } g.putImageData(im, 0, 0); }, 80);
+    }, 0);
+  } else if (f === 8) {
+    cls = "fl8";
+    document.body.setAttribute("data-calm", "");
+    var btns = "";
+    for (var fl = 1; fl <= 9; fl++) btns += "<button class='eb' data-f='" + fl + "'" + (fl > allowed ? " data-locked='1'" : "") + ">" + fl + "</button>";
+    out = "<div class='center' style='padding-top:10vh'><p class='tiny'>ELEVATOR</p><p class='big' id='fi'>8</p><div class='elev'>" + btns + "</div><p><button class='eb open' id='open'>OPEN</button></p><p id='em' class='dim' style='min-height:3em'></p><p style='max-width:520px;margin:20px auto'>" + folio(n)[1] + "</p></div>";
+    setTimeout(function () {
+      var em = document.getElementById("em");
+      document.querySelectorAll(".eb[data-f]").forEach(function (bt) {
+        bt.addEventListener("click", function () {
+          var to = +bt.dataset.f;
+          if (to > allowed) { em.textContent = "the button does nothing. it needs more keys than you are holding."; return; }
+          location.href = "p.html?n=" + Hell.rint(99999) + "&f=" + to;
+        });
+      });
+      document.getElementById("open").addEventListener("click", function () {
+        Hell.S.openPress = (Hell.S.openPress || 0) + 1; Hell.save();
+        var c = Hell.S.openPress;
+        if (c < 9) em.textContent = ["the doors do not move.", "nothing.", "a sound, very far away.", "the light flickers once.", "a hand?", "no. a sound that is like a hand.", "almost.", "nearly."][c - 1] || "";
+        else { em.innerHTML = "the doors open. on the other side, in white, in the font for tooltips: <b style='color:#fff;font-size:40px;letter-spacing:.3em'>OPENED</b>"; Hell.whisper("say it at the keyhole"); }
+      });
+    }, 0);
+  } else {
+    cls = "fl9";
+    document.body.setAttribute("data-nosoup", "");
+    out = "<div class='center' style='padding-top:30vh;color:#888'><p style='max-width:420px;margin:0 auto'>" + folio(n * 11 + 1)[1] + "</p><p style='margin-top:60px'><a href='keyhole.html'>the keyhole</a> &nbsp; " + floorLink("up", rl(), 8) + "</p></div>";
+  }
+  document.body.className = cls;
+  document.title = title;
+  pm.innerHTML = out + foot;
+})();
+
+</script>
+</body>
+</html>
