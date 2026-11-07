@@ -4,7 +4,7 @@
   else root.RoomSpots = api;
 })(typeof self !== "undefined" ? self : this, function () {
   // width / height of each room's stage, spots are in percent so x needs this to measure a real distance
-  const RATIO = { arcade: 1.5, pillow: 300 / 216 };
+  const RATIO = { arcade: 1.5, pillow: 300 / 216, studio: 300 / 216 };
 
   // things you have to walk up to. x, y and radius are percent of the stage (radius in height percent)
   const SPOTS = {
@@ -38,6 +38,24 @@
       },
     ],
     pillow: [],
+    studio: [
+      {
+        id: "easel",
+        label: "Easel",
+        x: 16,
+        y: 68,
+        radius: 9,
+        actions: [{ open: "studio", label: "Draw at the easel" }],
+      },
+      {
+        id: "gallery",
+        label: "Gallery wall",
+        x: 50,
+        y: 50,
+        radius: 9,
+        actions: [{ open: "studio", view: "gallery", label: "Browse saved art" }],
+      },
+    ],
   };
 
   // emotes you can't do from the chat side, only at a spot that offers them

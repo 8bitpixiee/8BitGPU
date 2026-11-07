@@ -48,3 +48,11 @@ test("the arcade cabinets open the games window and are not an emote", () => {
   assert.equal(spotAt("arcade", cabinets.x, cabinets.y)?.id, "cabinets");
   assert.equal(GATED.has(undefined), false);
 });
+
+test("the artists room easel opens the studio and is not an emote", () => {
+  const easel = SPOTS.studio.find((spot) => spot.id === "easel");
+  assert.equal(easel.actions[0].open, "studio");
+  assert.equal(spotAt("studio", easel.x, easel.y)?.id, "easel");
+  assert.equal(mayEmote("studio", "drink", easel.x, easel.y), false);
+  assert.equal(mayEmote("studio", "dance", 50, 80), true);
+});
