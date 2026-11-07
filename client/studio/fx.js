@@ -319,6 +319,612 @@
     encoders: {},
   };
 
+  // ---------- filters ----------
+  // each filter: {id,label,params,run(img,p)}; api.filters[id].apply fills in param defaults
+
+  const FILTERS = [];
+  const paletteOptions = () => PALETTES.map((p) => ({ value: p.id, label: p.name }));
+  const opt = (...vals) => vals.map((v) => ({ value: v[0], label: v[1] }));
+
+  function defineFilter(def) {
+    const withDefaults = (params) => {
+      const p = {};
+      for (const spec of def.params) p[spec.id] = spec.def;
+      return Object.assign(p, params || {});
+    };
+    const filter = {
+      id: def.id,
+      label: def.label,
+      params: def.params,
+      apply: (img, params) => def.run(img, withDefaults(params)),
+    };
+    FILTERS.push(filter);
+    api.filters[def.id] = filter;
+  }
+
+  const range = (id, label, min, max, def) => ({ id, type: "range", label, min, max, def });
+  const color = (id, label, def) => ({ id, type: "color", label, def });
+  const bool = (id, label, def) => ({ id, type: "bool", label, def });
+  const select = (id, label, options, def) => ({ id, type: "select", label, options, def });
+
+  // run fn(i, r, g, b, a) -> [r,g,b,a] or nothing to keep, over every pixel
+  function perPixel(img, fn) {
+    const out = cloneImage(img);
+    const d = out.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const res = fn(d[i], d[i + 1], d[i + 2], d[i + 3], i / 4);
+      if (res) {
+        d[i] = res[0];
+        d[i + 1] = res[1];
+        d[i + 2] = res[2];
+        if (res.length > 3) d[i + 3] = res[3];
+      }
+    }
+    return out;
+  }
+
+  const NEIGH4 = [[0, -1], [-1, 0], [1, 0], [0, 1]];
+  const NEIGH8 = NEIGH4.concat([[-1, -1], [1, -1], [-1, 1], [1, 1]]);
+
+  defineFilter({
+    id: "brightness-contrast",
+    label: "Brightness / Contrast",
+    params: [range("brightness", "Brightness", -100, 100, 0), range("contrast", "Contrast", -100, 100, 0)],
+    run(img, p) {
+      // contrast pivots around mid grey, brightness is a flat shift in 0..255 terms
+      const c = p.contrast >= 0 ? 1 + p.contrast / 50 : 1 + p.contrast / 100;
+      const b = (p.brightness / 100) * 255;
+      const f = (v) => clamp8((v - 128) * c + 128 + b);
+      return perPixel(img, (r, g, bl) => [f(r), f(g), f(bl)]);
+    },
+  });
+
+  defineFilter({
+    id: "hsl",
+    label: "Hue / Saturation / Lightness",
+    params: [range("hue", "Hue", -180, 180, 0), range("saturation", "Saturation", -100, 100, 0), range("lightness", "Lightness", -100, 100, 0)],
+    run(img, p) {
+      return perPixel(img, (r, g, b) => {
+        const [h, s, l] = rgbToHsl(r, g, b);
+        const ns = clamp(p.saturation >= 0 ? s + (1 - s) * (p.saturation / 100) : s * (1 + p.saturation / 100), 0, 1);
+        const nl = clamp(p.lightness >= 0 ? l + (1 - l) * (p.lightness / 100) : l * (1 + p.lightness / 100), 0, 1);
+        return hslToRgb(h + p.hue, ns, nl);
+      });
+    },
+  });
+
+  defineFilter({
+    id: "invert",
+    label: "Invert colors",
+    params: [bool("alpha", "Invert alpha too", false)],
+    run: (img, p) => perPixel(img, (r, g, b, a) => [255 - r, 255 - g, 255 - b, p.alpha ? 255 - a : a]),
+  });
+
+  defineFilter({
+    id: "grayscale",
+    label: "Grayscale",
+    params: [select("mode", "Method", opt(["luma", "Luma"], ["average", "Average"], ["lightness", "Lightness"]), "luma")],
+    run(img, p) {
+      return perPixel(img, (r, g, b) => {
+        const v = clamp8(p.mode === "average" ? (r + g + b) / 3 : p.mode === "lightness" ? (Math.max(r, g, b) + Math.min(r, g, b)) / 2 : luma(r, g, b));
+        return [v, v, v];
+      });
+    },
+  });
+
+  defineFilter({
+    id: "posterize",
+    label: "Posterize",
+    params: [range("levels", "Levels per channel", 2, 16, 4)],
+    run(img, p) {
+      const n = Math.max(2, p.levels | 0);
+      const f = (v) => clamp8(Math.round((v / 255) * (n - 1)) * (255 / (n - 1)));
+      return perPixel(img, (r, g, b) => [f(r), f(g), f(b)]);
+    },
+  });
+
+  defineFilter({
+    id: "threshold",
+    label: "Threshold",
+    params: [range("level", "Level", 0, 255, 128), color("dark", "Dark", "#000000"), color("light", "Light", "#ffffff")],
+    run(img, p) {
+      const dark = parseColor(p.dark);
+      const light = parseColor(p.light);
+      return perPixel(img, (r, g, b) => (luma(r, g, b) >= p.level ? light : dark));
+    },
+  });
+
+  // outer: transparent pixels touching the shape; inner: shape pixels touching the outside
+  function outlineImage(img, p, onlyRing) {
+    const { width: w, height: h } = img;
+    const col = parseColor(p.color);
+    const neigh = p.neighbours === 4 || p.neighbours === "4" ? NEIGH4 : NEIGH8;
+    const solid = (x, y, d) => x >= 0 && y >= 0 && x < w && y < h && d[(y * w + x) * 4 + 3] >= 128;
+    let cur = cloneImage(img);
+    const rounds = onlyRing ? 1 : Math.max(1, p.thickness | 0);
+    for (let round = 0; round < rounds; round++) {
+      const src = cur.data;
+      const out = cloneImage(cur);
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const i = (y * w + x) * 4;
+          const here = src[i + 3] >= 128;
+          const touches = neigh.some(([dx, dy]) => solid(x + dx, y + dy, src) !== here);
+          if (p.mode === "inner" || onlyRing) {
+            // outside the canvas counts as empty so shapes on the edge still get a border
+            const edge = here && neigh.some(([dx, dy]) => !solid(x + dx, y + dy, src));
+            if (edge) {
+              if (!onlyRing) {
+                out.data[i] = col[0];
+                out.data[i + 1] = col[1];
+                out.data[i + 2] = col[2];
+                out.data[i + 3] = 255;
+              }
+            } else if (onlyRing && here) {
+              out.data.fill(0, i, i + 4);
+            }
+          } else if (!here && touches) {
+            out.data[i] = col[0];
+            out.data[i + 1] = col[1];
+            out.data[i + 2] = col[2];
+            out.data[i + 3] = 255;
+          }
+        }
+      }
+      cur = out;
+    }
+    return cur;
+  }
+
+  defineFilter({
+    id: "outline",
+    label: "Outline",
+    params: [
+      select("mode", "Place", opt(["outer", "Outside"], ["inner", "Inside"]), "outer"),
+      select("neighbours", "Neighbours", opt([8, "8 (square)"], [4, "4 (cross)"]), 8),
+      color("color", "Color", "#000000"),
+      range("thickness", "Thickness", 1, 4, 1),
+    ],
+    run: (img, p) => outlineImage(img, p, false),
+  });
+
+  defineFilter({
+    id: "outline-only",
+    label: "Outline only",
+    params: [select("neighbours", "Neighbours", opt([8, "8 (square)"], [4, "4 (cross)"]), 8)],
+    run: (img, p) => outlineImage(img, { neighbours: p.neighbours }, true),
+  });
+
+  defineFilter({
+    id: "drop-shadow",
+    label: "Drop shadow",
+    params: [range("dx", "Offset X", -16, 16, 1), range("dy", "Offset Y", -16, 16, 1), color("color", "Color", "#000000"), range("opacity", "Opacity", 0, 100, 50)],
+    run(img, p) {
+      const { width: w, height: h } = img;
+      const col = parseColor(p.color);
+      const out = makeImage(w, h);
+      const s = img.data;
+      const d = out.data;
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const i = (y * w + x) * 4;
+          // shadow first, then the sprite composited over it
+          const sx = x - p.dx;
+          const sy = y - p.dy;
+          let sa = 0;
+          if (sx >= 0 && sy >= 0 && sx < w && sy < h) sa = (s[(sy * w + sx) * 4 + 3] / 255) * (p.opacity / 100);
+          const fa = s[i + 3] / 255;
+          const oa = fa + sa * (1 - fa);
+          if (oa <= 0) continue;
+          for (let k = 0; k < 3; k++) d[i + k] = clamp8((s[i + k] * fa + col[k] * sa * (1 - fa)) / oa);
+          d[i + 3] = clamp8(oa * 255);
+        }
+      }
+      return out;
+    },
+  });
+
+  defineFilter({
+    id: "replace-color",
+    label: "Replace color",
+    params: [color("from", "Replace", "#ff0000"), color("to", "With", "#00ff00"), range("tolerance", "Tolerance", 0, 255, 0)],
+    run(img, p) {
+      const f = parseColor(p.from);
+      const t = parseColor(p.to);
+      return perPixel(img, (r, g, b, a) => {
+        if (a === 0) return null;
+        return Math.max(Math.abs(r - f[0]), Math.abs(g - f[1]), Math.abs(b - f[2])) <= p.tolerance ? t : null;
+      });
+    },
+  });
+
+  defineFilter({
+    id: "curves",
+    label: "Curves (lite)",
+    params: [range("gamma", "Gamma", 0.2, 3, 1), range("shadows", "Shadows", -100, 100, 0), range("highlights", "Highlights", -100, 100, 0)],
+    run(img, p) {
+      // one lookup table shared by all channels: gamma, then a soft push on each end
+      const lut = new Uint8ClampedArray(256);
+      for (let i = 0; i < 256; i++) {
+        const t = Math.pow(i / 255, 1 / p.gamma);
+        const v = t + (p.shadows / 100) * 0.35 * Math.pow(1 - t, 2) * (1 - t * 0.5) + (p.highlights / 100) * 0.35 * Math.pow(t, 2) * t;
+        lut[i] = clamp8(v * 255);
+      }
+      return perPixel(img, (r, g, b) => [lut[r], lut[g], lut[b]]);
+    },
+  });
+
+  // kernels as rows; `alpha` kernels also smear transparency, `bias` shifts the result for signed kernels
+  const ones = (n) => Array.from({ length: n }, () => Array(n).fill(1));
+  const KERNELS = {
+    "blur-3x3": { k: ones(3), alpha: true },
+    "blur-5x5": { k: ones(5), alpha: true },
+    "gaussian-3x3": { k: [[1, 2, 1], [2, 4, 2], [1, 2, 1]], alpha: true },
+    "gaussian-5x5": { k: [[1, 4, 6, 4, 1], [4, 16, 24, 16, 4], [6, 24, 36, 24, 6], [4, 16, 24, 16, 4], [1, 4, 6, 4, 1]], alpha: true },
+    "sharpen-3x3": { k: [[0, -1, 0], [-1, 5, -1], [0, -1, 0]] },
+    "sharpen-strong": { k: [[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]] },
+    "edges-find": { k: [[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]] },
+    "edges-horizontal": { k: [[-1, -2, -1], [0, 0, 0], [1, 2, 1]], bias: 128 },
+    "edges-vertical": { k: [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], bias: 128 },
+    emboss: { k: [[-2, -1, 0], [-1, 1, 1], [0, 1, 2]], bias: 128 },
+    "box-blur-horizontal": { k: [[1, 1, 1, 1, 1]], alpha: true },
+    "box-blur-vertical": { k: [[1], [1], [1], [1], [1]], alpha: true },
+  };
+
+  function convolve(img, name, opts) {
+    const def = KERNELS[name] || KERNELS["blur-3x3"];
+    const strength = opts && opts.strength != null ? opts.strength : 1;
+    const { width: w, height: h } = img;
+    const k = def.k;
+    const kh = k.length;
+    const kw = k[0].length;
+    let sum = 0;
+    for (const row of k) for (const v of row) sum += v;
+    const div = sum === 0 ? 1 : sum;
+    const bias = def.bias || 0;
+    const src = img.data;
+    const out = cloneImage(img);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let a = 0;
+        let wa = 0;
+        for (let j = 0; j < kh; j++) {
+          for (let i = 0; i < kw; i++) {
+            // clamp to the edge so borders don't darken
+            const sx = clamp(x + i - (kw >> 1), 0, w - 1);
+            const sy = clamp(y + j - (kh >> 1), 0, h - 1);
+            const si = (sy * w + sx) * 4;
+            const kv = k[j][i];
+            // alpha weighting keeps transparent pixels' hidden colours out of the blur
+            const al = def.alpha ? src[si + 3] / 255 : 1;
+            r += src[si] * kv * al;
+            g += src[si + 1] * kv * al;
+            b += src[si + 2] * kv * al;
+            a += src[si + 3] * kv;
+            wa += kv * al;
+          }
+        }
+        const oi = (y * w + x) * 4;
+        const nr = def.alpha ? (wa > 0 ? r / wa : src[oi]) : r / div + bias;
+        const ng = def.alpha ? (wa > 0 ? g / wa : src[oi + 1]) : g / div + bias;
+        const nb = def.alpha ? (wa > 0 ? b / wa : src[oi + 2]) : b / div + bias;
+        // signed kernels are meant for opaque pixels, so keep their alpha
+        const na = def.alpha ? a / div : src[oi + 3];
+        out.data[oi] = clamp8(src[oi] + (nr - src[oi]) * strength);
+        out.data[oi + 1] = clamp8(src[oi + 1] + (ng - src[oi + 1]) * strength);
+        out.data[oi + 2] = clamp8(src[oi + 2] + (nb - src[oi + 2]) * strength);
+        out.data[oi + 3] = clamp8(src[oi + 3] + (na - src[oi + 3]) * strength);
+      }
+    }
+    return out;
+  }
+
+  defineFilter({
+    id: "convolution",
+    label: "Convolution matrix",
+    params: [select("kernel", "Matrix", Object.keys(KERNELS).map((k) => ({ value: k, label: k })), "blur-3x3"), range("strength", "Strength", 0, 1, 1)],
+    run: (img, p) => convolve(img, p.kernel, { strength: p.strength }),
+  });
+
+  defineFilter({
+    id: "pixelate",
+    label: "Pixelate",
+    params: [range("size", "Block size", 1, 32, 2)],
+    run(img, p) {
+      const { width: w, height: h } = img;
+      const n = Math.max(1, p.size | 0);
+      const out = cloneImage(img);
+      for (let by = 0; by < h; by += n) {
+        for (let bx = 0; bx < w; bx += n) {
+          let r = 0;
+          let g = 0;
+          let b = 0;
+          let a = 0;
+          let cnt = 0;
+          for (let y = by; y < Math.min(h, by + n); y++) {
+            for (let x = bx; x < Math.min(w, bx + n); x++) {
+              const i = (y * w + x) * 4;
+              const al = img.data[i + 3];
+              r += img.data[i] * al;
+              g += img.data[i + 1] * al;
+              b += img.data[i + 2] * al;
+              a += al;
+              cnt++;
+            }
+          }
+          const rgb = a ? [r / a, g / a, b / a] : [0, 0, 0];
+          for (let y = by; y < Math.min(h, by + n); y++) {
+            for (let x = bx; x < Math.min(w, bx + n); x++) {
+              const i = (y * w + x) * 4;
+              out.data[i] = rgb[0];
+              out.data[i + 1] = rgb[1];
+              out.data[i + 2] = rgb[2];
+              out.data[i + 3] = a / cnt;
+            }
+          }
+        }
+      }
+      return out;
+    },
+  });
+
+  // Bayer matrix of size n (power of two), values 0..n*n-1
+  function bayer(n) {
+    if (n === 1) return [[0]];
+    const h = bayer(n / 2);
+    const m = [];
+    for (let y = 0; y < n; y++) {
+      m.push([]);
+      for (let x = 0; x < n; x++) {
+        const base = h[y % (n / 2)][x % (n / 2)] * 4;
+        m[y].push(base + [[0, 2], [3, 1]][y >= n / 2 ? 1 : 0][x >= n / 2 ? 1 : 0]);
+      }
+    }
+    return m;
+  }
+  const HALFTONE4 = [[12, 5, 6, 13], [4, 0, 1, 7], [11, 3, 2, 8], [15, 10, 9, 14]];
+
+  function ditherImage(img, palColors, method, strength) {
+    const { width: w, height: h } = img;
+    const pal = palColors.map((c) => parseColor(c));
+    const nearest = nearestMapper(pal);
+    const out = cloneImage(img);
+    const d = out.data;
+    const amt = strength / 100;
+    // spread: how far ordered noise can push a channel, tied to how coarse the palette is
+    const spread = 255 / Math.max(2, Math.cbrt(pal.length));
+    const ordered = { bayer2: bayer(2), bayer4: bayer(4), bayer8: bayer(8), ordered: HALFTONE4 }[method];
+    if (ordered) {
+      const n = ordered.length;
+      const cells = n * n;
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const i = (y * w + x) * 4;
+          if (d[i + 3] < 128) continue;
+          const off = ((ordered[y % n][x % n] + 0.5) / cells - 0.5) * spread * amt;
+          const c = pal[nearest(clamp8(d[i] + off), clamp8(d[i + 1] + off), clamp8(d[i + 2] + off))];
+          d[i] = c[0];
+          d[i + 1] = c[1];
+          d[i + 2] = c[2];
+          d[i + 3] = 255;
+        }
+      }
+      return out;
+    }
+    // error diffusion on float buffers; serpentine scan avoids diagonal streaks
+    const buf = new Float32Array(w * h * 3);
+    for (let i = 0; i < w * h; i++) for (let k = 0; k < 3; k++) buf[i * 3 + k] = d[i * 4 + k];
+    const kernels =
+      method === "atkinson"
+        ? { div: 8, taps: [[1, 0, 1], [2, 0, 1], [-1, 1, 1], [0, 1, 1], [1, 1, 1], [0, 2, 1]] }
+        : { div: 16, taps: [[1, 0, 7], [-1, 1, 3], [0, 1, 5], [1, 1, 1]] };
+    for (let y = 0; y < h; y++) {
+      const ltr = y % 2 === 0;
+      for (let s = 0; s < w; s++) {
+        const x = ltr ? s : w - 1 - s;
+        const pi = y * w + x;
+        if (d[pi * 4 + 3] < 128) continue;
+        const cr = clamp8(buf[pi * 3]);
+        const cg = clamp8(buf[pi * 3 + 1]);
+        const cb = clamp8(buf[pi * 3 + 2]);
+        const c = pal[nearest(cr, cg, cb)];
+        const err = [(cr - c[0]) * amt, (cg - c[1]) * amt, (cb - c[2]) * amt];
+        d[pi * 4] = c[0];
+        d[pi * 4 + 1] = c[1];
+        d[pi * 4 + 2] = c[2];
+        d[pi * 4 + 3] = 255;
+        for (const [tx, ty, wt] of kernels.taps) {
+          const nx = x + (ltr ? tx : -tx);
+          const ny = y + ty;
+          if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+          for (let k = 0; k < 3; k++) buf[(ny * w + nx) * 3 + k] += (err[k] * wt) / kernels.div;
+        }
+      }
+    }
+    return out;
+  }
+
+  defineFilter({
+    id: "dither",
+    label: "Dither to palette",
+    params: [
+      select("palette", "Palette", paletteOptions(), "pico8"),
+      select("method", "Method", opt(["bayer2", "Bayer 2x2"], ["bayer4", "Bayer 4x4"], ["bayer8", "Bayer 8x8"], ["ordered", "Ordered (halftone)"], ["floyd-steinberg", "Floyd-Steinberg"], ["atkinson", "Atkinson"]), "bayer4"),
+      range("strength", "Strength", 0, 100, 100),
+    ],
+    run: (img, p) => ditherImage(img, paletteById(p.palette).colors, p.method, p.strength),
+  });
+
+  defineFilter({
+    id: "quantize",
+    label: "Quantize colors",
+    params: [range("colors", "Colors", 2, 256, 16)],
+    run(img, p) {
+      const pal = medianCut(collectColors(img), p.colors | 0);
+      if (!pal.length) return cloneImage(img);
+      const nearest = nearestMapper(pal);
+      return perPixel(img, (r, g, b, a) => (a < 128 ? null : pal[nearest(r, g, b)]));
+    },
+  });
+
+  defineFilter({
+    id: "hue-shift-ramp",
+    label: "Hue-shift ramp",
+    params: [range("amount", "Max shift", 0, 90, 30), range("warm", "Highlight hue", 0, 360, 55), range("cool", "Shadow hue", 0, 360, 250)],
+    run(img, p) {
+      // brighter pixels lean toward the warm hue, darker ones toward the cool hue
+      return perPixel(img, (r, g, b) => {
+        const [h, s, l] = rgbToHsl(r, g, b);
+        const t = (l - 0.5) * 2;
+        const target = t >= 0 ? p.warm : p.cool;
+        return hslToRgb(hueToward(h, target, Math.abs(t) * p.amount), s, l);
+      });
+    },
+  });
+
+  defineFilter({
+    id: "shade",
+    label: "Shading (lighten / darken)",
+    params: [select("dir", "Direction", opt(["lighten", "Lighten"], ["darken", "Darken"]), "lighten"), range("amount", "Amount", 0, 100, 15), range("hueShift", "Hue shift", 0, 60, 12)],
+    run(img, p) {
+      const up = p.dir === "lighten";
+      return perPixel(img, (r, g, b) => {
+        const [h, s, l] = rgbToHsl(r, g, b);
+        const nl = clamp(l + (up ? 1 : -1) * (p.amount / 100), 0, 1);
+        // lighter shades warm up, darker ones cool down, the usual pixel-art cheat
+        return hslToRgb(hueToward(h, up ? 60 : 250, p.hueShift), s, nl);
+      });
+    },
+  });
+
+  defineFilter({
+    id: "despeckle",
+    label: "Despeckle",
+    params: [range("agree", "Neighbours that must agree", 3, 8, 5), bool("isolated", "Remove lone pixels", true)],
+    run(img, p) {
+      const { width: w, height: h } = img;
+      const src = img.data;
+      const out = cloneImage(img);
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const i = (y * w + x) * 4;
+          if (src[i + 3] < 128) continue;
+          const counts = new Map();
+          let opaque = 0;
+          for (const [dx, dy] of NEIGH8) {
+            const nx = x + dx;
+            const ny = y + dy;
+            if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+            const ni = (ny * w + nx) * 4;
+            if (src[ni + 3] < 128) continue;
+            opaque++;
+            const key = (src[ni] << 16) | (src[ni + 1] << 8) | src[ni + 2];
+            counts.set(key, (counts.get(key) || 0) + 1);
+          }
+          if (opaque === 0) {
+            if (p.isolated) out.data[i + 3] = 0;
+            continue;
+          }
+          const mine = (src[i] << 16) | (src[i + 1] << 8) | src[i + 2];
+          let bestKey = mine;
+          let best = 0;
+          for (const [key, n] of counts) {
+            if (n > best) {
+              best = n;
+              bestKey = key;
+            }
+          }
+          if (bestKey !== mine && best >= p.agree && (counts.get(mine) || 0) === 0) {
+            out.data[i] = (bestKey >> 16) & 255;
+            out.data[i + 1] = (bestKey >> 8) & 255;
+            out.data[i + 2] = bestKey & 255;
+          }
+        }
+      }
+      return out;
+    },
+  });
+
+  defineFilter({
+    id: "noise",
+    label: "Noise",
+    params: [range("amount", "Amount", 0, 100, 20), bool("mono", "Monochrome", true), range("seed", "Seed", 0, 9999, 1), bool("onlyOpaque", "Skip transparent", true)],
+    run(img, p) {
+      const rnd = mulberry32(p.seed);
+      return perPixel(img, (r, g, b, a) => {
+        // always draw the randoms so a given seed gives the same pattern whatever the pixels are
+        const n1 = (rnd() - 0.5) * 2.55 * p.amount;
+        const n2 = p.mono ? n1 : (rnd() - 0.5) * 2.55 * p.amount;
+        const n3 = p.mono ? n1 : (rnd() - 0.5) * 2.55 * p.amount;
+        if (p.onlyOpaque && a === 0) return null;
+        return [clamp8(r + n1), clamp8(g + n2), clamp8(b + n3)];
+      });
+    },
+  });
+
+  defineFilter({
+    id: "gradient-map",
+    label: "Gradient map",
+    params: [color("dark", "Shadows", "#1a1c2c"), bool("useMid", "Use midtone", true), color("mid", "Midtones", "#b13e53"), color("light", "Highlights", "#ffcd75")],
+    run(img, p) {
+      const a = parseColor(p.dark);
+      const m = parseColor(p.mid);
+      const b = parseColor(p.light);
+      const stops = p.useMid ? [a, m, b] : [a, b];
+      return perPixel(img, (r, g, bl) => {
+        const t = luma(r, g, bl) / 255;
+        const seg = Math.min(stops.length - 2, Math.floor(t * (stops.length - 1)));
+        const lt = t * (stops.length - 1) - seg;
+        return [0, 1, 2].map((k) => clamp8(stops[seg][k] + (stops[seg + 1][k] - stops[seg][k]) * lt));
+      });
+    },
+  });
+
+  defineFilter({
+    id: "flip-rotate",
+    label: "Flip / rotate sprite",
+    params: [select("op", "Operation", opt(["flip-h", "Flip horizontal"], ["flip-v", "Flip vertical"], ["rotate-180", "Rotate 180"], ["rotate-cw", "Rotate 90 clockwise"], ["rotate-ccw", "Rotate 90 counter-clockwise"]), "flip-h")],
+    run(img, p) {
+      // size must stay put, so 90 degree turns on non-square images rotate about the centre and clip
+      const { width: w, height: h } = img;
+      const out = makeImage(w, h);
+      const cx = (w - 1) / 2;
+      const cy = (h - 1) / 2;
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          let sx = x;
+          let sy = y;
+          if (p.op === "flip-h") sx = w - 1 - x;
+          else if (p.op === "flip-v") sy = h - 1 - y;
+          else if (p.op === "rotate-180") {
+            sx = w - 1 - x;
+            sy = h - 1 - y;
+          } else {
+            const dx = x - cx;
+            const dy = y - cy;
+            // clockwise output pixel pulls from the pixel a quarter turn back
+            sx = Math.round(cx + (p.op === "rotate-cw" ? dy : -dy));
+            sy = Math.round(cy + (p.op === "rotate-cw" ? -dx : dx));
+          }
+          if (sx < 0 || sy < 0 || sx >= w || sy >= h) continue;
+          const si = (sy * w + sx) * 4;
+          const di = (y * w + x) * 4;
+          for (let k = 0; k < 4; k++) out.data[di + k] = img.data[si + k];
+        }
+      }
+      return out;
+    },
+  });
+
+  api.convolve = convolve;
+  api.KERNELS = KERNELS;
+  api.dither = ditherImage;
+  api.bayer = bayer;
+  api.outline = outlineImage;
+
   // @@FILTERS@@
   // @@ENCODERS@@
   // @@EXPORTERS@@
