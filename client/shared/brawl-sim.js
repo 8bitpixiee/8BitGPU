@@ -173,8 +173,8 @@
       def.bt = 0;
     }
     def.hp = Math.max(0, def.hp - dmg);
-    att.meter = Math.min(100, att.meter + dmg * (kind === "hit" ? 1.2 : 0.4));
-    def.meter = Math.min(100, def.meter + dmg * 0.6);
+    att.meter = Math.min(100, att.meter + dmg * (kind === "hit" ? 1.5 : 0.4));
+    def.meter = Math.min(100, def.meter + dmg * 0.8);
     if (kind !== "block" && (def.x <= LEFT + 1 || def.x >= RIGHT - 1)) att.vx = -dir * m.kb * 0.5;
     s.hitstop = kind === "block" ? 2 : kind === "gbreak" ? 10 : heavy ? 6 : 3;
     s.ev.push({ k: kind, x: def.x, y: def.y - 80, d: Math.round(dmg), side: def.side, big: heavy, c: def.combo, dir, f: s.frame });
@@ -549,7 +549,8 @@
     s.phase = "intro";
     s.pt = INTRO;
     s.rw = -1;
-    s.f = s.f.map((me) => fighter(me.side, me.race, s.hpMul[me.side]));
+    // meter carries over so a super can be saved for the next round
+    s.f = s.f.map((me) => ({ ...fighter(me.side, me.race, s.hpMul[me.side]), meter: me.meter }));
   }
 
   function step(s, bits0, bits1) {
