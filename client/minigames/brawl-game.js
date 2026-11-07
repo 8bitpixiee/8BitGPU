@@ -7,6 +7,7 @@
   const KEYS = {
     a: BIT.L, arrowleft: BIT.L, d: BIT.R, arrowright: BIT.R, w: BIT.U, arrowup: BIT.U, " ": BIT.U,
     s: BIT.B, arrowdown: BIT.B, j: BIT.A, z: BIT.A, k: BIT.H, x: BIT.H, l: BIT.S, c: BIT.S,
+    i: BIT.T, u: BIT.T, o: BIT.B | BIT.S,
   };
 
   function start(host, opts) {
@@ -18,7 +19,7 @@
     let tapped = 0;
     let ended = false;
     let raf = 0;
-    let state = BrawlSim.create(races);
+    let state = BrawlSim.create(races, { stage: opts.stage, hp: opts.hp });
     const seen = new Set();
     let net = null;
 
@@ -27,6 +28,7 @@
       mySide,
       onInput: (bit, down) => press(bit, down),
     });
+    if (opts.info) view.info(opts.info);
 
     function press(bit, down) {
       if (down) {
@@ -75,7 +77,7 @@
 
     // ---------------------------------------------------------------- cpu
     if (mode === "cpu") {
-      const brain = BrawlAI.create({ side: 1, level: opts.level, seed: (Date.now() & 0xffff) + 1 });
+      const brain = BrawlAI.create({ side: 1, level: opts.level, style: opts.style, seed: (Date.now() & 0xffff) + 1 });
       let acc = 0;
       let last = performance.now();
       const loop = (now) => {
@@ -89,7 +91,11 @@
           showEvents(state.ev);
         }
         view.render(state);
-        if (state.over && !ended && state.phase === "matchend") setTimeout(() => finish({ winner: state.winner, reason: "over" }), 2200);
+        // hp is what the player had left, the gauntlet turns it into a score bonus
+        if (state.over && !ended && state.phase === "matchend") {
+          const left = Math.round(state.f[0].hp);
+          setTimeout(() => finish({ winner: state.winner, reason: "over", hp: left, wins: [...state.wins] }), 2200);
+        }
         raf = requestAnimationFrame(loop);
       };
       raf = requestAnimationFrame(loop);
@@ -112,7 +118,7 @@
         send() {
           if (!ws || ws.readyState !== 1) return;
           unacked.push({ q: ++seq, p: tapped, at: performance.now() });
-          ws.send(JSON.stringify({ t: "in", q: seq, h: held, p: tapped }));
+          ws.send(JSON.stringify({ t: "in", v: BrawlSim.PROTOCOL, q: seq, h: held, p: tapped }));
           tapped = 0;
           if (unacked.length > 120) unacked = unacked.slice(-60);
         },
@@ -135,6 +141,11 @@
             msg = JSON.parse(event.data);
           } catch {
             return;
+          }
+          // the server runs a newer (or older) fight than this page, so predicting it would be nonsense
+          if (msg.t === "hello" && msg.v !== BrawlSim.PROTOCOL) {
+            alive = false;
+            return finish({ winner: -1, reason: "version" });
           }
           if (msg.t === "s") {
             snap = msg.s;
