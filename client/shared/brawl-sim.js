@@ -3,7 +3,7 @@
   if (typeof module === "object" && module.exports) module.exports = api;
   else root.BrawlSim = api;
 })(typeof self !== "undefined" ? self : this, function (Races) {
-  const { RACES, SPECIALS } = Races;
+  const { RACES, SPECIALS, SUPERS } = Races;
 
   // The whole fight lives here. The browser runs it for the CPU and to predict your own fighter, the
   // server runs the same code as the referee, so it never uses Math.random or the clock.
@@ -23,33 +23,74 @@
   const JUMP = 17;
   const WALK = 4.2;
   const SPECIAL_COST = 50;
+  const SUPER_COST = 100;
+  // bump this whenever the sim or the messages change, the server and the page must agree on it
+  const PROTOCOL = 2;
+  const GUARD_BREAK = 40;
 
-  const BIT = { L: 1, R: 2, U: 4, B: 8, A: 16, H: 32, S: 64 };
+  // T is the throw button, Block + Special spends a full meter on the super
+  const BIT = { L: 1, R: 2, U: 4, B: 8, A: 16, H: 32, S: 64, T: 128 };
+
+  // hazard: what the stage does to both fighters. all of it is worked out from the round clock
+  const STAGES = [
+    { id: "street", name: "Back Alley", hazard: "" },
+    { id: "neon", name: "Neon Arcade", hazard: "zap" },
+    { id: "docks", name: "Rainy Docks", hazard: "barrel" },
+    { id: "roof", name: "Windy Rooftop", hazard: "wind" },
+  ];
+  const ZAP_CYCLE = 420;
+  const BARREL_EVERY = 400;
+  const GUST_CYCLE = 300;
 
   const MOVES = {
-    light: { kind: "melee", startup: 4, active: 3, recover: 9, reach: 72, dmg: 6, kb: 3, stun: 12 },
+    light: { kind: "melee", startup: 4, active: 3, recover: 9, reach: 72, dmg: 6, kb: 3, stun: 16 },
     heavy: { kind: "melee", startup: 10, active: 4, recover: 17, reach: 92, dmg: 14, kb: 9, stun: 20, lunge: 3 },
+    airlight: { kind: "melee", air: true, startup: 5, active: 7, recover: 8, reach: 62, dmg: 5, kb: 3, stun: 14 },
+    airheavy: { kind: "melee", air: true, spike: true, startup: 9, active: 6, recover: 10, reach: 54, dmg: 11, kb: 4, stun: 22 },
+    throw: { kind: "throw", startup: 5, active: 2, recover: 24, reach: 64, dmg: 12, kb: 8, stun: 34 },
   };
 
-  const fighter = (side, race) => {
+  // what a move may be cut into once it has touched the other fighter
+  const CANCELS = {
+    light: ["light", "heavy", "special", "super"],
+    heavy: ["special", "super"],
+    airlight: ["airlight", "airheavy"],
+    special: ["super"],
+  };
+  const MAX_CHAIN = 3;
+
+  const fighter = (side, race, hpMul = 1) => {
     const stats = RACES[race] || RACES.pixie;
     return {
       side, race: RACES[race] ? race : "pixie",
       x: side ? 700 : 260, y: FLOOR, vx: 0, vy: 0, face: side ? -1 : 1,
-      hp: stats.hp, max: stats.hp, meter: 0,
+      hp: stats.hp * hpMul, max: stats.hp * hpMul, meter: 0, gd: 0, inv: 0, chain: 0,
       st: "idle", atk: "", at: 0, landed: 0, air: stats.airJumps,
       stun: 0, bs: 0, armor: 0, buff: 0, combo: 0, prev: 0, buf: "", bt: 0,
     };
   };
 
-  function create(races) {
+  // opts.stage is an index into STAGES, opts.hp scales each side's health (the gauntlet uses it)
+  function create(races, opts = {}) {
+    const hp = opts.hp || [1, 1];
     return {
       frame: 0, phase: "intro", pt: INTRO, round: 1, wins: [0, 0], timer: ROUND, hitstop: 0, rw: -1,
-      winner: -1, over: false, f: [fighter(0, races[0]), fighter(1, races[1])], p: [], ev: [],
+      winner: -1, over: false, stage: (opts.stage || 0) % STAGES.length, hpMul: [hp[0], hp[1]],
+      f: [fighter(0, races[0], hp[0]), fighter(1, races[1], hp[1])], p: [], h: [], ev: [],
     };
   }
 
-  const clone = (s) => ({ ...s, wins: [...s.wins], f: s.f.map((x) => ({ ...x })), p: s.p.map((x) => ({ ...x })), ev: [] });
+  // the same stage for both browsers and the referee, picked from the match id
+  function stageFor(text) {
+    let n = 0;
+    for (const ch of String(text)) n = (n * 31 + ch.charCodeAt(0)) >>> 0;
+    return n % STAGES.length;
+  }
+
+  const clone = (s) => ({
+    ...s, wins: [...s.wins], hpMul: [...s.hpMul], f: s.f.map((x) => ({ ...x })),
+    p: s.p.map((x) => ({ ...x })), h: s.h.map((x) => ({ ...x })), ev: [],
+  });
 
   // what the server sends, events are rebuilt by whoever runs the steps
   const snapshot = (s) => {
@@ -58,7 +99,10 @@
     return copy;
   };
 
-  const moveOf = (me) => (me.atk === "special" ? SPECIALS[RACES[me.race].special] : MOVES[me.atk]);
+  const moveOf = (me) =>
+    me.atk === "special" ? SPECIALS[RACES[me.race].special] : me.atk === "super" ? SUPERS[RACES[me.race].special] : MOVES[me.atk];
+  // the frame the move is done hitting and starts to recover, cancels open up from here
+  const recoverFrom = (m) => (m.kind === "dash" ? m.startup + m.dur : m.kind === "flurry" ? m.startup + m.hits * m.gap : m.startup + m.active);
   const total = (m) => {
     if (m.kind === "dash") return m.startup + m.dur + m.recover;
     if (m.kind === "flurry") return m.startup + m.hits * m.gap + m.recover;
@@ -70,16 +114,19 @@
   const overlaps = (a0, a1, b0, b1) => a0 < b1 && b0 < a1;
 
   // the front of the attacker against the body of the defender
-  function meleeHit(me, opp, reach) {
+  function meleeHit(me, opp, reach, low) {
+    const drop = low ? 60 : 0;
     const x0 = me.face > 0 ? me.x : me.x - reach;
     const x1 = me.face > 0 ? me.x + reach : me.x;
     return (
       overlaps(x0, x1, opp.x - BODY_HALF, opp.x + BODY_HALF) &&
-      overlaps(me.y - 115, me.y - 15, opp.y - BODY_HEIGHT, opp.y)
+      overlaps(me.y - 115 + drop, me.y - 15 + drop, opp.y - BODY_HEIGHT, opp.y)
     );
   }
 
   function applyHit(s, att, def, m, dir) {
+    // a super winds up untouchable
+    if (def.inv > 0) return false;
     let dmg = m.dmg * (att.buff > 0 ? SPECIALS.overclock.dmgMul : 1);
     const heavy = m.dmg >= 12;
     let kind = "hit";
@@ -88,19 +135,35 @@
       def.vx += dir * m.kb * 0.2;
       kind = "armor";
     } else if (def.st === "block" && def.y >= FLOOR) {
-      dmg *= 0.15;
-      def.stun = 7;
-      def.bs = 1;
-      def.vx = dir * m.kb * 0.6;
-      kind = "block";
+      // blocking soaks damage but fills the guard gauge, a full one breaks and leaves you open
+      def.gd += m.gd || (heavy ? 22 : 10);
+      if (def.gd >= GUARD_BREAK) {
+        kind = "gbreak";
+        def.gd = 0;
+        dmg *= 0.5;
+        def.stun = 50;
+        def.bs = 0;
+        def.st = "hit";
+        def.vx = dir * m.kb * 0.8;
+        def.vy = -5;
+        def.y -= 1;
+        def.atk = "";
+      } else {
+        dmg *= 0.15;
+        def.stun = 7;
+        def.bs = 1;
+        def.vx = dir * m.kb * 0.6;
+        kind = "block";
+      }
     } else {
-      dmg *= Math.pow(0.88, def.combo);
+      dmg *= Math.max(0.4, Math.pow(0.88, def.combo));
       def.combo++;
       def.stun = m.stun;
       def.bs = 0;
       def.st = "hit";
       def.vx = dir * m.kb;
-      if (def.y < FLOOR) def.vy = -5;
+      if (m.spike && def.y < FLOOR) def.vy = 9;
+      else if (def.y < FLOOR) def.vy = -5;
       else if (m.kb >= 9) {
         def.vy = -6;
         def.y -= 1;
@@ -113,9 +176,43 @@
     att.meter = Math.min(100, att.meter + dmg * (kind === "hit" ? 1.2 : 0.4));
     def.meter = Math.min(100, def.meter + dmg * 0.6);
     if (kind !== "block" && (def.x <= LEFT + 1 || def.x >= RIGHT - 1)) att.vx = -dir * m.kb * 0.5;
-    s.hitstop = kind === "block" ? 2 : heavy ? 6 : 3;
-    s.ev.push({ k: kind, x: def.x, y: def.y - 80, d: Math.round(dmg), side: def.side, big: heavy, f: s.frame });
+    s.hitstop = kind === "block" ? 2 : kind === "gbreak" ? 10 : heavy ? 6 : 3;
+    s.ev.push({ k: kind, x: def.x, y: def.y - 80, d: Math.round(dmg), side: def.side, big: heavy, c: def.combo, dir, f: s.frame });
     return true;
+  }
+
+  // throws go through a guard but not through a jump or an attack that is already out
+  function applyThrow(s, att, def, m) {
+    const dir = att.face;
+    def.hp = Math.max(0, def.hp - m.dmg);
+    def.stun = m.stun;
+    def.bs = 0;
+    def.st = "hit";
+    def.atk = "";
+    def.armor = 0;
+    def.combo = 1;
+    def.vx = dir * m.kb;
+    def.vy = -9;
+    def.y -= 1;
+    att.meter = Math.min(100, att.meter + m.dmg);
+    s.hitstop = 8;
+    s.ev.push({ k: "throw", x: def.x, y: def.y - 80, d: m.dmg, side: def.side, big: true, dir, f: s.frame });
+  }
+
+  // the stage hurts whoever is standing in the wrong place
+  function hazardHit(s, def, dmg, dir, k) {
+    if (def.inv > 0 || def.st === "ko" || def.st === "win") return;
+    def.hp = Math.max(0, def.hp - dmg);
+    def.stun = 26;
+    def.st = "hit";
+    def.bs = 0;
+    def.atk = "";
+    def.armor = 0;
+    def.combo = 0;
+    def.vx = dir * 6;
+    def.vy = -8;
+    def.y -= 1;
+    s.ev.push({ k, x: def.x, y: def.y - 80, d: dmg, side: def.side, big: true, f: s.frame });
   }
 
   function physics(me, friction) {
@@ -132,24 +229,78 @@
     me.x = Math.max(LEFT, Math.min(RIGHT, me.x));
   }
 
-  function startAttack(me, kind) {
+  function startAttack(s, me, kind) {
     me.atk = kind;
     me.at = 0;
     me.landed = 0;
     me.st = "atk";
-    me.vx = 0;
+    // air moves keep their momentum, the rest plant their feet
+    if (!MOVES[kind]?.air) me.vx = 0;
+    if (kind === "super") {
+      const m = moveOf(me);
+      me.inv = m.startup + 6;
+      s.hitstop = 36;
+      s.ev.push({ k: "super", x: me.x, y: me.y - 80, side: me.side, f: s.frame });
+    }
   }
+
+  // what a press means right now: the same button is a different move in the air or with a full meter
+  function wantOf(me, pressed, bits) {
+    const air = me.y < FLOOR;
+    if (pressed & BIT.S) return bits & BIT.B && me.meter >= SUPER_COST && !air ? "super" : "special";
+    if (pressed & BIT.T) return air ? "" : "throw";
+    if (pressed & BIT.H) return air ? "airheavy" : "heavy";
+    if (pressed & BIT.A) return air ? "airlight" : "light";
+    return "";
+  }
+
+  const affordable = (me, kind) => (kind === "special" ? me.meter >= SPECIAL_COST : kind === "super" ? me.meter >= SUPER_COST : true);
+  const pay = (me, kind) => {
+    if (kind === "special") me.meter -= SPECIAL_COST;
+    else if (kind === "super") me.meter -= SUPER_COST;
+  };
 
   function runAttack(s, me, opp) {
     const m = moveOf(me);
     const t = me.at;
     const live = (from, len) => t >= from && t < from + len;
     me.armor = m.armor && t < m.startup + m.active ? 1 : 0;
+    // cancel: a move that touched the other fighter can be cut short into the next one, that is how combos chain
+    if (me.buf && me.bt > 0 && me.landed & 1 && t >= recoverFrom(m) && (CANCELS[me.atk] || []).includes(me.buf)) {
+      const next = me.buf;
+      me.buf = "";
+      me.bt = 0;
+      if (affordable(me, next) && (next !== me.atk || me.chain < MAX_CHAIN)) {
+        const same = next === me.atk;
+        pay(me, next);
+        me.chain = same ? me.chain + 1 : 1;
+        startAttack(s, me, next);
+        s.ev.push({ k: "cancel", x: me.x, y: me.y - 70, side: me.side, f: s.frame });
+        return runAttack(s, me, opp);
+      }
+    }
     if (m.kind === "melee") {
       if (m.lunge && t === m.startup) me.vx = me.face * m.lunge;
-      if (live(m.startup, m.active) && !(me.landed & 1) && meleeHit(me, opp, m.reach)) {
+      if (live(m.startup, m.active) && !(me.landed & 1) && meleeHit(me, opp, m.reach, m.air)) {
         me.landed |= 1;
         applyHit(s, me, opp, m, me.face);
+      }
+    } else if (m.kind === "throw") {
+      const near = Math.abs(opp.x - me.x) <= m.reach && opp.y >= FLOOR && me.y >= FLOOR;
+      if (live(m.startup, m.active) && !(me.landed & 1) && near) {
+        if (opp.atk === "throw") {
+          // both grabbed at once, so both break free
+          me.landed |= 1;
+          for (const who of [me, opp]) {
+            who.atk = "";
+            who.st = "idle";
+            who.vx = (who === me ? -1 : 1) * me.face * 6;
+          }
+          s.ev.push({ k: "tech", x: (me.x + opp.x) / 2, y: me.y - 70, side: me.side, f: s.frame });
+        } else if (!opp.atk && opp.stun <= 0 && opp.st !== "ko" && opp.inv <= 0) {
+          me.landed |= 1;
+          applyThrow(s, me, opp, m);
+        }
       }
     } else if (m.kind === "area") {
       if (t === m.startup) {
@@ -211,17 +362,20 @@
     if (!me.atk) return;
     me.at = t + 1;
     physics(me, 0.85);
+    // touching the floor ends an air move early, with a little landing lag
+    if (m.air && me.y >= FLOOR && me.at < total(m) - 5) me.at = total(m) - 5;
     if (me.at >= total(m)) {
       me.atk = "";
       me.st = "idle";
       me.armor = 0;
+      me.chain = 0;
       if (me.bt > 0 && me.buf) {
         const next = me.buf;
         me.buf = "";
         me.bt = 0;
-        if (next !== "special" || me.meter >= SPECIAL_COST) {
-          if (next === "special") me.meter -= SPECIAL_COST;
-          startAttack(me, next);
+        if (affordable(me, next) && !(MOVES[next]?.air && me.y >= FLOOR)) {
+          pay(me, next);
+          startAttack(s, me, next);
         }
       }
     }
@@ -234,6 +388,9 @@
     if (me.bt > 0) me.bt--;
     if (me.st === "ko" || me.st === "win") return physics(me, 0.9);
     if (me.buff > 0) me.buff--;
+    if (me.inv > 0) me.inv--;
+    // the guard gauge drains when you are not taking hits
+    if (me.gd > 0) me.gd = Math.max(0, me.gd - (me.st === "block" ? 0.06 : 0.25));
     if (me.stun > 0) {
       me.stun--;
       me.st = me.bs ? "block" : "hit";
@@ -245,7 +402,7 @@
       }
       return;
     }
-    const want = pressed & BIT.A ? "light" : pressed & BIT.H ? "heavy" : pressed & BIT.S ? "special" : "";
+    const want = wantOf(me, pressed, bits);
     if (me.atk) {
       if (want) {
         me.buf = want;
@@ -256,9 +413,12 @@
     const grounded = me.y >= FLOOR;
     const dir = (bits & BIT.R ? 1 : 0) - (bits & BIT.L ? 1 : 0);
     const speed = WALK * stats.speed * buffMul(me, "speedMul");
-    if (want && (want !== "special" || me.meter >= SPECIAL_COST)) {
-      if (want === "special") me.meter -= SPECIAL_COST;
-      startAttack(me, want);
+    // a super you cannot afford still tries the plain special
+    const pick = want === "super" && !affordable(me, "super") ? "special" : want;
+    if (pick && affordable(me, pick)) {
+      pay(me, pick);
+      me.chain = 0;
+      startAttack(s, me, pick);
       return runAttack(s, me, opp);
     }
     if (grounded) {
@@ -302,6 +462,48 @@
     });
   }
 
+  // 0 off, 1 warning, 2 live. the view reads these too so what you see is what the referee does
+  function zapState(s) {
+    const ph = (ROUND - s.timer) % ZAP_CYCLE;
+    return ph < 300 || ph >= 380 ? 0 : ph < 360 ? 1 : 2;
+  }
+
+  // -1 or 1 while a gust blows, 0 when the air is calm
+  function windOf(s) {
+    const e = ROUND - s.timer;
+    if (e % GUST_CYCLE < 60 || e % GUST_CYCLE >= 240) return 0;
+    return Math.floor(e / GUST_CYCLE) % 2 ? -1 : 1;
+  }
+
+  function hazards(s) {
+    const kind = STAGES[s.stage].hazard;
+    const e = ROUND - s.timer;
+    if (kind === "zap") {
+      if (e % ZAP_CYCLE === 360) {
+        s.ev.push({ k: "zap", x: 480, y: FLOOR - 40, f: s.frame });
+        for (const me of s.f) if (Math.abs(me.x - 480) < 70 && me.y >= FLOOR - 10) hazardHit(s, me, 7, me.x >= 480 ? 1 : -1, "hazard");
+      }
+    } else if (kind === "wind") {
+      const w = windOf(s);
+      if (w) for (const me of s.f) if (me.st !== "ko") me.x = Math.max(LEFT, Math.min(RIGHT, me.x + w * (me.y < FLOOR ? 1.4 : 0.7)));
+    } else if (kind === "barrel") {
+      if (e > 0 && e % BARREL_EVERY === 0) {
+        const n = e / BARREL_EVERY;
+        s.h.push({ x: LEFT + 60 + ((n * 379 + s.round * 211) % 700), y: -60, vy: 0, t: 0 });
+      }
+      s.h = s.h.filter((b) => {
+        b.t++;
+        if (b.t < 45) return true;
+        b.vy += 0.9;
+        b.y += b.vy;
+        if (b.y < FLOOR) return true;
+        s.ev.push({ k: "thud", x: b.x, y: FLOOR - 10, f: s.frame });
+        for (const me of s.f) if (Math.abs(me.x - b.x) < 48 && me.y >= FLOOR - 30) hazardHit(s, me, 10, me.x >= b.x ? 1 : -1, "hazard");
+        return false;
+      });
+    }
+  }
+
   function separate(s) {
     const [a, b] = s.f;
     const gap = BODY_HALF * 2 - Math.abs(a.x - b.x);
@@ -322,6 +524,7 @@
       me.atk = "";
       me.armor = 0;
       me.stun = 0;
+      me.inv = 0;
       me.st = winner === me.side ? "win" : winner === -1 ? "idle" : "ko";
       if (me.st === "ko") {
         me.vy = -6;
@@ -330,6 +533,7 @@
       }
     }
     s.p = [];
+    s.h = [];
     s.phase = winner >= 0 && s.wins[winner] >= WINS_NEEDED ? "matchend" : "roundend";
     s.pt = ROUND_END;
     if (s.phase === "matchend") {
@@ -345,7 +549,7 @@
     s.phase = "intro";
     s.pt = INTRO;
     s.rw = -1;
-    s.f = s.f.map((me) => fighter(me.side, me.race));
+    s.f = s.f.map((me) => fighter(me.side, me.race, s.hpMul[me.side]));
   }
 
   function step(s, bits0, bits1) {
@@ -375,12 +579,15 @@
         control(s, b, a, bits1);
       }
       projectiles(s);
+      hazards(s);
       separate(s);
       for (const me of s.f) me.meter = Math.min(100, me.meter + 0.03);
       if (a.hp <= 0 || b.hp <= 0) endRound(s, "ko");
       else if (s.timer <= 0) endRound(s, "time");
       return s;
     }
+    // the knockout plays in slow motion, two frames in three do nothing
+    if (s.phase === "roundend" && s.pt > ROUND_END - 30 && s.frame % 3) return s;
     // between rounds the fighters just settle
     control(s, a, b, 0);
     control(s, b, a, 0);
@@ -389,7 +596,7 @@
   }
 
   return {
-    W, FLOOR, LEFT, RIGHT, FPS, INTRO, ROUND, ROUND_END, WINS_NEEDED, BODY_HALF, BODY_HEIGHT, SPECIAL_COST,
-    BIT, MOVES, create, clone, snapshot, step, moveOf, total, meleeHit,
+    W, FLOOR, LEFT, RIGHT, FPS, INTRO, ROUND, ROUND_END, WINS_NEEDED, BODY_HALF, BODY_HEIGHT, SPECIAL_COST, SUPER_COST,
+    GUARD_BREAK, PROTOCOL, STAGES, BIT, MOVES, CANCELS, MAX_CHAIN, zapState, windOf, stageFor, create, clone, snapshot, step, moveOf, total, meleeHit,
   };
 });
