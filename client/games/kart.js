@@ -1251,7 +1251,7 @@
       cam.x += (tx - cam.x) * 0.2;
       cam.y += (ty - cam.y) * 0.2;
       cam.a += wrapAngle(me.a - cam.a) * 0.12;
-      const zoom = 0.8 - Math.min(0.12, me.speed * 0.02) - (me.boost > 0 ? 0.04 : 0);
+      const zoom = 1.0 - Math.min(0.12, me.speed * 0.02) - (me.boost > 0 ? 0.04 : 0);
 
       g.fillStyle = tr.def.theme.grass;
       g.fillRect(0, 0, W, H);
