@@ -1,5 +1,6 @@
 import { validateNameplate, nameplateFor } from "./nameplates.js";
 import { handleLeaderboard } from "./leaderboard.js";
+import { handleStudio } from "./studio.js";
 import { GAMES } from "./games/config.js";
 import { badgesFor, badgesForMany, cleanPicks, savePicks } from "./badges.js";
 import { handleGoogle } from "./google.js";
@@ -524,6 +525,7 @@ async function handleApi(request, env, url) {
     );
   }
   if (path.startsWith("/api/leaderboard/")) return handleLeaderboard(request, env, await currentUser(request, env.DB), url);
+  if (path.startsWith("/api/studio/")) return handleStudio(request, env, await currentUser(request, env.DB), url);
   // generic multiplayer relay: /api/games/ws?game=kart&room=ABCD
   if (path === "/api/games/ws") {
     const user = await currentUser(request, env.DB);
