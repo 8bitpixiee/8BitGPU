@@ -1,0 +1,31 @@
+/* studio window and the dialogs around the editor */
+.st-window { position: fixed; inset: 2vh 2vw; z-index: 1000; display: flex; flex-direction: column; background: #2a1d38; color: #fff; border: 3px outset #e7d5f1; border-radius: 6px; box-shadow: 0 10px 40px #000a; overflow: hidden; }
+.st-window[hidden] { display: none; }
+.st-bar { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: linear-gradient(#e3a46a, #a86a3f); border-bottom: 2px solid #f4d2a8; font-size: 14px; }
+.st-close { padding: 2px 10px; font-size: 18px; line-height: 1.1; }
+.st-body { flex: 1; min-height: 0; display: flex; }
+.st-shell { position: relative; display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; background: #2a1d38; color: #fff; }
+.st-editor { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: auto; }
+.st-status { padding: 4px 10px; background: #3b2a5a; border-top: 1px solid #d4b6ee66; font-size: 12px; }
+.st-peers { padding: 3px 10px; background: #1f6f5f; font-size: 12px; }
+.st-note { margin: 8px 0; font-size: 13px; line-height: 1.4; }
+.st-dialog-back { position: absolute; inset: 0; z-index: 50; display: grid; place-items: center; background: #0008; }
+.st-dialog { display: grid; gap: 10px; width: min(420px, 92%); max-height: 88%; overflow: auto; padding: 14px; border: 2px solid #e7d5f1; border-radius: 8px; background: #2d1c40; }
+.st-dialog.wide { width: min(760px, 94%); }
+.st-dialog h2 { margin: 0; font-size: 15px; }
+.st-dialog input { padding: 5px 8px; font-size: 14px; }
+.st-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.st-actions .primary { background: #c7ffe1; color: #183f35; font-weight: 700; }
+.st-actions .danger, .st-del { background: #f4b6b6; color: #4a1414; }
+.st-sizes { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.st-custom input { width: 70px; }
+.st-code { text-transform: uppercase; letter-spacing: .3em; font: 700 22px monospace; text-align: center; }
+.st-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+.st-card { display: grid; gap: 4px; }
+.st-open { display: grid; gap: 3px; justify-items: center; padding: 6px; text-align: center; }
+.st-open img { width: 96px; height: 96px; object-fit: contain; image-rendering: pixelated; background: repeating-conic-gradient(#ccc 0 25%, #fff 0 50%) 0 0 / 12px 12px; }
+.st-open small { opacity: .75; }
+.st-del { font-size: 11px; padding: 2px 6px; }
+/* standalone studio.html */
+body.st-page { margin: 0; height: 100dvh; display: flex; flex-direction: column; background: #2a1d38; }
+@media (max-width: 650px) { .st-window { inset: 0; border-radius: 0; } }
