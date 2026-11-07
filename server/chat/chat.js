@@ -1,10 +1,11 @@
 import { nameplateFor } from "../nameplates.js";
 import { once } from "../once.js";
 import { portrait, roomAvatar } from "./chat-avatar.js";
+import Rooms from "../../client/shared/rooms.js";
 const reply = (body, status = 200) =>
   Response.json(body, { status, headers: { "cache-control": "no-store" } });
-const ROOM_IDS = ["arcade", "pillow"];
-const objectName = room => room === "arcade" ? "lounge" : "pillow";
+const ROOM_IDS = Rooms.ROOM_IDS;
+const objectName = room => Rooms.ROOMS[room].object;
 export const loungeCall = (env, path, body, room) => {
   if (!env.LOUNGE) return Promise.resolve();
   return Promise.all((room ? [room] : ROOM_IDS).map(id =>
@@ -117,9 +118,12 @@ export async function handleChat(request, env, user, readBody) {
       return reply({ error: "Use this website to join the room." }, 403);
     if (!env.LOUNGE) return reply({ error: "The room is not available right now." }, 503);
     const row = await db.prepare("SELECT avatar_json AS avatar FROM player_data WHERE user_id=?").bind(user.id).first();
+    // "from" only counts if this room really has a door to that room
+    const from = url.searchParams.get("from");
     const who = { id: user.id, username: user.username, nameplate: await nameplateFor(db,user.id), owner, avatar: roomAvatar(row?.avatar), room,
-      from: url.searchParams.get("from") === (room === "arcade" ? "pillow" : "arcade") };
-    await loungeCall(env, "/kick", { userId: user.id, reason: "room_changed" }, room === "arcade" ? "pillow" : "arcade");
+      from: Rooms.entryFrom(room, from) ? from : "" };
+    // one seat at a time: leave every other room
+    await Promise.all(ROOM_IDS.filter(id => id !== room).map(id => loungeCall(env, "/kick", { userId: user.id, reason: "room_changed" }, id)));
     return env.LOUNGE.get(env.LOUNGE.idFromName(objectName(room))).fetch(
       new Request("https://lounge/connect", {
         headers: { Upgrade: "websocket", "x-lounge-user": encodeURIComponent(JSON.stringify(who)) },
