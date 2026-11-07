@@ -358,9 +358,10 @@ for (const spot of spots) {
   });
   el("mapStage").append(marker);
 }
-// a spot either plays an emote or opens the arcade cabinet window
+// a spot either plays an emote or opens a window (arcade cabinets, the drawing studio)
 function useAction(action) {
   if (action.open === "minigames") return window.Minigames?.open();
+  if (action.open === "studio") return window.StudioShell ? window.StudioShell.open({ view: action.view }) : status("The studio is still setting up.");
   return playEmote(action.emote);
 }
 // what the arcade window needs from the room
