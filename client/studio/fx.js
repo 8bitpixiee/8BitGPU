@@ -925,10 +925,665 @@
   api.bayer = bayer;
   api.outline = outlineImage;
 
-  // @@FILTERS@@
-  // @@ENCODERS@@
-  // @@EXPORTERS@@
-  // @@REGISTER@@
+  // ---------- byte-level encoders: png, apng, zip, gif ----------
+
+  const CRC_TABLE = (() => {
+    const t = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) {
+      let c = n;
+      for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+      t[n] = c >>> 0;
+    }
+    return t;
+  })();
+
+  function crc32(bytes, start, end) {
+    let c = 0xffffffff;
+    for (let i = start || 0; i < (end == null ? bytes.length : end); i++) c = CRC_TABLE[(c ^ bytes[i]) & 255] ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  }
+
+  function adler32(bytes) {
+    let a = 1;
+    let b = 0;
+    for (let i = 0; i < bytes.length; i++) {
+      a = (a + bytes[i]) % 65521;
+      b = (b + a) % 65521;
+    }
+    return ((b << 16) | a) >>> 0;
+  }
+
+  function concat(parts) {
+    let len = 0;
+    for (const p of parts) len += p.length;
+    const out = new Uint8Array(len);
+    let o = 0;
+    for (const p of parts) {
+      out.set(p, o);
+      o += p.length;
+    }
+    return out;
+  }
+
+  const u32be = (n) => new Uint8Array([(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255]);
+  const u16be = (n) => new Uint8Array([(n >>> 8) & 255, n & 255]);
+
+  // zlib stream; real deflate when the platform has it, otherwise stored blocks (bigger but valid)
+  async function zlibCompress(bytes) {
+    if (typeof CompressionStream === "function") {
+      const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate"));
+      return new Uint8Array(await new Response(stream).arrayBuffer());
+    }
+    const parts = [new Uint8Array([0x78, 0x01])];
+    for (let i = 0; i < bytes.length || i === 0; i += 65535) {
+      const chunk = bytes.subarray(i, Math.min(bytes.length, i + 65535));
+      const last = i + 65535 >= bytes.length ? 1 : 0;
+      parts.push(new Uint8Array([last, chunk.length & 255, chunk.length >> 8, ~chunk.length & 255, (~chunk.length >> 8) & 255]), chunk);
+      if (last) break;
+    }
+    parts.push(u32be(adler32(bytes)));
+    return concat(parts);
+  }
+
+  function pngChunk(type, data) {
+    const body = concat([new Uint8Array([...type].map((c) => c.charCodeAt(0))), data]);
+    return concat([u32be(data.length), body, u32be(crc32(body))]);
+  }
+
+  const PNG_SIG = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+
+  // each scanline gets a filter byte of 0 in front
+  function rawScanlines(img) {
+    const { width: w, height: h, data } = img;
+    const raw = new Uint8Array((w * 4 + 1) * h);
+    for (let y = 0; y < h; y++) raw.set(data.subarray(y * w * 4, (y + 1) * w * 4), y * (w * 4 + 1) + 1);
+    return raw;
+  }
+
+  const ihdr = (w, h) => pngChunk("IHDR", concat([u32be(w), u32be(h), new Uint8Array([8, 6, 0, 0, 0])]));
+
+  async function encodePNG(img) {
+    const idat = await zlibCompress(rawScanlines(img));
+    return concat([PNG_SIG, ihdr(img.width, img.height), pngChunk("IDAT", idat), pngChunk("IEND", new Uint8Array(0))]);
+  }
+
+  // frames: [{image, ms}]; loops 0 = forever
+  async function encodeAPNG(frames, loops) {
+    const { width: w, height: h } = frames[0].image;
+    const parts = [PNG_SIG, ihdr(w, h), pngChunk("acTL", concat([u32be(frames.length), u32be(loops || 0)]))];
+    let seq = 0;
+    for (let i = 0; i < frames.length; i++) {
+      const ms = Math.max(1, Math.round(frames[i].ms || 100));
+      const fctl = concat([u32be(seq++), u32be(w), u32be(h), u32be(0), u32be(0), u16be(ms), u16be(1000), new Uint8Array([0, 0])]);
+      parts.push(pngChunk("fcTL", fctl));
+      const z = await zlibCompress(rawScanlines(frames[i].image));
+      // first frame doubles as the plain PNG image, later ones ride in fdAT with a sequence number
+      parts.push(i === 0 ? pngChunk("IDAT", z) : pngChunk("fdAT", concat([u32be(seq++), z])));
+    }
+    parts.push(pngChunk("IEND", new Uint8Array(0)));
+    return concat(parts);
+  }
+
+  // stored (uncompressed) zip; entries: [{name, data: Uint8Array}]
+  function encodeZip(entries) {
+    const enc = new TextEncoder();
+    const now = new Date();
+    const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1);
+    const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+    const le16 = (n) => new Uint8Array([n & 255, (n >> 8) & 255]);
+    const le32 = (n) => new Uint8Array([n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255]);
+    const locals = [];
+    const centrals = [];
+    let offset = 0;
+    for (const e of entries) {
+      const name = enc.encode(e.name);
+      const crc = crc32(e.data);
+      // flag bit 11 = names are utf-8
+      const common = [le16(20), le16(0x0800), le16(0), le16(dosTime), le16(dosDate), le32(crc), le32(e.data.length), le32(e.data.length), le16(name.length), le16(0)];
+      const local = concat([le32(0x04034b50), ...common, name, e.data]);
+      centrals.push(concat([le32(0x02014b50), le16(20), ...common, le16(0), le16(0), le16(0), le32(0), le32(offset), name]));
+      locals.push(local);
+      offset += local.length;
+    }
+    const central = concat(centrals);
+    const end = concat([le32(0x06054b50), le16(0), le16(0), le16(entries.length), le16(entries.length), le32(central.length), le32(offset), le16(0)]);
+    return concat([...locals, central, end]);
+  }
+
+  // ----- gif -----
+
+  // LZW with variable code size, emits the sub-blocked byte stream (without min-code-size byte)
+  function lzwEncode(indices, minCode) {
+    const clear = 1 << minCode;
+    const eoi = clear + 1;
+    const out = [];
+    let cur = 0;
+    let bits = 0;
+    let size = minCode + 1;
+    let next = eoi + 1;
+    let dict = new Map();
+    const emit = (code) => {
+      cur |= code << bits;
+      bits += size;
+      while (bits >= 8) {
+        out.push(cur & 255);
+        cur >>>= 8;
+        bits -= 8;
+      }
+    };
+    emit(clear);
+    let prefix = indices[0];
+    for (let i = 1; i < indices.length; i++) {
+      const c = indices[i];
+      const key = (prefix << 8) | c;
+      const hit = dict.get(key);
+      if (hit !== undefined) {
+        prefix = hit;
+        continue;
+      }
+      emit(prefix);
+      if (next < 4096) {
+        // the decoder is one entry behind, so the width bumps when the code about to be added needs it
+        if (next === 1 << size) size++;
+        dict.set(key, next++);
+      } else {
+        emit(clear);
+        dict = new Map();
+        size = minCode + 1;
+        next = eoi + 1;
+      }
+      prefix = c;
+    }
+    emit(prefix);
+    emit(eoi);
+    if (bits > 0) out.push(cur & 255);
+    const blocks = [];
+    for (let i = 0; i < out.length; i += 255) {
+      const chunk = out.slice(i, i + 255);
+      blocks.push(chunk.length, ...chunk);
+    }
+    blocks.push(0);
+    return blocks;
+  }
+
+  // opts: {loops (0 = forever), tagFrames not handled here}; frames [{image, ms}]
+  function encodeGIF(frames, opts) {
+    opts = opts || {};
+    const { width: w, height: h } = frames[0].image;
+    // one global palette across frames so colours don't flicker; index 0 is reserved for transparency
+    const all = new Map();
+    let hasAlpha = false;
+    for (const f of frames) {
+      for (const [k, n] of collectColors(f.image)) all.set(k, (all.get(k) || 0) + n);
+      for (let i = 3; i < f.image.data.length && !hasAlpha; i += 4) if (f.image.data[i] < 128) hasAlpha = true;
+    }
+    const maxColors = hasAlpha ? 255 : 256;
+    let colors = medianCut(all, maxColors);
+    if (!colors.length) colors = [[0, 0, 0]];
+    const palette = hasAlpha ? [[0, 0, 0]].concat(colors) : colors;
+    const offset = hasAlpha ? 1 : 0;
+    const nearest = nearestMapper(colors);
+    let tableBits = 1;
+    while (1 << tableBits < palette.length) tableBits++;
+    const tableSize = 1 << tableBits;
+    const le16 = (n) => [n & 255, (n >> 8) & 255];
+    const bytes = [...Array.from("GIF89a", (c) => c.charCodeAt(0)), ...le16(w), ...le16(h), 0x80 | ((tableBits - 1) << 4) | (tableBits - 1), 0, 0];
+    for (let i = 0; i < tableSize; i++) bytes.push(...(palette[i] || [0, 0, 0]));
+    const loops = opts.loops == null ? 0 : opts.loops;
+    // loops=1 means play once, which a gif does when the extension is left out
+    if (loops !== 1) bytes.push(0x21, 0xff, 11, ...Array.from("NETSCAPE2.0", (c) => c.charCodeAt(0)), 3, 1, ...le16(loops === 0 ? 0 : loops - 1), 0);
+    const minCode = Math.max(2, tableBits);
+    for (const f of frames) {
+      const d = f.image.data;
+      const idx = new Uint8Array(w * h);
+      for (let i = 0; i < w * h; i++) idx[i] = d[i * 4 + 3] < 128 ? 0 : offset + nearest(d[i * 4], d[i * 4 + 1], d[i * 4 + 2]);
+      const delay = Math.max(2, Math.round((f.ms || 100) / 10));
+      // disposal 2 clears to transparent before the next frame so old pixels don't ghost
+      bytes.push(0x21, 0xf9, 4, (hasAlpha ? 2 << 2 : 1 << 2) | (hasAlpha ? 1 : 0), ...le16(delay), 0, 0);
+      bytes.push(0x2c, 0, 0, 0, 0, ...le16(w), ...le16(h), 0, minCode);
+      for (const b of lzwEncode(idx, minCode)) bytes.push(b);
+    }
+    bytes.push(0x3b);
+    return Uint8Array.from(bytes);
+  }
+
+  // gif decoder: returns {w, h, loops, frames: [{image, ms}]}, each frame composited to full size
+  function decodeGIF(buf) {
+    const b = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+    const sig = String.fromCharCode(...b.subarray(0, 6));
+    if (sig !== "GIF87a" && sig !== "GIF89a") throw new Error("not a gif");
+    let p = 6;
+    const u16 = () => {
+      const v = b[p] | (b[p + 1] << 8);
+      p += 2;
+      return v;
+    };
+    const w = u16();
+    const h = u16();
+    const flags = b[p++];
+    p += 2; // background index, aspect ratio
+    const readTable = (n) => {
+      const t = [];
+      for (let i = 0; i < n; i++) t.push([b[p++], b[p++], b[p++]]);
+      return t;
+    };
+    const globalTable = flags & 0x80 ? readTable(1 << ((flags & 7) + 1)) : null;
+    const frames = [];
+    let loops = 1;
+    let gce = null;
+    let canvas = makeImage(w, h);
+    const skipBlocks = () => {
+      while (b[p] !== 0) p += b[p] + 1;
+      p++;
+    };
+    while (p < b.length && b[p] !== 0x3b) {
+      const intro = b[p++];
+      if (intro === 0x21) {
+        const label = b[p++];
+        if (label === 0xf9) {
+          p++; // block size
+          const pk = b[p++];
+          const delay = u16();
+          const trans = b[p++];
+          p++;
+          gce = { disposal: (pk >> 2) & 7, transparent: pk & 1 ? trans : -1, ms: delay * 10 };
+        } else if (label === 0xff && b[p] === 11 && String.fromCharCode(...b.subarray(p + 1, p + 12)) === "NETSCAPE2.0") {
+          p += 12;
+          p++; // sub-block length 3
+          p++; // sub-block id 1
+          const n = u16();
+          loops = n === 0 ? 0 : n + 1;
+          p++;
+        } else {
+          skipBlocks();
+        }
+      } else if (intro === 0x2c) {
+        const fx0 = u16();
+        const fy0 = u16();
+        const fw = u16();
+        const fh = u16();
+        const lf = b[p++];
+        const table = lf & 0x80 ? readTable(1 << ((lf & 7) + 1)) : globalTable;
+        const minCode = b[p++];
+        const data = [];
+        while (b[p] !== 0) {
+          for (let i = 0; i < b[p]; i++) data.push(b[p + 1 + i]);
+          p += b[p] + 1;
+        }
+        p++;
+        const px = lzwDecode(data, minCode, fw * fh);
+        const before = cloneImage(canvas);
+        const order = [];
+        if (lf & 0x40) {
+          // interlaced rows come in four passes
+          for (const [start, step] of [[0, 8], [4, 8], [2, 4], [1, 2]]) for (let y = start; y < fh; y += step) order.push(y);
+        } else for (let y = 0; y < fh; y++) order.push(y);
+        for (let row = 0; row < fh; row++) {
+          const y = fy0 + order[row];
+          for (let x = 0; x < fw; x++) {
+            const ci = px[row * fw + x];
+            if (gce && ci === gce.transparent) continue;
+            if (x + fx0 >= w || y >= h) continue;
+            const c = (table && table[ci]) || [0, 0, 0];
+            canvas.data.set([c[0], c[1], c[2], 255], (y * w + x + fx0) * 4);
+          }
+        }
+        frames.push({ image: cloneImage(canvas), ms: gce ? gce.ms : 100 });
+        const disposal = gce ? gce.disposal : 0;
+        if (disposal === 2) {
+          for (let y = fy0; y < Math.min(h, fy0 + fh); y++) canvas.data.fill(0, (y * w + fx0) * 4, (y * w + Math.min(w, fx0 + fw)) * 4);
+        } else if (disposal === 3) canvas = before;
+        gce = null;
+      } else break;
+    }
+    return { w, h, loops, frames };
+  }
+
+  function lzwDecode(data, minCode, total) {
+    const out = new Uint8Array(total);
+    const clear = 1 << minCode;
+    const eoi = clear + 1;
+    let size = minCode + 1;
+    let prefix = new Int32Array(4096);
+    let suffix = new Uint8Array(4096);
+    let next = eoi + 1;
+    let prev = -1;
+    let cur = 0;
+    let bits = 0;
+    let di = 0;
+    let o = 0;
+    const stack = [];
+    const first = (code) => {
+      while (code >= clear) code = prefix[code];
+      return code;
+    };
+    while (o < total) {
+      while (bits < size && di < data.length) {
+        cur |= data[di++] << bits;
+        bits += 8;
+      }
+      if (bits < size) break;
+      const code = cur & ((1 << size) - 1);
+      cur >>>= size;
+      bits -= size;
+      if (code === clear) {
+        size = minCode + 1;
+        next = eoi + 1;
+        prev = -1;
+        continue;
+      }
+      if (code === eoi) break;
+      let walk = code;
+      if (prev === -1) {
+        out[o++] = code;
+        prev = code;
+        continue;
+      }
+      if (code >= next) {
+        // the one tricky case: code not in the table yet, it's prev + first(prev)
+        stack.push(first(prev));
+        walk = prev;
+      }
+      while (walk >= clear) {
+        stack.push(suffix[walk]);
+        walk = prefix[walk];
+      }
+      stack.push(walk);
+      const f = stack[stack.length - 1];
+      while (stack.length && o < total) out[o++] = stack.pop();
+      stack.length = 0;
+      if (next < 4096) {
+        prefix[next] = prev;
+        suffix[next] = f;
+        next++;
+        if (next === 1 << size && size < 12) size++;
+      }
+      prev = code;
+    }
+    return out;
+  }
+
+  Object.assign(api.encoders, { crc32, adler32, zlibCompress, encodePNG, encodeAPNG, encodeZip, encodeGIF, decodeGIF, lzwEncode, lzwDecode, concat });
+
+  // ---------- exporters + importers ----------
+
+  // nearest-neighbour upscale, 1..16
+  function scaleImage(img, n) {
+    n = clamp(Math.round(n) || 1, 1, 16);
+    if (n === 1) return img;
+    const { width: w, height: h } = img;
+    const out = makeImage(w * n, h * n);
+    for (let y = 0; y < h * n; y++) {
+      const sy = (y / n) | 0;
+      for (let x = 0; x < w * n; x++) {
+        const si = (sy * w + ((x / n) | 0)) * 4;
+        out.data.set(img.data.subarray(si, si + 4), (y * w * n + x) * 4);
+      }
+    }
+    return out;
+  }
+
+  const tagOf = (doc, name) => (doc.tags || []).find((t) => t.name === name);
+
+  // frames to export: whole animation, a named tag, or an explicit from/to
+  function frameRange(doc, opts) {
+    const total = doc.frames.length;
+    let from = 0;
+    let to = total - 1;
+    const tag = opts.tag && tagOf(doc, opts.tag);
+    if (tag) {
+      from = tag.from;
+      to = tag.to;
+    } else if (opts.from != null || opts.to != null) {
+      from = opts.from == null ? 0 : opts.from;
+      to = opts.to == null ? total - 1 : opts.to;
+    }
+    from = clamp(from | 0, 0, total - 1);
+    to = clamp(to | 0, from, total - 1);
+    const list = [];
+    for (let i = from; i <= to; i++) list.push(i);
+    // ping-pong plays forward then back without repeating the end frames
+    if (tag && tag.direction === "pingpong" && list.length > 2) for (let i = list.length - 2; i > 0; i--) list.push(list[i]);
+    if (tag && tag.direction === "reverse") list.reverse();
+    return list;
+  }
+
+  function gatherFrames(doc, opts) {
+    const scale = opts.scale || 1;
+    return frameRange(doc, opts).map((i) => ({ index: i, image: scaleImage(doc.flatten(i), scale), ms: doc.frames[i].ms || 100 }));
+  }
+
+  const pngBlob = async (img) => new Blob([await encodePNG(img)], { type: "image/png" });
+  const baseName = (opts, doc) => (opts && opts.name) || (doc && doc.name) || "sprite";
+
+  // sheet layout: where each frame goes and how big the sheet is
+  function layoutSheet(count, fw, fh, opts) {
+    const pad = opts.padding || 0; // space around each frame
+    const gap = opts.spacing || 0; // space between frames
+    const border = opts.border || 0;
+    let cols;
+    if (opts.layout === "horizontal") cols = count;
+    else if (opts.layout === "vertical") cols = 1;
+    else if (opts.layout === "grid") cols = clamp(opts.columns | 0 || Math.ceil(Math.sqrt(count)), 1, count);
+    else {
+      // packed: pick the column count with the smallest, squarest sheet
+      let best = null;
+      for (let c = 1; c <= count; c++) {
+        const r = Math.ceil(count / c);
+        const cw = c * (fw + pad * 2) + (c - 1) * gap;
+        const ch = r * (fh + pad * 2) + (r - 1) * gap;
+        const score = cw * ch * 1000 + Math.abs(cw - ch);
+        if (!best || score < best.score) best = { c, score };
+      }
+      cols = best.c;
+    }
+    const rows = Math.ceil(count / cols);
+    const cellW = fw + pad * 2;
+    const cellH = fh + pad * 2;
+    let w = border * 2 + cols * cellW + (cols - 1) * gap;
+    let h = border * 2 + rows * cellH + (rows - 1) * gap;
+    if (opts.layout === "packed" && opts.pow2) {
+      const up = (n) => 1 << Math.ceil(Math.log2(Math.max(1, n)));
+      w = up(w);
+      h = up(h);
+    }
+    const positions = [];
+    for (let i = 0; i < count; i++) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      positions.push({ x: border + col * (cellW + gap) + pad, y: border + row * (cellH + gap) + pad });
+    }
+    return { positions, w, h, cols, rows };
+  }
+
+  // paints a frame into the sheet at x,y
+  function blit(dst, src, x, y) {
+    for (let row = 0; row < src.height; row++) {
+      const si = row * src.width * 4;
+      dst.data.set(src.data.subarray(si, si + src.width * 4), ((y + row) * dst.width + x) * 4);
+    }
+  }
+
+  // returns {image, json}; json follows Aseprite's --data format (hash or array)
+  function buildSpriteSheet(doc, opts) {
+    opts = opts || {};
+    const frames = gatherFrames(doc, opts);
+    const scale = clamp(opts.scale || 1, 1, 16);
+    const fw = doc.w * scale;
+    const fh = doc.h * scale;
+    const lay = layoutSheet(frames.length, fw, fh, opts);
+    const sheet = makeImage(lay.w, lay.h);
+    frames.forEach((f, i) => blit(sheet, f.image, lay.positions[i].x, lay.positions[i].y));
+    const name = baseName(opts, doc);
+    const entries = frames.map((f, i) => ({
+      filename: `${name} ${i}.aseprite`,
+      frame: { x: lay.positions[i].x, y: lay.positions[i].y, w: fw, h: fh },
+      rotated: false,
+      trimmed: false,
+      spriteSourceSize: { x: 0, y: 0, w: fw, h: fh },
+      sourceSize: { w: fw, h: fh },
+      duration: f.ms,
+    }));
+    const frameTags = (doc.tags || []).map((t) => ({ name: t.name, from: t.from, to: t.to, direction: t.direction || "forward" }));
+    const meta = {
+      app: "8BitGPU Pixel Studio",
+      version: "1.0",
+      image: opts.imageName || `${name}.png`,
+      format: "RGBA8888",
+      size: { w: lay.w, h: lay.h },
+      scale: String(scale),
+      frameTags,
+      layers: (doc.layers || []).map((l) => ({ name: l.name, opacity: l.opacity == null ? 255 : l.opacity, blendMode: l.blendMode || "normal" })),
+      slices: [],
+    };
+    const framesOut = opts.jsonFormat === "array" ? entries : Object.fromEntries(entries.map((e) => [e.filename, (({ filename, ...rest }) => rest)(e)]));
+    return { image: sheet, json: { frames: framesOut, meta } };
+  }
+
+  const zipOf = (entries) => new Blob([encodeZip(entries)], { type: "application/zip" });
+
+  const EXPORTERS = [
+    {
+      id: "png",
+      label: "PNG image",
+      ext: "png",
+      mime: "image/png",
+      async export(doc, opts) {
+        opts = opts || {};
+        const i = clamp(opts.frame == null ? 0 : opts.frame, 0, doc.frames.length - 1);
+        return pngBlob(scaleImage(doc.flatten(i), opts.scale || 1));
+      },
+    },
+    {
+      id: "png-sequence",
+      label: "PNG sequence (zip)",
+      ext: "zip",
+      mime: "application/zip",
+      async export(doc, opts) {
+        opts = opts || {};
+        const name = baseName(opts, doc);
+        const frames = gatherFrames(doc, opts);
+        const digits = String(frames.length).length;
+        const entries = [];
+        for (let i = 0; i < frames.length; i++) {
+          entries.push({ name: `${name}_${String(i).padStart(digits, "0")}.png`, data: await encodePNG(frames[i].image) });
+        }
+        return zipOf(entries);
+      },
+    },
+    {
+      id: "spritesheet",
+      label: "Sprite sheet (PNG)",
+      ext: "png",
+      mime: "image/png",
+      async export(doc, opts) {
+        return pngBlob(buildSpriteSheet(doc, opts).image);
+      },
+    },
+    {
+      id: "atlas-json",
+      label: "Sprite sheet atlas (Aseprite JSON)",
+      ext: "json",
+      mime: "application/json",
+      async export(doc, opts) {
+        return new Blob([JSON.stringify(buildSpriteSheet(doc, opts).json, null, 2)], { type: "application/json" });
+      },
+    },
+    {
+      id: "spritesheet-zip",
+      label: "Sprite sheet + atlas (zip)",
+      ext: "zip",
+      mime: "application/zip",
+      async export(doc, opts) {
+        opts = opts || {};
+        const name = baseName(opts, doc);
+        const sheet = buildSpriteSheet(doc, Object.assign({}, opts, { imageName: `${name}.png` }));
+        return zipOf([
+          { name: `${name}.png`, data: await encodePNG(sheet.image) },
+          { name: `${name}.json`, data: new TextEncoder().encode(JSON.stringify(sheet.json, null, 2)) },
+        ]);
+      },
+    },
+    {
+      id: "gif",
+      label: "Animated GIF",
+      ext: "gif",
+      mime: "image/gif",
+      async export(doc, opts) {
+        opts = opts || {};
+        return new Blob([encodeGIF(gatherFrames(doc, opts), { loops: opts.loops })], { type: "image/gif" });
+      },
+    },
+    {
+      id: "apng",
+      label: "Animated PNG",
+      ext: "png",
+      mime: "image/apng",
+      async export(doc, opts) {
+        opts = opts || {};
+        return new Blob([await encodeAPNG(gatherFrames(doc, opts), opts.loops || 0)], { type: "image/apng" });
+      },
+    },
+    {
+      id: "webp",
+      label: "WebP image (if supported)",
+      ext: "webp",
+      mime: "image/webp",
+      async export(doc, opts) {
+        opts = opts || {};
+        // only the browser's canvas can write webp; bail out clearly where it can't
+        if (typeof document === "undefined") throw new Error("WebP export needs a browser");
+        const img = scaleImage(doc.flatten(clamp(opts.frame == null ? 0 : opts.frame, 0, doc.frames.length - 1)), opts.scale || 1);
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        canvas.getContext("2d").putImageData(img, 0, 0);
+        const blob = await new Promise((res) => canvas.toBlob(res, "image/webp", 1));
+        if (!blob || blob.type !== "image/webp") throw new Error("this browser can't encode WebP");
+        return blob;
+      },
+    },
+  ];
+  for (const e of EXPORTERS) api.exporters[e.id] = e;
+
+  // ----- importers -----
+
+  async function imageFromFile(file) {
+    const bmp = await createImageBitmap(file);
+    const canvas = typeof OffscreenCanvas === "function" ? new OffscreenCanvas(bmp.width, bmp.height) : Object.assign(document.createElement("canvas"), { width: bmp.width, height: bmp.height });
+    const ctx = canvas.getContext("2d");
+    // 1:1 draw, so pixels come back exactly as stored
+    ctx.drawImage(bmp, 0, 0);
+    return ctx.getImageData(0, 0, bmp.width, bmp.height);
+  }
+
+  api.importers.png = async (file) => {
+    const imageData = await imageFromFile(file);
+    return { w: imageData.width, h: imageData.height, imageData };
+  };
+  // gif keeps every frame: {w, h, loops, frames:[{image, ms}], imageData: first frame}
+  api.importers.gif = async (file) => {
+    const gif = decodeGIF(new Uint8Array(await file.arrayBuffer()));
+    return Object.assign(gif, { imageData: gif.frames[0] && gif.frames[0].image });
+  };
+
+  api.buildSpriteSheet = buildSpriteSheet;
+  api.scaleImage = scaleImage;
+  api.layoutSheet = layoutSheet;
+
+  // ---------- plug into the editor ----------
+
+  function register() {
+    const studio = root.PixelStudio;
+    if (!studio) return;
+    for (const f of FILTERS) if (studio.registerFilter) studio.registerFilter({ id: f.id, label: f.label, params: f.params, apply: f.apply });
+    for (const p of PALETTES) if (studio.registerPalette) studio.registerPalette({ id: p.id, name: p.name, colors: p.colors.slice() });
+    for (const e of EXPORTERS) if (studio.registerExporter) studio.registerExporter(e);
+    studio.importers = Object.assign(studio.importers || {}, api.importers);
+    studio.paletteTools = api.tools;
+  }
+  register();
+
 
   return api;
 });

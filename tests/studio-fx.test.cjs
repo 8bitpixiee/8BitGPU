@@ -156,3 +156,198 @@ test("shade, hue-shift ramp, gradient map, noise, flip, despeckle", () => {
   sp.data.set([200, 0, 0, 255], 16);
   assert.deepEqual(px(run("despeckle", sp), 1, 1), [10, 10, 10, 255]);
 });
+
+// ---- encoders ----
+const zlib = require("node:zlib");
+
+const noisy = (w, h, seed, alphaHole) => {
+  const im = fx.makeImage(w, h);
+  let s = seed;
+  for (let i = 0; i < w * h; i++) {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    im.data.set(alphaHole && i % 11 === 0 ? [0, 0, 0, 0] : [s & 255, (s >> 8) & 255, (s >> 16) & 255, 255], i * 4);
+  }
+  return im;
+};
+
+// tiny png reader for checking our writer (we only ever write filter 0)
+function readPng(buf) {
+  let p = 8;
+  const chunks = [];
+  while (p < buf.length) {
+    const len = buf.readUInt32BE(p);
+    const type = buf.toString("latin1", p + 4, p + 8);
+    const body = buf.subarray(p + 8, p + 8 + len);
+    assert.equal(buf.readUInt32BE(p + 8 + len), fx.encoders.crc32(buf, p + 4, p + 8 + len), "crc " + type);
+    chunks.push({ type, body });
+    p += 12 + len;
+  }
+  const head = chunks[0].body;
+  const w = head.readUInt32BE(0);
+  const h = head.readUInt32BE(4);
+  const raw = zlib.inflateSync(Buffer.concat(chunks.filter((c) => c.type === "IDAT").map((c) => c.body)));
+  const out = new Uint8Array(w * h * 4);
+  for (let y = 0; y < h; y++) out.set(raw.subarray(y * (w * 4 + 1) + 1, (y + 1) * (w * 4 + 1)), y * w * 4);
+  return { w, h, data: out, chunks };
+}
+
+test("png encoder round-trips through zlib", async () => {
+  const im = noisy(13, 7, 3, true);
+  const png = readPng(Buffer.from(await fx.encoders.encodePNG(im)));
+  assert.equal(png.w, 13);
+  assert.deepEqual(Array.from(png.data), Array.from(im.data));
+});
+
+test("stored-block zlib fallback inflates correctly", async () => {
+  const saved = global.CompressionStream;
+  global.CompressionStream = undefined;
+  try {
+    const big = Uint8Array.from({ length: 70000 }, (_, i) => (i * 7) & 255);
+    const z = await fx.encoders.zlibCompress(big);
+    assert.deepEqual(Array.from(zlib.inflateSync(Buffer.from(z))), Array.from(big));
+  } finally {
+    global.CompressionStream = saved;
+  }
+});
+
+test("zip writer makes a readable store archive", () => {
+  const data = new TextEncoder().encode("hello zip");
+  const zip = Buffer.from(fx.encoders.encodeZip([{ name: "a.txt", data }]));
+  assert.equal(zip.readUInt32LE(0), 0x04034b50);
+  assert.equal(zip.readUInt32LE(14), fx.encoders.crc32(data));
+  assert.equal(zip.readUInt16LE(zip.length - 22 + 10), 1);
+  assert.equal(zip.subarray(30 + 5, 30 + 5 + 9).toString(), "hello zip");
+});
+
+test("gif: lzw round trip incl. dictionary overflow", () => {
+  const px = Uint8Array.from({ length: 20000 }, (_, i) => ((i * i) >> 3) & 63);
+  const stream = fx.encoders.lzwEncode(px, 6);
+  const data = [];
+  for (let p = 0; stream[p] !== 0; p += stream[p] + 1) for (let i = 1; i <= stream[p]; i++) data.push(stream[p + i]);
+  assert.deepEqual(Array.from(fx.encoders.lzwDecode(data, 6, px.length)), Array.from(px));
+});
+
+test("gif encode/decode keeps exact colours, transparency, delays and loop", () => {
+  const mk = (seed) => {
+    const im = fx.makeImage(12, 10);
+    for (let i = 0; i < 120; i++) im.data.set(i % 9 === 0 ? [0, 0, 0, 0] : [((i + seed) % 5) * 50, ((i * 3) % 4) * 80, seed * 60, 255], i * 4);
+    return im;
+  };
+  const frames = [mk(0), mk(1), mk(2)].map((image, i) => ({ image, ms: 40 + i * 30 }));
+  const gif = fx.encoders.encodeGIF(frames, { loops: 0 });
+  assert.equal(Buffer.from(gif).toString("latin1", 0, 6), "GIF89a");
+  const dec = fx.encoders.decodeGIF(gif);
+  assert.equal(dec.frames.length, 3);
+  assert.equal(dec.loops, 0);
+  assert.deepEqual(dec.frames.map((f) => f.ms), [40, 70, 100]);
+  frames.forEach((f, k) => assert.deepEqual(Array.from(dec.frames[k].image.data), Array.from(f.image.data)));
+  assert.equal(fx.encoders.decodeGIF(fx.encoders.encodeGIF(frames, { loops: 1 })).loops, 1);
+  assert.equal(fx.encoders.decodeGIF(fx.encoders.encodeGIF(frames, { loops: 3 })).loops, 3);
+});
+
+test("gif with many colours quantizes to 256 and still decodes", () => {
+  const im = noisy(64, 64, 9, false);
+  const dec = fx.encoders.decodeGIF(fx.encoders.encodeGIF([{ image: im, ms: 100 }]));
+  assert.ok(fx.collectColors(dec.frames[0].image).size <= 256);
+});
+
+// ---- exporters ----
+const fakeDoc = () => ({
+  w: 4,
+  h: 3,
+  name: "hero",
+  frames: [{ ms: 100 }, { ms: 200 }, { ms: 300 }, { ms: 400 }],
+  tags: [{ name: "walk", from: 1, to: 3, direction: "forward" }],
+  layers: [{ name: "Layer 1" }],
+  flatten: (i) => noisy(4, 3, i + 1, false),
+});
+const bytesOf = async (blob) => Buffer.from(await blob.arrayBuffer());
+
+test("exporters expose the registry shape", () => {
+  for (const id of ["png", "png-sequence", "spritesheet", "atlas-json", "spritesheet-zip", "gif", "apng", "webp"]) {
+    const e = fx.exporters[id];
+    assert.ok(e && e.label && e.ext && e.mime && typeof e.export === "function", id);
+  }
+});
+
+test("png exporter scales nearest-neighbour", async () => {
+  const doc = fakeDoc();
+  const png = readPng(await bytesOf(await fx.exporters.png.export(doc, { frame: 2, scale: 3 })));
+  assert.equal(png.w, 12);
+  assert.equal(png.h, 9);
+  const src = doc.flatten(2);
+  assert.deepEqual(Array.from(png.data.slice((4 * 12 + 7) * 4, (4 * 12 + 7) * 4 + 4)), Array.from(src.data.slice((1 * 4 + 2) * 4, (1 * 4 + 2) * 4 + 4)));
+});
+
+test("spritesheet layouts and atlas json", () => {
+  const doc = fakeDoc();
+  const h = fx.buildSpriteSheet(doc, { layout: "horizontal" });
+  assert.equal(h.image.width, 16);
+  assert.equal(h.image.height, 3);
+  const v = fx.buildSpriteSheet(doc, { layout: "vertical", padding: 1 });
+  assert.equal(v.image.width, 6);
+  assert.equal(v.image.height, 4 * 5);
+  const g = fx.buildSpriteSheet(doc, { layout: "grid", columns: 2, spacing: 2, border: 1 });
+  assert.equal(g.image.width, 1 * 2 + 8 + 2);
+  assert.equal(g.image.height, 1 * 2 + 6 + 2);
+  const p = fx.buildSpriteSheet(doc, { layout: "packed" });
+  assert.ok(p.image.width * p.image.height <= 8 * 6);
+  const j = h.json;
+  assert.equal(Object.keys(j.frames).length, 4);
+  assert.deepEqual(j.frames["hero 2.aseprite"].frame, { x: 8, y: 0, w: 4, h: 3 });
+  assert.equal(j.frames["hero 2.aseprite"].duration, 300);
+  assert.deepEqual(j.meta.frameTags, [{ name: "walk", from: 1, to: 3, direction: "forward" }]);
+  assert.equal(j.meta.format, "RGBA8888");
+  assert.deepEqual(j.meta.size, { w: 16, h: 3 });
+  // frame pixels land where the atlas says
+  assert.deepEqual(Array.from(h.image.data.slice(8 * 4, 8 * 4 + 4)), Array.from(doc.flatten(2).data.slice(0, 4)));
+  const arr = fx.buildSpriteSheet(doc, { jsonFormat: "array" }).json;
+  assert.ok(Array.isArray(arr.frames) && arr.frames[0].filename);
+});
+
+test("png sequence zip and tag ranges", async () => {
+  const zip = await bytesOf(await fx.exporters["png-sequence"].export(fakeDoc(), { tag: "walk", name: "hero" }));
+  assert.equal(zip.readUInt16LE(zip.length - 22 + 10), 3);
+  assert.ok(zip.includes("hero_0.png"));
+  assert.ok(zip.includes("hero_2.png"));
+});
+
+test("gif and apng exporters", async () => {
+  const doc = fakeDoc();
+  const gif = fx.encoders.decodeGIF(await bytesOf(await fx.exporters.gif.export(doc, { tag: "walk", scale: 2, loops: 0 })));
+  assert.equal(gif.frames.length, 3);
+  assert.equal(gif.w, 8);
+  assert.deepEqual(gif.frames.map((f) => f.ms), [200, 300, 400]);
+  const apng = await bytesOf(await fx.exporters.apng.export(doc, { loops: 2 }));
+  const png = readPng(apng); // the default image is frame 0
+  assert.deepEqual(Array.from(png.data), Array.from(doc.flatten(0).data));
+  const types = png.chunks.map((c) => c.type);
+  assert.equal(types.filter((t) => t === "fcTL").length, 4);
+  assert.equal(types.filter((t) => t === "fdAT").length, 3);
+  assert.equal(png.chunks.find((c) => c.type === "acTL").body.readUInt32BE(4), 2);
+  assert.ok(types.indexOf("acTL") < types.indexOf("IDAT"));
+});
+
+test("registers into PixelStudio and stays quiet when it's missing", () => {
+  const seen = { f: [], p: [], e: [] };
+  global.PixelStudio = {
+    registerFilter: (f) => seen.f.push(f.id),
+    registerPalette: (p) => seen.p.push(p.id),
+    registerExporter: (e) => seen.e.push(e.id),
+  };
+  const path = require.resolve("../client/studio/fx.js");
+  delete require.cache[path];
+  const savedSelf = global.self;
+  global.self = global; // the plugin looks for PixelStudio on its root
+  try {
+    require(path);
+  } finally {
+    global.self = savedSelf;
+    delete global.PixelStudio;
+    delete require.cache[path];
+  }
+  assert.ok(seen.f.includes("outline") && seen.f.length >= 20);
+  assert.ok(seen.p.length >= 20);
+  assert.ok(seen.e.includes("gif"));
+  assert.doesNotThrow(() => require(path));
+});
