@@ -1,1 +1,19 @@
 /* dungeon cabinet styles */
+.dg-root { min-height: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px 12px; background: radial-gradient(#2b1260, #0d0618); color: #e6dcff; font-family: monospace; overflow: auto; }
+.dg-title { margin: 4px 0 0; font-size: 28px; letter-spacing: 2px; color: #ffd54a; text-shadow: 2px 2px #000; }
+.dg-sub, .dg-help, .dg-notice { margin: 0; max-width: 480px; text-align: center; font-size: 13px; line-height: 1.4; }
+.dg-help { font-size: 11px; color: #b9a9e8; }
+.dg-notice { color: #ff9a9a; }
+.dg-code { margin: 0; font-size: 44px; letter-spacing: 8px; color: #8affb0; text-shadow: 2px 2px #000; }
+.dg-row, .dg-race { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.dg-racename { min-width: 240px; text-align: center; font-size: 14px; }
+.dg-btn { padding: 8px 18px; font: bold 14px monospace; color: #fff; background: linear-gradient(#8a5fd0, #4a2a8a); border: 2px outset #cfa6ff; border-radius: 6px; cursor: pointer; }
+.dg-btn:hover, .dg-btn:focus-visible { background: linear-gradient(#a37ae8, #5d38a8); }
+.dg-btn.small { padding: 3px 10px; font-size: 12px; }
+.dg-input { width: 130px; padding: 7px 8px; font: bold 14px monospace; text-transform: uppercase; text-align: center; color: #fff; background: #1a0d33; border: 2px inset #8a5fd0; border-radius: 4px; }
+.dg-players { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 14px; }
+.dg-score { display: grid; gap: 4px; text-align: center; font-size: 14px; }
+.dg-score strong { font-size: 20px; color: #ffd54a; }
+.dg-lb canvas { max-width: 100%; height: auto; }
+.dg-canvas { width: min(100%, 960px); aspect-ratio: 640 / 400; max-height: calc(100% - 44px); image-rendering: pixelated; background: #07040c; border: 2px solid #4a2a8a; touch-action: none; outline: none; cursor: crosshair; }
+.dg-bar { display: flex; gap: 8px; }

@@ -826,3 +826,896 @@
     statsOf, addRelic, hurtEnemy, hurtPlayer, snapshot, lerpSnap, score, raceOf: Races.raceOf, specialOf: Races.specialOf, RACES: Races.RACES,
   };
 });
+
+// ======================================================================== the cabinet (browser only)
+(() => {
+  if (typeof window === "undefined" || !window.ArcadeGames || !window.DungeonSim) return;
+  const Sim = window.DungeonSim;
+  const T = Sim.TILE;
+  const VW = 640;
+  const VH = 400;
+  const ART = "client/games/dungeon/";
+  const ICON = ART + "icon.png";
+
+  const img = (name) => { const i = new Image(); i.src = ART + name + ".png"; return i; };
+  const ready = (i) => i.complete && i.naturalWidth > 0;
+  const MON = { slime: 0, bat: 1, archer: 2, brute: 3, mage: 4, boss: 5 };
+  const MON_SIZE = { slime: 28, bat: 24, archer: 30, brute: 44, mage: 30, boss: 84 };
+
+  // body color, accent style for the little procedural heroes
+  const LOOK = {
+    pixie: ["#ff8ad8", "wings"], deerbra: ["#b0763c", "antlers"], bovadill: ["#d8b27a", "horns"], thixie: ["#6bcf5a", "wings"],
+    null: ["#3a2f55", "visor"], voidling: ["#4a2f7a", "visor"], clanker: ["#9aa3b5", "visor"], mermaid: ["#4fd0d9", "fin"],
+    anthro: ["#f0953a", "ears"], macho: ["#d9453f", "none"], femme: ["#d94fb0", "ears"], maxie: ["#4f7fe0", "none"], pickle: ["#6ba84a", "none"],
+  };
+
+  // ---------------------------------------------------------------- sound (tiny synth, no files)
+  function makeAudio() {
+    let ac = null;
+    let muted = false;
+    const last = {};
+    const tone = (f, d, type = "square", vol = 0.04, slide = 0, delay = 0) => {
+      if (muted) return;
+      try {
+        ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+        const t = ac.currentTime + delay;
+        const o = ac.createOscillator();
+        const g = ac.createGain();
+        o.type = type;
+        o.frequency.setValueAtTime(f, t);
+        if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, f + slide), t + d);
+        g.gain.setValueAtTime(vol, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+        o.connect(g).connect(ac.destination);
+        o.start(t);
+        o.stop(t + d + 0.02);
+      } catch { /* no audio, no problem */ }
+    };
+    const SFX = {
+      shoot: () => tone(520, 0.07, "square", 0.025, -220),
+      hit: () => tone(210, 0.08, "sawtooth", 0.04, -120),
+      kill: () => { tone(330, 0.14, "square", 0.045, -240); tone(110, 0.2, "sawtooth", 0.04, -60, 0.05); },
+      hurt: () => tone(150, 0.22, "sawtooth", 0.07, -90),
+      gold: () => { tone(880, 0.05, "square", 0.03); tone(1320, 0.08, "square", 0.03, 0, 0.05); },
+      potion: () => tone(500, 0.12, "sine", 0.06, 400),
+      relic: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.12, "triangle", 0.06, 0, i * 0.07)),
+      chest: () => [392, 523, 659].forEach((f, i) => tone(f, 0.1, "square", 0.04, 0, i * 0.06)),
+      special: () => tone(300, 0.25, "sawtooth", 0.05, 500),
+      ring: () => tone(180, 0.2, "triangle", 0.05, 200),
+      boom: () => tone(90, 0.35, "sawtooth", 0.07, -50),
+      blink: () => tone(900, 0.1, "sine", 0.04, -600),
+      down: () => tone(220, 0.5, "sawtooth", 0.07, -170),
+      revive: () => [330, 440, 554].forEach((f, i) => tone(f, 0.12, "triangle", 0.06, 0, i * 0.08)),
+      descend: () => tone(600, 0.6, "triangle", 0.06, -450),
+      floor: () => { tone(196, 0.3, "square", 0.04); tone(147, 0.5, "square", 0.04, 0, 0.18); },
+      bossdead: () => [262, 330, 392, 523].forEach((f, i) => tone(f, 0.25, "square", 0.05, 0, i * 0.12)),
+    };
+    return {
+      play(name) {
+        const now = performance.now();
+        if (now - (last[name] || 0) < 45) return; // many hits in one frame should not stack into noise
+        last[name] = now;
+        SFX[name]?.();
+      },
+      toggle: () => (muted = !muted),
+      get muted() { return muted; },
+      close() { try { ac?.close(); } catch { /* ignore */ } },
+    };
+  }
+
+  const el = (tag, cls, text) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  };
+
+  // ---------------------------------------------------------------- drawing helpers (no state)
+  function bar(g, x, y, w, h, frac, col, back = "#1a1420") {
+    g.fillStyle = "#000";
+    g.fillRect(x - 1, y - 1, w + 2, h + 2);
+    g.fillStyle = back;
+    g.fillRect(x, y, w, h);
+    g.fillStyle = col;
+    g.fillRect(x, y, Math.max(0, Math.min(1, frac)) * w, h);
+  }
+
+  function drawHero(g, p, t, isMe) {
+    const [col, acc] = LOOK[p.race] || LOOK.pixie;
+    const bob = p.down ? 0 : Math.sin(t / 130 + p.x) * 1;
+    g.fillStyle = "rgba(0,0,0,.35)";
+    g.beginPath();
+    g.ellipse(p.x, p.y + 10, 11, 4, 0, 0, 7);
+    g.fill();
+    if (p.down) {
+      g.fillStyle = col;
+      g.fillRect(p.x - 12, p.y + 2, 24, 8);
+      g.fillStyle = "#f0d0b0";
+      g.fillRect(p.x + 8, p.y, 8, 8);
+      g.strokeStyle = "#8affb0";
+      g.lineWidth = 3;
+      g.beginPath();
+      g.arc(p.x, p.y - 6, 14, -Math.PI / 2, -Math.PI / 2 + (p.rev / Sim.REVIVE_FRAMES) * Math.PI * 2);
+      g.stroke();
+      return;
+    }
+    const y = p.y + bob;
+    if (p.inv && Math.floor(t / 70) % 2) g.globalAlpha = 0.45;
+    if (acc === "wings") { g.fillStyle = "rgba(200,240,255,.8)"; g.fillRect(p.x - 14, y - 10, 7, 10); g.fillRect(p.x + 7, y - 10, 7, 10); }
+    g.fillStyle = "#1a1420";
+    g.fillRect(p.x - 8, y - 12, 16, 22);
+    g.fillStyle = col;
+    g.fillRect(p.x - 7, y - 3, 14, 12);
+    g.fillStyle = acc === "visor" ? "#2a2438" : "#f0d0b0";
+    g.fillRect(p.x - 6, y - 11, 12, 9);
+    g.fillStyle = acc === "visor" ? "#7fe0ff" : "#1a1420";
+    const fx = Math.cos(p.face) > 0 ? 1 : -1;
+    g.fillRect(p.x - 3 + fx, y - 8, 2, 2);
+    g.fillRect(p.x + 1 + fx, y - 8, 2, 2);
+    g.fillStyle = col;
+    if (acc === "antlers") { g.fillRect(p.x - 8, y - 17, 2, 7); g.fillRect(p.x + 6, y - 17, 2, 7); g.fillRect(p.x - 10, y - 17, 3, 2); g.fillRect(p.x + 7, y - 17, 3, 2); }
+    if (acc === "horns") { g.fillRect(p.x - 7, y - 15, 3, 5); g.fillRect(p.x + 4, y - 15, 3, 5); }
+    if (acc === "ears") { g.fillRect(p.x - 7, y - 16, 4, 6); g.fillRect(p.x + 3, y - 16, 4, 6); }
+    if (acc === "fin") g.fillRect(p.x - 3, y - 16, 6, 6);
+    g.globalAlpha = 1;
+    if (p.buff) { g.strokeStyle = "#ffd54a"; g.lineWidth = 2; g.strokeRect(p.x - 10, y - 14, 20, 26); }
+    if (isMe) {
+      g.fillStyle = "#fff";
+      g.fillRect(p.x - 3, y - 24, 6, 3);
+    } else {
+      g.font = "9px monospace";
+      g.textAlign = "center";
+      g.fillStyle = "#fff";
+      g.fillText(String(p.name).slice(0, 10), p.x, y - 20);
+    }
+  }
+
+  function drawTouch(g, pointers, stick, touchBtn) {
+    g.globalAlpha = 0.45;
+    const st = [...pointers.values()].find((p) => p.kind === "stick");
+    const bx = st ? st.ox : 90;
+    const by = st ? st.oy : VH - 90;
+    g.strokeStyle = "#fff";
+    g.lineWidth = 2;
+    g.beginPath();
+    g.arc(bx, by, 40, 0, 7);
+    g.stroke();
+    g.fillStyle = "#fff";
+    g.beginPath();
+    g.arc(bx + stick.dx * 40, by + stick.dy * 40, 16, 0, 7);
+    g.fill();
+    g.fillStyle = touchBtn.atk ? "#ffd54a" : "#e0455a";
+    g.beginPath();
+    g.arc(VW - 70, VH - 70, 34, 0, 7);
+    g.fill();
+    g.fillStyle = touchBtn.sp ? "#ffd54a" : "#6b5fa8";
+    g.beginPath();
+    g.arc(VW - 150, VH - 50, 26, 0, 7);
+    g.fill();
+    g.globalAlpha = 1;
+    g.fillStyle = "#fff";
+    g.font = "bold 11px monospace";
+    g.textAlign = "center";
+    g.fillText("ATK", VW - 70, VH - 66);
+    g.fillText("SP", VW - 150, VH - 46);
+  }
+
+  ArcadeGames.register({
+    id: "dungeon",
+    title: "Dungeon Crawl",
+    blurb: "1-4 player co-op roguelite. Descend, loot relics, beat a boss every third floor.",
+    icon: ICON,
+    mount(host, ctx) {
+      const art = { tiles: img("tiles"), mon: img("monsters"), items: img("items") };
+      const audio = makeAudio();
+      const me0 = ctx.me();
+      const myName = me0?.username || "hero";
+      let race = Sim.raceOf(me0?.avatar);
+      const raceList = Object.keys(Sim.RACES);
+
+      const root = el("div", "dg-root");
+      host.append(root);
+      let screen = "menu";
+      let net = null;
+      let lb = null;
+      let game = null; // the running game, see startRun
+      let myId = "solo";
+      let netHostId = null;
+      let lobby = new Map();
+
+      const clear = () => { lb?.destroy(); lb = null; root.replaceChildren(); };
+      function stopNet() {
+        if (net) { try { net.close(); } catch { /* ignore */ } }
+        net = null;
+        lobby = new Map();
+      }
+      const newSeed = () => (Math.floor(Math.random() * 2 ** 32) ^ Date.now()) >>> 0;
+      const newCode = () => Array.from({ length: 4 }, () => "ABCDEFGHJKLMNPQRSTUVWXYZ"[Math.floor(Math.random() * 24)]).join("");
+
+      // ------------------------------------------------------------ menu
+      function showMenu(msg) {
+        stopGame();
+        stopNet();
+        screen = "menu";
+        clear();
+        root.append(el("h2", "dg-title", "Dungeon Crawl"));
+        root.append(el("p", "dg-sub", "Fight down through the floors. Your race decides your special. Bring up to three friends."));
+        if (msg) root.append(el("p", "dg-notice", msg));
+
+        const pick = el("div", "dg-race");
+        const prev = el("button", "dg-btn small", "<");
+        const next = el("button", "dg-btn small", ">");
+        const label = el("div", "dg-racename");
+        const refresh = () => {
+          label.textContent = `${Sim.RACES[race].name} · ${Sim.specialOf(race).name} (${Sim.MELEE.has(race) ? "melee" : "ranged"})`;
+        };
+        prev.onclick = () => { race = raceList[(raceList.indexOf(race) + raceList.length - 1) % raceList.length]; refresh(); };
+        next.onclick = () => { race = raceList[(raceList.indexOf(race) + 1) % raceList.length]; refresh(); };
+        refresh();
+        pick.append(prev, label, next);
+        root.append(pick);
+
+        const row = el("div", "dg-row");
+        const solo = el("button", "dg-btn", "Solo run");
+        solo.onclick = () => startRun({ role: "solo", seed: newSeed(), roster: [{ id: "solo", name: myName, race }] });
+        const hostBtn = el("button", "dg-btn", "Host co-op");
+        hostBtn.onclick = () => openRoom(newCode());
+        row.append(solo, hostBtn);
+        root.append(row);
+
+        const joinRow = el("div", "dg-row");
+        const input = el("input", "dg-input");
+        input.maxLength = 8;
+        input.placeholder = "ROOM CODE";
+        input.setAttribute("aria-label", "room code");
+        const join = el("button", "dg-btn", "Join");
+        join.onclick = () => { const c = input.value.trim().toUpperCase(); if (c.length >= 3) openRoom(c); };
+        input.onkeydown = (e) => { e.stopPropagation(); if (e.key === "Enter") join.onclick(); };
+        joinRow.append(input, join);
+        root.append(joinRow);
+
+        root.append(el("p", "dg-help", "Move: WASD / arrows. Attack: Space or J (auto-aims, or hold the mouse to aim). Special: K / Shift. Mute: M. Touch: on-screen stick and buttons."));
+        const lbHost = el("div", "dg-lb");
+        root.append(lbHost);
+        lb = ctx.leaderboard.mountCanvas(lbHost, "dungeon", { me: me0?.username, width: 380, height: 300, title: "DUNGEON" });
+        const quit = el("button", "dg-btn small", "Back to arcade");
+        quit.onclick = () => ctx.close();
+        root.append(quit);
+      }
+
+      // ------------------------------------------------------------ lobby + networking
+      function openRoom(code) {
+        stopNet();
+        screen = "lobby";
+        let said = false;
+        net = ctx.net("dungeon", code, {
+          onHello() {
+            myId = net.id;
+            netHostId = net.host();
+            const info = { id: net.id, name: myName, race };
+            if (net.isHost()) lobby.set(info.id, info);
+            else if (!said) { said = true; net.send({ t: "join", ...info }, netHostId); }
+            showLobby(code);
+          },
+          onJoin() { if (screen === "lobby") showLobby(code); },
+          onLeave(id) {
+            lobby.delete(id);
+            if (game) {
+              if (game.role === "client" && id === game.hostId) endRun("The host left the dungeon.");
+              else if (game.role === "host") Sim.removePlayer(game.sim, id);
+            } else if (id === netHostId && screen === "lobby") showMenu("The host left the room.");
+            else if (screen === "lobby") { broadcastLobby(); showLobby(code); }
+          },
+          onMsg: (from, d) => onMsg(from, d, code),
+          onClose() {
+            if (game && !game.ended && game.role !== "solo") endRun("Lost the connection.");
+            else if (screen === "lobby") showMenu("Could not stay connected to that room.");
+          },
+        });
+      }
+
+      function broadcastLobby() {
+        if (net?.isHost()) net.send({ t: "lobby", list: [...lobby.values()] });
+      }
+
+      function onMsg(from, d, code) {
+        if (!d || typeof d !== "object") return;
+        if (net.isHost()) {
+          if (d.t === "join") {
+            const info = { id: from, name: String(d.name || "hero").slice(0, 20), race: Sim.RACES[d.race] ? d.race : "pixie" };
+            if (game) {
+              if (game.role !== "host") return;
+              if (Sim.addPlayer(game.sim, info)) net.send({ t: "start", seed: game.sim.seed }, from);
+              else net.send({ t: "full" }, from);
+            } else {
+              lobby.set(from, info);
+              broadcastLobby();
+              if (screen === "lobby") showLobby(code);
+            }
+          } else if (d.t === "in" && game?.role === "host" && d.i && typeof d.i === "object") {
+            Sim.setInput(game.sim, from, d.i);
+          }
+          return;
+        }
+        if (d.t === "lobby" && Array.isArray(d.list)) {
+          lobby = new Map(d.list.map((p) => [p.id, p]));
+          if (screen === "lobby") showLobby(code);
+        } else if (d.t === "start") {
+          startRun({ role: "client", seed: d.seed, hostId: from });
+        } else if (d.t === "full") {
+          showMenu("That run already has four heroes.");
+        } else if (d.t === "s" && game?.role === "client" && d.s) {
+          game.snaps.push({ at: performance.now(), s: d.s });
+          if (game.snaps.length > 4) game.snaps.shift();
+          game.lastSnap = performance.now();
+          handleEvents(d.s.ev);
+          if (d.s.over) endRun(d.s.reason === "dead" ? "Everyone fell." : "The run ended.");
+        }
+      }
+
+      function showLobby(code) {
+        clear();
+        screen = "lobby";
+        root.append(el("h2", "dg-title", "Co-op lobby"));
+        root.append(el("p", "dg-code", code));
+        root.append(el("p", "dg-sub", "Friends join with this room code from the Dungeon Crawl menu."));
+        const list = el("ul", "dg-players");
+        const players = net?.players() || [];
+        for (const p of players) {
+          const info = lobby.get(p.id);
+          list.append(el("li", "", `${p.username}${p.id === net.id ? " (you)" : ""}${info ? " · " + Sim.RACES[info.race].name : " · joining..."}`));
+        }
+        root.append(list);
+        const row = el("div", "dg-row");
+        if (net?.isHost()) {
+          const start = el("button", "dg-btn", "Start run");
+          start.onclick = () => {
+            const seed = newSeed();
+            const roster = [...lobby.values()].filter((p) => players.some((q) => q.id === p.id)).slice(0, Sim.MAX_PLAYERS);
+            net.send({ t: "start", seed });
+            startRun({ role: "host", seed, roster });
+          };
+          row.append(start);
+        } else row.append(el("p", "dg-sub", "Waiting for the host to start..."));
+        const leave = el("button", "dg-btn small", "Leave");
+        leave.onclick = () => showMenu();
+        row.append(leave);
+        root.append(row);
+      }
+
+      // ------------------------------------------------------------ input
+      const keys = new Set();
+      const pointers = new Map(); // touch id -> { kind, ox, oy }
+      let mouse = null; // canvas-space point while the mouse button is held
+      let touchMode = false;
+      const stick = { dx: 0, dy: 0 };
+      const touchBtn = { atk: false, sp: false };
+
+      const onKey = (down) => (e) => {
+        if (e.target?.tagName === "INPUT") return;
+        const k = e.key.toLowerCase();
+        if (down && k === "m") { audio.toggle(); return; }
+        keys[down ? "add" : "delete"](k === " " ? "space" : k);
+        if (game && ["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(k)) e.preventDefault();
+      };
+      const kd = onKey(true);
+      const ku = onKey(false);
+      window.addEventListener("keydown", kd);
+      window.addEventListener("keyup", ku);
+
+      function readInput(camPlayer) {
+        const h = (a, b) => (keys.has(a) || keys.has(b) ? 1 : 0);
+        const dx = Math.max(-1, Math.min(1, h("d", "arrowright") - h("a", "arrowleft") + stick.dx));
+        const dy = Math.max(-1, Math.min(1, h("s", "arrowdown") - h("w", "arrowup") + stick.dy));
+        const atk = keys.has("space") || keys.has("j") || keys.has("z") || touchBtn.atk || !!mouse;
+        const sp = keys.has("k") || keys.has("shift") || keys.has("x") || keys.has("e") || touchBtn.sp;
+        const inp = { dx: Math.round(dx * 100) / 100, dy: Math.round(dy * 100) / 100, atk: atk ? 1 : 0, sp: sp ? 1 : 0, ax: 0, ay: 0, manual: 0 };
+        if (mouse && camPlayer && game) {
+          inp.manual = 1;
+          inp.ax = Math.round((mouse.x + game.cam.x - camPlayer.x) * 10) / 10;
+          inp.ay = Math.round((mouse.y + game.cam.y - camPlayer.y) * 10) / 10;
+        }
+        return inp;
+      }
+
+      function bindPointers(canvas) {
+        const pos = (e) => {
+          const r = canvas.getBoundingClientRect();
+          return { x: ((e.clientX - r.left) * VW) / r.width, y: ((e.clientY - r.top) * VH) / r.height };
+        };
+        canvas.addEventListener("pointerdown", (e) => {
+          const p = pos(e);
+          canvas.setPointerCapture?.(e.pointerId);
+          if (e.pointerType === "mouse") { mouse = p; return; }
+          touchMode = true;
+          if (Math.hypot(p.x - (VW - 70), p.y - (VH - 70)) < 44) { pointers.set(e.pointerId, { kind: "atk" }); touchBtn.atk = true; }
+          else if (Math.hypot(p.x - (VW - 150), p.y - (VH - 50)) < 36) { pointers.set(e.pointerId, { kind: "sp" }); touchBtn.sp = true; }
+          else pointers.set(e.pointerId, { kind: "stick", ox: p.x, oy: p.y });
+        });
+        canvas.addEventListener("pointermove", (e) => {
+          const p = pos(e);
+          if (e.pointerType === "mouse") { if (mouse) mouse = p; return; }
+          const t = pointers.get(e.pointerId);
+          if (t?.kind !== "stick") return;
+          const dx = p.x - t.ox;
+          const dy = p.y - t.oy;
+          const len = Math.hypot(dx, dy);
+          const k = len > 8 ? Math.min(1, len / 40) / len : 0;
+          stick.dx = dx * k;
+          stick.dy = dy * k;
+        });
+        const up = (e) => {
+          if (e.pointerType === "mouse") { mouse = null; return; }
+          const t = pointers.get(e.pointerId);
+          if (!t) return;
+          if (t.kind === "stick") { stick.dx = 0; stick.dy = 0; }
+          if (t.kind === "atk") touchBtn.atk = false;
+          if (t.kind === "sp") touchBtn.sp = false;
+          pointers.delete(e.pointerId);
+        };
+        canvas.addEventListener("pointerup", up);
+        canvas.addEventListener("pointercancel", up);
+        canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+      }
+
+      // ------------------------------------------------------------ the run
+      function startRun(o) {
+        clear();
+        screen = "play";
+        const canvas = el("canvas", "dg-canvas");
+        canvas.width = VW;
+        canvas.height = VH;
+        canvas.tabIndex = 0;
+        const tools = el("div", "dg-bar");
+        const muteBtn = el("button", "dg-btn small", audio.muted ? "Sound off" : "Sound on");
+        muteBtn.onclick = () => { audio.toggle(); muteBtn.textContent = audio.muted ? "Sound off" : "Sound on"; };
+        const quit = el("button", "dg-btn small", "Quit run");
+        quit.onclick = () => endRun("You left the dungeon.");
+        tools.append(muteBtn, quit);
+        root.append(canvas, tools);
+        const g2 = canvas.getContext("2d");
+        g2.imageSmoothingEnabled = false;
+        game = {
+          role: o.role, hostId: o.hostId || net?.host(), sim: null, snaps: [], lastSnap: performance.now(), model: null, cam: { x: 0, y: 0 },
+          netEv: [], fx: [], banner: null, shake: 0, seen: null, vis: null, mapKey: "", map: null, raf: 0, last: performance.now(), acc: 0,
+          lastSend: 0, ended: false, canvas, g2, start: performance.now(),
+        };
+        if (o.role !== "client") {
+          game.sim = Sim.create(o.seed, o.roster);
+          myId = o.role === "solo" ? "solo" : net.id;
+        }
+        bindPointers(canvas);
+        game.raf = requestAnimationFrame(frame);
+        canvas.focus();
+      }
+
+      function stopGame() {
+        if (game) cancelAnimationFrame(game.raf);
+        game = null;
+        keys.clear();
+        pointers.clear();
+        mouse = null;
+        stick.dx = stick.dy = 0;
+        touchBtn.atk = touchBtn.sp = false;
+      }
+
+      function frame(now) {
+        const gm = game;
+        if (!gm) return;
+        gm.raf = requestAnimationFrame(frame);
+        const dt = Math.min(100, now - gm.last);
+        gm.last = now;
+        if (gm.role === "client") {
+          const rt = now - 90; // render a little in the past so there is always a next snapshot to blend toward
+          const sn = gm.snaps;
+          if (sn.length) {
+            let a = sn[0];
+            let b = sn[sn.length - 1];
+            for (let i = 0; i < sn.length - 1; i++) if (sn[i].at <= rt && sn[i + 1].at >= rt) { a = sn[i]; b = sn[i + 1]; }
+            gm.model = rt >= b.at || a === b ? b.s : Sim.lerpSnap(a.s, b.s, (rt - a.at) / Math.max(1, b.at - a.at));
+          }
+          if (now - gm.lastSend > 33) {
+            gm.lastSend = now;
+            net?.send({ t: "in", i: readInput(gm.model?.p.find((p) => p.id === myId)) }, gm.hostId);
+          }
+          if (now - gm.lastSnap > 6000 && now - gm.start > 6000) { endRun("The host stopped responding."); return; }
+        } else {
+          gm.acc += dt;
+          let n = 0;
+          while (gm.acc >= 1000 / 60 && n < 5) {
+            gm.acc -= 1000 / 60;
+            n++;
+            Sim.setInput(gm.sim, myId, readInput(gm.sim.players.find((p) => p.id === myId)));
+            Sim.step(gm.sim);
+            const ev = gm.sim.ev.splice(0);
+            handleEvents(ev);
+            gm.netEv.push(...ev);
+            if (gm.role === "host" && gm.sim.t % 4 === 0) {
+              const s = Sim.snapshot(gm.sim);
+              s.ev = gm.netEv.splice(0);
+              net.send({ t: "s", s });
+            }
+          }
+          if (n === 5) gm.acc = 0;
+          gm.model = Sim.snapshot(gm.sim);
+          if (gm.sim.over) {
+            if (gm.role === "host") { const s = Sim.snapshot(gm.sim); s.ev = gm.netEv.splice(0); net.send({ t: "s", s }); }
+            endRun(gm.sim.reason === "dead" ? "Everyone fell." : "The run ended.");
+            return;
+          }
+        }
+        if (gm.model) render(gm, now);
+      }
+
+      // ------------------------------------------------------------ events: sounds + floating text
+      function handleEvents(ev) {
+        const gm = game;
+        if (!gm || !ev) return;
+        const text = (x, y, txt, col, big) => gm.fx.push({ k: "text", x, y, t: 0, txt, col, big });
+        for (const [k, x, y, v] of ev) {
+          const near = Math.hypot(x - (gm.cam.x + VW / 2), y - (gm.cam.y + VH / 2)) < 520;
+          switch (k) {
+            case "hit": if (near) { audio.play("hit"); text(x, y, String(v), "#fff"); } break;
+            case "hurt": audio.play("hurt"); gm.shake = 8; text(x, y, "-" + v, "#ff6a6a"); break;
+            case "shoot": if (near) audio.play("shoot"); break;
+            case "kill": if (near) audio.play(v ? "bossdead" : "kill"); break;
+            case "gold": audio.play("gold"); text(x, y, "+" + v, "#ffd54a"); break;
+            case "potion": audio.play("potion"); text(x, y, "heal", "#8affb0"); break;
+            case "relic": {
+              audio.play("relic");
+              const r = Sim.RELICS[Sim.RELIC_IDS[v]];
+              text(x, y - 10, r.name, r.color, 1);
+              gm.banner = { text: `${r.name}: ${r.desc}`, t: 0, small: 1 };
+              break;
+            }
+            case "chest": audio.play("chest"); break;
+            case "special": if (near) audio.play("special"); break;
+            case "ring": gm.fx.push({ k: "ring", x, y, r: v, t: 0 }); if (near) audio.play("ring"); break;
+            case "boom": gm.shake = 6; audio.play("boom"); break;
+            case "blink": if (near) audio.play("blink"); break;
+            case "down": audio.play("down"); break;
+            case "revive": audio.play("revive"); break;
+            case "descend": audio.play("descend"); break;
+            case "floor": audio.play("floor"); gm.banner = { text: v % 3 === 0 ? `FLOOR ${v} - BOSS` : `FLOOR ${v}`, t: 0 }; break;
+            default: break;
+          }
+        }
+        if (gm.fx.length > 80) gm.fx.splice(0, gm.fx.length - 80);
+      }
+
+      // ------------------------------------------------------------ rendering
+      function drawMon(g, type, frame2, cx, cy, size, flash, flip) {
+        if (!ready(art.mon)) { g.fillStyle = "#d33"; g.fillRect(cx - size / 2, cy - size / 2, size, size); return; }
+        const sx = (MON[type] * 2 + frame2) * 16;
+        g.save();
+        g.translate(cx, cy - size * 0.2);
+        if (flip) g.scale(-1, 1);
+        g.drawImage(art.mon, sx, 0, 16, 16, -size / 2, -size / 2, size, size);
+        if (flash) { g.globalCompositeOperation = "lighter"; g.drawImage(art.mon, sx, 0, 16, 16, -size / 2, -size / 2, size, size); }
+        g.restore();
+      }
+      function drawItem(g, idx, cx, cy, size) {
+        if (ready(art.items)) g.drawImage(art.items, idx * 16, 0, 16, 16, cx - size / 2, cy - size / 2, size, size);
+        else { g.fillStyle = "#ffd54a"; g.fillRect(cx - 4, cy - 4, 8, 8); }
+      }
+
+      function ensureMap(gm, model) {
+        const key = model.seed + ":" + model.n;
+        if (gm.mapKey === key) return;
+        gm.mapKey = key;
+        gm.map = Sim.generate(model.seed, model.n);
+        gm.seen = new Uint8Array(gm.map.w * gm.map.h);
+        gm.vis = new Uint8Array(gm.map.w * gm.map.h);
+        gm.torchSet = new Set(gm.map.torches.map((t) => t.y * gm.map.w + t.x));
+      }
+
+      function render(gm, now) {
+        const g = gm.g2;
+        const model = gm.model;
+        ensureMap(gm, model);
+        const map = gm.map;
+        const mePl = model.p.find((p) => p.id === myId) || model.p[0];
+        // spectate a teammate while down
+        const focus = mePl?.down ? model.p.find((p) => !p.down) || mePl : mePl;
+        if (focus) {
+          gm.cam.x = Math.max(0, Math.min(map.w * T - VW, focus.x - VW / 2));
+          gm.cam.y = Math.max(0, Math.min(map.h * T - VH, focus.y - VH / 2));
+          gm.vis.fill(0);
+          Sim.reveal(map, focus.x, focus.y, 9, gm.vis);
+          for (let i = 0; i < gm.vis.length; i++) if (gm.vis[i]) gm.seen[i] = 1;
+        }
+        let cx = Math.round(gm.cam.x);
+        let cy = Math.round(gm.cam.y);
+        if (gm.shake > 0) { cx += Math.round((Math.sin(now) * gm.shake) / 2); cy += Math.round((Math.cos(now * 1.3) * gm.shake) / 2); gm.shake -= 0.5; }
+        g.globalCompositeOperation = "source-over";
+        g.fillStyle = "#07040c";
+        g.fillRect(0, 0, VW, VH);
+        g.save();
+        g.translate(-cx, -cy);
+
+        const x0 = Math.max(0, Math.floor(cx / T));
+        const y0 = Math.max(0, Math.floor(cy / T));
+        const x1 = Math.min(map.w - 1, Math.floor((cx + VW) / T));
+        const y1 = Math.min(map.h - 1, Math.floor((cy + VH) / T));
+        const tilesOk = ready(art.tiles);
+        for (let ty = y0; ty <= y1; ty++) {
+          for (let tx = x0; tx <= x1; tx++) {
+            const i = ty * map.w + tx;
+            if (!gm.seen[i]) continue;
+            const isFloor = map.tiles[i] === 1;
+            let idx;
+            if (isFloor) idx = Sim.hash(tx, ty, 5) % 7 === 0 ? 1 : 0;
+            else if (Sim.floorAt(map, tx, ty + 1)) idx = gm.torchSet.has(i) ? 5 : 2;
+            else idx = 3;
+            if (tilesOk) g.drawImage(art.tiles, idx * 16, 0, 16, 16, tx * T, ty * T, T, T);
+            else { g.fillStyle = isFloor ? "#3a3350" : idx === 2 ? "#6b4f5e" : "#1c1626"; g.fillRect(tx * T, ty * T, T, T); }
+            if (!gm.vis[i]) { g.fillStyle = "rgba(8,5,16,.62)"; g.fillRect(tx * T, ty * T, T, T); }
+          }
+        }
+        const exT = { x: Math.floor(map.exit.x / T), y: Math.floor(map.exit.y / T) };
+        if (gm.seen[exT.y * map.w + exT.x]) {
+          g.globalAlpha = model.exit ? 1 : 0.4;
+          if (tilesOk) g.drawImage(art.tiles, 64, 0, 16, 16, exT.x * T, exT.y * T, T, T);
+          g.globalAlpha = 1;
+          g.textAlign = "center";
+          if (!model.exit) { g.fillStyle = "#ff6a6a"; g.font = "bold 9px monospace"; g.fillText("SEALED", map.exit.x, map.exit.y + 3); }
+          else if (model.stairs > 0) { g.fillStyle = "#8affb0"; g.fillRect(map.exit.x - 24, map.exit.y - 22, (48 * model.stairs) / Sim.STAIR_FRAMES, 4); }
+        }
+        const visAt = (x, y) => gm.vis[Math.floor(y / T) * map.w + Math.floor(x / T)] === 1;
+
+        for (const [, kind, x, y, v] of model.it) {
+          if (!visAt(x, y)) continue;
+          const bob = Math.sin(now / 200 + x) * 2;
+          if (kind === "gold") drawItem(g, 0, x, y + bob, 14);
+          else if (kind === "potion") drawItem(g, 1, x, y + bob, 18);
+          else if (kind === "relic") {
+            g.fillStyle = Sim.RELICS[Sim.RELIC_IDS[v]].color + "55";
+            g.beginPath();
+            g.arc(x, y + bob, 13, 0, 7);
+            g.fill();
+            drawItem(g, 2, x, y + bob, 20);
+          } else drawItem(g, 3, x, y, 26);
+        }
+
+        // enemies and heroes sorted by y so they overlap sensibly
+        const things = [];
+        for (const e of model.e) if (visAt(e[2], e[3])) things.push({ y: e[3], e });
+        for (const p of model.p) things.push({ y: p.y, p });
+        things.sort((a, b) => a.y - b.y);
+        for (const th of things) {
+          if (th.p) { drawHero(g, th.p, now, th.p.id === myId); continue; }
+          const [, type, x, y, hp, max, fl, ang] = th.e;
+          const size = MON_SIZE[type];
+          g.fillStyle = "rgba(0,0,0,.35)";
+          g.beginPath();
+          g.ellipse(x, y + size * 0.3, size * 0.4, size * 0.13, 0, 0, 7);
+          g.fill();
+          if (fl & 4) {
+            g.strokeStyle = "rgba(255,70,70,.7)";
+            g.lineWidth = type === "boss" ? 6 : 3;
+            g.beginPath();
+            g.moveTo(x, y);
+            g.lineTo(x + Math.cos(ang) * 150, y + Math.sin(ang) * 150);
+            g.stroke();
+          }
+          const f2 = Math.floor(now / 220 + x) % 2;
+          drawMon(g, type, fl & 8 ? 0 : f2, x, y - (type === "bat" ? 8 + Math.sin(now / 90 + x) * 3 : 0), size, fl & 2, Math.cos(ang) < 0);
+          if (hp < max && type !== "boss") {
+            g.fillStyle = "#000";
+            g.fillRect(x - 12, y - size * 0.7, 24, 4);
+            g.fillStyle = "#e0455a";
+            g.fillRect(x - 11, y - size * 0.7 + 1, (22 * hp) / max, 2);
+          }
+        }
+
+        for (const [, x, y, vx, vy, r, team, kind] of model.sh) {
+          if (!visAt(x, y)) continue;
+          if (kind === "slash") {
+            g.strokeStyle = "#fff";
+            g.lineWidth = 3;
+            g.beginPath();
+            g.arc(x - vx * 2, y - vy * 2, r, Math.atan2(vy, vx) - 1, Math.atan2(vy, vx) + 1);
+            g.stroke();
+          } else if (kind === "arrow") {
+            g.strokeStyle = "#d8c8a0";
+            g.lineWidth = 2;
+            g.beginPath();
+            g.moveTo(x, y);
+            g.lineTo(x - vx * 3, y - vy * 3);
+            g.stroke();
+          } else if (kind === "orb" && ready(art.items)) drawItem(g, 5, x, y, r * 2.6);
+          else {
+            g.fillStyle = kind === "spec" ? "#ffd54a" : team ? "#ff6a6a" : "#9fe8ff";
+            g.beginPath();
+            g.arc(x, y, r, 0, 7);
+            g.fill();
+          }
+        }
+
+        for (const f of gm.fx) {
+          f.t++;
+          if (f.k === "text") {
+            g.font = `bold ${f.big ? 11 : 9}px monospace`;
+            g.textAlign = "center";
+            g.fillStyle = "#000";
+            g.fillText(f.txt, f.x + 1, f.y - f.t * 0.6 + 1);
+            g.fillStyle = f.col;
+            g.fillText(f.txt, f.x, f.y - f.t * 0.6);
+          } else {
+            g.strokeStyle = `rgba(255,255,255,${1 - f.t / 18})`;
+            g.lineWidth = 3;
+            g.beginPath();
+            g.arc(f.x, f.y, f.r * Math.min(1, f.t / 8), 0, 7);
+            g.stroke();
+          }
+        }
+        gm.fx = gm.fx.filter((f) => f.t < (f.k === "text" ? 50 : 18));
+        g.restore();
+
+        // light falloff around whoever the camera follows
+        if (focus) {
+          const lx = focus.x - cx;
+          const ly = focus.y - cy;
+          const grd = g.createRadialGradient(lx, ly, 70, lx, ly, 290);
+          grd.addColorStop(0, "rgba(0,0,0,0)");
+          grd.addColorStop(1, "rgba(5,3,12,.72)");
+          g.fillStyle = grd;
+          g.fillRect(0, 0, VW, VH);
+        }
+        drawHud(g, gm, model, mePl);
+      }
+
+      function drawHud(g, gm, model, mePl) {
+        g.textBaseline = "alphabetic";
+        g.textAlign = "left";
+        if (mePl) {
+          bar(g, 8, 8, 120, 10, mePl.hp / mePl.max, mePl.down ? "#555" : "#e0455a");
+          g.font = "bold 9px monospace";
+          g.fillStyle = "#fff";
+          g.fillText(`${mePl.hp}/${mePl.max}`, 12, 16);
+          const sp = Sim.specialOf(mePl.race);
+          const total = ({ proj: 300, buff: 600 }[sp.kind] || 360) * Math.pow(0.85, mePl.relics.haste || 0);
+          bar(g, 8, 22, 120, 6, 1 - mePl.sp / total, mePl.sp > 0 ? "#6b5fa8" : "#ffd54a");
+          g.fillStyle = "#cbbcf5";
+          g.fillText(mePl.sp > 0 ? sp.name : sp.name + " READY (K)", 8, 38);
+          let rx = 8;
+          let ry = 44;
+          for (const id of Sim.RELIC_IDS) {
+            const n = mePl.relics[id];
+            if (!n) continue;
+            const r = Sim.RELICS[id];
+            g.fillStyle = "#000";
+            g.fillRect(rx - 1, ry - 1, 17, 17);
+            g.fillStyle = r.color;
+            g.fillRect(rx, ry, 15, 15);
+            g.fillStyle = "#1a1420";
+            g.font = "bold 10px monospace";
+            g.fillText(r.letter, rx + 4, ry + 11);
+            if (n > 1) { g.fillStyle = "#fff"; g.font = "bold 8px monospace"; g.fillText("x" + n, rx + 5, ry + 24); }
+            rx += 18;
+            if (rx > 150) { rx = 8; ry += 26; }
+          }
+        }
+        // teammates sit under the minimap
+        let ty = 6 + gm.map.h * 2 + 14;
+        for (const p of model.p) {
+          if (p.id === myId) continue;
+          g.font = "8px monospace";
+          g.fillStyle = "#fff";
+          g.textAlign = "right";
+          g.fillText(String(p.name).slice(0, 10), VW - 126, ty + 5);
+          bar(g, VW - 120, ty, 112, 5, p.hp / p.max, p.down ? "#555" : "#6bcf5a");
+          ty += 12;
+        }
+        g.textAlign = "center";
+        g.font = "bold 12px monospace";
+        g.fillStyle = "#fff";
+        g.fillText(`FLOOR ${model.n}`, VW / 2, 16);
+        g.font = "10px monospace";
+        g.fillStyle = "#ffd54a";
+        g.fillText(`gold ${model.gold}  kills ${model.kills}  score ${Sim.score(model.n, model.gold, model.kills)}`, VW / 2, 29);
+        if (model.boss) {
+          const w = 260;
+          bar(g, VW / 2 - w / 2, VH - 24, w, 10, model.boss.hp / model.boss.max, "#c03a8a");
+          g.fillStyle = "#fff";
+          g.font = "bold 10px monospace";
+          g.fillText(model.boss.name, VW / 2, VH - 28);
+        }
+        // minimap
+        const map = gm.map;
+        const mx = VW - map.w * 2 - 6;
+        const my = 6;
+        g.fillStyle = "rgba(0,0,0,.55)";
+        g.fillRect(mx - 2, my - 2, map.w * 2 + 4, map.h * 2 + 4);
+        for (let y = 0; y < map.h; y++) {
+          for (let x = 0; x < map.w; x++) {
+            const i = y * map.w + x;
+            if (!gm.seen[i] || map.tiles[i] !== 1) continue;
+            g.fillStyle = gm.vis[i] ? "#8d82b0" : "#4d4570";
+            g.fillRect(mx + x * 2, my + y * 2, 2, 2);
+          }
+        }
+        const exI = Math.floor(map.exit.y / T) * map.w + Math.floor(map.exit.x / T);
+        if (gm.seen[exI]) { g.fillStyle = model.exit ? "#8affb0" : "#ff6a6a"; g.fillRect(mx + Math.floor(map.exit.x / T) * 2 - 1, my + Math.floor(map.exit.y / T) * 2 - 1, 4, 4); }
+        for (const p of model.p) {
+          g.fillStyle = p.id === myId ? "#fff" : "#6bcf5a";
+          g.fillRect(mx + Math.floor(p.x / T) * 2 - 1, my + Math.floor(p.y / T) * 2 - 1, 3, 3);
+        }
+        g.fillStyle = "#e0455a";
+        for (const e of model.e) if (gm.vis[Math.floor(e[3] / T) * map.w + Math.floor(e[2] / T)]) g.fillRect(mx + Math.floor(e[2] / T) * 2, my + Math.floor(e[3] / T) * 2, 2, 2);
+        if (gm.banner) {
+          gm.banner.t++;
+          const a = Math.min(1, (200 - gm.banner.t) / 40);
+          if (a <= 0) gm.banner = null;
+          else {
+            g.globalAlpha = a;
+            g.textAlign = "center";
+            g.font = gm.banner.small ? "bold 11px monospace" : "bold 26px monospace";
+            g.fillStyle = "#000";
+            g.fillText(gm.banner.text, VW / 2 + 2, VH / 2 - 60 + 2);
+            g.fillStyle = gm.banner.small ? "#fff" : "#ffd54a";
+            g.fillText(gm.banner.text, VW / 2, VH / 2 - 60);
+            g.globalAlpha = 1;
+          }
+        }
+        if (mePl?.down) {
+          g.textAlign = "center";
+          g.font = "bold 12px monospace";
+          g.fillStyle = "#ff8a8a";
+          g.fillText("You are down. A teammate can stand by you to revive you.", VW / 2, VH - 50);
+        }
+        if (touchMode) drawTouch(g, pointers, stick, touchBtn);
+      }
+
+      // ------------------------------------------------------------ end of run
+      function endRun(reason) {
+        const gm = game;
+        if (!gm || gm.ended) return;
+        gm.ended = true;
+        const m = gm.model || { n: 1, gold: 0, kills: 0, p: [] };
+        const floors = m.n;
+        const total = Sim.score(floors, m.gold, m.kills);
+        const players = Math.max(1, m.p.length);
+        stopGame();
+        stopNet();
+        screen = "end";
+        clear();
+        root.append(el("h2", "dg-title", "Run over"));
+        root.append(el("p", "dg-sub", reason));
+        const tbl = el("div", "dg-score");
+        tbl.append(el("div", "", `Floor reached: ${floors} (+${floors * 1000})`), el("div", "", `Gold: ${m.gold}`), el("div", "", `Kills: ${m.kills}`), el("strong", "", `Score: ${total.toLocaleString()}`));
+        root.append(tbl);
+        const status = el("p", "dg-sub", "Saving your score...");
+        root.append(status);
+        const lbHost = el("div", "dg-lb");
+        root.append(lbHost);
+        const board = ctx.leaderboard.mountCanvas(lbHost, "dungeon", { me: me0?.username, width: 380, height: 300, title: "DUNGEON" });
+        lb = board;
+        ctx.leaderboard.submit("dungeon", total, { floors, players }).then((res) => {
+          if (screen !== "end") return;
+          status.textContent = !res ? "Score not saved (sign in to get on the board)." : res.improved ? "New personal best!" : "Saved. Your best is still higher.";
+          board.refresh();
+        });
+        const row = el("div", "dg-row");
+        const again = el("button", "dg-btn", "Play again");
+        again.onclick = () => showMenu();
+        const quit = el("button", "dg-btn small", "Back to arcade");
+        quit.onclick = () => ctx.close();
+        row.append(again, quit);
+        root.append(row);
+      }
+
+      showMenu();
+      return {
+        destroy() {
+          window.removeEventListener("keydown", kd);
+          window.removeEventListener("keyup", ku);
+          stopGame();
+          stopNet();
+          lb?.destroy();
+          audio.close();
+        },
+      };
+    },
+  });
+})();
