@@ -878,6 +878,7 @@
       if (v == null || v === false) continue;
       if (k === "class") e.className = v;
       else if (k === "style") e.style.cssText = v;
+      else if (k === "text") e.textContent = v;
       else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
       else if (k in e && k !== "list") e[k] = v;
       else e.setAttribute(k, v === true ? "" : v);
@@ -1209,11 +1210,13 @@
     }
     toScreen(x, y) { return [this.pan.x + x * this.zoom, this.pan.y + y * this.zoom]; }
     fit() {
+      this.touched = false;
       const r = this.stage.getBoundingClientRect(), d = this.doc;
       const k = Math.min((r.width - 32) / d.w, (r.height - 32) / d.h);
       this.zoom = k >= 1 ? Math.max(1, Math.floor(k)) : Math.max(0.25, k);
       this.center();
       this.scheduleDraw();
+      this.syncStatus && this.syncStatus();
     }
     center() {
       const r = this.stage.getBoundingClientRect();
@@ -1223,6 +1226,7 @@
     zoomTo(z, cx, cy) {
       const r = this.stage.getBoundingClientRect();
       if (cx == null) { cx = r.width / 2; cy = r.height / 2; }
+      this.touched = true;
       z = clamp(z, 0.25, 96);
       const px = (cx - this.pan.x) / this.zoom, py = (cy - this.pan.y) / this.zoom;
       this.zoom = z;
@@ -1409,6 +1413,7 @@
       }
       const dr = this.drag;
       if (dr && dr.kind === "pan") {
+        this.touched = true;
         this.pan.x = dr.px + (e.clientX - dr.sx);
         this.pan.y = dr.py + (e.clientY - dr.sy);
       } else if (dr && dr.kind === "tool") {
@@ -1846,7 +1851,7 @@
       on(root, "keyup", (e) => { if (e.key === " ") this.spaceDown = false; });
       on(document, "pointerdown", (e) => { if (this.menuEl && !this.menuEl.contains(e.target) && !e.target.closest(".pxs-mb")) this.closeMenu(); });
       if (typeof ResizeObserver === "function") {
-        this.ro = new ResizeObserver(() => { this.resizeView(); if (!this.fitted) this.fit(); });
+        this.ro = new ResizeObserver(() => { this.resizeView(); if (!this.touched && this.stage.clientWidth > 0) this.fit(); });
         this.ro.observe(this.stage);
       } else on(window, "resize", () => this.resizeView());
       this.antTimer = setInterval(() => { if (this.sel && !this.dead) { this.ants = ((this.ants || 0) + 1) % 6; this.scheduleDraw(); } }, 140);
@@ -2688,7 +2693,6 @@
   if (isDom) {
     PixelStudio._ui = (host, opts) => {
       const ed = new Editor(host, opts || {});
-      ed.fitted = false;
       return ed;
     };
   }

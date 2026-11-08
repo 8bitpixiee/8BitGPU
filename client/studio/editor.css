@@ -6,6 +6,8 @@
 }
 .pxs-ed button, .pxs-ed select, .pxs-ed input { font: inherit; color: inherit; }
 .pxs-ed button { cursor: pointer; }
+.pxs-ed select { background: var(--panel2); border: 1px solid var(--line); color: var(--fg); }
+.pxs-ed select option { background: var(--panel); color: var(--fg); }
 .pxs-ed button:disabled { opacity: .4; cursor: default; }
 .pxs-menubar { display: flex; align-items: center; gap: 2px; padding: 2px 4px; background: var(--panel); border-bottom: 1px solid var(--line); overflow-x: auto; flex: none; }
 .pxs-mb, .pxs-mini { background: none; border: 1px solid transparent; border-radius: 3px; padding: 4px 8px; white-space: nowrap; }
