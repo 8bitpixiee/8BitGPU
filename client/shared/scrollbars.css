@@ -1,0 +1,8 @@
+/* purple scrollbars so the arcade and the studio don't fall back to the browser's grey ones */
+* { scrollbar-width: thin; scrollbar-color: #8b64b0 #24123a; }
+*::-webkit-scrollbar { width: 12px; height: 12px; }
+*::-webkit-scrollbar-track { background: #24123a; border-left: 1px solid #3b2358; }
+*::-webkit-scrollbar-thumb { background: linear-gradient(90deg, #a98ac8, #7a55a0); border: 2px solid #24123a; border-radius: 8px; }
+*::-webkit-scrollbar-thumb:hover { background: linear-gradient(90deg, #c8a6e6, #9467bd); }
+*::-webkit-scrollbar-corner { background: #24123a; }
+*::-webkit-scrollbar-button { display: none; }
