@@ -596,7 +596,7 @@
   // ==================================================================================================
   const W = 640, H = 400;
   const STEP_MS = 1000 / FPS;
-  const ICON = "client/games/kart/icon.png"; // drawn in Aseprite, source is icon.aseprite next to it
+  const ICON = "client/games/kart/icon.png";
 
   const store = {
     get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } },

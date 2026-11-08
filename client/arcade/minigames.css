@@ -5,6 +5,7 @@
 .mg-body { flex: 1; min-height: 0; overflow: auto; padding: 16px; }
 .mg-window.playing .mg-body { position: relative; padding: 0; overflow: hidden; }
 .mg-arena { position: absolute; inset: 0; }
+.mg-extra { position: absolute; inset: 0; overflow: auto; }
 .mg-leave { position: absolute; left: 50%; top: 58px; z-index: 5; transform: translateX(-50%); padding: 3px 12px; font-size: 12px; }
 .mg-window.playing .mg-leave { opacity: .85; }
 

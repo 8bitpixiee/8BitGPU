@@ -15,5 +15,5 @@
 .dg-score { display: grid; gap: 4px; text-align: center; font-size: 14px; }
 .dg-score strong { font-size: 20px; color: #ffd54a; }
 .dg-lb canvas { max-width: 100%; height: auto; }
-.dg-canvas { width: min(100%, 960px); aspect-ratio: 640 / 400; max-height: calc(100% - 44px); image-rendering: pixelated; background: #07040c; border: 2px solid #4a2a8a; touch-action: none; outline: none; cursor: crosshair; }
+.dg-canvas { width: min(100%, 960px, calc((100dvh - 110px) * 1.6)); aspect-ratio: 640 / 400; image-rendering: pixelated; background: #07040c; border: 2px solid #4a2a8a; touch-action: none; outline: none; cursor: crosshair; }
 .dg-bar { display: flex; gap: 8px; }

@@ -1,6 +1,6 @@
 /* survivors cabinet styles */
 .mg-extra[data-game="survivors"] { padding: 0; background: #0f0820; }
-.sv-root { position: relative; width: 100%; max-width: 800px; margin: 0 auto; aspect-ratio: 800 / 480; background: #1a1030; user-select: none; }
+.sv-root { position: relative; width: min(100%, 800px, calc((100dvh - 56px) * 5 / 3)); margin: 0 auto; aspect-ratio: 800 / 480; background: #1a1030; user-select: none; }
 .sv-canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; outline: none; }
 .sv-overlay { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(12, 6, 28, .78); overflow: auto; }
 .sv-overlay.on { display: flex; }
