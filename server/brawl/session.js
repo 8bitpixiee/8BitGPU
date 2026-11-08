@@ -16,12 +16,14 @@ export class BrawlSession {
     this.id = id;
     this.players = players.map(({ id: userId, username, avatar, race }) => ({ id: userId, username, avatar, race }));
     this.io = io;
-    this.sim = Sim.create(this.players.map((player) => player.race));
+    // the stage comes from the match id so both browsers draw the same one
+    this.sim = Sim.create(this.players.map((player) => player.race), { stage: Sim.stageFor(id) });
     this.held = [0, 0];
     this.pending = [0, 0];
     this.seq = [0, 0];
     this.online = [false, false];
     this.dropAt = [0, 0];
+    this.stale = [false, false];
     this.budget = [INPUTS_PER_SECOND, INPUTS_PER_SECOND];
     this.budgetAt = [0, 0];
     this.done = 0;
@@ -39,7 +41,7 @@ export class BrawlSession {
   connect(side) {
     this.online[side] = true;
     this.dropAt[side] = 0;
-    this.io.send(side, JSON.stringify({ t: "hello", id: this.id, side, players: this.players, frame: this.sim.frame }));
+    this.io.send(side, JSON.stringify({ t: "hello", v: Sim.PROTOCOL, id: this.id, side, players: this.players, frame: this.sim.frame }));
     if (this.finished) return this.io.send(side, this.endMessage());
     if (this.started) this.io.send(side, this.stateMessage());
     if (!this.started && this.online[0] && this.online[1]) {
@@ -71,7 +73,13 @@ export class BrawlSession {
       return;
     }
     if (msg?.t !== "in") return;
-    const bits = (value) => (Number.isInteger(value) ? value & 127 : 0);
+    // a page from before the last sim change would play a different fight, tell it to reload and ignore it
+    if (msg.v !== Sim.PROTOCOL) {
+      if (!this.stale[side]) this.io.send(side, JSON.stringify({ t: "end", winner: -1, reason: "version", v: Sim.PROTOCOL }));
+      this.stale[side] = true;
+      return;
+    }
+    const bits = (value) => (Number.isInteger(value) ? value & 255 : 0);
     this.held[side] = bits(msg.h);
     this.pending[side] |= bits(msg.p);
     if (Number.isInteger(msg.q) && msg.q > this.seq[side]) this.seq[side] = msg.q;

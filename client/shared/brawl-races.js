@@ -32,6 +32,36 @@
     brine: { name: "Brine Splash", kind: "area", startup: 10, active: 4, recover: 20, reach: 120, dmg: 10, kb: 6, stun: 18, heal: 8 },
   };
 
+  // one super per race, spent from a full meter with Block + Special. They reuse the special kinds, just bigger,
+  // and the fighter cannot be hurt while it winds up. dmg on a multi hit is per hit
+  const spread = (n, gap, make) => Array.from({ length: n }, (_, i) => make(i, i * gap));
+  const SUPERS = {
+    glitter: {
+      name: "Stardust Storm", kind: "proj", startup: 14, active: 18, recover: 20,
+      shots: spread(5, 4, (i, at) => ({ at, vx: 9, vy: -3 + i * 1.1, g: 0.1, dmg: 8, r: 18, life: 90, stun: 18, kb: 6 })),
+    },
+    antler: { name: "Stampede", kind: "dash", startup: 10, dur: 26, vx: 15, reach: 80, dmg: 30, kb: 14, stun: 30, recover: 16 },
+    slam: { name: "Earthquake", kind: "area", startup: 20, active: 4, recover: 30, reach: 280, dmg: 30, kb: 14, stun: 34, groundOnly: true },
+    thorns: {
+      name: "Briar Barrage", kind: "proj", startup: 10, active: 26, recover: 16,
+      shots: spread(8, 3, (i, at) => ({ at, vx: 11, vy: 0, g: 0, dmg: 6, r: 12, life: 70, stun: 14, kb: 4 })),
+    },
+    voidstep: { name: "Event Horizon", kind: "teleport", startup: 12, behind: 70, active: 6, reach: 110, dmg: 30, kb: 12, stun: 30, recover: 14 },
+    overclock: { name: "Meltdown", kind: "area", startup: 16, active: 4, recover: 28, reach: 220, dmg: 28, kb: 13, stun: 30 },
+    bubble: {
+      name: "Tidal Wave", kind: "proj", startup: 14, active: 1, recover: 24,
+      shots: [{ at: 0, vx: 6, vy: 0, g: 0, dmg: 30, r: 60, life: 150, stun: 34, kb: 12 }],
+    },
+    claw: { name: "Feral Frenzy", kind: "flurry", startup: 8, hits: 8, gap: 4, drift: 4, reach: 90, dmg: 5, kb: 2, stun: 12, recover: 18 },
+    haymaker: { name: "Wrecking Ball", kind: "melee", startup: 22, active: 5, recover: 26, reach: 120, dmg: 36, kb: 18, stun: 36, armor: true },
+    spinkick: { name: "Tornado Kicks", kind: "flurry", startup: 8, hits: 6, gap: 5, drift: 2, reach: 100, dmg: 6, kb: 4, stun: 14, recover: 18 },
+    shock: {
+      name: "Fault Line", kind: "proj", startup: 10, active: 18, recover: 18,
+      shots: spread(3, 8, (i, at) => ({ at, vx: 12, vy: 0, g: 0, dmg: 11, r: 18, life: 70, stun: 20, kb: 6, ground: true })),
+    },
+    brine: { name: "Brine Tsunami", kind: "area", startup: 14, active: 4, recover: 26, reach: 200, dmg: 24, kb: 10, stun: 26, heal: 25 },
+  };
+
   // hp, walk speed multiplier, jump power multiplier, extra jumps in the air, gravity multiplier
   const RACES = {
     pixie: { name: "Pixie", hp: 90, speed: 1.1, jump: 1.05, airJumps: 1, gravity: 1, special: "glitter" },
@@ -66,6 +96,7 @@
   }
 
   const specialOf = (race) => SPECIALS[(RACES[race] || RACES.pixie).special];
+  const superOf = (race) => SUPERS[(RACES[race] || RACES.pixie).special];
 
-  return { SPECIALS, RACES, raceOf, specialOf };
+  return { SPECIALS, SUPERS, RACES, raceOf, specialOf, superOf };
 });

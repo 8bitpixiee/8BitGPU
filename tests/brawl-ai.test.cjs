@@ -11,7 +11,7 @@ function play(races, levels, seeds, frames = 60000) {
   for (let i = 0; i < frames && !s.over; i++) {
     const a = levels[0] ? brains[0](s) : 0;
     const b = levels[1] ? brains[1](s) : 0;
-    if (a < 0 || a > 127 || b < 0 || b > 127) bad++;
+    if (a < 0 || a > 255 || b < 0 || b > 255) bad++;
     Sim.step(s, a, b);
   }
   return { s, bad };

@@ -1,0 +1,17 @@
+/* Pixel Party */
+.party { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%; background: #14082e; color: #e6dcff; font-family: monospace; padding: 12px; box-sizing: border-box; }
+.party [hidden] { display: none !important; }
+.party-panel { display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; max-width: 360px; }
+.party-panel h2 { margin: 0; color: #ffd54a; letter-spacing: 2px; }
+.party-btn { background: #ff5fb0; color: #1a0b3a; border: 0; border-bottom: 4px solid #a8326f; padding: 8px 16px; font: bold 14px monospace; cursor: pointer; }
+.party-btn:hover { filter: brightness(1.1); }
+.party-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+.party-row { display: flex; gap: 8px; align-items: center; }
+.party-code { width: 80px; padding: 6px; font: bold 14px monospace; text-transform: uppercase; text-align: center; background: #2b1260; color: #fff; border: 2px solid #6a4ab8; }
+.party-list { list-style: none; margin: 0; padding: 0; }
+.party-list li { padding: 2px 0; }
+.party-note { margin: 0; color: #b9a9e8; font-size: 12px; }
+.party-stage { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+.party-canvas { width: min(100%, 720px, calc((100dvh - 190px) * 1.6)); aspect-ratio: 480 / 300; image-rendering: pixelated; background: #1a0b3a; touch-action: none; }
+.party-after { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.party-after .lb-canvas { max-width: 100%; }

@@ -5,6 +5,7 @@
 .mg-body { flex: 1; min-height: 0; overflow: auto; padding: 16px; }
 .mg-window.playing .mg-body { position: relative; padding: 0; overflow: hidden; }
 .mg-arena { position: absolute; inset: 0; }
+.mg-extra { position: absolute; inset: 0; overflow: auto; }
 .mg-leave { position: absolute; left: 50%; top: 58px; z-index: 5; transform: translateX(-50%); padding: 3px 12px; font-size: 12px; }
 .mg-window.playing .mg-leave { opacity: .85; }
 
@@ -35,3 +36,11 @@
 .mg-toast { position: fixed; right: 12px; top: 56px; z-index: 1100; display: grid; gap: 6px; max-width: 300px; }
 .mg-toast-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px; border: 2px solid #fff; border-radius: 8px; background: #2d1c40f2; font-size: 13px; box-shadow: 0 4px 14px #0008; }
 .mg-toast-row span { flex: 1 1 100%; }
+
+/* brawl lobby extras: gauntlet board and the move list */
+.mg-board { margin-top: 10px; }
+.mg-board canvas, .mg-result canvas { display: block; width: 100%; max-width: 420px; height: auto; margin: 0 auto; border: 2px solid #d4b6ee; border-radius: 6px; image-rendering: pixelated; }
+.mg-moves summary { cursor: pointer; font-weight: 700; font-size: 15px; }
+.mg-move-body { margin-top: 10px; }
+.mg-result small { color: #b8ff6a; }
+.mg-result:has(canvas) { max-height: 92%; overflow: auto; }

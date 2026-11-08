@@ -23,7 +23,7 @@ function link(delay) {
     const c = clients[side];
     c.held = held;
     c.unacked.push({ q: ++c.seq, p: taps, at: clock.t });
-    toServer.push({ at: clock.t + delay, side, text: JSON.stringify({ t: "in", q: c.seq, h: held, p: taps }) });
+    toServer.push({ at: clock.t + delay, side, text: JSON.stringify({ t: "in", v: Sim.PROTOCOL, q: c.seq, h: held, p: taps }) });
   };
   const step = () => {
     clock.t += 5;

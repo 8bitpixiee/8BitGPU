@@ -6,8 +6,8 @@
     { id: "brawl", title: "Pixie Brawl", blurb: "1v1 street brawler. Your own Being fights, and every race brings its own special move.", icon: "assets/ui/minigames/icon-brawl.png" },
     { id: "fps", title: "Super Cool FPS game no HACKING", blurb: "Not a real game. It is a joke. You will get pickled.", icon: "assets/ui/minigames/icon-pickle.png" },
   ];
-  const LEVELS = [["easy", "Easy"], ["normal", "Normal"], ["hard", "Hard"]];
-  const CONTROLS = "Move A D / ← →   Jump W / ↑   Block S / ↓   Light J   Heavy K   Special L";
+  const LEVELS = [["easy", "Easy"], ["normal", "Normal"], ["hard", "Hard"], ["brutal", "Brutal"]];
+  const CONTROLS = "Move A D / ← →   Jump W / ↑   Block S / ↓   Light J   Heavy K   Throw I   Special L   Super S + L (or O)";
 
   const el = (tag, className, text) => {
     const node = document.createElement(tag);
@@ -27,7 +27,9 @@
   let title = null;
   let game = null;
   let fps = null;
+  let extra = null;
   let level = "normal";
+  let streak = null; // the gauntlet run in progress: { wins, hp }
   let waiting = null; // who I challenged and am waiting on
   let incoming = new Map(); // challenges from other people, by id
   let notice = "";
@@ -63,6 +65,8 @@
     game = null;
     fps?.destroy();
     fps = null;
+    extra?.destroy?.();
+    extra = null;
   }
 
   function closeWindow() {
@@ -86,12 +90,33 @@
     if (next === "pick") return pick();
     if (next === "brawl") return brawlMenu();
     if (next === "fps") return fpsView();
+    const extra = window.ArcadeGames?.get(next);
+    if (extra) return extraView(extra);
+  }
+
+  // games from client/games/*.js. they get the whole window body and clean up through destroy()
+  function extraView(info) {
+    title.textContent = info.title;
+    const host = el("div", "mg-extra");
+    host.dataset.game = info.id;
+    body.append(host);
+    win.classList.add("playing");
+    const me = () => room()?.me();
+    const ctx = {
+      me,
+      others: () => room()?.others() || [],
+      close: () => show("pick"),
+      setTitle: (text) => { title.textContent = text; },
+      leaderboard: window.Leaderboard,
+      net: (game, code, handlers) => window.GameNet.connect(game, code, handlers),
+    };
+    extra = info.mount(host, ctx) || null;
   }
 
   function pick() {
     title.textContent = "Arcade.exe · pick a game";
     const list = el("div", "mg-games");
-    for (const info of GAMES) {
+    for (const info of [...GAMES, ...(window.ArcadeGames?.list() || [])]) {
       const card = el("button", "mg-card");
       card.type = "button";
       const icon = el("img", "mg-icon");
@@ -129,12 +154,28 @@
     }
     cpu.append(levels, button("Start fight", () => startCpu(), "mg-go"));
 
+    const gauntlet = el("section", "mg-panel");
+    gauntlet.append(
+      el("h2", "", "Gauntlet"),
+      el("p", "mg-help", "Fight one CPU after another, each tougher than the last, until you lose. Every win is 1000 points plus the health you kept."),
+      button("Start gauntlet", () => startGauntlet(true), "mg-go"),
+    );
+    const board = el("div", "mg-board");
+    gauntlet.append(board);
+    if (window.Leaderboard) extra = window.Leaderboard.mountCanvas(board, "brawl", { me: me?.username, title: "PIXIE BRAWL", width: 420, height: 320 });
+
+    const moves = el("details", "mg-panel mg-moves");
+    moves.append(el("summary", "", "Move list"));
+    const moveBody = el("div", "mg-move-body");
+    moves.append(moveBody);
+    moves.addEventListener("toggle", () => moves.open && BrawlView.moveList(moveBody, race));
+
     const versus = el("section", "mg-panel");
     versus.append(el("h2", "", "Challenge someone in this room"));
     versus.append(challengeList());
 
     const help = el("p", "mg-help", CONTROLS);
-    body.append(head, cpu, versus, help);
+    body.append(head, cpu, gauntlet, versus, moves, help);
     if (notice) body.append(el("p", "mg-notice", notice));
   }
 
@@ -186,6 +227,57 @@
     return host;
   }
 
+  // the races CpuRoster really has art for
+  const rosterRaces = () => [...new Set(CpuRoster.roster.map((entry) => entry.race))];
+
+  function startGauntlet(fresh) {
+    const me = room()?.me();
+    if (!me) return setNotice("Enter the room first.");
+    stopGames();
+    if (fresh || !streak) streak = { wins: 0, hp: 0 };
+    const race = me.avatar?.race || "pixie";
+    const foe = BrawlAI.gauntletFoe(streak.wins, race, rosterRaces());
+    const opponent = CpuRoster.byRace(foe.race);
+    const players = [{ name: me.username, race, avatar: me.avatar }, opponent];
+    title.textContent = `Gauntlet · ${me.username} vs ${opponent.name}`;
+    const host = arena(() => { streak = null; show("brawl"); });
+    game = BrawlGame.start(host, {
+      mode: "cpu", players, level: foe.level, style: foe.style, stage: foe.stage, hp: [1, foe.hp],
+      info: `Gauntlet fight ${streak.wins + 1} · ${foe.level} ${foe.style} · score ${BrawlAI.gauntletScore(streak.wins, streak.hp)}`,
+      onEnd: (result) => gauntletDone(result, me, race),
+    });
+  }
+
+  async function gauntletDone(result, me, race) {
+    if (!win || win.hidden || !streak) return;
+    const box = el("div", "mg-result");
+    const won = result.winner === 0;
+    if (won) {
+      streak.wins++;
+      streak.hp += result.hp || 0;
+    }
+    const score = BrawlAI.gauntletScore(streak.wins, streak.hp);
+    box.append(el("strong", "", won ? `Win ${streak.wins}! Score ${score}` : streak.wins ? `Streak over: ${streak.wins} wins, score ${score}` : "Knocked out in the first fight."));
+    // scores keep only your best on the server, so posting after every win is safe
+    if (streak.wins && window.Leaderboard) {
+      const posted = await window.Leaderboard.submit("brawl", score, { race, wins: streak.wins });
+      if (posted?.improved) box.append(el("small", "", "New personal best!"));
+    }
+    if (won) box.append(button("Next fighter", () => startGauntlet(false), "mg-go"));
+    else {
+      streak = null;
+      body.append(box);
+      if (window.Leaderboard) {
+        const board = el("div", "mg-board");
+        box.append(board);
+        extra = window.Leaderboard.mountCanvas(board, "brawl", { me: me.username, title: "PIXIE BRAWL", width: 360, height: 300 });
+      }
+      box.append(button("Try again", () => { stopGames(); startGauntlet(true); }, "mg-go"));
+    }
+    box.append(button("Back to the menu", () => { streak = null; show("brawl"); }));
+    if (!box.isConnected) body.append(box);
+  }
+
   function startCpu() {
     const me = room()?.me();
     if (!me) return setNotice("Enter the room first.");
@@ -219,6 +311,7 @@
     const box = el("div", "mg-result");
     const won = result.winner === mySide;
     const text =
+      result.reason === "version" ? "This page is out of date. Reload it to play online." :
       result.reason === "lost" ? "Lost the connection." :
       result.reason === "noshow" ? "Nobody showed up." :
       result.winner < 0 ? "Draw." : won ? (result.reason === "forfeit" ? "They left. You win!" : "You win!") : "You lost. Rematch?";
