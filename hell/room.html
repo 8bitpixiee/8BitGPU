@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Room</title>
+<link rel="stylesheet" href="hell.css">
+</head>
+<body data-page="room" class="v">
+
+<main class="wrap">
+  <h1 class="room-title center" id="rt">ROOM</h1>
+  <canvas class="pix" id="scene" width="96" height="54"></canvas>
+  <div id="rd" class="letter" style="margin-top:18px"></div>
+  <div class="exits" id="exits"></div>
+</main>
+<div class="mini"><button id="snd" type="button">sound: off</button> &middot; esc</div>
+<script src="hell.js"></script>
+<script>
+
+(function () {
+  var q = new URLSearchParams(location.search).get("n");
+  var n = parseInt(q, 10);
+  if (isNaN(n) || n < 0) n = 0;
+  var real = n;
+  var over = n > 255;
+  if (over) n = n % 256;
+  Hell.S.rseq = (Hell.S.rseq || []).concat([n]).slice(-3); Hell.save();
+  var hex = "0x" + n.toString(16).toUpperCase().padStart(2, "0");
+  var done = {};
+  try { done = JSON.parse(localStorage.getItem("8bitgpu-hell-doors") || "{}"); done[n] = 1; localStorage.setItem("8bitgpu-hell-doors", JSON.stringify(done)); } catch (e) { /* ok */ }
+  var rand = Hell.mulberry(n * 2654435761 + 9);
+  var pickl = function (l) { return Hell.pick(rand, l); };
+  var rooms = [
+    "a bedroom with the dimensions of your first bedroom, except longer",
+    "a server closet where every light is the same green",
+    "the Pillow Room, empty, every pillow dented as though someone just stood up",
+    "a hallway that is the Start menu, except the programs are rooms",
+    "a kitchen where the tap runs a very slow version of your name",
+    "a stairwell going down to a floor that is also the ceiling",
+    "a classroom with one desk, and your handwriting already on it",
+    "a bathroom with the mirror turned to face the wall",
+    "a laundromat at the exact hour nobody is in a laundromat",
+    "an arcade cabinet's insides, warm, humming, and full of small dry things",
+    "a waiting room with a number for you, and the number is the room number"
+  ];
+  var things = [
+    "A CRT in the corner shows this room, from behind you.",
+    "A phone has been off the hook since before there were phones.",
+    "The wallpaper repeats every few feet, and in the repeat is one face that is not part of the pattern.",
+    "There is a bowl of something that was candy. Whatever ate it did not take the wrapper off.",
+    "A window looks out on the same room, a little further along.",
+    "Someone has written the word LATER on the floor, in a hand that is not tired.",
+    "A pillow is on the ground. It is wet in a way that does not require a face.",
+    "A curtain moves, and there is no curtain."
+  ];
+  var sounds = [
+    "Somewhere a keyboard is typing very slowly, deciding what to say.",
+    "You can hear breathing, but it is not coming from a mouth.",
+    "The room hums at a pitch you recognise from the inside of your own head.",
+    "Every few seconds the light blinks, as if the room were the one who needed to.",
+    "Down the hall, a door is opening. Each time you look, it is only one door further."
+  ];
+  var warm = [
+    "There is a chair. The chair is warm.",
+    "Someone has been here recently. The chair holds the shape of them, and the shape is yours.",
+    "On the table is a cup of tea, still steaming, with a cursor floating in it.",
+    "You are sure you left by a different door. You are not sure it was you who left."
+  ];
+  var title = "ROOM " + hex;
+  var text = [];
+  if (over) {
+    title = "ROOM " + real;
+    text = ["There is no room " + real + ". There are only 256 doors, and you have counted " + (real + 1) + ".", "You are standing in it.", "Do not tell the others where it is. They will want to come."];
+  } else if (n === 0) {
+    text = ["The first room. It is warm, and it smells like the inside of a new computer.", "Nothing is wrong here. That is what is wrong. You are standing in the one place it has never touched, and it can only watch from the doorway, and the doorway has been getting closer, just a little, every time you looked away.", "There is a chair. It is empty. Sit in it and see what happens to the door."];
+  } else if (n === 255) {
+    text = ["You already know this room.", "You have been here. Not here, not this site, you. You were small, and the light was blue, and something on the other side of the glass learned how to do your face.", "It has been practising since then. This is where it keeps the good one."];
+  } else if (n === 102) {
+    title = "ROOM 0x66";
+    text = ["The room is in hexadecimal. In the decimal world it is room 102. In the one beneath, it is the other number, twice, and then once more, hidden.", "Say it quietly. It likes it said quietly."];
+    var sq = Hell.S.rseq;
+    if (sq.length === 3 && sq[0] === 0 && sq[1] === 255 && sq[2] === 102) text.push("<b style='font-size:44px;color:#fff;letter-spacing:.3em'>WAS</b><br>It is written on the wall, in a handwriting that is not tired, in the past tense.");
+  } else if (n === 6) {
+    text = ["Six chairs around a table laid for seven.", "The seventh place has your name on a card, and the card is damp, as if it had been held by someone who knew you were late."];
+  } else {
+    text = [
+      "The door opens inward. Inside is " + pickl(rooms) + ".",
+      pickl(things),
+      pickl(sounds),
+      pickl(warm)
+    ];
+  }
+  var seq = text.map(function (t) { return "<p>" + t + "</p>"; }).join("");
+  document.getElementById("rt").textContent = title;
+  document.title = title;
+  document.getElementById("rd").innerHTML = seq;
+
+  // exits. the one labelled back does not go back
+  var ex = document.getElementById("exits");
+  function link(label, num) {
+    var a = document.createElement("a");
+    a.href = "room.html?n=" + num;
+    a.textContent = label;
+    ex.append(a);
+  }
+  var base = n + 1;
+  link(pickl(["the door ahead", "the narrow door", "the door that is slightly open"]), (n * 5 + 3 + Math.floor(rand() * 40)) % 256);
+  link(pickl(["the door you did not notice", "the other door", "the door with the wet handle"]), (n * 11 + 7 + Math.floor(rand() * 90)) % 256);
+  link("back", Math.floor(Math.random() * 256));
+  if (Hell.S.rooms >= 13) {
+    var b = document.createElement("a");
+    b.href = "bottom.html";
+    b.textContent = "the stairs, which were not here";
+    ex.append(b);
+  }
+  if (Hell.S.rooms === 5) Hell.whisper("that was not the way you came in");
+  if (Hell.S.rooms === 9) Hell.whisper("you are getting good at this");
+
+  // pixel room
+  var c = document.getElementById("scene");
+  var g = c.getContext("2d");
+  var W = c.width, H = c.height;
+  var hue = Math.floor(rand() * 360);
+  var tint = n === 0 ? "hsl(28,45%,16%)" : "hsl(" + hue + ",22%,10%)";
+  g.fillStyle = tint; g.fillRect(0, 0, W, H);
+  g.fillStyle = "hsl(" + hue + ",18%,6%)"; g.fillRect(0, 38, W, 16);
+  g.fillStyle = "hsl(" + hue + ",16%,18%)"; g.fillRect(0, 37, W, 2);
+  var dx = 8 + Math.floor(rand() * 60);
+  g.fillStyle = "#020101"; g.fillRect(dx, 12, 14, 26);
+  g.fillStyle = "#3a2a1a"; g.fillRect(dx - 1, 11, 16, 1); g.fillRect(dx - 1, 11, 1, 27); g.fillRect(dx + 14, 11, 1, 27);
+  if (rand() < .6) { g.fillStyle = "#6a5030"; g.fillRect(dx + 11, 26, 1, 2); }
+  var wx = (dx > 40 ? 12 : 64) + Math.floor(rand() * 10);
+  g.fillStyle = "#08121c"; g.fillRect(wx, 8, 14, 14);
+  g.fillStyle = "#c8c8b0"; g.fillRect(wx + 9, 11, 2, 2);
+  g.fillStyle = tint; g.fillRect(wx + 6, 8, 1, 14); g.fillRect(wx, 14, 14, 1);
+  // the figure
+  var fx = 70 + Math.floor(rand() * 20) - (dx > 50 ? 50 : 0);
+  var turned = Hell.S.rooms > 8 || n === 255;
+  g.fillStyle = "#000";
+  g.fillRect(fx, 22, 5, 16); g.fillRect(fx + 1, 17, 3, 5);
+  if (turned) { g.fillStyle = "#e8e8d0"; g.fillRect(fx + 1, 19, 1, 1); g.fillRect(fx + 3, 19, 1, 1); }
+  if (n === 0) { g.fillStyle = "rgba(0,0,0,.35)"; g.fillRect(fx, 22, 5, 16); }
+  // grain
+  for (var i = 0; i < 160; i++) { g.fillStyle = "rgba(255,255,255," + (rand() * .08).toFixed(3) + ")"; g.fillRect(Math.floor(rand() * W), Math.floor(rand() * H), 1, 1); }
+})();
+
+</script>
+</body>
+</html>

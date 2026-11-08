@@ -386,3 +386,6 @@
 #startAccounts button:disabled { opacity: .65; cursor: default; }
 #startAccounts button:not(:disabled):hover { filter: brightness(1.1); }
 .sm-session[hidden], .sm-login[hidden], #startAccounts[hidden] { display: none; }
+
+#desktopContextMenu .context-locked { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; opacity: .6; cursor: default; }
+#desktopContextMenu .context-locked kbd { font: inherit; font-size: 10px; letter-spacing: .04em; color: #7a6a8a; }

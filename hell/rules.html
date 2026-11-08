@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Rules of the Desktop</title>
+<link rel="stylesheet" href="hell.css">
+</head>
+<body data-page="rules" class="t-d">
+
+<main class="wrap">
+  <h1>Rules of the Desktop</h1>
+  <ol id="rules" style="padding-left:2.2em"></ol>
+</main>
+<div class="mini"><button id="snd" type="button">sound: off</button> &middot; esc</div>
+<script src="hell.js"></script>
+<script>
+
+var base = [
+  "Do not log out. It will notice the gap.",
+  "If your Being blinks without you, do not mention it to your Being.",
+  "The clock in the tray is correct. The time it shows is not for you.",
+  "Closing a window does not close it. It stops being polite about it.",
+  "If the Pillow Room has one more pillow than yesterday, do not count the pillows again.",
+  "You may hear typing. Do not type back.",
+  "Never open a window that is already open.",
+  "The taskbar has one more icon than you installed. Do not click it. Do not hover. It knows when you hover.",
+  "If you hear your own name from the next room, you are in the next room.",
+  "Do not look in the corner of the screen for longer than it takes to read this rule.",
+  "The pixie is a friend. The pixie is not the thing inside the pixie.",
+  "If the dock shows two of you, wave at neither.",
+  "Do not read the Ledger aloud. It adds a line each time.",
+  "At 3:33 the wallpaper is a different wallpaper. Do not tell it that you noticed.",
+  "It is polite. It is so polite. That is how you know.",
+  "Rule 16 is a lie. Rules 1 to 15 were also written by the liar.",
+  "If a rule is wrong, it was not written by us.",
+  "You are the reason there are seventeen rules.",
+  "Save your work. It will not be here. Save it anyway.",
+  "Never apologise to the desktop. It counts it as a yes.",
+  "Anyone who tells you the Start orb is only an icon has been in a room with a warm chair.",
+  "If there is a rule you cannot read, it is the one about you.",
+  "You can leave whenever you like. You will not like it.",
+  "If someone else's name appears in your window, it is your name, and the other person is you.",
+  "Do not sleep while the screen is on. Do not sleep while it is off either, but that one is advice.",
+  "There is no rule 26.",
+  "Rule 26 is the only rule that matters.",
+  "Stop reading rule 26."
+];
+var ol = document.getElementById("rules");
+var shown = 0;
+function add() {
+  if (shown >= 66) return;
+  var li = document.createElement("li");
+  var text = shown < base.length ? base[shown] : ["", "it", "you", "again", "the dock", "behind you", "not yet", "they all look like you now"][Math.floor(Math.random() * 8)] + " " + base[Math.floor(Math.random() * base.length)].toLowerCase();
+  if (shown === 65) text = "There are only sixty-five rules. Who wrote the other one?";
+  li.textContent = text;
+  if (shown > 20 && Math.random() < .25) li.value = 1 + Math.floor(Math.random() * 99);
+  if (shown > 40) li.style.color = "#c21";
+  ol.append(li);
+  shown++;
+}
+for (var i = 0; i < 10; i++) add();
+addEventListener("scroll", function () { if (innerHeight + scrollY > document.body.scrollHeight - 200) for (var k = 0; k < 4; k++) add(); });
+setInterval(add, 4000);
+
+</script>
+</body>
+</html>

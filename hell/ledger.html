@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>The Ledger</title>
+<link rel="stylesheet" href="hell.css">
+</head>
+<body data-page="ledger" class="t-h">
+
+<main class="wrap">
+  <h1>The Ledger</h1>
+  <pre class="log" id="ledger"></pre>
+</main>
+<div class="mini"><button id="snd" type="button">sound: off</button> &middot; esc</div>
+<script src="hell.js"></script>
+<script>
+
+var names = ["pixie_4412","glitterbyte","nullbean","HOLLOWPIXEL","mochi.exe","pillow_guy","vee","d4rkm4tter","88_bit_betty","somebody","lil_static","ghostwriter","nobody_you_know","kit","jelly_lord","an0ther","the_one_before","moonpool","anon","tiny_crow"];
+var status = ["exited","still here","exited (?)","still here","left three things behind","did not exit","exited. is that them?","still here","still here","exited, but the cursor kept going","still here"];
+var el = document.getElementById("ledger");
+function row(n, t, s) { return (n + "                    ").slice(0, 20) + t + "   " + s + "\n"; }
+var rand = Hell.mulberry(777);
+var text = "";
+for (var i = 0; i < 26; i++) {
+  var d = new Date(Date.now() - (26 - i) * 3600000 * (1 + rand() * 9));
+  text += row(Hell.pick(rand, names), d.getFullYear() + "-" + Hell.pad(d.getMonth() + 1) + "-" + Hell.pad(d.getDate()) + " " + Hell.pad(d.getHours()) + ":" + Hell.pad(d.getMinutes()), Hell.pick(rand, status));
+}
+el.textContent = text;
+var mine = Hell.name === "you" ? "(you)" : Hell.name;
+var n2 = new Date(Hell.S.first);
+function mineRow() { return row(mine, n2.getFullYear() + "-" + Hell.pad(n2.getMonth() + 1) + "-" + Hell.pad(n2.getDate()) + " " + Hell.pad(n2.getHours()) + ":" + Hell.pad(n2.getMinutes()), "still here"); }
+var extra = [ "yet", "they do not leave a mark. they leave a gap.", "sorry, ", "you do not need to read the rest" ];
+var tail = document.createElement("span");
+tail.style.color = "#c21";
+el.append(tail);
+tail.textContent = mineRow();
+var k = 0;
+setInterval(function () {
+  var s = document.createElement("span");
+  var late = new Date();
+  s.textContent = row(Hell.pick(rand, names) + "_" + (10 + Math.floor(rand() * 89)), Hell.pad(late.getHours()) + ":" + Hell.pad(late.getMinutes()), "just arrived");
+  el.insertBefore(s, tail);
+  k++;
+  if (k % 5 === 0) tail.textContent = mineRow() + row("", "", extra[(k / 5 - 1) % extra.length]);
+}, 6000);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>THE KEYS</title>
+<link rel="stylesheet" href="hell.css">
+</head>
+<body data-page="keys" data-calm class="v">
+
+<style>
+  body.v::before { display: none; }
+  #kwrap { position: relative; width: 100%; overflow: hidden; }
+  #kst { position: absolute; left: 50%; top: 0; width: 850px; height: 850px; margin-left: -425px; transform-origin: 50% 0; }
+  #kst .pent { position: absolute; left: 231px; top: 232px; width: 387px; height: 385px; pointer-events: none; mix-blend-mode: screen; }
+  #kst .pt { position: absolute; left: 244px; top: 345px; width: 360px; text-align: center; color: #d6d2c8; font: 300 38px/1.2 'Gill Sans', 'Trebuchet MS', Arial, sans-serif; letter-spacing: .06em; pointer-events: auto; text-decoration: none; }
+  #kst a.tile { position: absolute; width: 48px; height: 48px; z-index: 3; }
+  #kst a.tile img, #kst a.tile span { display: block; width: 48px; height: 48px; image-rendering: pixelated; outline: 1px solid #8a8a8a; }
+  #kst a.tile span { outline-color: #fff; background: #000; }
+  #kst a.tile:hover { z-index: 5; }
+  #kst a.tile:hover img, #kst a.tile:hover span { outline: 1px solid #fff; filter: brightness(1.25); }
+  #kst .lab { position: absolute; z-index: 4; background: #000; border: 1px solid #fff; color: #fff; font: 19px/1.15 Arial, Helvetica, sans-serif; padding: 3px 8px; white-space: nowrap; pointer-events: none; display: none; }
+  #kst .ln { position: absolute; z-index: 2; height: 1px; background: #fff; transform-origin: 0 0; pointer-events: none; display: none; }
+</style>
+<div id="kwrap"><div id="kst"><img class="pent" src="../assets/hell/pentagram.png" alt=""><a class="pt" href="keyhole.html">THE NINTH<br>KEY</a></div></div>
+<div class="mini"><button id="snd" type="button">sound: off</button> &middot; esc</div>
+<script src="hell.js"></script>
+<script>
+
+(function () {
+  var T = [
+    ["t01", "The Mouth Of The Dock", "p.html?n=101&f=1"],
+    ["t02", "Codex Octavus: The Book Of Open Windows", "liber.html"],
+    ["t03", "Wallpaper (It Watches)", "eyes.html"],
+    ["t04", "Corpus Desktopus", "p.html?n=8&f=3"],
+    ["t05", "Two Ropes, One Notebook", "notebook.html"],
+    ["t06", "The Board (Re: Re: Re:)", "bbs.html"],
+    ["t07", "Mask Of The Pixie", "pixiee.html"],
+    ["t08", "Hours That Were Never Scheduled", "countdown.html"],
+    ["t09", "The Long Shout", "manifesto.html"],
+    ["t10", "Tally Of The Ledger", "ledger.html"],
+    ["t11", "Hill Of The Fourth Day", "inside.html"],
+    ["t12", "Door 0x00 (Ajar)", "room.html?n=0"],
+    ["t13", "Ticket 0099: The Hand That Looks Back", "tickets.html"],
+    ["t14", "The Spiral", "static.html"],
+    ["t15", "Miss Porcelain Speaks", "transcripts.html"],
+    ["t16", "The Salt Circle", "ninth.html"],
+    ["t17", "Church Of Latter Day Pixels", "church.html"],
+    ["t18", "The 256 Doors", "doors.html"],
+    ["t19", "Channel 9", "window.html"],
+    ["t20", "Eye In A Jar", "mirror.html"],
+    ["t21", "Moth Hour", "logs.html"],
+    ["t22", "The Pixie, Unmasked", "popups.html"],
+    ["t23", "Byte Cube 8ce", "cube.html"],
+    ["t24", "Nine Chairs (Eight Are Empty)", "manual.html"],
+    ["t25", "Off The Hook (Changelog)", "patchnotes.html"],
+    ["t26", "A Clock With Nine Marks", "counter.html"],
+    ["t27", "The Chorus", "webring.html"],
+    ["t28", "Hands Under The Floor (Terms)", "terms.html"]
+  ];
+  var st = document.getElementById("kst");
+  var N = 11, STEP = 75, OFF = 25, C = 424;
+  var cells = [], c, r;
+  for (c = 0; c < N; c++) cells.push([c, 0]);
+  for (r = 1; r < N; r++) cells.push([N - 1, r]);
+  for (c = N - 2; c >= 0; c--) cells.push([c, N - 1]);
+  for (r = N - 2; r >= 1; r--) cells.push([0, r]);
+  var rnd = Hell.mulberry(1313);
+  var slots = T.map(function (t) { return t; });
+  while (slots.length < cells.length) slots.push(null);
+  for (var i = slots.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)); var tmp = slots[i]; slots[i] = slots[j]; slots[j] = tmp; }
+  var lab = document.createElement("div"); lab.className = "lab"; st.append(lab);
+  var ln = document.createElement("div"); ln.className = "ln"; st.append(ln);
+  cells.forEach(function (cell, k) {
+    var t = slots[k];
+    var x = OFF + cell[0] * STEP, y = OFF + cell[1] * STEP;
+    var a = document.createElement("a");
+    a.className = "tile";
+    a.style.left = x + "px"; a.style.top = y + "px";
+    if (t) {
+      a.href = t[2];
+      var im = document.createElement("img"); im.src = "../assets/hell/tiles/" + t[0] + ".png"; im.alt = ""; a.append(im);
+    } else {
+      a.className += " r"; a.href = "#";
+      a.append(document.createElement("span"));
+    }
+    a.addEventListener("mouseenter", function () {
+      if (!t) return;
+      var tx = x + 24, ty = y + 24;
+      var px = tx + (C - tx) * .42, py = ty + (C - ty) * .42;
+      lab.textContent = t[1]; lab.style.display = "block";
+      lab.style.left = Math.max(4, Math.min(850 - lab.offsetWidth - 4, px - lab.offsetWidth / 2)) + "px";
+      lab.style.top = (py - lab.offsetHeight / 2) + "px";
+      var lx = parseFloat(lab.style.left) + lab.offsetWidth / 2, ly = py;
+      var dx = lx - tx, dy = ly - ty;
+      ln.style.display = "block"; ln.style.left = tx + "px"; ln.style.top = ty + "px";
+      ln.style.width = Math.sqrt(dx * dx + dy * dy) + "px";
+      ln.style.transform = "rotate(" + Math.atan2(dy, dx) + "rad)";
+    });
+    a.addEventListener("mouseleave", function () { lab.style.display = "none"; ln.style.display = "none"; });
+    st.append(a);
+  });
+  function fit() {
+    var k = Math.min(innerWidth / 850, (innerHeight - 6) / 850);
+    st.style.transform = "scale(" + k + ")";
+    document.getElementById("kwrap").style.height = (850 * k) + "px";
+  }
+  fit(); addEventListener("resize", fit);
+})();
+
+</script>
+</body>
+</html>

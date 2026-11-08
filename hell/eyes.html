@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Wallpaper</title>
+<link rel="stylesheet" href="hell.css">
+</head>
+<body data-page="eyes" data-calm class="v">
+
+<main class="wrap wide">
+  <h1 class="center">Wallpaper</h1>
+  <canvas class="pix" id="eyes" width="240" height="135"></canvas>
+</main>
+<div class="mini"><button id="snd" type="button">sound: off</button> &middot; esc</div>
+<script src="hell.js"></script>
+<script>
+
+var c = document.getElementById("eyes");
+var g = c.getContext("2d");
+var eyes = [];
+function add() { eyes.push({ x: 12 + Math.random() * 216, y: 10 + Math.random() * 115, r: 5 + Math.random() * 6, bl: 0 }); }
+for (var i = 0; i < 5; i++) add();
+var mx = 120, my = 68;
+c.addEventListener("mousemove", function (e) { var b = c.getBoundingClientRect(); mx = (e.clientX - b.left) / b.width * c.width; my = (e.clientY - b.top) / b.height * c.height; });
+c.addEventListener("click", function () {
+  var best = -1, bd = 1e9;
+  eyes.forEach(function (e, i) { var d = Math.hypot(e.x - mx, e.y - my); if (d < bd) { bd = d; best = i; } });
+  if (best >= 0 && bd < 20) { eyes.splice(best, 1); add(); add(); Hell.whisper("that one had a name"); }
+});
+setInterval(function () { if (eyes.length < 110) add(); }, 3200);
+function draw() {
+  g.fillStyle = "#050303"; g.fillRect(0, 0, c.width, c.height);
+  eyes.forEach(function (e) {
+    if (Math.random() < .004) e.bl = 6;
+    var lid = e.bl > 0 ? e.bl-- : 0;
+    var h = e.r * .55 * (lid > 0 ? .15 : 1);
+    g.fillStyle = "#d8d0b8";
+    g.beginPath(); g.ellipse(e.x, e.y, e.r, h, 0, 0, 7); g.fill();
+    var a = Math.atan2(my - e.y, mx - e.x), d = Math.min(e.r * .45, Math.hypot(mx - e.x, my - e.y) / 8);
+    g.fillStyle = "#300";
+    g.beginPath(); g.ellipse(e.x + Math.cos(a) * d, e.y + Math.sin(a) * d * .5, e.r * .32, Math.max(.4, h * .8), 0, 0, 7); g.fill();
+    g.fillStyle = "#000"; g.fillRect(e.x + Math.cos(a) * d - 1, e.y + Math.sin(a) * d * .5 - 1, 2, 2);
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+</script>
+</body>
+</html>

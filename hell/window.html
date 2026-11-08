@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>You</title>
+<link rel="stylesheet" href="hell.css">
+</head>
+<body data-page="window" class="t-a">
+
+<main class="wrap">
+  <h1>You</h1>
+  <pre class="log" id="you"></pre>
+  <p id="cursor" class="mono red"></p>
+</main>
+<div class="mini"><button id="snd" type="button">sound: off</button> &middot; esc</div>
+<script src="hell.js"></script>
+<script>
+
+var el = document.getElementById("you");
+var start = Date.now();
+var keys = 0;
+try { keys = localStorage.length; } catch (e) { keys = 0; }
+var cores = navigator.hardwareConcurrency || "an unknown number of";
+function render() {
+  var secs = Math.round((Date.now() - start) / 1000);
+  el.textContent = [
+    "name                 " + Hell.name,
+    "local time           " + Hell.clock() + "  (" + Hell.tz + ")",
+    "screen               " + screen.width + " x " + screen.height + ", and you are using " + innerWidth + " x " + innerHeight + " of it",
+    "language             " + (navigator.language || "unknown"),
+    "cores                " + cores + ", none of them idle",
+    "things left behind   " + keys + " (we counted)",
+    "first seen           " + Hell.since() + " ago",
+    "on this page         " + secs + " seconds",
+    "doors opened         " + Hell.S.rooms,
+    "",
+    "your Being has been standing in the dock this whole time.",
+    "it has not blinked."
+  ].join("\n");
+}
+Hell.since = function () { var m = Math.max(0, Math.round((Date.now() - Hell.S.first) / 60000)); return m < 2 ? "a moment" : m < 120 ? m + " minutes" : Math.round(m / 60) + " hours"; };
+render();
+setInterval(render, 1000);
+var cur = document.getElementById("cursor");
+document.addEventListener("mousemove", function (e) { cur.textContent = "your cursor is at " + e.clientX + ", " + e.clientY + ". so is something else."; });
+
+</script>
+</body>
+</html>
