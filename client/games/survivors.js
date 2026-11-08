@@ -782,3 +782,673 @@
     addWeapon, collect, buildGrid, mulberry,
   };
 });
+
+// ====================================================================== the cabinet (browser only)
+(function () {
+  if (typeof window === "undefined" || !window.ArcadeGames || !window.SurvivorsSim) return;
+  const Sim = window.SurvivorsSim;
+  const W = 800;
+  const H = 480;
+  const BASE = "client/games/survivors/";
+  const SHEETS = "assets/avatar/animations/";
+  const ENEMY_ORDER = ["gnat", "shambler", "bat", "slime", "blob", "archer", "ghost", "brute"];
+  const BOSS_ORDER = ["boss1", "boss2", "boss3", "boss4"];
+  const fmtTime = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t) % 60).padStart(2, "0")}`;
+
+  const loadImg = (src) => {
+    const img = new Image();
+    img.src = src;
+    return img;
+  };
+  // white copy of a sheet, used for the hit flash (drawing it over the sprite is much cheaper than filters)
+  function whiten(img) {
+    const c = document.createElement("canvas");
+    c.width = img.width;
+    c.height = img.height;
+    const x = c.getContext("2d");
+    x.drawImage(img, 0, 0);
+    x.globalCompositeOperation = "source-in";
+    x.fillStyle = "#fff";
+    x.fillRect(0, 0, c.width, c.height);
+    return c;
+  }
+
+  // ---------------------------------------------------------------- generated sound (nothing to download)
+  function makeAudio() {
+    let ac = null, master = null, muted = false, timer = 0, step = 0, intensity = 0;
+    const last = {};
+    const api = {
+      get muted() { return muted; },
+      init() {
+        if (ac) { if (ac.state === "suspended") ac.resume(); return; }
+        const A = window.AudioContext || window.webkitAudioContext;
+        if (!A) return;
+        ac = new A();
+        master = ac.createGain();
+        master.gain.value = muted ? 0 : 0.5;
+        master.connect(ac.destination);
+      },
+      toggle() {
+        muted = !muted;
+        if (master) master.gain.value = muted ? 0 : 0.5;
+        return muted;
+      },
+      tone(freq, dur, type = "square", vol = 0.12, slide = 0, at = 0) {
+        if (!ac) return;
+        const t = ac.currentTime + at;
+        const o = ac.createOscillator(), gn = ac.createGain();
+        o.type = type;
+        o.frequency.setValueAtTime(freq, t);
+        if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, freq + slide), t + dur);
+        gn.gain.setValueAtTime(vol, t);
+        gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(gn).connect(master);
+        o.start(t);
+        o.stop(t + dur + 0.02);
+      },
+      noise(dur, vol = 0.1, at = 0) {
+        if (!ac) return;
+        const t = ac.currentTime + at;
+        const buf = ac.createBuffer(1, Math.max(1, Math.floor(ac.sampleRate * dur)), ac.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+        const src = ac.createBufferSource(), gn = ac.createGain();
+        src.buffer = buf;
+        gn.gain.value = vol;
+        src.connect(gn).connect(master);
+        src.start(t);
+      },
+      // gap stops a 600 enemy fight from turning the speakers into a wall of clicks
+      sfx(name, gap = 0.05, arg = 0) {
+        if (!ac || muted) return;
+        const now = performance.now() / 1000;
+        if (now - (last[name] || 0) < gap) return;
+        last[name] = now;
+        const seq = (freqs, dur, type, vol, step) => freqs.forEach((f, i) => api.tone(f, dur, type, vol, 0, i * step));
+        if (name === "shoot") api.tone(660 + Math.random() * 120, 0.07, "square", 0.04, -300);
+        else if (name === "hit") api.tone(180 + Math.random() * 60, 0.05, "triangle", 0.07, -80);
+        else if (name === "kill") api.noise(0.06, 0.05);
+        else if (name === "gem") api.tone(800 + Math.min(12, arg) * 90, 0.06, "sine", 0.06);
+        else if (name === "hurt") { api.noise(0.2, 0.18); api.tone(140, 0.2, "sawtooth", 0.12, -90); }
+        else if (name === "level") seq([523, 659, 784, 1046], 0.16, "square", 0.08, 0.07);
+        else if (name === "chest") seq([392, 523, 659, 784, 1046, 1318], 0.2, "triangle", 0.1, 0.06);
+        else if (name === "boom") { api.noise(0.35, 0.2); api.tone(90, 0.3, "sawtooth", 0.15, -50); }
+        else if (name === "zap") api.tone(1200, 0.12, "sawtooth", 0.06, -900);
+        else if (name === "boss") { api.tone(110, 0.6, "sawtooth", 0.16, -30); api.tone(104, 0.6, "sawtooth", 0.16, -30, 0.3); }
+        else if (name === "heal") seq([660, 880], 0.12, "sine", 0.1, 0.08);
+        else if (name === "die") seq([330, 262, 196, 131], 0.3, "sawtooth", 0.12, 0.18);
+        else if (name === "win") seq([523, 659, 784, 1046, 784, 1046, 1318], 0.22, "square", 0.09, 0.12);
+      },
+      // simple minor-key loop: bass every other step, arp on top, hats once things get busy
+      music(on, heat = 0) {
+        clearInterval(timer);
+        intensity = heat;
+        if (!on || !ac) return;
+        let next = ac.currentTime + 0.1;
+        const bass = [0, 0, 3, 0, 5, 3, 7, 5];
+        const arp = [0, 3, 7, 12, 7, 3, 10, 7];
+        const roots = [0, -2, 3, -4];
+        timer = setInterval(() => {
+          if (muted) { next = ac.currentTime + 0.1; return; }
+          while (next < ac.currentTime + 0.4) {
+            const at = next - ac.currentTime, i = step % 8;
+            const root = 55 * Math.pow(2, roots[Math.floor(step / 8) % 4] / 12);
+            if (i % 2 === 0) api.tone(root * Math.pow(2, bass[i] / 12), 0.2, "triangle", 0.1, 0, at);
+            api.tone(root * 4 * Math.pow(2, arp[i] / 12), 0.1, "square", 0.025 + intensity * 0.01, 0, at);
+            if (intensity > 0 && i % 2 === 1) api.noise(0.03, 0.025, at);
+            step++;
+            next += intensity > 1 ? 0.17 : 0.2;
+          }
+        }, 100);
+      },
+      setHeat(h) { intensity = h; },
+      destroy() { clearInterval(timer); if (ac) ac.close().catch(() => {}); ac = null; },
+    };
+    return api;
+  }
+
+  // ---------------------------------------------------------------- the player's Being (body sheet, walk row)
+  let manifestP = null;
+  function loadAvatar(avatar) {
+    const out = { layers: [] };
+    manifestP = manifestP || fetch(SHEETS + "manifest.json").then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+    manifestP.then((manifest) => {
+      const names = [];
+      const base = (v) => (typeof v === "string" ? decodeURIComponent(v.split(/[?#]/)[0].split("/").pop()) : "");
+      if (avatar?.bodyAsset) names.push(base(avatar.bodyAsset));
+      else if (avatar?.species === "Thixie") names.push("thixie_body_v1.png", "thixie_head_v1.png");
+      for (const k of ["ears", "chest", "hair", "eyes", "fit", "extra"]) names.push(base(avatar?.layers?.[k]));
+      for (const name of names) {
+        if (!name || !manifest[name]) continue;
+        const img = loadImg(SHEETS + encodeURIComponent(name));
+        // pushed up front so layers keep their stacking order, drawn once their image is in
+        const layer = { img, w: manifest[name].width, h: manifest[name].height, ok: false };
+        img.onload = () => { layer.ok = true; };
+        out.layers.push(layer);
+      }
+    });
+    return out;
+  }
+
+  // ---------------------------------------------------------------- the game
+  function mount(host, ctx) {
+    host.replaceChildren();
+    const root = document.createElement("div");
+    root.className = "sv-root";
+    const canvas = document.createElement("canvas");
+    canvas.width = W;
+    canvas.height = H;
+    canvas.className = "sv-canvas";
+    canvas.setAttribute("role", "img");
+    canvas.setAttribute("aria-label", "Pixie Survivors: your Being fights off a growing horde. Move with WASD or the arrow keys, weapons fire on their own.");
+    const overlay = document.createElement("div");
+    overlay.className = "sv-overlay";
+    root.append(canvas, overlay);
+    host.append(root);
+    const g = canvas.getContext("2d");
+    g.imageSmoothingEnabled = false;
+
+    const audio = makeAudio();
+    const sheetE = loadImg(BASE + "enemies.png");
+    const sheetB = loadImg(BASE + "bosses.png");
+    const sheetS = loadImg(BASE + "shots.png");
+    let whiteE = null, whiteB = null;
+    sheetE.onload = () => { whiteE = whiten(sheetE); };
+    sheetB.onload = () => { whiteB = whiten(sheetB); };
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const me = ctx.me();
+    const races = window.BrawlRaces;
+    const race = races ? races.raceOf(me?.avatar) : "pixie";
+    const raceInfo = races?.RACES?.[race] || { name: "Pixie", hp: 100, speed: 1 };
+    const avatar = loadAvatar(me?.avatar);
+
+    let sim = null, mode = "menu", raf = 0, last = 0, acc = 0, lb = null;
+    let fx = [], parts = [], texts = [], shake = 0, flash = 0, hurtFlash = 0, banner = null, toast = null, gemChain = 0, gemAt = 0, nukeFlash = 0;
+    const keys = new Set();
+    let stick = null;
+
+    // ---- input
+    const MOVE = { w: [0, -1], arrowup: [0, -1], s: [0, 1], arrowdown: [0, 1], a: [-1, 0], arrowleft: [-1, 0], d: [1, 0], arrowright: [1, 0] };
+    function input() {
+      let x = 0, y = 0;
+      for (const k of keys) if (MOVE[k]) { x += MOVE[k][0]; y += MOVE[k][1]; }
+      if (stick) { x += stick.dx; y += stick.dy; }
+      return { x, y };
+    }
+    function onKey(e) {
+      if (!host.isConnected) return;
+      const k = e.key.toLowerCase();
+      if (e.type === "keyup") { keys.delete(k); return; }
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (MOVE[k] && mode === "play") e.preventDefault();
+      if (MOVE[k]) keys.add(k);
+      if (k === "m") { audio.init(); audio.toggle(); }
+      else if ((k === "p" || k === "escape") && (mode === "play" || mode === "pause")) { e.preventDefault(); setPause(mode === "play"); }
+      else if (mode === "cards" && /^[1-4]$/.test(k)) pickCard(Number(k) - 1);
+    }
+    function pointer(e) {
+      if (mode !== "play") return;
+      const r = canvas.getBoundingClientRect();
+      const x = ((e.clientX - r.left) / r.width) * W, y = ((e.clientY - r.top) / r.height) * H;
+      if (e.type === "pointerdown") { stick = { id: e.pointerId, ox: x, oy: y, x, y, dx: 0, dy: 0 }; canvas.setPointerCapture?.(e.pointerId); }
+      else if (stick && stick.id === e.pointerId) {
+        if (e.type === "pointermove") {
+          stick.x = x; stick.y = y;
+          stick.dx = Math.max(-1, Math.min(1, (x - stick.ox) / 45));
+          stick.dy = Math.max(-1, Math.min(1, (y - stick.oy) / 45));
+        } else stick = null;
+      }
+    }
+    const auto = () => { if (document.hidden && mode === "play") setPause(true); };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("keyup", onKey);
+    window.addEventListener("blur", auto);
+    document.addEventListener("visibilitychange", auto);
+    for (const t of ["pointerdown", "pointermove", "pointerup", "pointercancel"]) canvas.addEventListener(t, pointer);
+    canvas.style.touchAction = "none";
+
+    // ---- overlay screens
+    const el = (tag, cls, text) => {
+      const n = document.createElement(tag);
+      if (cls) n.className = cls;
+      if (text != null) n.textContent = text;
+      return n;
+    };
+    const btn = (label, fn, cls = "") => {
+      const b = el("button", "sv-btn " + cls, label);
+      b.type = "button";
+      b.addEventListener("click", fn);
+      return b;
+    };
+    function screen(...nodes) {
+      overlay.replaceChildren(...nodes);
+      overlay.classList.toggle("on", nodes.length > 0);
+      overlay.querySelector("button")?.focus({ preventScroll: true });
+    }
+    function menu() {
+      mode = "menu";
+      audio.music(false);
+      const start = Sim.WEAPONS[Sim.START[race]?.weapon || "sparkle"];
+      const card = el("div", "sv-panel");
+      const board = el("div", "sv-board");
+      card.append(
+        el("h2", "sv-title", "Pixie Survivors"),
+        el("p", "sv-sub", `${raceInfo.name} starts with ${start.name}. Weapons fire on their own. Live for 11 minutes, then take down the Static King.`),
+        el("p", "sv-keys", "WASD / arrows or drag to move  -  P pause  -  M sound  -  1-4 pick cards"),
+        btn("Start run", startRun, "primary"),
+        btn("Back to games", () => ctx.close()),
+        board,
+      );
+      screen(card);
+      lb?.destroy();
+      lb = ctx.leaderboard?.mountCanvas(board, "survivors", { width: 420, height: 250, me: me?.username, title: "SURVIVORS" }) || null;
+    }
+    function startRun() {
+      audio.init();
+      lb?.destroy();
+      lb = null;
+      sim = Sim.create({ race, hp: raceInfo.hp, speed: raceInfo.speed, seed: (Math.random() * 2 ** 32) >>> 0 });
+      fx = []; parts = []; texts = []; shake = flash = hurtFlash = nukeFlash = 0; banner = toast = null; acc = 0; stick = null;
+      mode = "play";
+      screen();
+      audio.music(true, 0);
+    }
+    function setPause(on) {
+      if (on) {
+        mode = "pause";
+        audio.music(false);
+        const panel = el("div", "sv-panel");
+        panel.append(
+          el("h2", "sv-title", "Paused"),
+          btn("Resume", () => setPause(false), "primary"),
+          btn(audio.muted ? "Sound: off" : "Sound: on", (e) => { audio.init(); e.target.textContent = audio.toggle() ? "Sound: off" : "Sound: on"; }),
+          btn("Quit to menu", menu),
+        );
+        screen(panel);
+      } else {
+        mode = "play";
+        last = performance.now();
+        screen();
+        audio.music(true, sim.t > 300 ? 1 : 0);
+      }
+    }
+    function showCards() {
+      mode = "cards";
+      stick = null;
+      const panel = el("div", "sv-panel wide");
+      panel.append(el("h2", "sv-title", `Level ${sim.level}`));
+      const row = el("div", "sv-cards");
+      sim.choices.forEach((c, i) => {
+        const def = c.kind === "weapon" ? Sim.WEAPONS[c.id] : c.kind === "passive" ? Sim.PASSIVES[c.id] : { name: c.kind === "heal" ? "Snack" : "Bonus", color: "#ffd54a" };
+        const b = el("button", "sv-card");
+        b.type = "button";
+        b.style.setProperty("--c", def.color || "#ffd54a");
+        b.append(el("span", "sv-key", String(i + 1)), el("strong", "", def.name), el("em", "", c.isNew ? "NEW" : c.level ? `Lv ${c.level}` : ""), el("small", "", c.text));
+        b.addEventListener("click", () => pickCard(i));
+        row.append(b);
+      });
+      panel.append(row);
+      screen(panel);
+    }
+    function pickCard(i) {
+      if (mode !== "cards" || !Sim.choose(sim, i)) return;
+      audio.sfx("gem", 0, 8);
+      if (sim.phase === "levelup") showCards();
+      else { mode = "play"; last = performance.now(); screen(); }
+    }
+    function finish() {
+      const won = sim.phase === "won";
+      mode = "over";
+      audio.music(false);
+      audio.sfx(won ? "win" : "die", 0);
+      const score = Sim.score(sim);
+      const minutes = Math.round((sim.t / 60) * 10) / 10;
+      const panel = el("div", "sv-panel");
+      const status = el("p", "sv-sub", "Saving your score...");
+      const board = el("div", "sv-board");
+      panel.append(
+        el("h2", "sv-title", won ? "The Static King falls!" : "You got swarmed"),
+        el("p", "sv-big", score.toLocaleString() + " pts"),
+        el("p", "sv-sub", `${fmtTime(sim.t)} survived  -  ${sim.kills} kills  -  level ${sim.level}`),
+        status,
+        btn("Run it back", startRun, "primary"),
+        btn("Back to games", () => ctx.close()),
+        board,
+      );
+      screen(panel);
+      lb = ctx.leaderboard?.mountCanvas(board, "survivors", { width: 420, height: 250, me: me?.username, title: "SURVIVORS" }) || null;
+      Promise.resolve(ctx.leaderboard?.submit("survivors", score, { race, minutes })).then((res) => {
+        status.textContent = !res ? "Sign in to save scores on the board." : res.improved ? "New personal best!" : "Your best is still higher.";
+        lb?.refresh();
+      });
+    }
+
+    // ---- turning sim events into juice
+    function burst(x, y, color, n, speed = 90, life = 0.5, size = 3) {
+      for (let i = 0; i < n && parts.length < 450; i++) {
+        const a = Math.random() * 6.283, v = speed * (0.3 + Math.random());
+        parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: life * (0.6 + Math.random() * 0.6), max: life, color, size });
+      }
+    }
+    function handle(ev) {
+      switch (ev.t) {
+        case "hit":
+          if (texts.length < 70) texts.push({ x: ev.x + (Math.random() - 0.5) * 10, y: ev.y - 8, text: String(ev.dmg), life: 0.6, crit: ev.crit });
+          audio.sfx("hit", 0.04);
+          break;
+        case "kill":
+          burst(ev.x, ev.y, ev.big ? "#ffd54a" : "#d9c9ff", ev.big ? 40 : 5, ev.big ? 220 : 70, 0.5);
+          audio.sfx("kill", 0.04);
+          if (ev.big) { shake = Math.max(shake, 12); audio.sfx("boom", 0.2); }
+          break;
+        case "gem": {
+          const now = performance.now();
+          gemChain = now - gemAt < 350 ? gemChain + 1 : 0;
+          gemAt = now;
+          audio.sfx("gem", 0.03, gemChain);
+          break;
+        }
+        case "shoot": audio.sfx("shoot", 0.08); break;
+        case "hurt": shake = Math.max(shake, 9); hurtFlash = 0.35; audio.sfx("hurt", 0.1); break;
+        case "whip": fx.push({ k: "whip", x: ev.x, y: ev.y, side: ev.side, reach: ev.reach, color: ev.color, t: 0, life: 0.18 }); break;
+        case "aura": fx.push({ k: "ring", x: ev.x, y: ev.y, r: ev.r, color: ev.color, t: 0, life: 0.3 }); break;
+        case "explode":
+          fx.push({ k: "ring", x: ev.x, y: ev.y, r: ev.r, color: ev.color, t: 0, life: 0.35, fill: true });
+          burst(ev.x, ev.y, ev.color, 14, 160, 0.5, 4);
+          shake = Math.max(shake, 5);
+          audio.sfx("boom", 0.1);
+          break;
+        case "zap": fx.push({ k: "zap", x: ev.x, y: ev.y, px: ev.px, py: ev.py, color: ev.color, t: 0, life: 0.2, seed: Math.random() * 99 }); audio.sfx("zap", 0.06); break;
+        case "levelup": audio.sfx("level", 0); flash = 0.3; break;
+        case "heal": audio.sfx("heal", 0); burst(sim.p.x, sim.p.y, "#ff6b81", 14, 80, 0.6); break;
+        case "magnet": audio.sfx("heal", 0); toast = { text: "Magnet! Gems incoming", t: 2 }; break;
+        case "nuke": nukeFlash = 0.4; shake = 14; audio.sfx("boom", 0); toast = { text: "Bomb!", t: 1.5 }; break;
+        case "chest": audio.sfx("chest", 0); flash = 0.4; toast = { text: "Chest: " + ev.got.join(", "), t: 3.5 }; break;
+        case "swarm": banner = { text: "A swarm closes in!", t: 2.5, color: "#ff9aa2" }; break;
+        case "elite": banner = { text: "A big one hunts you", t: 2.5, color: "#ffd54a" }; break;
+        case "boss": banner = { text: ev.final ? "THE STATIC KING" : ev.name, t: 3.5, color: "#ff5b5b" }; audio.sfx("boss", 0); audio.setHeat(2); break;
+        case "windup": fx.push({ k: "ring", x: ev.x, y: ev.y, r: 36, color: "#ff5b5b", t: 0, life: 0.5 }); break;
+        default: break;
+      }
+    }
+
+    // ---- drawing
+    let camX = 0, camY = 0;
+    const sx = (x) => Math.round(x - camX), sy = (y) => Math.round(y - camY);
+    const hash = (a, b) => (Math.imul(a, 374761393) ^ Math.imul(b, 668265263)) >>> 0;
+    const dot = (x, y, r, c) => { g.fillStyle = c; g.beginPath(); g.arc(x, y, r, 0, 6.283); g.fill(); };
+
+    function drawBackground() {
+      const T = 64, x0 = Math.floor(camX / T), y0 = Math.floor(camY / T);
+      for (let ty = y0; ty <= y0 + H / T + 1; ty++) {
+        for (let tx = x0; tx <= x0 + W / T + 1; tx++) {
+          const h = hash(tx, ty), px = tx * T - Math.round(camX), py = ty * T - Math.round(camY);
+          g.fillStyle = (tx + ty) & 1 ? "#1e1337" : "#22163f";
+          g.fillRect(px, py, T, T);
+          const gx = px + ((h >> 3) % 50) + 4, gy = py + ((h >> 9) % 50) + 6;
+          if ((h & 7) === 0) {
+            g.fillStyle = "#2f5a4a";
+            g.fillRect(gx, gy, 2, 5); g.fillRect(gx + 3, gy + 2, 2, 3); g.fillRect(gx - 3, gy + 1, 2, 4);
+          } else if ((h & 31) === 1) {
+            g.fillStyle = "#ff8ad4"; g.fillRect(gx, gy, 3, 3);
+            g.fillStyle = "#ffe27a"; g.fillRect(gx + 1, gy + 1, 1, 1);
+          }
+        }
+      }
+    }
+
+    function drawEnemy(e) {
+      const x = sx(e.x), y = sy(e.y), boss = e.def.boss;
+      if (x < -90 || x > W + 90 || y < -90 || y > H + 90) return;
+      const size = boss ? e.r * 3.6 : e.def.r <= 6 ? 24 : e.def.r <= 10 ? 32 : 40;
+      const sz = e.elite ? size * 1.5 : size;
+      if (e.elite) dot(x, y, e.r + 6, "rgba(255,213,74,.25)");
+      if (e.state === 1) dot(x, y, e.r + 10 + Math.sin(e.t * 30) * 3, "rgba(255,60,60,.3)");
+      const bob = e.def.wobble || e.type === "gnat" ? Math.sin(e.t * 8 + e.id) * 2 : 0;
+      const cell = boss ? 48 : 16;
+      const idx = boss ? BOSS_ORDER.indexOf(e.type) : ENEMY_ORDER.indexOf(e.type);
+      const flip = e.x > sim.p.x; // sprites face left, mirror them when the player is to their left
+      const dx = Math.round(x - sz / 2), dy = Math.round(y - sz / 2 + bob);
+      if (!flip) { g.save(); g.translate(x, 0); g.scale(-1, 1); g.translate(-x, 0); }
+      g.drawImage(boss ? sheetB : sheetE, idx * cell, 0, cell, cell, dx, dy, sz, sz);
+      const w = boss ? whiteB : whiteE;
+      if (e.flash > 0 && w) { g.globalAlpha = 0.85; g.drawImage(w, idx * cell, 0, cell, cell, dx, dy, sz, sz); g.globalAlpha = 1; }
+      if (!flip) g.restore();
+      if (!boss && e.hp < e.maxHp && e.maxHp > 40) {
+        g.fillStyle = "#000"; g.fillRect(x - 12, y - sz / 2 - 5, 24, 3);
+        g.fillStyle = "#ff6b81"; g.fillRect(x - 12, y - sz / 2 - 5, 24 * Math.max(0, e.hp / e.maxHp), 3);
+      }
+    }
+
+    function drawPlayer(now) {
+      const p = sim.p, x = sx(p.x), y = sy(p.y);
+      if (p.iframes > 0 && Math.floor(now / 60) % 2 === 0) g.globalAlpha = 0.45;
+      g.fillStyle = "rgba(0,0,0,.35)";
+      g.beginPath(); g.ellipse(x, y + 14, 12, 4, 0, 0, 6.283); g.fill();
+      const flip = p.fx < 0;
+      if (flip) { g.save(); g.translate(x, 0); g.scale(-1, 1); g.translate(-x, 0); }
+      const ready = avatar.layers.filter((l) => l.ok);
+      if (ready.length) {
+        const row = p.moving ? 1 : 0, frame = Math.floor(now / (p.moving ? 100 : 200)) % 8;
+        for (const l of ready) g.drawImage(l.img, frame * l.w, row * l.h, l.w, l.h, Math.round(x - l.w / 2), Math.round(y + 17 - l.h), l.w, l.h);
+      } else {
+        // no sheet for this outfit (or still loading): a little drawn pixie so the game still reads
+        const flap = Math.sin(now / 60) * 5;
+        g.fillStyle = "#bff3ff"; g.fillRect(x - 15, y - 12 - flap, 10, 14); g.fillRect(x + 5, y - 12 - flap, 10, 14);
+        g.fillStyle = "#ff8ad4"; g.fillRect(x - 5, y - 2, 10, 14);
+        g.fillStyle = "#ffe0c8"; g.fillRect(x - 5, y - 12, 10, 10);
+        g.fillStyle = "#1a1030"; g.fillRect(x - 3, y - 8, 2, 2); g.fillRect(x + 1, y - 8, 2, 2);
+        g.fillStyle = "#ffe27a"; g.fillRect(x - 5, y - 15, 10, 4);
+      }
+      if (flip) g.restore();
+      g.globalAlpha = 1;
+      g.fillStyle = "#000"; g.fillRect(x - 16, y + 20, 32, 4);
+      g.fillStyle = p.hp / p.maxHp > 0.3 ? "#6be86b" : "#ff5b5b"; g.fillRect(x - 15, y + 21, 30 * Math.max(0, p.hp / p.maxHp), 2);
+    }
+
+    function drawShots(now) {
+      for (const sh of sim.shots) {
+        const x = sx(sh.x), y = sy(sh.y);
+        if (sh.kind === "bolt") { g.globalAlpha = 0.5; dot(x, y, sh.r + 3, sh.color); g.globalAlpha = 1; g.drawImage(sheetS, 0, 0, 16, 16, x - 8, y - 8, 16, 16); }
+        else if (sh.kind === "knife") { g.save(); g.translate(x, y); g.rotate(sh.ang); g.drawImage(sheetS, 64, 0, 16, 16, -8, -8, 16, 16); g.restore(); }
+        else if (sh.kind === "orbit") { g.save(); g.translate(x, y); g.rotate(sh.a + Math.PI / 2); g.drawImage(sheetS, 16, 0, 16, 16, -10, -14, 20, 28); g.restore(); }
+        else if (sh.kind === "boomer") { const k = Math.max(1, sh.r / 12); g.save(); g.translate(x, y); g.rotate(sh.ang); g.drawImage(sheetS, 32, 0, 16, 16, -8 * k, -8 * k, 16 * k, 16 * k); g.restore(); }
+        else if (sh.kind === "bomb") { const k = 1 + Math.sin(now / 40) * 0.1; g.drawImage(sheetS, 48, 0, 16, 16, x - 8 * k, y - 8 * k, 16 * k, 16 * k); }
+      }
+      for (const b of sim.eshots) { const x = sx(b.x), y = sy(b.y); dot(x, y, 6, "#ff5b5b"); dot(x, y, 3, "#ffd0b0"); }
+    }
+
+    function drawLoot(now) {
+      for (const gem of sim.gems) {
+        const x = sx(gem.x), y = sy(gem.y);
+        if (x < -10 || x > W + 10 || y < -10 || y > H + 10) continue;
+        const s = gem.v >= 25 ? 6 : gem.v >= 5 ? 5 : 4;
+        g.fillStyle = gem.v >= 25 ? "#ff6bd6" : gem.v >= 5 ? "#ffd54a" : "#5ee0ff";
+        g.beginPath(); g.moveTo(x, y - s); g.lineTo(x + s - 1, y); g.lineTo(x, y + s); g.lineTo(x - s + 1, y); g.fill();
+        g.fillStyle = "rgba(255,255,255,.8)"; g.fillRect(x - 1, y - s + 2, 1, 2);
+      }
+      for (const k of sim.pickups) {
+        const x = sx(k.x), y = Math.round(sy(k.y) + Math.sin(now / 200 + k.x) * 2);
+        if (k.kind === "heart") {
+          g.fillStyle = "#ff4b6a"; g.fillRect(x - 6, y - 5, 5, 5); g.fillRect(x + 1, y - 5, 5, 5); g.fillRect(x - 6, y - 1, 12, 4); g.fillRect(x - 4, y + 3, 8, 3); g.fillRect(x - 1, y + 6, 2, 2);
+        } else if (k.kind === "magnet") {
+          g.fillStyle = "#ff5b5b"; g.fillRect(x - 6, y - 6, 4, 9); g.fillRect(x + 2, y - 6, 4, 9); g.fillRect(x - 6, y + 3, 12, 3);
+          g.fillStyle = "#e8eef8"; g.fillRect(x - 6, y - 6, 4, 3); g.fillRect(x + 2, y - 6, 4, 3);
+        } else if (k.kind === "bomb") {
+          dot(x, y + 1, 7, "#222"); g.fillStyle = "#ffd54a"; g.fillRect(x + 2, y - 8, 3, 3);
+        } else {
+          dot(x, y, 18, `rgba(255,213,74,${0.2 + 0.15 * Math.sin(now / 150)})`);
+          g.fillStyle = "#000"; g.fillRect(x - 11, y - 8, 22, 16);
+          g.fillStyle = "#a8723e"; g.fillRect(x - 10, y - 7, 20, 14);
+          g.fillStyle = "#ffd54a"; g.fillRect(x - 10, y - 2, 20, 3); g.fillRect(x - 2, y - 3, 4, 6);
+        }
+      }
+    }
+
+    function drawFx(dt) {
+      for (const f of fx) {
+        f.t += dt;
+        const k = f.t / f.life, x = sx(f.x), y = sy(f.y);
+        g.globalAlpha = Math.max(0, 1 - k);
+        if (f.k === "ring") {
+          g.strokeStyle = f.color; g.lineWidth = 4; g.beginPath(); g.arc(x, y, f.r * (0.4 + 0.6 * k), 0, 6.283); g.stroke();
+          if (f.fill) { g.fillStyle = f.color; g.globalAlpha = Math.max(0, 0.35 * (1 - k)); g.fill(); }
+        } else if (f.k === "whip") {
+          g.fillStyle = f.color;
+          const len = f.reach * Math.min(1, k * 3 + 0.3);
+          for (let i = 0; i < 6; i++) g.fillRect(Math.round(x + f.side * ((len * i) / 6) - (f.side < 0 ? len / 6 : 0)), Math.round(y + Math.sin(i + f.t * 30) * 4 - 3), Math.ceil(len / 6) + 1, Math.max(2, 6 - i * 0.6));
+        } else if (f.k === "zap") {
+          g.strokeStyle = f.color; g.lineWidth = 3; g.beginPath();
+          const top = f.y - 400;
+          g.moveTo(x + Math.sin(f.seed) * 20, sy(top));
+          for (let i = 1; i < 6; i++) g.lineTo(x + Math.sin(f.seed * i) * 14, sy(top + (400 * i) / 6));
+          g.lineTo(x, y); g.stroke();
+          dot(x, y, 12 * (1 - k), "#fff");
+        }
+      }
+      g.globalAlpha = 1;
+      fx = fx.filter((f) => f.t < f.life);
+      for (const p of parts) {
+        p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.94; p.vy *= 0.94;
+        g.globalAlpha = Math.max(0, p.life / p.max);
+        g.fillStyle = p.color;
+        g.fillRect(sx(p.x), sy(p.y), p.size, p.size);
+      }
+      g.globalAlpha = 1;
+      parts = parts.filter((p) => p.life > 0);
+      g.font = "bold 12px monospace";
+      g.textAlign = "center";
+      for (const t of texts) {
+        t.life -= dt; t.y -= 28 * dt;
+        g.globalAlpha = Math.min(1, t.life * 3);
+        g.fillStyle = "#000"; g.fillText(t.text, sx(t.x) + 1, sy(t.y) + 1);
+        g.fillStyle = t.crit ? "#ffd54a" : "#fff"; g.fillText(t.text, sx(t.x), sy(t.y));
+      }
+      g.globalAlpha = 1;
+      texts = texts.filter((t) => t.life > 0);
+    }
+
+    function drawHud(dt) {
+      const p = sim.p;
+      g.fillStyle = "rgba(0,0,0,.6)"; g.fillRect(0, 0, W, 14);
+      g.fillStyle = "#5ee0ff"; g.fillRect(0, 0, (W * sim.xp) / sim.xpNext, 14);
+      g.textAlign = "left"; g.font = "bold 11px monospace"; g.fillStyle = "#fff"; g.fillText("LV " + sim.level, 6, 11);
+      g.textAlign = "center"; g.font = "bold 20px monospace";
+      g.fillStyle = "#000"; g.fillText(fmtTime(sim.t), W / 2 + 1, 38); g.fillStyle = "#fff"; g.fillText(fmtTime(sim.t), W / 2, 37);
+      g.textAlign = "right"; g.font = "bold 13px monospace"; g.fillStyle = "#fff";
+      g.fillText(`${sim.kills} kills`, W - 8, 32);
+      g.fillStyle = "#b9a9e8"; g.fillText(`${sim.enemies.length} foes`, W - 8, 47);
+      g.textAlign = "left"; g.fillStyle = "#ff8a9a";
+      g.fillText(`HP ${Math.ceil(p.hp)}/${p.maxHp}`, 8, 32);
+      let ix = 8;
+      const slot = (def, level, letter) => {
+        g.fillStyle = "rgba(0,0,0,.65)"; g.fillRect(ix, H - 38, 26, 32);
+        g.fillStyle = def.color || "#fff"; g.fillRect(ix + 2, H - 36, 22, 20);
+        g.fillStyle = "#1a1030"; g.font = "bold 13px monospace"; g.textAlign = "center"; g.fillText(letter, ix + 13, H - 21);
+        g.fillStyle = "#fff"; g.font = "bold 9px monospace"; g.fillText(level, ix + 13, H - 9);
+        ix += 29;
+      };
+      for (const w of sim.weapons) { const d = Sim.WEAPONS[w.id]; slot(d, d.evolved ? w.level : "MAX", d.name[0]); }
+      ix += 10;
+      for (const id of Object.keys(sim.passives)) slot(Sim.PASSIVES[id], sim.passives[id], Sim.PASSIVES[id].name[0]);
+      if (sim.boss) {
+        const b = sim.boss;
+        g.fillStyle = "rgba(0,0,0,.7)"; g.fillRect(W / 2 - 160, 44, 320, 12);
+        g.fillStyle = "#ff4b4b"; g.fillRect(W / 2 - 158, 46, 316 * Math.max(0, b.hp / b.maxHp), 8);
+        g.fillStyle = "#fff"; g.textAlign = "center"; g.font = "bold 11px monospace"; g.fillText(b.def.name, W / 2, 70);
+        if (sx(b.x) < 0 || sx(b.x) > W || sy(b.y) < 0 || sy(b.y) > H) {
+          const a = Math.atan2(b.y - p.y, b.x - p.x);
+          g.save(); g.translate(W / 2 + Math.cos(a) * 200, H / 2 + Math.sin(a) * 190); g.rotate(a);
+          g.fillStyle = "#ff4b4b"; g.beginPath(); g.moveTo(14, 0); g.lineTo(-8, -9); g.lineTo(-8, 9); g.fill(); g.restore();
+        }
+      }
+      if (banner) {
+        banner.t -= dt;
+        g.globalAlpha = Math.max(0, Math.min(1, banner.t));
+        g.font = "bold 30px monospace"; g.textAlign = "center";
+        g.fillStyle = "#000"; g.fillText(banner.text, W / 2 + 2, 122); g.fillStyle = banner.color; g.fillText(banner.text, W / 2, 120);
+        g.globalAlpha = 1;
+        if (banner.t <= 0) banner = null;
+      }
+      if (toast) {
+        toast.t -= dt;
+        g.globalAlpha = Math.max(0, Math.min(1, toast.t));
+        g.font = "bold 14px monospace"; g.textAlign = "center";
+        g.fillStyle = "#000"; g.fillText(toast.text, W / 2 + 1, H - 49); g.fillStyle = "#ffe27a"; g.fillText(toast.text, W / 2, H - 50);
+        g.globalAlpha = 1;
+        if (toast.t <= 0) toast = null;
+      }
+      if (stick) {
+        g.strokeStyle = "rgba(255,255,255,.35)"; g.lineWidth = 3; g.beginPath(); g.arc(stick.ox, stick.oy, 45, 0, 6.283); g.stroke();
+        dot(stick.ox + stick.dx * 45, stick.oy + stick.dy * 45, 18, "rgba(255,255,255,.4)");
+      }
+    }
+
+    function render(now, dt) {
+      const p = sim.p;
+      let ox = 0, oy = 0;
+      if (shake > 0.3 && !reduced) { ox = (Math.random() - 0.5) * shake; oy = (Math.random() - 0.5) * shake; }
+      shake *= Math.exp(-9 * dt);
+      camX = p.x - W / 2 + ox;
+      camY = p.y - H / 2 + oy;
+      drawBackground();
+      drawLoot(now);
+      for (const e of sim.enemies) drawEnemy(e);
+      drawShots(now);
+      drawPlayer(now);
+      drawFx(dt);
+      if (hurtFlash > 0) {
+        hurtFlash -= dt;
+        const grad = g.createRadialGradient(W / 2, H / 2, 150, W / 2, H / 2, 480);
+        grad.addColorStop(0, "rgba(255,0,0,0)"); grad.addColorStop(1, `rgba(255,0,0,${Math.min(0.6, hurtFlash * 1.6)})`);
+        g.fillStyle = grad; g.fillRect(0, 0, W, H);
+      }
+      if (flash > 0 && !reduced) { g.fillStyle = `rgba(255,255,255,${flash * 0.6})`; g.fillRect(0, 0, W, H); }
+      flash = Math.max(0, flash - dt);
+      if (nukeFlash > 0) { g.fillStyle = `rgba(255,240,200,${Math.min(1, nukeFlash * 1.5)})`; g.fillRect(0, 0, W, H); nukeFlash -= dt; }
+      drawHud(dt);
+    }
+
+    // the sim runs at a fixed 60Hz no matter the display rate
+    function frame(now) {
+      raf = requestAnimationFrame(frame);
+      const dt = Math.min(0.1, (now - last) / 1000 || 0);
+      last = now;
+      if (!sim) { g.fillStyle = "#1a1030"; g.fillRect(0, 0, W, H); return; }
+      if (mode === "play") {
+        acc += dt;
+        let n = 0;
+        while (acc >= 1 / 60 && n++ < 5 && sim.phase === "play") { Sim.step(sim, 1 / 60, input()); acc -= 1 / 60; }
+        if (n >= 5) acc = 0;
+        for (const ev of sim.events) handle(ev);
+        sim.events.length = 0;
+        if (sim.phase === "levelup") showCards();
+        else if (sim.phase === "dead" || sim.phase === "won") finish();
+      }
+      render(now, mode === "play" ? dt : 0);
+    }
+
+    menu();
+    raf = requestAnimationFrame((t) => { last = t; frame(t); });
+    return {
+      destroy() {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("keydown", onKey);
+        window.removeEventListener("keyup", onKey);
+        window.removeEventListener("blur", auto);
+        document.removeEventListener("visibilitychange", auto);
+        audio.destroy();
+        lb?.destroy();
+      },
+    };
+  }
+
+  window.ArcadeGames.register({
+    id: "survivors",
+    title: "Pixie Survivors",
+    blurb: "Auto-fire horde survival. Level up, evolve, slay the Static King.",
+    icon: BASE + "icon.png",
+    mount,
+  });
+})();
