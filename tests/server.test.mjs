@@ -157,3 +157,17 @@ test("roomAvatar tells the brawler which race you are", () => {
   assert.equal(roomAvatar(JSON.stringify({ species: "Custom", bodyAsset: "Clanker_F.png" })).race, "clanker");
   assert.equal(roomAvatar("garbage").race, "pixie");
 });
+
+test("a cookie with a broken escape doesn't throw and the rest still parse", async () => {
+  const { parseCookieHeader } = await import("../server/accounts.js");
+  const got = parseCookieHeader("a=1; bad=%E0%A4%A; eightbit_session=abc%2Bdef; novalue; x=y=z");
+  assert.deepEqual(got, { a: "1", eightbit_session: "abc+def", x: "y=z" });
+  assert.deepEqual(parseCookieHeader(null), {});
+});
+
+test("google-only accounts never count as having a passcode", async () => {
+  const { hasPasscode } = await import("../server/accounts.js");
+  assert.equal(hasPasscode(null), false);
+  assert.equal(hasPasscode({ password_hash: "google-sso", password_salt: "google-sso" }), false);
+  assert.equal(hasPasscode({ password_hash: "abc=", password_salt: "AAAAAAAAAAAAAAAAAAAAAA==" }), true);
+});

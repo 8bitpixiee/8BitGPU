@@ -10,7 +10,7 @@ import { handleChat, loungeCall } from "./chat/chat.js";
 import { mayUseBody, roomAvatar } from "./chat/chat-avatar.js";
 import { once } from "./once.js";
 import { isBossName } from "./boss.js";
-import { accountsCookie, addAccount, parseAccounts, removeAccount, sessionCookie } from "./accounts.js";
+import { accountsCookie, addAccount, hasPasscode, parseAccounts, parseCookieHeader, removeAccount, sessionCookie } from "./accounts.js";
 import { STORE_PRODUCTS } from "./store/store-catalog.js";
 
 const SESSION_LENGTH_SECONDS = 60 * 60 * 24 * 30;
@@ -59,15 +59,7 @@ const json = (body, status = 200, headers = {}) =>
   });
 
 function readCookies(request) {
-  return Object.fromEntries(
-    (request.headers.get("Cookie") || "")
-      .split(";")
-      .map((part) => {
-        const index = part.indexOf("=");
-        return index < 0 ? [] : [part.slice(0, index).trim(), decodeURIComponent(part.slice(index + 1))];
-      })
-      .filter((pair) => pair.length),
-  );
+  return parseCookieHeader(request.headers.get("Cookie"));
 }
 
 function randomBase64(byteLength = 32) {
@@ -79,6 +71,8 @@ function randomBase64(byteLength = 32) {
 function base64ToBytes(value) {
   return Uint8Array.from(atob(value), (character) => character.charCodeAt(0));
 }
+
+const DUMMY_SALT = "AAAAAAAAAAAAAAAAAAAAAA==";
 
 async function hashPassword(password, salt) {
   const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
@@ -656,6 +650,7 @@ async function handleApi(request, env, url) {
       .bind(user.id)
       .first();
     if (
+      !hasPasscode(secret) ||
       typeof body?.password !== "string" ||
       body.password.length > 128 ||
       !matches(secret.password_hash, await hashPassword(body.password, secret.password_salt))
@@ -752,12 +747,15 @@ async function handleApi(request, env, url) {
       typeof username === "string"
         ? await env.DB.prepare("SELECT * FROM users WHERE username = ?").bind(username).first()
         : null;
+    // unknown names and Google-only accounts still pay for one hash so the response time doesn't give them away
+    const real = hasPasscode(user);
     if (
-      !user ||
+      !real ||
       typeof password !== "string" ||
       password.length > 128 ||
       !matches(user.password_hash, await hashPassword(password, user.password_salt))
     ) {
+      if (!real && typeof password === "string" && password.length <= 128) await hashPassword(password, DUMMY_SALT);
       return json({ error: "Creature name or passcode is not right." }, 401);
     }
     const cookie = await createSession(user.id, env.DB);

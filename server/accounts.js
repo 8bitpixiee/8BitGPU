@@ -34,3 +34,22 @@ export function accountsCookie(tokens, maxAge) {
 
 export const sessionCookie = (token, maxAge) =>
   `eightbit_session=${encodeURIComponent(token)}; ${ATTRS}; Max-Age=${maxAge}`;
+
+// a bad %-escape in any cookie used to throw and take the whole request down with it, so those just get skipped
+export function parseCookieHeader(header) {
+  const out = {};
+  for (const part of String(header || "").split(";")) {
+    const index = part.indexOf("=");
+    if (index < 0) continue;
+    try {
+      out[part.slice(0, index).trim()] = decodeURIComponent(part.slice(index + 1));
+    } catch {
+      // ignore this one cookie
+    }
+  }
+  return out;
+}
+
+// accounts made through Google store this instead of a real hash, and it isn't valid base64 so it must never reach PBKDF2
+export const GOOGLE_ONLY = "google-sso";
+export const hasPasscode = (user) => Boolean(user) && user.password_hash !== GOOGLE_ONLY && user.password_salt !== GOOGLE_ONLY;
