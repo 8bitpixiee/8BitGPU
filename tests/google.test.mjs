@@ -41,3 +41,12 @@ test("the sign-in cookie says whether this run is linking", () => {
   assert.equal(parseOauthCookie("abc.def").link, false);
   assert.equal(parseOauthCookie(undefined).link, false);
 });
+
+test("sameState only accepts the exact state", async () => {
+  const { sameState } = await import("../server/google.js");
+  assert.equal(sameState("abc123", "abc123"), true);
+  assert.equal(sameState("abc123", "abc124"), false);
+  assert.equal(sameState("abc", "abc123"), false);
+  assert.equal(sameState(null, "abc"), false);
+  assert.equal(sameState("", ""), false);
+});

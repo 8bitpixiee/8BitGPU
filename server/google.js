@@ -67,6 +67,14 @@ async function freeUsername(db, base) {
 }
 
 // the sign-in cookie holds state, pkce verifier and whether this run is linking an existing account
+// compares without bailing at the first wrong character
+export function sameState(a, b) {
+  if (typeof a !== "string" || typeof b !== "string" || !a || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
 export function parseOauthCookie(value) {
   const [state, verifier, mode] = String(value || "").split(".");
   return { state, verifier, link: mode === "l" };
@@ -117,7 +125,7 @@ export async function handleGoogle(request, env, url, { db, createSession, readC
     const { state, verifier, link: linking } = parseOauthCookie(readCookies(request)[COOKIE]);
     const fail = (reason) => redirect(`/?signin=${reason}`, [clearState]);
     if (url.searchParams.get("error")) return fail("cancelled");
-    if (!state || !verifier || url.searchParams.get("state") !== state || !url.searchParams.get("code"))
+    if (!state || !verifier || !sameState(url.searchParams.get("state"), state) || !url.searchParams.get("code"))
       return fail("failed");
 
     const token = await fetch(TOKEN_URL, {
