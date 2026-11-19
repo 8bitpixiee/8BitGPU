@@ -93,7 +93,7 @@ export class LoungeRoom extends DurableObject {
     } else if (msg.t === "emote") {
       if (!EMOTES.has(msg.emote) || now - me.lastEmote < 500) return;
       // Allow emotes anywhere in the Arcade. Keep spot rules in other rooms.
-      if (me.room !== "arcade" && !RoomSpots.mayEmote(me.room, msg.emote, me.x me.y)) return;
+      if (me.room !== "arcade" && !RoomSpots.mayEmote(me.room, msg.emote, me.x, me.y)) return;
       me.emote = msg.emote;
       me.emoteUntil = now + EMOTE_MS;
       me.lastEmote = now;
