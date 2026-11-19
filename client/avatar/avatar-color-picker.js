@@ -55,6 +55,24 @@
     text.oninput=()=>{text.setCustomValidity(text.value&&!AvatarColors.validHex(text.value)?'Enter a color such as #b998dd.':'');if(AvatarColors.validHex(text.value))commit(text.value);};
     text.onchange=()=>{if(!AvatarColors.validHex(text.value))update();};
     reset.onclick=()=>{draftHex=draftHsl=null;if(linked())settings.skinColor=neutral();else delete settings.itemColors[selectedOption(activePickerCategory).id];update();applySkinColor();};
+    if (kind === 'skin') {
+  const swatches = document.createElement('div');
+  for (const [name, color] of Object.entries({
+    Porcelain: '#f6ddce',
+    Peach: '#efb293',
+    Honey: '#d99859',
+    Olive: '#b59262',
+    Chestnut: '#91573e',
+    Espresso: '#583529',
+  })) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = name;
+    button.onclick = () => commit(color);
+    swatches.append(button);
+  }
+  field.append(swatches);
+}
     controls.push(update);return update;
   }
   const skin=build('skinSliderControls','skin'),item=build('itemColorControls','item');
