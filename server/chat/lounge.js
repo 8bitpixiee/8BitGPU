@@ -92,8 +92,11 @@ export class LoungeRoom extends DurableObject {
       me.lastMove = now;
     } else if (msg.t === "emote") {
       if (!EMOTES.has(msg.emote) || now - me.lastEmote < 500) return;
-      // Allow emotes anywhere in the Arcade and Art Room
-      if (me.room !== "arcade" && me.room !=="studio" && !RoomSpots.mayEmote(me.room, msg.emote, me.x, me.y)) return;
+      // Allow emotes anywhere in the Arcade, Art Room, & Pillow Room
+      if (
+        !["arcade", "studio", "pillow"].includes(me.room) &&
+        !RoomSpots.mayEmote(me.room, msg.emote, me.x, me.y)
+      ) return;
       me.emote = msg.emote;
       me.emoteUntil = now + EMOTE_MS;
       me.lastEmote = now;
