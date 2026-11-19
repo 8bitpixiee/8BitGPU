@@ -55,31 +55,41 @@
     text.oninput=()=>{text.setCustomValidity(text.value&&!AvatarColors.validHex(text.value)?'Enter a color such as #b998dd.':'');if(AvatarColors.validHex(text.value))commit(text.value);};
     text.onchange=()=>{if(!AvatarColors.validHex(text.value))update();};
     reset.onclick=()=>{draftHex=draftHsl=null;if(linked())settings.skinColor=neutral();else delete settings.itemColors[selectedOption(activePickerCategory).id];update();applySkinColor();};
-    if (kind === 'skin') {
+   
+if (kind === 'skin') {
   const swatches = document.createElement('div');
   swatches.className = 'swatch-grid';
+
+  for (const [name, color] of Object.entries({
     Porcelain: '#f6ddce',
     Peach: '#efb293',
     Honey: '#d99859',
     Olive: '#b59262',
     Chestnut: '#91573e',
     Espresso: '#583529',
-    Pastel Pink: '#f7bcd7',
-    Pastel Peach: '#ffd2b8',
-    Pastel Yellow: '#fff0a8',
-    Pastel Mint: '#b9ecd4',
-    Pastel Blue: '#bddbff',
-    Pastel Lavender: '#d8c4f4',
+    'Pastel Pink': '#f7bcd7',
+    'Pastel Peach': '#ffd2b8',
+    'Pastel Yellow': '#fff0a8',
+    'Pastel Mint': '#b9ecd4',
+    'Pastel Blue': '#bddbff',
+    'Pastel Lavender': '#d8c4f4',
     Black: '#302a39',
     White: '#f8f5ff',
   })) {
     const button = document.createElement('button');
     button.type = 'button';
-    button.textContent = name;
+    button.className = 'swatch';
+    button.style.setProperty('--swatch-color', color);
+
+    const label = document.createElement('span');
+    label.textContent = name;
+    button.append(label);
     button.onclick = () => commit(color);
     swatches.append(button);
   }
-  field.append(swatches);
+
+  field.before(swatches);
+}
 }
     controls.push(update);return update;
   }
