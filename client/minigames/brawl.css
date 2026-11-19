@@ -34,8 +34,8 @@
 .bw-shadow { position: absolute; left: 0; top: -6px; width: 90px; height: 18px; margin-left: -45px; border-radius: 50%; background: #0007; }
 /* the room page loads its own .avatar-art rule after this file, so these need the extra weight */
 .bw .bw-f .bw-art { position: absolute; inset: auto; left: -90px; top: -140px; width: 180px; height: 180px; transform-origin: 50% 78%; }
-/* the art faces right as drawn, so it only flips when the fighter looks left */
-.bw-f[data-face="left"] .bw-art { scale: -1 1; }
+/* the art faces left as drawn, so it only flips when the fighter looks left */
+.bw-f[data-face="right"] .bw-art { scale: -1.08 1.04; }
 .bw-art .avatar-motion, .bw-art canvas, .bw-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
 .bw-tag { position: absolute; left: -60px; top: -170px; width: 120px; text-align: center; font: 700 11px Tahoma, Arial, sans-serif; text-shadow: 0 1px 2px #000; opacity: .85; }
 .bw-shield { position: absolute; left: -48px; top: -150px; width: 96px; height: 160px; border: 3px solid #8fe6ff; border-radius: 48px; background: #8fe6ff33; opacity: 0; transition: opacity .06s; pointer-events: none; }
@@ -45,7 +45,7 @@
 .bw-f.buffed .bw-art { filter: drop-shadow(0 0 8px #ffb347) drop-shadow(0 0 4px #ff6a00); }
 .bw-f.armored .bw-art { filter: drop-shadow(0 0 8px #fff) brightness(1.15); }
 .bw-f[data-st="atk"] .bw-art { scale: 1.08 1.04; }
-.bw-f[data-face="left"][data-st="atk"] .bw-art { scale: -1.08 1.04; }
+.bw-f[data-face="right"][data-st="atk"] .bw-art { scale: -1.08 1.04; }
 
 .bw-shot { position: absolute; border-radius: 50%; transform: translate(-50%, -50%); background: radial-gradient(#fff, #ffd6f7 45%, #c06bff 80%, #c06bff00); box-shadow: 0 0 14px #e6a8ff; pointer-events: none; }
 .bw-shot[data-race="thixie"] { background: radial-gradient(#fff, #c9ffb5 45%, #46c25a 80%, #46c25a00); box-shadow: 0 0 10px #8cff9b; }
