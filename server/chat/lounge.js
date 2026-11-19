@@ -92,8 +92,8 @@ export class LoungeRoom extends DurableObject {
       me.lastMove = now;
     } else if (msg.t === "emote") {
       if (!EMOTES.has(msg.emote) || now - me.lastEmote < 500) return;
-      // drinking, smoking and shrooms only happen at the bar and the stump
-      if (!RoomSpots.mayEmote(me.room, msg.emote, me.x, me.y)) return;
+      // Allow emotes anywhere in the Arcade. Keep spot rules in other rooms.
+      if (me.room !== "arcade" && !RoomSpots.mayEmote(me.room, msg.emote, me.x me.y)) return;
       me.emote = msg.emote;
       me.emoteUntil = now + EMOTE_MS;
       me.lastEmote = now;
