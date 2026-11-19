@@ -90,7 +90,6 @@ if (kind === 'skin') {
 
   field.before(swatches);
 }
-}
     controls.push(update);return update;
   }
   const skin=build('skinSliderControls','skin'),item=build('itemColorControls','item');
