@@ -470,7 +470,10 @@ function isPocketMode() {
 
 function closePocketApps() {
   if (!isPocketMode()) return;
-  openWindows.forEach((windowElement) => windowElement.remove());
+  openWindows.forEach((windowElement) => {
+  windowElement.labMusic?.pause();
+  windowElement.remove();
+});
   openWindows.clear();
   document.getElementById("osTaskTabs").replaceChildren();
 }
@@ -632,6 +635,7 @@ function openApp(appName, profileUsername) {
   });
   actions[2].addEventListener("click", () => {
     document.querySelector(`#osTaskTabs [data-app="${appName}"]`)?.remove();
+    windowElement.labMusic?.pause();
     windowElement.remove();
     openWindows.delete(appName);
   });
@@ -669,6 +673,17 @@ function openApp(appName, profileUsername) {
 
   document.getElementById("osWindowLayer").appendChild(windowElement);
   openWindows.set(appName, windowElement);
+  if (appName === "avatarLab") {
+  const music = new Audio("assets/audio/avatar-lab.mp3");
+  windowElement.labMusic = music;
+
+  const playMusic = () => music.play().catch(console.warn);
+  music.addEventListener("ended", () => {
+    music.currentTime = 16.38;
+    playMusic();
+  });
+  playMusic();
+}
   syncTaskTab(appName);
   addDrag(windowElement, header);
   windowElement.addEventListener("pointerdown", () => focusWindow(windowElement));
@@ -747,7 +762,16 @@ function cycleAngelTime() {
 window.cycleAngelTime = cycleAngelTime;
 updateAngelTime();
 setInterval(updateAngelTime, 30000);
-
+const startupSound = new Audio("assets/audio/startup.mp3");
+startupSound.play().catch((error) => {
+  if (error.name === "NotAllowedError") {
+    document.addEventListener("click", () => {
+      startupSound.play().catch(console.warn);
+    }, { once: true });
+  } else {
+    console.warn(error);
+  }
+});
 function finishDesktopBoot() {
   const bootScreen = document.getElementById("osBootScreen");
   if (!bootScreen) return;
