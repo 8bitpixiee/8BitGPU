@@ -57,13 +57,21 @@
     reset.onclick=()=>{draftHex=draftHsl=null;if(linked())settings.skinColor=neutral();else delete settings.itemColors[selectedOption(activePickerCategory).id];update();applySkinColor();};
     if (kind === 'skin') {
   const swatches = document.createElement('div');
-  for (const [name, color] of Object.entries({
+  swatches.className = 'swatch-grid';
     Porcelain: '#f6ddce',
     Peach: '#efb293',
     Honey: '#d99859',
     Olive: '#b59262',
     Chestnut: '#91573e',
     Espresso: '#583529',
+    Pastel Pink: '#f7bcd7',
+    Pastel Peach: '#ffd2b8',
+    Pastel Yellow: '#fff0a8',
+    Pastel Mint: '#b9ecd4',
+    Pastel Blue: '#bddbff',
+    Pastel Lavender: '#d8c4f4',
+    Black: '#302a39',
+    White: '#f8f5ff',
   })) {
     const button = document.createElement('button');
     button.type = 'button';
