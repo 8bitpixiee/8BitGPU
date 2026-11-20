@@ -230,6 +230,69 @@ let activePickerCategory = "hair";
 const activeFamily = {};
 const adjustableCategories = ["ears", "chest", "hair", "eyes", "fit", "extra"];
 const adjustmentProfiles = {};
+const undoAvatar = document.getElementById("undoAvatar");
+const redoAvatar = document.getElementById("redoAvatar");
+const avatarUndoStack = [];
+const avatarRedoStack = [];
+let activeColorInput = null;
+
+function avatarState() {
+  return JSON.stringify({ settings, selection, adjustmentProfiles });
+}
+
+function updateHistoryButtons() {
+  undoAvatar.disabled = !avatarUndoStack.length;
+  redoAvatar.disabled = !avatarRedoStack.length;
+}
+
+function editAvatar(change, colorInput = null) {
+  const before = avatarState();
+  change();
+  const after = avatarState();
+  if (before === after) return;
+  const lastEdit = avatarUndoStack.at(-1);
+  if (colorInput && colorInput === activeColorInput && lastEdit?.after === before) {
+    lastEdit.after = after;
+    if (lastEdit.before === after) avatarUndoStack.pop();
+  } else {
+    avatarUndoStack.push({ before, after });
+    if (avatarUndoStack.length > 50) avatarUndoStack.shift();
+  }
+  activeColorInput = colorInput;
+  avatarRedoStack.length = 0;
+  updateHistoryButtons();
+}
+
+function moveAvatarHistory(from, to, state, message) {
+  const entry = from.pop();
+  if (!entry) return;
+  to.push(entry);
+  activeColorInput = null;
+  const restored = JSON.parse(entry[state]);
+  Object.assign(settings, restored.settings);
+  Object.assign(selection, restored.selection);
+  Object.keys(adjustmentProfiles).forEach(key => delete adjustmentProfiles[key]);
+  Object.assign(adjustmentProfiles, restored.adjustmentProfiles);
+  Object.keys(activeFamily).forEach(key => delete activeFamily[key]);
+  renderAll();
+  updateHistoryButtons();
+  document.getElementById("saveStatus").textContent = message;
+}
+
+undoAvatar.onclick = () => moveAvatarHistory(avatarUndoStack, avatarRedoStack, "before", "Edit undone.");
+redoAvatar.onclick = () => moveAvatarHistory(avatarRedoStack, avatarUndoStack, "after", "Edit redone.");
+for (const type of ["change", "focusout"]) {
+  document.addEventListener(type, event => {
+    if (event.target === activeColorInput) activeColorInput = null;
+  });
+}
+document.addEventListener("keydown", event => {
+  if (!(event.ctrlKey || event.metaKey) || event.altKey || event.target.closest("input, textarea, select, [contenteditable]")) return;
+  const key = event.key.toLowerCase();
+  if (key !== "z" && key !== "y") return;
+  event.preventDefault();
+  (key === "y" || event.shiftKey ? redoAvatar : undoAvatar).click();
+});
 
 function profileKey() {
   return settings.species + ":" + settings.build;
@@ -512,7 +575,7 @@ function renderSpeciesChoices() {
   ).join("");
   document.getElementById("speciesGrid").innerHTML = playable + comingSoon;
   document.querySelectorAll("[data-species]").forEach((button) =>
-    button.addEventListener("click", () => {
+    button.addEventListener("click", () => editAvatar(() => {
       settings.species = button.dataset.species;
       settings.build = button.dataset.beingBuild;
       settings.bodyAsset = button.dataset.bodyAsset || "";
@@ -527,7 +590,7 @@ function renderSpeciesChoices() {
       ensureSelections();
       renderAll();
       document.getElementById("saveStatus").textContent = settings.species + " selected!";
-    }),
+    })),
   );
 }
 function renderBuildChoices() {
@@ -547,12 +610,12 @@ function renderBuildChoices() {
     )
     .join("");
   document.querySelectorAll("[data-build]").forEach((button) =>
-    button.addEventListener("click", () => {
+    button.addEventListener("click", () => editAvatar(() => {
       settings.build = button.dataset.build;
       if (settings.build === "Masc" || settings.build === "Chunky Masc") selection.fit = "fit-none";
       renderAll();
       document.getElementById("saveStatus").textContent = settings.build + " build selected!";
-    }),
+    })),
   );
 }
 function renderBreedChoices() {
@@ -577,11 +640,11 @@ function renderBreedChoices() {
     )
     .join("");
   document.querySelectorAll("[data-breed]").forEach((button) =>
-    button.addEventListener("click", () => {
+    button.addEventListener("click", () => editAvatar(() => {
       settings.build = button.dataset.breed;
       renderAll();
       document.getElementById("saveStatus").textContent = settings.build + " coat selected!";
-    }),
+    })),
   );
 }
 function renderToneChoices() {
@@ -600,11 +663,11 @@ function renderToneChoices() {
     )
     .join("");
   document.querySelectorAll("[data-tone]").forEach((button) =>
-    button.addEventListener("click", () => {
+    button.addEventListener("click", () => editAvatar(() => {
       settings.skinTone = button.dataset.tone;
       renderAll();
       document.getElementById("saveStatus").textContent = settings.skinTone + " selected!";
-    }),
+    })),
   );
 }
 function setStep(step) {
@@ -665,7 +728,7 @@ function renderPicker() {
     .map((choice) => tileMarkup(choice, "color-tile", choice.id === selection[category]))
     .join("");
   document.querySelectorAll(".asset-tile").forEach((button) =>
-    button.addEventListener("click", () => {
+    button.addEventListener("click", () => editAvatar(() => {
       const selectedFamily = groups.find((group) =>
         group.choices.some((choice) => choice.id === button.dataset.choiceId),
       );
@@ -682,10 +745,10 @@ function renderPicker() {
       selection[category] = selectedFamily.choices[0].id;
       renderAvatar();
       renderPicker();
-    }),
+    })),
   );
   document.querySelectorAll(".color-tile").forEach((button) =>
-    button.addEventListener("click", () => {
+    button.addEventListener("click", () => editAvatar(() => {
       const choice = visibleOptions(category).find((entry) => entry.id === button.dataset.choiceId);
       if (choice && !choice.src) {
         selection[category] = choice.id;
@@ -698,7 +761,7 @@ function renderPicker() {
       selection[category] = button.dataset.choiceId;
       renderAvatar();
       renderPicker();
-    }),
+    })),
   );
   renderAdjuster();
   renderItemSliders();
@@ -761,7 +824,7 @@ document.querySelectorAll("[data-picker-category]").forEach((button) =>
 );
 document
   .querySelectorAll("[data-adjust]")
-  .forEach((button) => button.addEventListener("click", () => adjustActiveLayer(button.dataset.adjust)));
+  .forEach((button) => button.addEventListener("click", () => editAvatar(() => adjustActiveLayer(button.dataset.adjust))));
 [
   ["skinHue", "hue"],
   ["skinSaturation", "saturation"],
@@ -811,7 +874,7 @@ document
 document
   .getElementById("nextButton")
   .addEventListener("click", () => setStep(steps[Math.min(steps.length - 1, currentStep + 1)]));
-document.getElementById("randomizeButton").addEventListener("click", () => {
+document.getElementById("randomizeButton").addEventListener("click", () => editAvatar(() => {
   settings.species = randomChoice(PLAYABLE_SPECIES);
   settings.build = randomChoice(speciesData[settings.species].builds);
   settings.skinTone = randomChoice(speciesData[settings.species].tones);
@@ -820,7 +883,7 @@ document.getElementById("randomizeButton").addEventListener("click", () => {
   );
   renderAll();
   document.getElementById("saveStatus").textContent = "New look generated!";
-});
+}));
 document.getElementById("saveButton").addEventListener("click", async () => {
   const layers = {};
   Object.keys(selection).forEach((category) => (layers[category] = selectedOption(category).src));

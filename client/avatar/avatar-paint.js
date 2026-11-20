@@ -36,14 +36,14 @@
   center.textContent = '●';
   center.title = 'Reset position only';
   center.setAttribute('aria-label','Restore selected asset position');
-  center.onclick = () => {
+  center.onclick = () => editAvatar(() => {
     const defaults = defaultAdjustments()[activePickerCategory];
     const adjustment = activeAdjustments()[activePickerCategory];
     adjustment.x = defaults.x;
     adjustment.y = defaults.y;
     applyLayerAdjustment(activePickerCategory);
     renderAdjuster();
-  };
+  });
   pad.append(center);
   pad.querySelector('[data-adjust="reset"]').textContent = 'Reset all';
   const note = document.createElement('p');

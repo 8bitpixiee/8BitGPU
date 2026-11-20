@@ -44,8 +44,10 @@
     const result=`url("#${id}")`;matrices.set(key,result);return result;
   }
   async function resolve(avatar,key,bodyImage) {
-    const skin=['body','head','chest'].includes(key);
-    const color=skin ? avatar?.skinColor : avatar?.itemColors?.[avatar?.selection?.[key]];
+    const itemColor=avatar?.itemColors?.[avatar?.selection?.[key]];
+    const matchSkin=key==='chest'&&!validHex(itemColor?.hex);
+    const skin=key==='body'||key==='head'||matchSkin;
+    const color=skin ? avatar?.skinColor : itemColor;
     const white=Boolean(avatar?.bodyAsset&&skin);
     if(validHex(color?.hex))return {hex:color.hex};
     if(key==='chest'){

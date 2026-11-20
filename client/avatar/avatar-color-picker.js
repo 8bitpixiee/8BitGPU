@@ -25,36 +25,40 @@
       const row=document.createElement('label'),output=document.createElement('output'),range=document.createElement('input');
       row.textContent=name+' ';row.append(output);range.type='range';range.min=0;range.max=max;range.step=1;range.setAttribute('aria-label',(kind==='skin'?'Skin ': 'Item ')+name);
       field.append(row,range);channels[key]={range,output};
-      range.oninput=()=>{const values={h:+channels.h.range.value,s:+channels.s.range.value,l:+channels.l.range.value};commit(hex(values.h,values.s,values.l),values);};
+      range.oninput=()=>{const values={h:+channels.h.range.value,s:+channels.s.range.value,l:+channels.l.range.value};commit(hex(values.h,values.s,values.l),values,range);};
     }
     const reset=document.createElement('button');reset.type='button';reset.textContent='Original palette';field.append(reset);
     const hint=document.createElement('p');hint.className='avatar-color-hint';field.append(hint);
-    function linked(){return kind==='skin'||activePickerCategory==='chest';}
-    function color(){return linked()?settings.skinColor:settings.itemColors[selectedOption(activePickerCategory).id];}
-    function commit(value,values=null){
+    const isSkin=kind==='skin';
+    function color(){return isSkin?settings.skinColor:settings.itemColors[selectedOption(activePickerCategory).id];}
+    function commit(value,values=null,input=null){
       if(!AvatarColors.validHex(value))return;
       const next={...neutral(),hex:value.toLowerCase()};
       draftHex=next.hex;draftHsl=values;
-      if(linked())settings.skinColor=next;else settings.itemColors[selectedOption(activePickerCategory).id]=next;
-      update();applySkinColor();
+      editAvatar(() => {
+        if(isSkin)settings.skinColor=next;else settings.itemColors[selectedOption(activePickerCategory).id]=next;
+        update();applySkinColor();
+      },input);
     }
     function update(){
       const value=color(),custom=AvatarColors.validHex(value?.hex),current=custom?value.hex:defaults[kind];
       const values=draftHex===current&&draftHsl?draftHsl:hsl(current),selected=kind==='item'?selectedOption(activePickerCategory):null;
       const enabled=kind==='skin'||Boolean(selected?.src);
-      legend.textContent=kind==='skin'?'Skin color':activePickerCategory==='chest'?'Chest — linked to skin':'Color '+selected.name;
-      well.value=current;text.value=custom?current:'';text.placeholder=current;
+      const isChest=!isSkin&&activePickerCategory==='chest';
+      legend.textContent=isSkin?'Skin color':'Color '+selected.name;
+      reset.textContent=isChest?'Match skin':'Original palette';
+      well.value=current;text.value=custom?current:'';text.placeholder=current;text.setCustomValidity('');
       Object.entries(channels).forEach(([key,{range,output}])=>{range.value=values[key];output.textContent=values[key]+(key==='h'?'°':'%');range.disabled=!enabled;});
       well.disabled=text.disabled=reset.disabled=!enabled;
       channels.h.range.style.background='linear-gradient(90deg,red,#ff0,#0f0,#0ff,#00f,#f0f,red)';
       channels.s.range.style.background=`linear-gradient(90deg,${hex(values.h,0,values.l)},${hex(values.h,100,values.l)})`;
       channels.l.range.style.background=`linear-gradient(90deg,#000,${hex(values.h,values.s,50)},#fff)`;
-      hint.textContent=!enabled?'Choose an item first.':activePickerCategory==='chest'&&kind==='item'?'Changing this color also changes the body and head.':custom?'Full-spectrum tint. Black outlines and shading are preserved.':'Original palette active. Pick a color to start a full-spectrum tint.';
+      hint.textContent=!enabled?'Choose an item first.':isChest&&!custom?'Matches skin until you choose a chest color.':custom?'Full-spectrum tint. Black outlines and shading are preserved.':'Original palette active. Pick a color to start a full-spectrum tint.';
     }
-    well.oninput=()=>commit(well.value);
-    text.oninput=()=>{text.setCustomValidity(text.value&&!AvatarColors.validHex(text.value)?'Enter a color such as #b998dd.':'');if(AvatarColors.validHex(text.value))commit(text.value);};
+    well.oninput=()=>commit(well.value,null,well);
+    text.oninput=()=>{text.setCustomValidity(text.value&&!AvatarColors.validHex(text.value)?'Enter a color such as #b998dd.':'');if(AvatarColors.validHex(text.value))commit(text.value,null,text);};
     text.onchange=()=>{if(!AvatarColors.validHex(text.value))update();};
-    reset.onclick=()=>{draftHex=draftHsl=null;if(linked())settings.skinColor=neutral();else delete settings.itemColors[selectedOption(activePickerCategory).id];update();applySkinColor();};
+    reset.onclick=()=>editAvatar(()=>{draftHex=draftHsl=null;if(isSkin)settings.skinColor=neutral();else delete settings.itemColors[selectedOption(activePickerCategory).id];update();applySkinColor();});
    
 if (kind === 'skin') {
   const swatches = document.createElement('div');
