@@ -42,14 +42,19 @@
 <link rel="stylesheet" href="client/desktop/halloween.css"></head>
 
 <body>
-    <div id="osBootScreen" aria-label="8BitGPU is starting">
+        <dialog id="osBootScreen" aria-labelledby="bootTitle">
         <div class="boot-shell">
-            <span class="boot-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-            <p class="boot-title">8BitGPU</p>
-            <p class="boot-status">Starting your desktop...</p>
+            <img class="boot-emblem" src="assets/ui/start-orb.png"
+                 width="84" height="84" alt="">
+            <p class="boot-title" id="bootTitle">PixieNet</p>
+            <p class="boot-status" id="bootStatus" role="status">Welcome to 8BitGPU</p>
+            <div class="boot-actions">
+                <button type="button" id="bootLogin" autofocus>Log in</button>
+                <button type="button" id="bootGuest">Continue as guest</button>
+            </div>
             <span class="boot-track" aria-hidden="true"><span></span></span>
         </div>
-    </div>
+    </dialog>
     <div class="desktop">
     <div id="wallpaperRotator" aria-hidden="true">
         <span class="wallpaper-frame is-visible"></span>

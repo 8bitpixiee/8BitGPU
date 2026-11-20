@@ -37,7 +37,16 @@
         actions: [{ emote: "shroom", label: "Eat a mushroom" }],
       },
     ],
-    pillow: [],
+        pillow: [
+      {
+        id: "pillow-pile",
+        label: "Pillow pile",
+        x: 79,
+        y: 72,
+        radius: 10,
+        actions: [{ emote: "wave", label: "Wave hello" }],
+      },
+    ],
     studio: [
       {
         id: "easel",

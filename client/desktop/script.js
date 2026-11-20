@@ -668,20 +668,44 @@ function openApp(appName, profileUsername) {
   } else {
     const content = document.createElement("div");
     content.innerHTML = typeof app.content === "function" ? app.content() : app.content;
-    windowElement.appendChild(content);
+  function setupDesktopBoot() {
+  const screen = document.getElementById("osBootScreen");
+  const seenKey = "8bitgpu-desktop-booted";
+  if (!screen) return;
+  if (sessionStorage.getItem(seenKey)) {
+    screen.remove();
+    return;
   }
 
-  document.getElementById("osWindowLayer").appendChild(windowElement);
-  openWindows.set(appName, windowElement);
-  
-   if (appName === "avatarLab") {
-    const music = new Audio("assets/audio/avatar-lab.mp3");
-    music.loop = true;
-    windowElement.labMusic = music;
-    music.play().catch(console.warn);
+  const startupSound = new Audio("assets/audio/startup.mp3");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let starting = false;
+
+  function enterDesktop(openLogin) {
+    if (starting) return;
+    starting = true;
+    startupSound.play().catch(console.warn);
+    screen.classList.add("is-starting");
+    document.getElementById("bootStatus").textContent = "Starting PixieNet…";
+
+    window.setTimeout(() => {
+      screen.classList.add("is-finished");
+      window.setTimeout(() => {
+        sessionStorage.setItem(seenKey, "1");
+        screen.close();
+        screen.remove();
+        if (openLogin) openApp("login");
+      }, reducedMotion.matches ? 0 : 600);
+    }, reducedMotion.matches ? 0 : 1150);
   }
-  syncTaskTab(appName);
-  addDrag(windowElement, header);
+
+  document.getElementById("bootLogin").onclick = () => enterDesktop(true);
+  document.getElementById("bootGuest").onclick = () => enterDesktop(false);
+  screen.addEventListener("cancel", event => event.preventDefault());
+  screen.showModal();
+}
+
+setupDesktopBoot(); 
   windowElement.addEventListener("pointerdown", () => focusWindow(windowElement));
   focusWindow(windowElement);
 }
