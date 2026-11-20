@@ -673,17 +673,13 @@ function openApp(appName, profileUsername) {
 
   document.getElementById("osWindowLayer").appendChild(windowElement);
   openWindows.set(appName, windowElement);
-  if (appName === "avatarLab") {
-  const music = new Audio("assets/audio/avatar-lab.mp3");
-  windowElement.labMusic = music;
-
-  const playMusic = () => music.play().catch(console.warn);
-  music.addEventListener("ended", () => {
-    music.currentTime = 16.38;
-    playMusic();
-  });
-  playMusic();
-}
+  
+   if (appName === "avatarLab") {
+    const music = new Audio("assets/audio/avatar-lab.mp3");
+    music.loop = true;
+    windowElement.labMusic = music;
+    music.play().catch(console.warn);
+  }
   syncTaskTab(appName);
   addDrag(windowElement, header);
   windowElement.addEventListener("pointerdown", () => focusWindow(windowElement));
